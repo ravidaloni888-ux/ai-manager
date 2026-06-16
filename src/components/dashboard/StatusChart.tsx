@@ -16,7 +16,7 @@ export default function StatusChart({ useCases }: Props) {
   }, [useCases])
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
+    <div className="bg-white rounded-xl shadow-md p-5">
       <h3 className="text-sm font-semibold text-slate-700 mb-4">Status Distribution</h3>
       <ResponsiveContainer width="100%" height={220}>
         <PieChart>

@@ -46,6 +46,8 @@ export interface AIUseCase {
   urgency: number         // 1–10, weight 10%
   priorityScore: number   // computed
 
+  startDate?: string
+
   createdAt: string
   updatedAt: string
 }

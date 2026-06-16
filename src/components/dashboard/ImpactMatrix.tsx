@@ -54,7 +54,7 @@ export default function ImpactMatrix({ useCases }: Props) {
     })), [useCases])
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
+    <div className="bg-white rounded-xl shadow-md p-5">
       <h3 className="text-sm font-semibold text-slate-700 mb-1">
         Impact / Feasibility Matrix
       </h3>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { nanoid } from 'nanoid'
@@ -19,36 +19,90 @@ const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm te
 const labelCls = 'block text-xs font-semibold text-slate-600 mb-1'
 const textareaCls = `${inputCls} resize-none`
 
+const COMPETENCY_OPTIONS = [
+  'Data Science', 'Machine Learning Engineering', 'Data Engineering',
+  'Software Engineering', 'MLOps / DevOps', 'Business Analysis',
+  'Domain Expertise', 'Project Management', 'UX / Design',
+  'Data Governance', 'Legal / Compliance', 'Change Management',
+]
+
+const TIMELINE_OPTIONS = [
+  '< 1 Month', '1–3 Months', '3–6 Months',
+  '6–12 Months', '1–2 Years', '2+ Years',
+]
+
+function CompetencySelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const selected = value ? value.split(',').map((s) => s.trim()).filter(Boolean) : []
+
+  const toggle = (comp: string) => {
+    const next = selected.includes(comp)
+      ? selected.filter((s) => s !== comp)
+      : [...selected, comp]
+    onChange(next.join(', '))
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`${inputCls} flex items-center justify-between text-left gap-2`}
+      >
+        <span className={`truncate ${selected.length ? 'text-slate-800' : 'text-slate-400'}`}>
+          {selected.length ? selected.join(', ') : 'Select competencies…'}
+        </span>
+        <svg className="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d={open ? 'M4.5 15.75l7.5-7.5 7.5 7.5' : 'M19.5 8.25l-7.5 7.5-7.5-7.5'} />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute z-20 left-0 right-0 top-[calc(100%+4px)] bg-white rounded-xl shadow-xl border border-slate-100 max-h-56 overflow-y-auto">
+          {COMPETENCY_OPTIONS.map((comp) => (
+            <label
+              key={comp}
+              className="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 cursor-pointer text-sm text-slate-700"
+            >
+              <input
+                type="checkbox"
+                checked={selected.includes(comp)}
+                onChange={() => toggle(comp)}
+                className="accent-blue-600 w-4 h-4 flex-shrink-0"
+              />
+              {comp}
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SliderField({
-  label, name, description, register, value,
+  label, name, weight, register, value,
 }: {
   label: string
   name: string
-  description: string
+  weight: string
   register: any
   value: number
 }) {
   const pct = ((value - 1) / 9) * 100
   const color = value >= 8 ? '#22c55e' : value >= 6 ? '#f59e0b' : value >= 4 ? '#f97316' : '#ef4444'
   return (
-    <div>
-      <div className="flex justify-between items-baseline mb-1">
-        <label className={labelCls}>{label}</label>
-        <span className="text-lg font-bold" style={{ color }}>{value}</span>
-      </div>
-      <p className="text-[11px] text-slate-400 mb-2">{description}</p>
+    <div className="flex items-center gap-3">
+      <span className="text-sm text-slate-600 w-36 flex-shrink-0">{label}</span>
+      <span className="text-xs text-slate-400 w-10 flex-shrink-0 text-right">{weight}</span>
       <input
         type="range"
         min={1}
         max={10}
         step={1}
-        className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
+        className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
         style={{ background: `linear-gradient(to right, ${color} ${pct}%, #e2e8f0 ${pct}%)` }}
         {...register(name, { valueAsNumber: true })}
       />
-      <div className="flex justify-between text-[10px] text-slate-400 mt-0.5">
-        <span>1 — Low</span><span>10 — High</span>
-      </div>
+      <span className="w-6 text-right text-base font-bold flex-shrink-0" style={{ color }}>{value}</span>
     </div>
   )
 }
@@ -68,6 +122,7 @@ export default function CanvasForm({ existing }: Props) {
     technicalFeasibility: 'Medium',
     teamCompetencies: '',
     timeline: '',
+    startDate: '',
     estimatedCostK: 100,
     expectedBenefitK: 200,
     businessImpact: 7,
@@ -76,7 +131,7 @@ export default function CanvasForm({ existing }: Props) {
     urgency: 5,
   }
 
-  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, reset, control, setValue, formState: { errors } } = useForm<FormData>({
     defaultValues,
   })
 
@@ -148,9 +203,10 @@ export default function CanvasForm({ existing }: Props) {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="flex items-center gap-1.5 text-sm border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 px-3 py-2 rounded-lg"
+                className="flex items-center gap-1.5 text-sm border border-slate-100 bg-white text-slate-600 hover:bg-slate-50 px-3 py-2 rounded-lg shadow-sm"
               >
-                🖨️ Print PDF
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" /></svg>
+                Print PDF
               </button>
             )}
             <button
@@ -162,42 +218,15 @@ export default function CanvasForm({ existing }: Props) {
             </button>
             <button
               type="submit"
-              className="text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg"
+              className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg transition-colors"
             >
               {existing ? 'Save Changes' : 'Create Use Case'}
             </button>
           </div>
         </div>
 
-        {/* Live score bar */}
-        <div className="bg-slate-800 rounded-xl p-4 flex items-center gap-6 text-white">
-          <div className="text-center">
-            <p className="text-[10px] text-slate-400 uppercase tracking-wide">Priority Score</p>
-            <p className={`text-3xl font-bold ${scoreColor(liveScore)}`}>{liveScore}</p>
-            <p className="text-[10px] text-slate-400">/ 10</p>
-          </div>
-          <div className="flex-1 h-3 bg-slate-700 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-300"
-              style={{
-                width: `${(liveScore / 10) * 100}%`,
-                background: liveScore >= 8 ? '#22c55e' : liveScore >= 6 ? '#f59e0b' : '#ef4444',
-              }}
-            />
-          </div>
-          <div className="text-center">
-            <p className="text-[10px] text-slate-400 uppercase tracking-wide">3-Year ROI</p>
-            <p className={`text-2xl font-bold ${liveROI > 200 ? 'text-green-400' : liveROI > 0 ? 'text-amber-400' : 'text-red-400'}`}>
-              {liveROI}%
-            </p>
-          </div>
-          <div className="text-[10px] text-slate-500 max-w-[180px]">
-            Score = Impact×40% + Feasibility×30% + Strategic Fit×20% + Urgency×10%
-          </div>
-        </div>
-
         {/* Section 1: Basic Info */}
-        <section className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Case Information</h2>
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-3 md:col-span-1">
@@ -230,7 +259,7 @@ export default function CanvasForm({ existing }: Props) {
         </section>
 
         {/* Section 2: AI Use Case Canvas */}
-        <section className="bg-white border border-slate-200 rounded-xl p-5 space-y-4">
+        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
             AI Use Case Canvas <span className="text-slate-400 font-normal normal-case">(9 elements)</span>
           </h2>
@@ -290,12 +319,11 @@ export default function CanvasForm({ existing }: Props) {
               </div>
             </div>
 
-            <div>
+            <div className="md:col-span-2">
               <label className={labelCls}>6 · Team Competencies Needed</label>
-              <input
-                {...register('teamCompetencies')}
-                className={inputCls}
-                placeholder="e.g. Data Scientist, ML Engineer, Business Analyst"
+              <CompetencySelect
+                value={watched.teamCompetencies ?? ''}
+                onChange={(v) => setValue('teamCompetencies', v)}
               />
             </div>
 
@@ -304,7 +332,21 @@ export default function CanvasForm({ existing }: Props) {
               <input
                 {...register('timeline')}
                 className={inputCls}
-                placeholder="e.g. 3-month pilot, 6-month full rollout"
+                placeholder="e.g. 3–6 Months"
+                list="timeline-options"
+                autoComplete="off"
+              />
+              <datalist id="timeline-options">
+                {TIMELINE_OPTIONS.map((o) => <option key={o} value={o} />)}
+              </datalist>
+            </div>
+
+            <div>
+              <label className={labelCls}>Start Date</label>
+              <input
+                type="date"
+                {...register('startDate')}
+                className={inputCls}
               />
             </div>
 
@@ -341,44 +383,49 @@ export default function CanvasForm({ existing }: Props) {
         </section>
 
         {/* Section 3: Portfolio Scoring */}
-        <section className="bg-white border border-slate-200 rounded-xl p-5">
+        <section className="bg-white rounded-xl shadow-md p-5">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">
             Portfolio Scoring
           </h2>
           <p className="text-xs text-slate-400 mb-5">
             Weighted model (Chapter 2.5): Impact 40% · Feasibility 30% · Strategic Fit 20% · Urgency 10%
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <SliderField
-              label="Business Impact"
-              name="businessImpact"
-              description="How significant is the value created for the organisation? (weight: 40%)"
-              register={register}
-              value={Number(watched.businessImpact ?? 7)}
-            />
-            <SliderField
-              label="Feasibility"
-              name="feasibility"
-              description="How achievable is this given our data, tech, and team? (weight: 30%)"
-              register={register}
-              value={Number(watched.feasibility ?? 7)}
-            />
-            <SliderField
-              label="Strategic Fit"
-              name="strategicFit"
-              description="How well does this align with our top strategic priorities? (weight: 20%)"
-              register={register}
-              value={Number(watched.strategicFit ?? 7)}
-            />
-            <SliderField
-              label="Urgency"
-              name="urgency"
-              description="How time-sensitive is the opportunity or problem? (weight: 10%)"
-              register={register}
-              value={Number(watched.urgency ?? 5)}
-            />
+          <div className="space-y-3">
+            <SliderField label="Business Impact" name="businessImpact" weight="40%" register={register} value={Number(watched.businessImpact ?? 7)} />
+            <SliderField label="Feasibility"     name="feasibility"    weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
+            <SliderField label="Strategic Fit"   name="strategicFit"   weight="20%" register={register} value={Number(watched.strategicFit ?? 7)} />
+            <SliderField label="Urgency"         name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
           </div>
         </section>
+
+        {/* Priority Score — below portfolio scoring */}
+        <div className="bg-[#1a2538] rounded-xl p-5 flex items-center gap-6 text-white">
+          <div className="text-center min-w-[80px]">
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Priority Score</p>
+            <p className={`text-4xl font-bold ${scoreColor(liveScore)}`}>{liveScore}</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">/ 10</p>
+          </div>
+          <div className="flex-1 space-y-2">
+            <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                  width: `${(liveScore / 10) * 100}%`,
+                  background: liveScore >= 8 ? '#22c55e' : liveScore >= 6 ? '#f59e0b' : '#ef4444',
+                }}
+              />
+            </div>
+            <p className="text-[10px] text-slate-500">
+              Impact×40% + Feasibility×30% + Strategic Fit×20% + Urgency×10%
+            </p>
+          </div>
+          <div className="text-center min-w-[80px]">
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">3-Year ROI</p>
+            <p className={`text-3xl font-bold ${liveROI > 200 ? 'text-green-400' : liveROI > 0 ? 'text-amber-400' : 'text-red-400'}`}>
+              {liveROI}%
+            </p>
+          </div>
+        </div>
 
         {/* Bottom actions */}
         <div className="flex justify-end gap-2 pb-8">
@@ -391,7 +438,7 @@ export default function CanvasForm({ existing }: Props) {
           </button>
           <button
             type="submit"
-            className="text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg"
+            className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg transition-colors"
           >
             {existing ? 'Save Changes' : 'Create Use Case'}
           </button>

@@ -25,7 +25,7 @@ export default function DeptChart({ useCases }: Props) {
   }, [useCases])
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
+    <div className="bg-white rounded-xl shadow-md p-5">
       <h3 className="text-sm font-semibold text-slate-700 mb-4">Use Cases by Department</h3>
       <ResponsiveContainer width="100%" height={220}>
         <BarChart data={data} layout="vertical" margin={{ left: 10, right: 20 }}>

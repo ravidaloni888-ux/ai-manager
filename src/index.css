@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html, body, #root {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    background: #e8eff7;
+  }
+}
+
 @layer utilities {
   .no-print {
     @apply print:hidden;

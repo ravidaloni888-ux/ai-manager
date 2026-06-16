@@ -15,9 +15,9 @@ export default function ListPage() {
         </div>
         <button
           onClick={() => navigate('/canvas/new')}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-1.5"
+          className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors"
         >
-          ＋ New Use Case
+          + New Use Case
         </button>
       </div>
 

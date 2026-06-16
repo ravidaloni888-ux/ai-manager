@@ -7,6 +7,7 @@ import KpiCard from '../components/dashboard/KpiCard'
 import StatusChart from '../components/dashboard/StatusChart'
 import DeptChart from '../components/dashboard/DeptChart'
 import ImpactMatrix from '../components/dashboard/ImpactMatrix'
+import { IconClipboard, IconRocket, IconStar, IconMoneybag, IconTrendingUp, IconPlus } from '../components/icons/NavIcons'
 
 export default function DashboardPage() {
   const { useCases } = useUseCasesStore()
@@ -39,9 +40,9 @@ export default function DashboardPage() {
         </div>
         <button
           onClick={() => navigate('/canvas/new')}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg"
+          className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors"
         >
-          ＋ New Use Case
+          <IconPlus /> New Use Case
         </button>
       </div>
 
@@ -50,35 +51,35 @@ export default function DashboardPage() {
         <KpiCard
           label="Total Use Cases"
           value={stats.total}
-          icon="📋"
+          icon={<IconClipboard />}
           color="bg-blue-50 text-blue-600"
         />
         <KpiCard
           label="In Production"
           value={stats.inProduction}
           sub={`${Math.round((stats.inProduction / stats.total) * 100)}% of portfolio`}
-          icon="🚀"
+          icon={<IconRocket />}
           color="bg-green-50 text-green-600"
         />
         <KpiCard
           label="Avg Priority Score"
           value={stats.avgScore}
           sub="out of 10.0"
-          icon="⭐"
+          icon={<IconStar />}
           color="bg-amber-50 text-amber-600"
         />
         <KpiCard
           label="Total Annual Benefit"
           value={`€${stats.totalBenefit.toLocaleString()}k`}
           sub="expected per year"
-          icon="💰"
+          icon={<IconMoneybag />}
           color="bg-emerald-50 text-emerald-600"
         />
         <KpiCard
           label="Portfolio 3-Yr ROI"
           value={`${stats.portfolioROI}%`}
           sub={`€${stats.totalCost.toLocaleString()}k invested`}
-          icon="📈"
+          icon={<IconTrendingUp />}
           color="bg-violet-50 text-violet-600"
         />
       </div>
@@ -93,7 +94,7 @@ export default function DashboardPage() {
       <ImpactMatrix useCases={useCases} />
 
       {/* Top 5 */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5">
+      <div className="bg-white rounded-xl shadow-md p-5">
         <h3 className="text-sm font-semibold text-slate-700 mb-4">Top 5 Use Cases by Priority Score</h3>
         <table className="w-full text-sm">
           <thead>
