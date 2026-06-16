@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { IconGithub, IconGlobe, IconFolder, IconCopy } from '../components/icons/NavIcons'
+import { IconGithub, IconGlobe, IconFolder, IconCopy, IconDatabase } from '../components/icons/NavIcons'
 
 const LOCAL_PATH = '/Users/ra/Downloads/git/ai-manager'
 const GITHUB_URL = 'https://github.com/ravidaloni888-ux/ai-manager'
 const VERCEL_URL = 'https://vercel.com/info-11678597s-projects/ai-manager-new'
+const SUPABASE_URL = 'https://supabase.com/dashboard/project/zvmujqhjqgzujmrvdxbr'
 
 function LinkCard({
   icon,
@@ -86,6 +87,14 @@ export default function SettingsPage() {
           href={VERCEL_URL}
           value={VERCEL_URL}
           iconBg="bg-blue-50 text-blue-600"
+        />
+
+        <LinkCard
+          icon={<IconDatabase />}
+          label="Supabase Database"
+          href={SUPABASE_URL}
+          value={SUPABASE_URL}
+          iconBg="bg-emerald-50 text-emerald-600"
         />
 
         <LinkCard
