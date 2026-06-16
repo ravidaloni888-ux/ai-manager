@@ -4,7 +4,7 @@ import NavItem from './NavItem'
 import {
   IconDashboard, IconList, IconChartBar, IconMap,
   IconAlert, IconBuilding, IconCurrency, IconFlag, IconSearch,
-  IconBrain, IconPlus,
+  IconBrain, IconPlus, IconSettings,
 } from '../icons/NavIcons'
 
 interface AppShellProps {
@@ -38,6 +38,7 @@ export default function AppShell({ children }: AppShellProps) {
           </p>
           <NavItem to="/dashboard" icon={<IconDashboard />} label="Dashboard" />
           <NavItem to="/use-cases" icon={<IconList />} label="AI Use Cases" />
+          <NavItem to="/settings" icon={<IconSettings />} label="Settings" />
 
           <div className="pt-4" />
 
