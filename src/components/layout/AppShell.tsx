@@ -65,50 +65,54 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem icon={<IconSearch />} label="Vendor Comparison" disabled badge="R3" />
         </nav>
 
-        {/* Footer action */}
-        <div className="px-3 py-4 border-t border-white/10 space-y-2">
+        {/* Sidebar footer — user info when logged in */}
+        {user && (
+          <div className="px-3 py-4 border-t border-white/10">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs text-slate-400 truncate max-w-[130px]">{user.email}</span>
+              <button onClick={() => signOut()} className="text-xs text-slate-400 hover:text-white transition-colors">
+                Sign out
+              </button>
+            </div>
+          </div>
+        )}
+      </aside>
+
+      {/* Main content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Top bar */}
+        <div className="flex-shrink-0 flex items-center justify-end gap-2 px-6 py-3">
           {user ? (
+            <button
+              onClick={() => navigate('/canvas/new')}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+            >
+              <IconPlus /> New Use Case
+            </button>
+          ) : (
             <>
               <button
-                onClick={() => navigate('/canvas/new')}
-                className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2.5 px-3 rounded-lg transition-colors"
-              >
-                <IconPlus /> New Use Case
-              </button>
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs text-slate-400 truncate max-w-[120px]">{user.email}</span>
-                <button
-                  onClick={() => signOut()}
-                  className="text-xs text-slate-400 hover:text-white transition-colors"
-                >
-                  Sign out
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button
                 onClick={() => setShowBeta(true)}
-                className="flex-shrink-0 text-xs text-slate-300 hover:text-white border border-white/20 hover:border-white/40 px-2.5 py-2 rounded-lg transition-colors whitespace-nowrap"
+                className="text-sm text-slate-600 hover:text-slate-900 border border-slate-300 hover:border-slate-400 px-4 py-2 rounded-lg transition-colors"
               >
                 Request access
               </button>
               <button
                 disabled
-                className="flex-1 flex items-center justify-center gap-1.5 bg-white/5 text-slate-500 text-sm font-medium py-2 px-2 rounded-lg cursor-not-allowed"
+                className="flex items-center gap-2 bg-slate-200 text-slate-400 text-sm font-medium py-2 px-4 rounded-lg cursor-not-allowed"
               >
                 <IconPlus /> New Use Case
               </button>
-            </div>
+            </>
           )}
-          {showBeta && <BetaRequestModal onClose={() => setShowBeta(false)} />}
         </div>
-      </aside>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        {children}
+        <div className="flex-1 overflow-y-auto">
+          {children}
+        </div>
       </main>
+
+      {showBeta && <BetaRequestModal onClose={() => setShowBeta(false)} />}
     </div>
   )
 }
