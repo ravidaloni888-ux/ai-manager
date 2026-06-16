@@ -5,36 +5,63 @@ import DashboardPage from './pages/DashboardPage'
 import ListPage from './pages/ListPage'
 import CanvasPage from './pages/CanvasPage'
 import SettingsPage from './pages/SettingsPage'
+import LoginPage from './pages/LoginPage'
 import { useUseCasesStore } from './store/useCasesStore'
+import { useAuthStore } from './store/authStore'
+
+function Spinner() {
+  return (
+    <div className="flex h-screen items-center justify-center" style={{ background: '#e8eff7' }}>
+      <div className="text-center space-y-3">
+        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-sm text-slate-500">Loading AI Manager…</p>
+      </div>
+    </div>
+  )
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const user = useAuthStore((s) => s.user)
+  const authLoading = useAuthStore((s) => s.loading)
+  if (authLoading) return <Spinner />
+  if (!user) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
 
 function AppRoutes() {
-  const init = useUseCasesStore((s) => s.init)
-  const loading = useUseCasesStore((s) => s.loading)
+  const initData = useUseCasesStore((s) => s.init)
+  const dataLoading = useUseCasesStore((s) => s.loading)
+  const initAuth = useAuthStore((s) => s.init)
+  const authLoading = useAuthStore((s) => s.loading)
 
-  useEffect(() => { init() }, [init])
+  useEffect(() => {
+    const unsub = initAuth()
+    return unsub
+  }, [initAuth])
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center" style={{ background: '#e8eff7' }}>
-        <div className="text-center space-y-3">
-          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm text-slate-500">Loading AI Manager…</p>
-        </div>
-      </div>
-    )
-  }
+  useEffect(() => { initData() }, [initData])
+
+  if (authLoading || dataLoading) return <Spinner />
 
   return (
-    <AppShell>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/use-cases" element={<ListPage />} />
-        <Route path="/canvas/new" element={<CanvasPage />} />
-        <Route path="/canvas/:id" element={<CanvasPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
-    </AppShell>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/*"
+        element={
+          <AppShell>
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/use-cases" element={<ListPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
+              <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
+            </Routes>
+          </AppShell>
+        }
+      />
+    </Routes>
   )
 }
 

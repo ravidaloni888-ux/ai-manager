@@ -6,6 +6,7 @@ import {
   IconAlert, IconBuilding, IconCurrency, IconFlag, IconSearch,
   IconBrain, IconPlus, IconSettings,
 } from '../icons/NavIcons'
+import { useAuthStore } from '../../store/authStore'
 
 interface AppShellProps {
   children: ReactNode
@@ -13,6 +14,8 @@ interface AppShellProps {
 
 export default function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
+  const signOut = useAuthStore((s) => s.signOut)
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#e8eff7' }}>
@@ -61,13 +64,33 @@ export default function AppShell({ children }: AppShellProps) {
         </nav>
 
         {/* Footer action */}
-        <div className="px-3 py-4 border-t border-white/10">
-          <button
-            onClick={() => navigate('/canvas/new')}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2.5 px-3 rounded-lg transition-colors"
-          >
-            <IconPlus /> New Use Case
-          </button>
+        <div className="px-3 py-4 border-t border-white/10 space-y-2">
+          {user ? (
+            <>
+              <button
+                onClick={() => navigate('/canvas/new')}
+                className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2.5 px-3 rounded-lg transition-colors"
+              >
+                <IconPlus /> New Use Case
+              </button>
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs text-slate-400 truncate max-w-[120px]">{user.email}</span>
+                <button
+                  onClick={() => signOut()}
+                  className="text-xs text-slate-400 hover:text-white transition-colors"
+                >
+                  Sign out
+                </button>
+              </div>
+            </>
+          ) : (
+            <button
+              onClick={() => navigate('/login')}
+              className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium py-2.5 px-3 rounded-lg transition-colors"
+            >
+              Sign in to edit
+            </button>
+          )}
         </div>
       </aside>
 

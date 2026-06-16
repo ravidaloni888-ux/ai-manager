@@ -24,6 +24,7 @@ import {
 import { computeROI, scoreBg } from '../../lib/scoring'
 import { exportToCSV } from '../../lib/csvExport'
 import { useUseCasesStore } from '../../store/useCasesStore'
+import { useAuthStore } from '../../store/authStore'
 
 const ch = createColumnHelper<AIUseCase>()
 
@@ -37,6 +38,7 @@ const GROUP_OPTIONS = [
 export default function UseCaseTable() {
   const { useCases, deleteUseCase, duplicateUseCase } = useUseCasesStore()
   const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'priorityScore', desc: true }])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -66,13 +68,15 @@ export default function UseCaseTable() {
   const columns = useMemo(() => [
     ch.accessor('title', {
       header: 'Title',
-      cell: (i) => (
+      cell: (i) => user ? (
         <button
           onClick={() => navigate(`/canvas/${i.row.original.id}`)}
           className="text-blue-600 hover:underline font-medium text-left"
         >
           {i.getValue()}
         </button>
+      ) : (
+        <span className="font-medium text-slate-800">{i.getValue()}</span>
       ),
     }),
     ch.accessor('department', {
@@ -151,7 +155,7 @@ export default function UseCaseTable() {
       id: 'actions',
       header: '',
       enableHiding: false,
-      cell: (i) => (
+      cell: (i) => user ? (
         <div className="flex items-center gap-1">
           <ActionBtn label="✏️" title="Edit" onClick={() => navigate(`/canvas/${i.row.original.id}`)} />
           <ActionBtn label="📋" title="Duplicate" onClick={() => duplicateUseCase(i.row.original.id)} />
@@ -163,7 +167,7 @@ export default function UseCaseTable() {
             }}
           />
         </div>
-      ),
+      ) : null,
     }),
   ], [navigate, deleteUseCase, duplicateUseCase])
 
