@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .no-print {
+    @apply print:hidden;
+  }
+  .print-only {
+    @apply hidden print:block;
+  }
+}
+
+@media print {
+  body {
+    background: white !important;
+  }
+  aside {
+    display: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-canvas-grid {
+    display: grid !important;
+  }
+}
