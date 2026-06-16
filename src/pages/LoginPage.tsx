@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
@@ -14,6 +14,20 @@ export default function LoginPage() {
   const [forgotMode, setForgotMode] = useState(false)
   const [resetSent, setResetSent] = useState(false)
 
+  // Ask the browser password manager for saved credentials on mount
+  useEffect(() => {
+    if (!('credentials' in navigator)) return
+    navigator.credentials
+      .get({ password: true, mediation: 'optional' } as CredentialRequestOptions)
+      .then((cred) => {
+        if (!cred || cred.type !== 'password') return
+        const pc = cred as unknown as { id: string; password?: string }
+        setEmail(pc.id)
+        if (pc.password) setPassword(pc.password)
+      })
+      .catch(() => {})
+  }, [])
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -23,6 +37,14 @@ export default function LoginPage() {
       setError(err)
       setLoading(false)
     } else {
+      // Tell the browser to save/update these credentials
+      if ('credentials' in navigator && 'PasswordCredential' in window) {
+        try {
+          const PCtor = (window as unknown as Record<string, new (o: { id: string; password: string }) => Credential>).PasswordCredential
+          const cred = new PCtor({ id: email, password })
+          navigator.credentials.store(cred).catch(() => {})
+        } catch { /* unsupported browser */ }
+      }
       navigate('/dashboard')
     }
   }
