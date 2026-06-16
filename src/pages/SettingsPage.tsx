@@ -6,6 +6,7 @@ const GITHUB_URL = 'https://github.com/ravidaloni888-ux/ai-manager'
 const VERCEL_URL = 'https://vercel.com/info-11678597s-projects/ai-manager-new'
 const SUPABASE_URL = 'https://supabase.com/dashboard/project/zvmujqhjqgzujmrvdxbr'
 const LOCAL_URL = 'http://localhost:3001'
+const LIVE_URL = 'https://ai-manager-new.vercel.app'
 
 function LinkCard({
   icon,
@@ -84,10 +85,18 @@ export default function SettingsPage() {
 
         <LinkCard
           icon={<IconGlobe />}
-          label="Vercel Deployment"
+          label="Live App"
+          href={LIVE_URL}
+          value={LIVE_URL}
+          iconBg="bg-blue-50 text-blue-600"
+        />
+
+        <LinkCard
+          icon={<IconGlobe />}
+          label="Vercel Dashboard"
           href={VERCEL_URL}
           value={VERCEL_URL}
-          iconBg="bg-blue-50 text-blue-600"
+          iconBg="bg-slate-100 text-slate-600"
         />
 
         <LinkCard
