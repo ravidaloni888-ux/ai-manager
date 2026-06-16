@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavItem from './NavItem'
 import {
@@ -7,6 +7,7 @@ import {
   IconBrain, IconPlus, IconSettings,
 } from '../icons/NavIcons'
 import { useAuthStore } from '../../store/authStore'
+import BetaRequestModal from './BetaRequestModal'
 
 interface AppShellProps {
   children: ReactNode
@@ -16,6 +17,7 @@ export default function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const signOut = useAuthStore((s) => s.signOut)
+  const [showBeta, setShowBeta] = useState(false)
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#e8eff7' }}>
@@ -84,21 +86,22 @@ export default function AppShell({ children }: AppShellProps) {
               </div>
             </>
           ) : (
-            <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowBeta(true)}
+                className="flex-shrink-0 text-xs text-slate-300 hover:text-white border border-white/20 hover:border-white/40 px-2.5 py-2 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Request access
+              </button>
               <button
                 disabled
-                className="w-full flex items-center justify-center gap-2 bg-white/5 text-slate-500 text-sm font-medium py-2.5 px-3 rounded-lg cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-white/5 text-slate-500 text-sm font-medium py-2 px-2 rounded-lg cursor-not-allowed"
               >
                 <IconPlus /> New Use Case
               </button>
-              <a
-                href="mailto:info@hmi-expert.com?subject=Beta Access Request – AI Manager"
-                className="block text-center text-xs text-slate-400 hover:text-white transition-colors py-1"
-              >
-                Request beta access →
-              </a>
             </div>
           )}
+          {showBeta && <BetaRequestModal onClose={() => setShowBeta(false)} />}
         </div>
       </aside>
 
