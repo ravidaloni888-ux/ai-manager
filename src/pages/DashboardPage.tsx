@@ -8,10 +8,12 @@ import StatusChart from '../components/dashboard/StatusChart'
 import DeptChart from '../components/dashboard/DeptChart'
 import ImpactMatrix from '../components/dashboard/ImpactMatrix'
 import { IconClipboard, IconRocket, IconStar, IconMoneybag, IconTrendingUp, IconPlus } from '../components/icons/NavIcons'
+import { useAuthStore } from '../store/authStore'
 
 export default function DashboardPage() {
   const { useCases } = useUseCasesStore()
   const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
 
   const stats = useMemo(() => {
     const total = useCases.length
@@ -38,12 +40,14 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
           <p className="text-sm text-slate-500 mt-0.5">AI use case portfolio overview</p>
         </div>
-        <button
-          onClick={() => navigate('/canvas/new')}
-          className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors"
-        >
-          <IconPlus /> New Use Case
-        </button>
+        {user && (
+          <button
+            onClick={() => navigate('/canvas/new')}
+            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <IconPlus /> New Use Case
+          </button>
+        )}
       </div>
 
       {/* KPI row */}
