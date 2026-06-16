@@ -90,12 +90,20 @@ export default function AppShell({ children }: AppShellProps) {
               <IconPlus /> New Use Case
             </button>
           ) : (
-            <button
-              onClick={() => setShowBeta(true)}
-              className="text-sm text-slate-600 hover:text-slate-900 border border-slate-300 hover:border-slate-400 px-4 py-2 rounded-lg transition-colors"
-            >
-              Request access
-            </button>
+            <>
+              <button
+                onClick={() => setShowBeta(true)}
+                className="text-sm text-slate-600 hover:text-slate-900 border border-slate-300 hover:border-slate-400 px-4 py-2 rounded-lg transition-colors"
+              >
+                Request access
+              </button>
+              <button
+                onClick={() => navigate('/login')}
+                className="text-sm bg-[#1a2538] hover:bg-[#243044] text-white font-medium px-4 py-2 rounded-lg transition-colors"
+              >
+                Login
+              </button>
+            </>
           )}
         </div>
 
