@@ -15,14 +15,6 @@ export default function ListPage() {
             Sort, filter, group, and manage your AI portfolio. Drag column headers to reorder.
           </p>
         </div>
-        {user && (
-          <button
-            onClick={() => navigate('/canvas/new')}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors"
-          >
-            + New Use Case
-          </button>
-        )}
       </div>
 
       <UseCaseTable />
