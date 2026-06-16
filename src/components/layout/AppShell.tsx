@@ -84,12 +84,20 @@ export default function AppShell({ children }: AppShellProps) {
               </div>
             </>
           ) : (
-            <button
-              onClick={() => navigate('/login')}
-              className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium py-2.5 px-3 rounded-lg transition-colors"
-            >
-              Sign in to edit
-            </button>
+            <div className="space-y-2">
+              <button
+                disabled
+                className="w-full flex items-center justify-center gap-2 bg-white/5 text-slate-500 text-sm font-medium py-2.5 px-3 rounded-lg cursor-not-allowed"
+              >
+                <IconPlus /> New Use Case
+              </button>
+              <a
+                href="mailto:info@hmi-expert.com?subject=Beta Access Request – AI Manager"
+                className="block text-center text-xs text-slate-400 hover:text-white transition-colors py-1"
+              >
+                Request beta access →
+              </a>
+            </div>
           )}
         </div>
       </aside>
