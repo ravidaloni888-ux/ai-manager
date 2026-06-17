@@ -183,6 +183,7 @@ export default function CanvasForm({ existing }: Props) {
     teamCompetencies: '',
     timeline: '',
     startDate: '',
+    cancellationReason: '',
     estimatedCostK: 100,
     expectedBenefitK: 200,
     businessImpact: 7,
@@ -355,6 +356,19 @@ export default function CanvasForm({ existing }: Props) {
                 ))}
               </div>
             </div>
+
+            {/* Cancellation reason — only shown when status is Cancelled */}
+            {watched.status === 'Cancelled' && (
+              <div className="col-span-3">
+                <label className={labelCls}>Reason for Cancellation</label>
+                <textarea
+                  {...register('cancellationReason')}
+                  rows={2}
+                  className={`${textareaCls} border-red-200 focus:ring-red-400`}
+                  placeholder="Why was this use case cancelled? (e.g. budget cut, strategic pivot, technical blocker…)"
+                />
+              </div>
+            )}
           </div>
         </section>
 
