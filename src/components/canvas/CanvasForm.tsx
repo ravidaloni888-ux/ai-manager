@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid'
 import {
   AIUseCase, DEPARTMENTS, STATUSES, AI_APPROACHES, FEASIBILITIES,
   STATUS_BG, APPROACH_BG, FEASIBILITY_BG,
+  PROJECT_HEALTH_OPTIONS, DEV_PHASES, ProjectHealth, DevPhase,
 } from '../../types'
 import { computePriorityScore, computeROI, scoreColor } from '../../lib/scoring'
 import { useUseCasesStore } from '../../store/useCasesStore'
@@ -115,6 +116,8 @@ export default function CanvasForm({ existing }: Props) {
     title: '',
     department: 'Sales',
     status: 'Idea',
+    projectHealth: 'Green',
+    devPhase: 'Problem Scoping',
     businessProblem: '',
     successMetrics: '',
     dataRequirements: '',
@@ -254,6 +257,36 @@ export default function CanvasForm({ existing }: Props) {
                   {currentStatus}
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* Project Health + Dev Phase */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Project Health</label>
+              <input type="hidden" {...register('projectHealth')} />
+              <div className="flex gap-1.5">
+                {PROJECT_HEALTH_OPTIONS.map((h) => (
+                  <button
+                    key={h.value}
+                    type="button"
+                    onClick={() => setValue('projectHealth', h.value as ProjectHealth)}
+                    className={`flex-1 text-xs font-medium py-1.5 rounded-lg border transition-colors ${
+                      (watched.projectHealth ?? 'Green') === h.value
+                        ? `${h.activeCls} border-transparent`
+                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    {h.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className={labelCls}>Development Phase</label>
+              <select {...register('devPhase')} className={inputCls}>
+                {DEV_PHASES.map((p) => <option key={p}>{p}</option>)}
+              </select>
             </div>
           </div>
         </section>
