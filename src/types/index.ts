@@ -19,6 +19,7 @@ export type Status =
   | 'Production'
   | 'Maintenance'
   | 'Cancelled'
+  | "Won't Do"
 
 export type AIApproach =
   | 'Supervised Learning'
@@ -133,6 +134,7 @@ export const STATUSES: Status[] = [
   'Production',
   'Maintenance',
   'Cancelled',
+  "Won't Do",
 ]
 
 export const AI_APPROACHES: AIApproach[] = [
@@ -193,6 +195,7 @@ export const STATUS_COLORS: Record<Status, string> = {
   'Production':           '#22c55e',
   'Maintenance':          '#14b8a6',
   'Cancelled':            '#ef4444',
+  "Won't Do":             '#6b7280',
 }
 
 export const STATUS_BG: Record<Status, string> = {
@@ -204,6 +207,7 @@ export const STATUS_BG: Record<Status, string> = {
   'Production':           'bg-green-100 text-green-700',
   'Maintenance':          'bg-teal-100 text-teal-700',
   'Cancelled':            'bg-red-100 text-red-600',
+  "Won't Do":             'bg-gray-100 text-gray-500',
 }
 
 export const APPROACH_BG: Record<AIApproach, string> = {
