@@ -51,15 +51,15 @@ export default function AppShell({ children }: AppShellProps) {
             Release 2
           </p>
           <NavItem icon={<IconChartBar />} label="Maturity Assessment" disabled badge="R2" />
-          <NavItem icon={<IconMap />} label="Strategy Wizard" disabled badge="R2" />
+          <NavItem icon={<IconBuilding />} label="AI Governance" disabled badge="R2" />
 
           <div className="pt-4" />
 
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
             Release 3
           </p>
+          <NavItem icon={<IconMap />} label="Strategy Wizard" disabled badge="R3" />
           <NavItem icon={<IconAlert />} label="Risk Manager" disabled badge="R3" />
-          <NavItem icon={<IconBuilding />} label="Governance Center" disabled badge="R3" />
           <NavItem icon={<IconCurrency />} label="ROI Calculator" disabled badge="R3" />
           <NavItem icon={<IconFlag />} label="Roadmap Generator" disabled badge="R3" />
           <NavItem icon={<IconSearch />} label="Vendor Comparison" disabled badge="R3" />
