@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { AIUseCase, ProjectHealth } from '../types'
+import { AIUseCase, ProjectHealth, Motivation } from '../types'
 
 function legacyHealth(raw: string | undefined): ProjectHealth {
   if (raw === 'Green' || raw === 'On Track') return 'On Track'
@@ -34,6 +34,7 @@ export function rowToUseCase(row: Record<string, unknown>): AIUseCase {
     urgency: row.urgency as number,
     priorityScore: row.priority_score as number,
     projectHealth: legacyHealth(row.project_health as string),
+    motivation: (row.motivation as Motivation) ?? undefined,
     startDate: (row.start_date as string) ?? undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -61,6 +62,7 @@ export function useCaseToRow(uc: AIUseCase): Record<string, unknown> {
     urgency: uc.urgency,
     priority_score: uc.priorityScore,
     project_health: uc.projectHealth ?? 'On Track',
+    motivation: uc.motivation ?? null,
     start_date: uc.startDate ?? null,
     created_at: uc.createdAt,
     updated_at: uc.updatedAt,

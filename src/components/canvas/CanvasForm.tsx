@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { nanoid } from 'nanoid'
 import {
   AIUseCase, DEPARTMENTS, STATUSES, AI_APPROACHES, FEASIBILITIES,
-  STATUS_BG, APPROACH_BG, FEASIBILITY_BG,
-  PROJECT_HEALTH_OPTIONS, ProjectHealth,
+  STATUS_BG, APPROACH_BG, FEASIBILITY_BG, MOTIVATION_BG,
+  PROJECT_HEALTH_OPTIONS, MOTIVATIONS, ProjectHealth,
 } from '../../types'
 import { computePriorityScore, computeROI, scoreColor } from '../../lib/scoring'
 import { useUseCasesStore } from '../../store/useCasesStore'
@@ -79,6 +79,56 @@ function CompetencySelect({ value, onChange }: { value: string; onChange: (v: st
   )
 }
 
+function MotivationSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const selected = value ? value.split(',').map((s) => s.trim()).filter(Boolean) : []
+
+  const toggle = (m: string) => {
+    const next = selected.includes(m) ? selected.filter((s) => s !== m) : [...selected, m]
+    onChange(next.join(', '))
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`${inputCls} flex items-center justify-between text-left gap-2`}
+      >
+        {selected.length ? (
+          <span className="flex flex-wrap gap-1 py-0.5">
+            {selected.map((m) => (
+              <span key={m} className={`text-xs font-medium px-2 py-0.5 rounded-full ${MOTIVATION_BG[m as keyof typeof MOTIVATION_BG] ?? 'bg-slate-100 text-slate-600'}`}>
+                {m}
+              </span>
+            ))}
+          </span>
+        ) : (
+          <span className="text-slate-400">Select motivations…</span>
+        )}
+        <svg className="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d={open ? 'M4.5 15.75l7.5-7.5 7.5 7.5' : 'M19.5 8.25l-7.5 7.5-7.5-7.5'} />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute z-20 left-0 right-0 top-[calc(100%+4px)] bg-white rounded-xl shadow-xl border border-slate-100 max-h-56 overflow-y-auto">
+          {MOTIVATIONS.map((m) => (
+            <label key={m} className="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 cursor-pointer text-sm">
+              <input
+                type="checkbox"
+                checked={selected.includes(m)}
+                onChange={() => toggle(m)}
+                className="accent-blue-600 w-4 h-4 flex-shrink-0"
+              />
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${MOTIVATION_BG[m]}`}>{m}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SliderField({
   label, name, weight, register, value,
 }: {
@@ -117,6 +167,7 @@ export default function CanvasForm({ existing }: Props) {
     department: 'Sales',
     status: 'Idea',
     projectHealth: 'On Track',
+    motivation: '',
     businessProblem: '',
     successMetrics: '',
     dataRequirements: '',
@@ -248,7 +299,17 @@ export default function CanvasForm({ existing }: Props) {
               </select>
             </div>
 
-            {/* Row 2: Stage + Health */}
+            {/* Row 2: Motivation */}
+            <div className="col-span-2">
+              <label className={labelCls}>Trigger / Motivation</label>
+              <MotivationSelect
+                value={watched.motivation ?? ''}
+                onChange={(v) => setValue('motivation', v)}
+              />
+            </div>
+            <div />
+
+            {/* Row 3: Stage + Health */}
             <div className="col-span-2">
               <label className={labelCls}>Project Stage</label>
               <div className="flex items-center gap-2">

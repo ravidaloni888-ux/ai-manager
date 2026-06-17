@@ -32,6 +32,20 @@ export type TechnicalFeasibility = 'Low' | 'Medium' | 'High'
 
 export type ProjectHealth = 'On Track' | 'At Risk' | 'Blocked'
 
+export type Motivation =
+  | 'Cost Reduction'
+  | 'Time Saving'
+  | 'Error Reduction'
+  | 'Revenue Growth'
+  | 'Customer Experience'
+  | 'Risk & Compliance'
+  | 'Quality Improvement'
+  | 'Competitive Advantage'
+  | 'Scalability'
+  | 'Data & Insights'
+  | 'Employee Experience'
+  | 'Sustainability'
+
 export interface AIUseCase {
   id: string
   title: string
@@ -57,6 +71,7 @@ export interface AIUseCase {
   priorityScore: number   // computed
 
   projectHealth?: ProjectHealth
+  motivation?: string
 
   startDate?: string
 
@@ -86,6 +101,36 @@ export const AI_APPROACHES: AIApproach[] = [
 ]
 
 export const FEASIBILITIES: TechnicalFeasibility[] = ['Low', 'Medium', 'High']
+
+export const MOTIVATIONS: Motivation[] = [
+  'Cost Reduction',
+  'Time Saving',
+  'Error Reduction',
+  'Revenue Growth',
+  'Customer Experience',
+  'Risk & Compliance',
+  'Quality Improvement',
+  'Competitive Advantage',
+  'Scalability',
+  'Data & Insights',
+  'Employee Experience',
+  'Sustainability',
+]
+
+export const MOTIVATION_BG: Record<Motivation, string> = {
+  'Cost Reduction':       'bg-emerald-100 text-emerald-700',
+  'Time Saving':          'bg-blue-100 text-blue-700',
+  'Error Reduction':      'bg-orange-100 text-orange-700',
+  'Revenue Growth':       'bg-green-100 text-green-700',
+  'Customer Experience':  'bg-pink-100 text-pink-700',
+  'Risk & Compliance':    'bg-red-100 text-red-700',
+  'Quality Improvement':  'bg-violet-100 text-violet-700',
+  'Competitive Advantage':'bg-indigo-100 text-indigo-700',
+  'Scalability':          'bg-cyan-100 text-cyan-700',
+  'Data & Insights':      'bg-amber-100 text-amber-700',
+  'Employee Experience':  'bg-teal-100 text-teal-700',
+  'Sustainability':       'bg-lime-100 text-lime-700',
+}
 
 export const PROJECT_HEALTH_OPTIONS: { value: ProjectHealth; label: string; activeCls: string; dotCls: string }[] = [
   { value: 'On Track', label: 'On Track', activeCls: 'bg-green-500 text-white', dotCls: 'bg-green-500' },
