@@ -6,6 +6,7 @@ import {
   AIUseCase, DEPARTMENTS, STATUSES, AI_APPROACHES, FEASIBILITIES,
   STATUS_BG, APPROACH_BG, FEASIBILITY_BG, MOTIVATION_BG,
   PROJECT_HEALTH_OPTIONS, MOTIVATIONS, ProjectHealth,
+  EU_AI_ACT_RISKS, EU_AI_ACT_BG, EuAiActRisk,
 } from '../../types'
 import { computePriorityScore, computeROI, scoreColor } from '../../lib/scoring'
 import { useUseCasesStore } from '../../store/useCasesStore'
@@ -168,6 +169,12 @@ export default function CanvasForm({ existing }: Props) {
     status: 'Idea',
     projectHealth: 'On Track',
     motivation: '',
+    euAiActRisk: 'Minimal Risk',
+    complianceLegal: false,
+    compliancePersonalData: false,
+    complianceDataMin: false,
+    complianceDocumentation: false,
+    complianceLiability: false,
     businessProblem: '',
     successMetrics: '',
     dataRequirements: '',
@@ -481,6 +488,47 @@ export default function CanvasForm({ existing }: Props) {
             <SliderField label="Feasibility"     name="feasibility"    weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
             <SliderField label="Strategic Fit"   name="strategicFit"   weight="20%" register={register} value={Number(watched.strategicFit ?? 7)} />
             <SliderField label="Urgency"         name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
+          </div>
+        </section>
+
+        {/* Section 4: Governance & Compliance */}
+        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Governance & Compliance</h2>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>EU AI Act Risikostufe</label>
+              <div className="flex items-center gap-2">
+                <select {...register('euAiActRisk')} className={inputCls}>
+                  {EU_AI_ACT_RISKS.map((r) => <option key={r}>{r}</option>)}
+                </select>
+                <span className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${EU_AI_ACT_BG[(watched.euAiActRisk ?? 'Minimal Risk') as EuAiActRisk]}`}>
+                  {watched.euAiActRisk ?? 'Minimal Risk'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className={labelCls}>Datenschutz-Checkliste</label>
+            <div className="space-y-2">
+              {[
+                { name: 'complianceLegal',         label: 'Einhaltung gesetzlicher Vorgaben (DSGVO, EU AI Act) geklärt' },
+                { name: 'compliancePersonalData',  label: 'Personenbezogene Daten & Rechtsgrundlage dokumentiert' },
+                { name: 'complianceDataMin',       label: 'Datenminimierung & Zweckbindung sichergestellt' },
+                { name: 'complianceDocumentation', label: 'Dokumentation & Nachweispflichten erfüllt' },
+                { name: 'complianceLiability',     label: 'Haftung & Verantwortlichkeit geregelt' },
+              ].map((item) => (
+                <label key={item.name} className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-100 hover:bg-slate-50 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    {...register(item.name as keyof FormData)}
+                    className="w-4 h-4 accent-blue-600 flex-shrink-0"
+                  />
+                  <span className="text-sm text-slate-700">{item.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </section>
 

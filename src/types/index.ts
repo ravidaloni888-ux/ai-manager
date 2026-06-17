@@ -32,6 +32,31 @@ export type TechnicalFeasibility = 'Low' | 'Medium' | 'High'
 
 export type ProjectHealth = 'On Track' | 'At Risk' | 'Blocked'
 
+export type EuAiActRisk = 'Minimal Risk' | 'Limited Risk' | 'High Risk' | 'Unacceptable Risk'
+
+export const EU_AI_ACT_RISKS: EuAiActRisk[] = [
+  'Minimal Risk', 'Limited Risk', 'High Risk', 'Unacceptable Risk',
+]
+
+export const EU_AI_ACT_BG: Record<EuAiActRisk, string> = {
+  'Minimal Risk':      'bg-green-100 text-green-700',
+  'Limited Risk':      'bg-amber-100 text-amber-700',
+  'High Risk':         'bg-orange-100 text-orange-700',
+  'Unacceptable Risk': 'bg-red-100 text-red-700',
+}
+
+export interface GovernanceData {
+  richtlinie: {
+    zweck: string; daten: string; transparenz: string
+    verantwortlichkeiten: string; risikomanagement: string; ethik: string; schulung: string
+  }
+  roles: { aiOwner: string; dpo: string; security: string; ethics: string; business: string }
+  steps: {
+    step1: boolean; step2: boolean; step3: boolean; step4: boolean; step5: boolean
+    step6: boolean; step7: boolean; step8: boolean; step9: boolean
+  }
+}
+
 export type Motivation =
   | 'Cost Reduction'
   | 'Time Saving'
@@ -72,6 +97,12 @@ export interface AIUseCase {
 
   projectHealth?: ProjectHealth
   motivation?: string
+  euAiActRisk?: EuAiActRisk
+  complianceLegal?: boolean
+  compliancePersonalData?: boolean
+  complianceDataMin?: boolean
+  complianceDocumentation?: boolean
+  complianceLiability?: boolean
 
   startDate?: string
 

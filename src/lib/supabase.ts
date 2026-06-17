@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { AIUseCase, ProjectHealth, Motivation } from '../types'
+import { AIUseCase, ProjectHealth, EuAiActRisk, GovernanceData } from '../types'
 
 function legacyHealth(raw: string | undefined): ProjectHealth {
   if (raw === 'Green' || raw === 'On Track') return 'On Track'
@@ -34,7 +34,13 @@ export function rowToUseCase(row: Record<string, unknown>): AIUseCase {
     urgency: row.urgency as number,
     priorityScore: row.priority_score as number,
     projectHealth: legacyHealth(row.project_health as string),
-    motivation: (row.motivation as Motivation) ?? undefined,
+    motivation: (row.motivation as string) ?? undefined,
+    euAiActRisk: (row.eu_ai_act_risk as EuAiActRisk) ?? 'Minimal Risk',
+    complianceLegal: (row.compliance_legal as boolean) ?? false,
+    compliancePersonalData: (row.compliance_personal_data as boolean) ?? false,
+    complianceDataMin: (row.compliance_data_min as boolean) ?? false,
+    complianceDocumentation: (row.compliance_documentation as boolean) ?? false,
+    complianceLiability: (row.compliance_liability as boolean) ?? false,
     startDate: (row.start_date as string) ?? undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -63,8 +69,70 @@ export function useCaseToRow(uc: AIUseCase): Record<string, unknown> {
     priority_score: uc.priorityScore,
     project_health: uc.projectHealth ?? 'On Track',
     motivation: uc.motivation ?? null,
+    eu_ai_act_risk: uc.euAiActRisk ?? 'Minimal Risk',
+    compliance_legal: uc.complianceLegal ?? false,
+    compliance_personal_data: uc.compliancePersonalData ?? false,
+    compliance_data_min: uc.complianceDataMin ?? false,
+    compliance_documentation: uc.complianceDocumentation ?? false,
+    compliance_liability: uc.complianceLiability ?? false,
     start_date: uc.startDate ?? null,
     created_at: uc.createdAt,
     updated_at: uc.updatedAt,
   }
+}
+
+const DEFAULT_GOVERNANCE: GovernanceData = {
+  richtlinie: { zweck: '', daten: '', transparenz: '', verantwortlichkeiten: '', risikomanagement: '', ethik: '', schulung: '' },
+  roles: { aiOwner: '', dpo: '', security: '', ethics: '', business: '' },
+  steps: { step1: false, step2: false, step3: false, step4: false, step5: false, step6: false, step7: false, step8: false, step9: false },
+}
+
+export async function loadGovernance(): Promise<GovernanceData> {
+  const { data } = await supabase.from('ai_governance').select('*').eq('id', 'singleton').single()
+  if (!data) return DEFAULT_GOVERNANCE
+  return {
+    richtlinie: {
+      zweck: data.richtlinie_zweck ?? '',
+      daten: data.richtlinie_daten ?? '',
+      transparenz: data.richtlinie_transparenz ?? '',
+      verantwortlichkeiten: data.richtlinie_verantwortlichkeiten ?? '',
+      risikomanagement: data.richtlinie_risikomanagement ?? '',
+      ethik: data.richtlinie_ethik ?? '',
+      schulung: data.richtlinie_schulung ?? '',
+    },
+    roles: {
+      aiOwner: data.role_ai_owner ?? '',
+      dpo: data.role_dpo ?? '',
+      security: data.role_security ?? '',
+      ethics: data.role_ethics ?? '',
+      business: data.role_business ?? '',
+    },
+    steps: {
+      step1: data.step1 ?? false, step2: data.step2 ?? false, step3: data.step3 ?? false,
+      step4: data.step4 ?? false, step5: data.step5 ?? false, step6: data.step6 ?? false,
+      step7: data.step7 ?? false, step8: data.step8 ?? false, step9: data.step9 ?? false,
+    },
+  }
+}
+
+export async function saveGovernance(g: GovernanceData): Promise<void> {
+  await supabase.from('ai_governance').upsert({
+    id: 'singleton',
+    richtlinie_zweck: g.richtlinie.zweck,
+    richtlinie_daten: g.richtlinie.daten,
+    richtlinie_transparenz: g.richtlinie.transparenz,
+    richtlinie_verantwortlichkeiten: g.richtlinie.verantwortlichkeiten,
+    richtlinie_risikomanagement: g.richtlinie.risikomanagement,
+    richtlinie_ethik: g.richtlinie.ethik,
+    richtlinie_schulung: g.richtlinie.schulung,
+    role_ai_owner: g.roles.aiOwner,
+    role_dpo: g.roles.dpo,
+    role_security: g.roles.security,
+    role_ethics: g.roles.ethics,
+    role_business: g.roles.business,
+    step1: g.steps.step1, step2: g.steps.step2, step3: g.steps.step3,
+    step4: g.steps.step4, step5: g.steps.step5, step6: g.steps.step6,
+    step7: g.steps.step7, step8: g.steps.step8, step9: g.steps.step9,
+    updated_at: new Date().toISOString(),
+  })
 }

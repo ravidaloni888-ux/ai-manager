@@ -51,7 +51,7 @@ export default function AppShell({ children }: AppShellProps) {
             Release 2
           </p>
           <NavItem icon={<IconChartBar />} label="Maturity Assessment" disabled badge="R2" />
-          <NavItem icon={<IconBuilding />} label="AI Governance" disabled badge="R2" />
+          <NavItem to="/governance" icon={<IconBuilding />} label="AI Governance" />
 
           <div className="pt-4" />
 
