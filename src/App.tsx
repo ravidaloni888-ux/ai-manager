@@ -6,6 +6,7 @@ import ListPage from './pages/ListPage'
 import CanvasPage from './pages/CanvasPage'
 import SettingsPage from './pages/SettingsPage'
 import GovernancePage from './pages/GovernancePage'
+import EnablementPage from './pages/EnablementPage'
 import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { useUseCasesStore } from './store/useCasesStore'
@@ -59,6 +60,7 @@ function AppRoutes() {
               <Route path="/use-cases" element={<ListPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/governance" element={<GovernancePage />} />
+              <Route path="/enablement" element={<EnablementPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
               <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
             </Routes>

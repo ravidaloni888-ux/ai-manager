@@ -211,3 +211,18 @@ export const FEASIBILITY_BG: Record<TechnicalFeasibility, string> = {
   Medium: 'bg-amber-100 text-amber-700',
   Low:    'bg-red-100 text-red-600',
 }
+
+export const TRAINING_TOPICS = [
+  { key: 'fundamentals' as const, label: 'KI-Grundlagen & Funktionsweise', short: 'KI-Grundlagen', description: 'Was ist KI (insb. LLMs) und wie funktionieren diese Systeme grundlegend?', audience: 'Alle Mitarbeitenden', duration: '2h', color: 'blue' },
+  { key: 'ai_types'     as const, label: 'Unterscheidung von KI-Typen', short: 'KI-Typen', description: 'Was ist der Unterschied zwischen Public-, privaten LLMs und individuellen Modellen?', audience: 'IT, Management', duration: '1.5h', color: 'indigo' },
+  { key: 'data_safety'  as const, label: 'Sicherer Umgang mit Daten', short: 'Datensicherheit', description: 'Welche Daten dürfen in KI-Systeme eingegeben werden und welche nicht?', audience: 'Alle Mitarbeitenden', duration: '2h', color: 'red' },
+  { key: 'opportunities'as const, label: 'Chancen & Grenzen von KI', short: 'Chancen & Grenzen', description: 'Wofür eignet sich KI gut und wo liegen typische Fehlerquellen oder Halluzinationen?', audience: 'Management, Fachbereiche', duration: '2h', color: 'amber' },
+  { key: 'prompting'    as const, label: 'Best Practices im Prompting', short: 'Prompting', description: 'Wie formuliere ich effektive Anfragen, um qualitativ hochwertige Ergebnisse zu erhalten?', audience: 'Alle Anwender', duration: '3h', color: 'green' },
+  { key: 'compliance'   as const, label: 'Compliance & Unternehmensrichtlinien', short: 'Compliance', description: 'Welche internen Vorgaben und rechtlichen Rahmenbedingungen müssen beim Einsatz beachtet werden?', audience: 'Management, Legal, HR', duration: '2h', color: 'orange' },
+  { key: 'use_cases'    as const, label: 'Praxisnahe Anwendungsfälle', short: 'Anwendungsfälle', description: 'Wie kann KI konkret im eigenen Arbeitsbereich sinnvoll und effizient eingesetzt werden?', audience: 'Fachbereiche', duration: '4h (Workshop)', color: 'purple' },
+]
+
+export type TrainingTopicKey = typeof TRAINING_TOPICS[number]['key']
+export type TrainingStatus = 'open' | 'planned' | 'done'
+export type TrainingMap = Partial<Record<string, Partial<Record<TrainingTopicKey, TrainingStatus>>>>
+export interface EnablementData { trainingMap: TrainingMap }

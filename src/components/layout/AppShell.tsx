@@ -4,7 +4,7 @@ import NavItem from './NavItem'
 import {
   IconDashboard, IconList, IconChartBar, IconMap,
   IconAlert, IconBuilding, IconCurrency, IconFlag, IconSearch,
-  IconBrain, IconPlus, IconSettings,
+  IconBrain, IconPlus, IconSettings, IconAcademic,
 } from '../icons/NavIcons'
 import { useAuthStore } from '../../store/authStore'
 import BetaRequestModal from './BetaRequestModal'
@@ -52,6 +52,7 @@ export default function AppShell({ children }: AppShellProps) {
           </p>
           <NavItem icon={<IconChartBar />} label="Maturity Assessment" disabled badge="R2" />
           <NavItem to="/governance" icon={<IconBuilding />} label="AI Governance" />
+          <NavItem to="/enablement" icon={<IconAcademic />} label="Enablement & Coaching" />
 
           <div className="pt-4" />
 

@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { AIUseCase, ProjectHealth, EuAiActRisk, GovernanceData } from '../types'
+import { AIUseCase, ProjectHealth, EuAiActRisk, GovernanceData, EnablementData, TrainingMap } from '../types'
 
 function legacyHealth(raw: string | undefined): ProjectHealth {
   if (raw === 'Green' || raw === 'On Track') return 'On Track'
@@ -113,6 +113,26 @@ export async function loadGovernance(): Promise<GovernanceData> {
       step7: data.step7 ?? false, step8: data.step8 ?? false, step9: data.step9 ?? false,
     },
   }
+}
+
+const DEFAULT_ENABLEMENT: EnablementData = { trainingMap: {} }
+
+export async function loadEnablement(): Promise<EnablementData> {
+  try {
+    const { data } = await supabase.from('ai_enablement').select('*').eq('id', 'singleton').single()
+    if (!data) return DEFAULT_ENABLEMENT
+    return { trainingMap: (data.training_map as TrainingMap) ?? {} }
+  } catch {
+    return DEFAULT_ENABLEMENT
+  }
+}
+
+export async function saveEnablement(d: EnablementData): Promise<void> {
+  await supabase.from('ai_enablement').upsert({
+    id: 'singleton',
+    training_map: d.trainingMap,
+    updated_at: new Date().toISOString(),
+  })
 }
 
 export async function saveGovernance(g: GovernanceData): Promise<void> {
