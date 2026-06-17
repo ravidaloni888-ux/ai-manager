@@ -189,6 +189,13 @@ export default function CanvasForm({ existing }: Props) {
     feasibility: 7,
     strategicFit: 7,
     urgency: 5,
+    docGoal: '',
+    docDataBasis: '',
+    docRiskMitigation: '',
+    docExplainability: '',
+    docOperations: '',
+    docRegulatory: '',
+    docVersioning: '',
   }
 
   const { register, handleSubmit, reset, control, setValue, formState: { errors } } = useForm<FormData>({
@@ -528,6 +535,59 @@ export default function CanvasForm({ existing }: Props) {
                   <span className="text-sm text-slate-700">{item.label}</span>
                 </label>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Section 5: Dokumentation (Step 9) */}
+        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Dokumentation</h2>
+            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Step 9 · 9-Schritte-Framework</span>
+          </div>
+          <p className="text-xs text-slate-400 -mt-2">Formale Nachweisdokumentation für Compliance und Audit. Alle Felder optional.</p>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className={labelCls}>1 · Zielsetzung & Anwendungsbereich</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wofür wird die KI eingesetzt? Welche Modelle, Datenquellen und Technologien kommen zum Einsatz?</p>
+              <textarea {...register('docGoal')} rows={3} className={textareaCls} placeholder="Beschreibung des KI-Systems, unterstützte Prozesse und Entscheidungen…" />
+            </div>
+
+            <div>
+              <label className={labelCls}>2 · Datenbasis & Datenflüsse</label>
+              <p className="text-xs text-slate-400 mb-1.5">Welche Daten werden verwendet, woher stammen sie und wie werden sie verarbeitet?</p>
+              <textarea {...register('docDataBasis')} rows={3} className={textareaCls} placeholder="Datenquellen, Verarbeitungsschritte, Qualitätssicherung…" />
+            </div>
+
+            <div>
+              <label className={labelCls}>3 · Risikobewertung & Maßnahmen</label>
+              <p className="text-xs text-slate-400 mb-1.5">Welche Risiken wurden identifiziert und wie werden diese reduziert oder kontrolliert?</p>
+              <textarea {...register('docRiskMitigation')} rows={3} className={textareaCls} placeholder="Identifizierte Risiken, Gegenmaßnahmen, Restrisiko…" />
+            </div>
+
+            <div>
+              <label className={labelCls}>4 · Erklärbarkeit & Entscheidungslogik</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wie lassen sich Ergebnisse der KI nachvollziehen und interpretieren?</p>
+              <textarea {...register('docExplainability')} rows={3} className={textareaCls} placeholder="Erklärbarkeitsansatz, Interpretierbarkeit für Endanwender…" />
+            </div>
+
+            <div>
+              <label className={labelCls}>5 · Betriebs- & Überwachungskonzept</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wie wird die KI im laufenden Betrieb überwacht, gewartet und verbessert?</p>
+              <textarea {...register('docOperations')} rows={3} className={textareaCls} placeholder="Monitoring, Wartungsintervalle, Verbesserungszyklus…" />
+            </div>
+
+            <div>
+              <label className={labelCls}>6 · Compliance & regulatorische Nachweise</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wie wird die Einhaltung von Gesetzen und internen Richtlinien dokumentiert?</p>
+              <textarea {...register('docRegulatory')} rows={3} className={textareaCls} placeholder="Nachweisführung, Prüfpfade, zuständige Stelle…" />
+            </div>
+
+            <div>
+              <label className={labelCls}>7 · Änderungs- & Versionsmanagement</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wie werden Anpassungen am Modell oder an den Daten nachvollziehbar festgehalten?</p>
+              <textarea {...register('docVersioning')} rows={3} className={textareaCls} placeholder="Versionierung, Änderungsprotokoll, Release-Prozess…" />
             </div>
           </div>
         </section>

@@ -106,6 +106,15 @@ export interface AIUseCase {
 
   startDate?: string
 
+  // Step 9 documentation
+  docGoal?: string
+  docDataBasis?: string
+  docRiskMitigation?: string
+  docExplainability?: string
+  docOperations?: string
+  docRegulatory?: string
+  docVersioning?: string
+
   createdAt: string
   updatedAt: string
 }
