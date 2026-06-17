@@ -37,7 +37,8 @@ const ch = createColumnHelper<AIUseCase>()
 const GROUP_OPTIONS = [
   { value: '', label: 'No grouping' },
   { value: 'department', label: 'Department' },
-  { value: 'status', label: 'Status' },
+  { value: 'status', label: 'Stage' },
+  { value: 'projectHealth', label: 'Health' },
   { value: 'aiApproach', label: 'AI Approach' },
 ]
 
