@@ -10,7 +10,15 @@ export type Department =
   | 'Logistics'
   | 'Other'
 
-export type Status = 'Idea' | 'Evaluation' | 'Pilot' | 'Production' | 'Cancelled'
+export type Status =
+  | 'Idea'
+  | 'Problem Scoping'
+  | 'Data Exploration'
+  | 'Modeling & Piloting'
+  | 'Evaluation & Testing'
+  | 'Production'
+  | 'Maintenance'
+  | 'Cancelled'
 
 export type AIApproach =
   | 'Supervised Learning'
@@ -21,6 +29,8 @@ export type AIApproach =
   | 'NLP'
 
 export type TechnicalFeasibility = 'Low' | 'Medium' | 'High'
+
+export type ProjectHealth = 'On Track' | 'At Risk' | 'Blocked'
 
 export interface AIUseCase {
   id: string
@@ -46,6 +56,8 @@ export interface AIUseCase {
   urgency: number         // 1–10, weight 10%
   priorityScore: number   // computed
 
+  projectHealth?: ProjectHealth
+
   startDate?: string
 
   createdAt: string
@@ -57,7 +69,16 @@ export const DEPARTMENTS: Department[] = [
   'HR', 'IT', 'Legal', 'Marketing', 'Logistics', 'Other',
 ]
 
-export const STATUSES: Status[] = ['Idea', 'Evaluation', 'Pilot', 'Production', 'Cancelled']
+export const STATUSES: Status[] = [
+  'Idea',
+  'Problem Scoping',
+  'Data Exploration',
+  'Modeling & Piloting',
+  'Evaluation & Testing',
+  'Production',
+  'Maintenance',
+  'Cancelled',
+]
 
 export const AI_APPROACHES: AIApproach[] = [
   'Supervised Learning', 'Unsupervised Learning', 'Reinforcement Learning',
@@ -66,20 +87,38 @@ export const AI_APPROACHES: AIApproach[] = [
 
 export const FEASIBILITIES: TechnicalFeasibility[] = ['Low', 'Medium', 'High']
 
+export const PROJECT_HEALTH_OPTIONS: { value: ProjectHealth; label: string; activeCls: string; dotCls: string }[] = [
+  { value: 'On Track', label: 'On Track', activeCls: 'bg-green-500 text-white', dotCls: 'bg-green-500' },
+  { value: 'At Risk',  label: 'At Risk',  activeCls: 'bg-amber-400 text-white', dotCls: 'bg-amber-400' },
+  { value: 'Blocked',  label: 'Blocked',  activeCls: 'bg-red-500 text-white',   dotCls: 'bg-red-500'   },
+]
+
+export const HEALTH_BG: Record<ProjectHealth, string> = {
+  'On Track': 'bg-green-100 text-green-700',
+  'At Risk':  'bg-amber-100 text-amber-700',
+  'Blocked':  'bg-red-100 text-red-600',
+}
+
 export const STATUS_COLORS: Record<Status, string> = {
-  Idea:       '#94a3b8',
-  Evaluation: '#f59e0b',
-  Pilot:      '#3b82f6',
-  Production: '#22c55e',
-  Cancelled:  '#ef4444',
+  'Idea':                 '#94a3b8',
+  'Problem Scoping':      '#a855f7',
+  'Data Exploration':     '#6366f1',
+  'Modeling & Piloting':  '#3b82f6',
+  'Evaluation & Testing': '#f59e0b',
+  'Production':           '#22c55e',
+  'Maintenance':          '#14b8a6',
+  'Cancelled':            '#ef4444',
 }
 
 export const STATUS_BG: Record<Status, string> = {
-  Idea:       'bg-slate-100 text-slate-600',
-  Evaluation: 'bg-amber-100 text-amber-700',
-  Pilot:      'bg-blue-100 text-blue-700',
-  Production: 'bg-green-100 text-green-700',
-  Cancelled:  'bg-red-100 text-red-600',
+  'Idea':                 'bg-slate-100 text-slate-600',
+  'Problem Scoping':      'bg-purple-100 text-purple-700',
+  'Data Exploration':     'bg-indigo-100 text-indigo-700',
+  'Modeling & Piloting':  'bg-blue-100 text-blue-700',
+  'Evaluation & Testing': 'bg-amber-100 text-amber-700',
+  'Production':           'bg-green-100 text-green-700',
+  'Maintenance':          'bg-teal-100 text-teal-700',
+  'Cancelled':            'bg-red-100 text-red-600',
 }
 
 export const APPROACH_BG: Record<AIApproach, string> = {

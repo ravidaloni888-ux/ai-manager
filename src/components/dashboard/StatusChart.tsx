@@ -8,16 +8,15 @@ interface Props {
 
 export default function StatusChart({ useCases }: Props) {
   const data = useMemo(() => {
-    const counts: Record<Status, number> = {
-      Idea: 0, Evaluation: 0, Pilot: 0, Production: 0, Cancelled: 0,
-    }
-    useCases.forEach((uc) => { counts[uc.status]++ })
+    const counts: Record<string, number> = {}
+    STATUSES.forEach((s) => { counts[s] = 0 })
+    useCases.forEach((uc) => { if (counts[uc.status] !== undefined) counts[uc.status]++ })
     return STATUSES.map((s) => ({ name: s, value: counts[s] })).filter((d) => d.value > 0)
   }, [useCases])
 
   return (
     <div className="bg-white rounded-xl shadow-md p-5">
-      <h3 className="text-sm font-semibold text-slate-700 mb-4">Status Distribution</h3>
+      <h3 className="text-sm font-semibold text-slate-700 mb-4">Stage Distribution</h3>
       <ResponsiveContainer width="100%" height={220}>
         <PieChart>
           <Pie

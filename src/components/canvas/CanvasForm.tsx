@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid'
 import {
   AIUseCase, DEPARTMENTS, STATUSES, AI_APPROACHES, FEASIBILITIES,
   STATUS_BG, APPROACH_BG, FEASIBILITY_BG,
-  PROJECT_HEALTH_OPTIONS, DEV_PHASES, ProjectHealth, DevPhase,
+  PROJECT_HEALTH_OPTIONS, ProjectHealth,
 } from '../../types'
 import { computePriorityScore, computeROI, scoreColor } from '../../lib/scoring'
 import { useUseCasesStore } from '../../store/useCasesStore'
@@ -116,8 +116,7 @@ export default function CanvasForm({ existing }: Props) {
     title: '',
     department: 'Sales',
     status: 'Idea',
-    projectHealth: 'Green',
-    devPhase: 'Problem Scoping',
+    projectHealth: 'On Track',
     businessProblem: '',
     successMetrics: '',
     dataRequirements: '',
@@ -232,7 +231,8 @@ export default function CanvasForm({ existing }: Props) {
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Case Information</h2>
           <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-3 md:col-span-1">
+            {/* Row 1: Title + Department */}
+            <div className="col-span-2">
               <label className={labelCls}>Title *</label>
               <input
                 {...register('title', { required: 'Title is required' })}
@@ -247,8 +247,10 @@ export default function CanvasForm({ existing }: Props) {
                 {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
               </select>
             </div>
-            <div>
-              <label className={labelCls}>Status</label>
+
+            {/* Row 2: Stage + Health */}
+            <div className="col-span-2">
+              <label className={labelCls}>Project Stage</label>
               <div className="flex items-center gap-2">
                 <select {...register('status')} className={inputCls}>
                   {STATUSES.map((s) => <option key={s}>{s}</option>)}
@@ -258,21 +260,17 @@ export default function CanvasForm({ existing }: Props) {
                 </span>
               </div>
             </div>
-          </div>
-
-          {/* Project Health + Dev Phase */}
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Project Health</label>
+              <label className={labelCls}>Health</label>
               <input type="hidden" {...register('projectHealth')} />
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 h-[38px]">
                 {PROJECT_HEALTH_OPTIONS.map((h) => (
                   <button
                     key={h.value}
                     type="button"
                     onClick={() => setValue('projectHealth', h.value as ProjectHealth)}
-                    className={`flex-1 text-xs font-medium py-1.5 rounded-lg border transition-colors ${
-                      (watched.projectHealth ?? 'Green') === h.value
+                    className={`flex-1 text-xs font-medium rounded-lg border transition-colors ${
+                      (watched.projectHealth ?? 'On Track') === h.value
                         ? `${h.activeCls} border-transparent`
                         : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
                     }`}
@@ -281,12 +279,6 @@ export default function CanvasForm({ existing }: Props) {
                   </button>
                 ))}
               </div>
-            </div>
-            <div>
-              <label className={labelCls}>Development Phase</label>
-              <select {...register('devPhase')} className={inputCls}>
-                {DEV_PHASES.map((p) => <option key={p}>{p}</option>)}
-              </select>
             </div>
           </div>
         </section>

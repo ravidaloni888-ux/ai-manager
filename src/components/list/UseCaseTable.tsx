@@ -17,8 +17,8 @@ import {
   ExpandedState,
 } from '@tanstack/react-table'
 import {
-  AIUseCase, Status, AIApproach, Department,
-  STATUS_BG, APPROACH_BG, FEASIBILITY_BG,
+  AIUseCase, Status, AIApproach, ProjectHealth,
+  STATUS_BG, APPROACH_BG, FEASIBILITY_BG, HEALTH_BG,
   STATUSES, AI_APPROACHES, DEPARTMENTS,
 } from '../../types'
 import { computeROI, scoreBg } from '../../lib/scoring'
@@ -56,7 +56,7 @@ export default function UseCaseTable() {
 
   // Column drag-reorder
   const allColumnIds = [
-    'title', 'department', 'status', 'aiApproach', 'technicalFeasibility',
+    'title', 'department', 'status', 'projectHealth', 'aiApproach', 'technicalFeasibility',
     'businessImpact', 'feasibility', 'strategicFit', 'urgency', 'priorityScore',
     'estimatedCostK', 'expectedBenefitK', 'roi',
     'successMetrics', 'dataRequirements', 'teamCompetencies', 'timeline',
@@ -84,13 +84,24 @@ export default function UseCaseTable() {
       filterFn: 'equals',
     }),
     ch.accessor('status', {
-      header: 'Status',
+      header: 'Stage',
       filterFn: 'equals',
       cell: (i) => (
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_BG[i.getValue() as Status]}`}>
           {i.getValue()}
         </span>
       ),
+    }),
+    ch.accessor('projectHealth', {
+      header: 'Health',
+      cell: (i) => {
+        const v = (i.getValue() ?? 'On Track') as ProjectHealth
+        return (
+          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${HEALTH_BG[v]}`}>
+            {v}
+          </span>
+        )
+      },
     }),
     ch.accessor('aiApproach', {
       header: 'AI Approach',

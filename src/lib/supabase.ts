@@ -1,5 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
-import { AIUseCase } from '../types'
+import { AIUseCase, ProjectHealth } from '../types'
+
+function legacyHealth(raw: string | undefined): ProjectHealth {
+  if (raw === 'Green' || raw === 'On Track') return 'On Track'
+  if (raw === 'Amber' || raw === 'At Risk') return 'At Risk'
+  if (raw === 'Red' || raw === 'Blocked') return 'Blocked'
+  return 'On Track'
+}
 
 const SUPABASE_URL = 'https://zvmujqhjqgzujmrvdxbr.supabase.co'
 const SUPABASE_ANON_KEY = 'sb_publishable_Mru4tFYVXpUmBxnq98cvfw_-JoKYzGb'
@@ -26,6 +33,7 @@ export function rowToUseCase(row: Record<string, unknown>): AIUseCase {
     strategicFit: row.strategic_fit as number,
     urgency: row.urgency as number,
     priorityScore: row.priority_score as number,
+    projectHealth: legacyHealth(row.project_health as string),
     startDate: (row.start_date as string) ?? undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -52,6 +60,7 @@ export function useCaseToRow(uc: AIUseCase): Record<string, unknown> {
     strategic_fit: uc.strategicFit,
     urgency: uc.urgency,
     priority_score: uc.priorityScore,
+    project_health: uc.projectHealth ?? 'On Track',
     start_date: uc.startDate ?? null,
     created_at: uc.createdAt,
     updated_at: uc.updatedAt,
