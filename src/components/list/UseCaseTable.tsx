@@ -19,7 +19,7 @@ import {
 import {
   AIUseCase, Status, AIApproach, ProjectHealth,
   STATUS_BG, APPROACH_BG, FEASIBILITY_BG, HEALTH_BG,
-  STATUSES, AI_APPROACHES, DEPARTMENTS,
+  STATUSES, AI_APPROACHES, DEPARTMENTS, PROJECT_HEALTH_OPTIONS,
 } from '../../types'
 import { computeROI, scoreBg } from '../../lib/scoring'
 import { exportToCSV } from '../../lib/csvExport'
@@ -94,6 +94,7 @@ export default function UseCaseTable() {
     }),
     ch.accessor('projectHealth', {
       header: 'Health',
+      filterFn: 'equals',
       cell: (i) => {
         const v = (i.getValue() ?? 'On Track') as ProjectHealth
         return (
@@ -211,6 +212,7 @@ export default function UseCaseTable() {
   const deptFilter = (columnFilters.find((f) => f.id === 'department')?.value as string) ?? ''
   const statusFilter = (columnFilters.find((f) => f.id === 'status')?.value as string) ?? ''
   const approachFilter = (columnFilters.find((f) => f.id === 'aiApproach')?.value as string) ?? ''
+  const healthFilter = (columnFilters.find((f) => f.id === 'projectHealth')?.value as string) ?? ''
 
   const setFilter = (colId: string, val: string) => {
     setColumnFilters((prev) => {
@@ -264,6 +266,12 @@ export default function UseCaseTable() {
           onChange={(v) => setFilter('aiApproach', v)}
           options={AI_APPROACHES}
           placeholder="All AI types"
+        />
+        <FilterSelect
+          value={healthFilter}
+          onChange={(v) => setFilter('projectHealth', v)}
+          options={PROJECT_HEALTH_OPTIONS.map((h) => h.value)}
+          placeholder="All health"
         />
 
         {/* Group by */}
