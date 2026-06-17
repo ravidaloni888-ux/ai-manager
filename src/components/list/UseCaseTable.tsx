@@ -15,12 +15,18 @@ import {
   ColumnOrderState,
   GroupingState,
   ExpandedState,
+  FilterFn,
 } from '@tanstack/react-table'
 import {
   AIUseCase, Status, AIApproach, ProjectHealth,
-  STATUS_BG, APPROACH_BG, FEASIBILITY_BG, HEALTH_BG,
-  STATUSES, AI_APPROACHES, DEPARTMENTS, PROJECT_HEALTH_OPTIONS,
+  STATUS_BG, APPROACH_BG, FEASIBILITY_BG, HEALTH_BG, MOTIVATION_BG,
+  STATUSES, AI_APPROACHES, DEPARTMENTS, PROJECT_HEALTH_OPTIONS, MOTIVATIONS,
 } from '../../types'
+
+const motivationFilterFn: FilterFn<AIUseCase> = (row, columnId, filterValue: string) => {
+  const cell = (row.getValue(columnId) as string) ?? ''
+  return cell.split(',').map((s) => s.trim()).includes(filterValue)
+}
 import { computeROI, scoreBg } from '../../lib/scoring'
 import { exportToCSV } from '../../lib/csvExport'
 import { useUseCasesStore } from '../../store/useCasesStore'
@@ -56,7 +62,7 @@ export default function UseCaseTable() {
 
   // Column drag-reorder
   const allColumnIds = [
-    'title', 'department', 'status', 'projectHealth', 'aiApproach', 'technicalFeasibility',
+    'title', 'department', 'status', 'projectHealth', 'motivation', 'aiApproach', 'technicalFeasibility',
     'businessImpact', 'feasibility', 'strategicFit', 'urgency', 'priorityScore',
     'estimatedCostK', 'expectedBenefitK', 'roi',
     'successMetrics', 'dataRequirements', 'teamCompetencies', 'timeline',
@@ -91,6 +97,23 @@ export default function UseCaseTable() {
           {i.getValue()}
         </span>
       ),
+    }),
+    ch.accessor('motivation', {
+      header: 'Motivation',
+      filterFn: motivationFilterFn,
+      cell: (i) => {
+        const v = (i.getValue() as string) ?? ''
+        if (!v) return null
+        return (
+          <div className="flex flex-wrap gap-1">
+            {v.split(',').map((m) => m.trim()).filter(Boolean).map((m) => (
+              <span key={m} className={`text-xs font-medium px-2 py-0.5 rounded-full ${MOTIVATION_BG[m as keyof typeof MOTIVATION_BG] ?? 'bg-slate-100 text-slate-600'}`}>
+                {m}
+              </span>
+            ))}
+          </div>
+        )
+      },
     }),
     ch.accessor('projectHealth', {
       header: 'Health',
@@ -211,7 +234,7 @@ export default function UseCaseTable() {
   // Per-column filters for dropdown fields
   const deptFilter = (columnFilters.find((f) => f.id === 'department')?.value as string) ?? ''
   const statusFilter = (columnFilters.find((f) => f.id === 'status')?.value as string) ?? ''
-  const approachFilter = (columnFilters.find((f) => f.id === 'aiApproach')?.value as string) ?? ''
+  const motivationFilter = (columnFilters.find((f) => f.id === 'motivation')?.value as string) ?? ''
   const healthFilter = (columnFilters.find((f) => f.id === 'projectHealth')?.value as string) ?? ''
 
   const setFilter = (colId: string, val: string) => {
@@ -262,10 +285,10 @@ export default function UseCaseTable() {
           placeholder="All departments"
         />
         <FilterSelect
-          value={approachFilter}
-          onChange={(v) => setFilter('aiApproach', v)}
-          options={AI_APPROACHES}
-          placeholder="All AI types"
+          value={motivationFilter}
+          onChange={(v) => setFilter('motivation', v)}
+          options={MOTIVATIONS}
+          placeholder="All motivations"
         />
         <FilterSelect
           value={healthFilter}
