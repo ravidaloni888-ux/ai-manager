@@ -3,8 +3,6 @@ import { useEnablementStore } from '../store/enablementStore'
 import { useAuthStore } from '../store/authStore'
 import { TRAINING_TOPICS, DEPARTMENTS, TrainingTopicKey, TrainingStatus, EnablementData } from '../types'
 
-const NEXT: Record<TrainingStatus, TrainingStatus> = { open: 'planned', planned: 'done', done: 'open' }
-
 const TOPIC_CLR: Record<string, { border: string; badge: string; badgeText: string }> = {
   blue:   { border: 'border-l-blue-500',   badge: 'bg-blue-100',   badgeText: 'text-blue-700' },
   indigo: { border: 'border-l-indigo-500', badge: 'bg-indigo-100', badgeText: 'text-indigo-700' },
@@ -15,15 +13,10 @@ const TOPIC_CLR: Record<string, { border: string; badge: string; badgeText: stri
   purple: { border: 'border-l-purple-500', badge: 'bg-purple-100', badgeText: 'text-purple-700' },
 }
 
-function statusCls(s: TrainingStatus) {
+function statusSelectCls(s: TrainingStatus) {
   if (s === 'done')    return 'bg-green-100 text-green-700 font-semibold'
   if (s === 'planned') return 'bg-amber-100 text-amber-700'
-  return 'text-slate-300'
-}
-function statusLabel(s: TrainingStatus) {
-  if (s === 'done')    return '✓'
-  if (s === 'planned') return 'Plan'
-  return '—'
+  return 'bg-slate-50 text-slate-400'
 }
 
 function getStatus(data: EnablementData, dept: string, key: TrainingTopicKey): TrainingStatus {
@@ -168,14 +161,17 @@ export default function EnablementPage() {
                       {TRAINING_TOPICS.map(topic => {
                         const s = getStatus(data, dept, topic.key)
                         return (
-                          <td key={topic.key} className="text-center px-1 py-1.5 border-b border-slate-50" style={{ background: rowBg }}>
-                            <button
-                              onClick={() => user && setStatus(dept, topic.key, NEXT[s])}
-                              title={user ? `Status wechseln (aktuell: ${s})` : 'Anmelden zum Bearbeiten'}
-                              className={`w-full px-2 py-1 rounded text-xs transition-all ${statusCls(s)} ${user ? 'hover:opacity-75 cursor-pointer' : 'cursor-default'}`}
+                          <td key={topic.key} className="px-1 py-1 border-b border-slate-50" style={{ background: rowBg }}>
+                            <select
+                              value={s}
+                              disabled={!user}
+                              onChange={e => setStatus(dept, topic.key, e.target.value as TrainingStatus)}
+                              className={`w-full text-xs rounded px-1.5 py-1 border-0 cursor-pointer outline-none transition-all ${statusSelectCls(s)} ${!user ? 'opacity-60 cursor-not-allowed' : ''}`}
                             >
-                              {statusLabel(s)}
-                            </button>
+                              <option value="open">— Offen</option>
+                              <option value="planned">⏳ Geplant</option>
+                              <option value="done">✓ Fertig</option>
+                            </select>
                           </td>
                         )
                       })}
@@ -213,10 +209,10 @@ export default function EnablementPage() {
             </table>
           </div>
           <div className="px-4 py-2.5 border-t border-slate-100 flex flex-wrap gap-4 text-xs text-slate-400">
-            <span className="flex items-center gap-1.5"><span className="text-slate-300 font-bold text-sm">—</span> Offen</span>
-            <span className="flex items-center gap-1.5"><span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[10px]">Plan</span> Geplant</span>
-            <span className="flex items-center gap-1.5"><span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[10px] font-semibold">✓</span> Abgeschlossen</span>
-            {user && <span className="ml-auto">Zelle anklicken zum Wechseln des Status</span>}
+            <span className="flex items-center gap-1.5"><span className="bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded text-[10px]">— Offen</span></span>
+            <span className="flex items-center gap-1.5"><span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[10px]">⏳ Geplant</span></span>
+            <span className="flex items-center gap-1.5"><span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[10px] font-semibold">✓ Fertig</span></span>
+            {user && <span className="ml-auto">Dropdown pro Zelle zum Setzen des Status</span>}
           </div>
         </div>
       )}
