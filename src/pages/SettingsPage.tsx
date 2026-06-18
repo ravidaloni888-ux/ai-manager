@@ -76,14 +76,6 @@ export default function SettingsPage() {
         <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Project Links</h2>
 
         <LinkCard
-          icon={<IconGithub />}
-          label="GitHub Repository"
-          href={GITHUB_URL}
-          value={GITHUB_URL}
-          iconBg="bg-slate-100 text-slate-700"
-        />
-
-        <LinkCard
           icon={<IconGlobe />}
           label="Live App"
           href={LIVE_URL}
@@ -93,10 +85,18 @@ export default function SettingsPage() {
 
         <LinkCard
           icon={<IconGlobe />}
-          label="Vercel Dashboard"
-          href={VERCEL_URL}
-          value={VERCEL_URL}
-          iconBg="bg-slate-100 text-slate-600"
+          label="Local Dev URL"
+          href={LOCAL_URL}
+          value={LOCAL_URL}
+          iconBg="bg-violet-50 text-violet-600"
+        />
+
+        <LinkCard
+          icon={<IconGithub />}
+          label="GitHub Repository"
+          href={GITHUB_URL}
+          value={GITHUB_URL}
+          iconBg="bg-slate-100 text-slate-700"
         />
 
         <LinkCard
@@ -108,18 +108,18 @@ export default function SettingsPage() {
         />
 
         <LinkCard
+          icon={<IconGlobe />}
+          label="Vercel Dashboard"
+          href={VERCEL_URL}
+          value={VERCEL_URL}
+          iconBg="bg-slate-100 text-slate-600"
+        />
+
+        <LinkCard
           icon={<IconFolder />}
           label="Local Folder"
           value={LOCAL_PATH}
           iconBg="bg-amber-50 text-amber-600"
-        />
-
-        <LinkCard
-          icon={<IconGlobe />}
-          label="Local Dev URL"
-          href={LOCAL_URL}
-          value={LOCAL_URL}
-          iconBg="bg-violet-50 text-violet-600"
         />
       </section>
 
