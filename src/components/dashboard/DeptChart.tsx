@@ -32,7 +32,7 @@ export default function DeptChart({ useCases }: Props) {
           <CartesianGrid strokeDasharray="3 3" horizontal={false} />
           <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
           <YAxis type="category" dataKey="dept" tick={{ fontSize: 11 }} width={110} />
-          <Tooltip formatter={(v) => [`${v} cases`, 'Count']} />
+          <Tooltip formatter={(v) => [`${v} Use Cases`, 'Count']} />
           <Bar dataKey="count" radius={[0, 4, 4, 0]}>
             {data.map((_, i) => (
               <Cell key={i} fill={COLORS[i % COLORS.length]} />

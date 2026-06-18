@@ -16,7 +16,7 @@ export default function StatusChart({ useCases }: Props) {
 
   return (
     <div className="bg-white rounded-xl shadow-md p-5">
-      <h3 className="text-sm font-semibold text-slate-700 mb-4">Stage Distribution</h3>
+      <h3 className="text-sm font-semibold text-slate-700 mb-4">Phase Distribution</h3>
       <ResponsiveContainer width="100%" height={220}>
         <PieChart>
           <Pie
@@ -33,7 +33,7 @@ export default function StatusChart({ useCases }: Props) {
               <Cell key={entry.name} fill={STATUS_COLORS[entry.name as Status]} />
             ))}
           </Pie>
-          <Tooltip formatter={(value) => [`${value} cases`, '']} />
+          <Tooltip formatter={(value) => [`${value} Use Cases`, '']} />
           <Legend iconType="circle" iconSize={8} />
         </PieChart>
       </ResponsiveContainer>

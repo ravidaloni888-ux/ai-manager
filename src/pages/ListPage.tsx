@@ -12,7 +12,7 @@ export default function ListPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-800">AI Use Cases</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Sort, filter, group, and manage your AI portfolio. Drag column headers to reorder.
+            Sort, filter, group and manage your AI portfolio.
           </p>
         </div>
       </div>

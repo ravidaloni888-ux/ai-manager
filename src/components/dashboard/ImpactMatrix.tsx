@@ -58,7 +58,7 @@ export default function ImpactMatrix({ useCases }: Props) {
       <h3 className="text-sm font-semibold text-slate-700 mb-1">
         Impact / Feasibility Matrix
       </h3>
-      <p className="text-xs text-slate-400 mb-4">Bubble size = estimated cost · Color = status</p>
+      <p className="text-xs text-slate-400 mb-4">Bubble size = Cost · Color = Phase</p>
       <ResponsiveContainer width="100%" height={320}>
         <ScatterChart margin={{ top: 10, right: 20, bottom: 30, left: 20 }}>
           {/* Quadrant backgrounds */}

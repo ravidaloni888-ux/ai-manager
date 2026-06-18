@@ -38,7 +38,7 @@ export default function DashboardPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-          <p className="text-sm text-slate-500 mt-0.5">AI use case portfolio overview</p>
+          <p className="text-sm text-slate-500 mt-0.5">AI Use Case Portfolio Overview</p>
         </div>
       </div>
 
@@ -72,7 +72,7 @@ export default function DashboardPage() {
           color="bg-emerald-50 text-emerald-600"
         />
         <KpiCard
-          label="Portfolio 3-Yr ROI"
+          label="3-Y Portfolio ROI"
           value={`${stats.portfolioROI}%`}
           sub={`€${stats.totalCost.toLocaleString()}k invested`}
           icon={<IconTrendingUp />}
@@ -98,9 +98,9 @@ export default function DashboardPage() {
               <th className="text-left py-2 font-semibold">#</th>
               <th className="text-left py-2 font-semibold">Title</th>
               <th className="text-left py-2 font-semibold">Department</th>
-              <th className="text-left py-2 font-semibold">Status</th>
+              <th className="text-left py-2 font-semibold">Phase</th>
               <th className="text-right py-2 font-semibold">Score</th>
-              <th className="text-right py-2 font-semibold">3-Yr ROI</th>
+              <th className="text-right py-2 font-semibold">3-Y ROI</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">

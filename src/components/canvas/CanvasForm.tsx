@@ -263,7 +263,7 @@ export default function CanvasForm({ existing }: Props) {
               {existing ? 'Edit Use Case' : 'New AI Use Case'}
             </h1>
             <p className="text-sm text-slate-500 mt-0.5">
-              AI Use Case Canvas — based on the K7.0069 KI-Management methodology
+              KI Use Case Canvas — basierend auf der K7.0069 KI-Management-Methodik
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -295,15 +295,15 @@ export default function CanvasForm({ existing }: Props) {
 
         {/* Section 1: Basic Info */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
-          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Case Information</h2>
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Basic Information</h2>
           <div className="grid grid-cols-3 gap-4">
             {/* Row 1: Title + Department */}
             <div className="col-span-2">
               <label className={labelCls}>Title *</label>
               <input
-                {...register('title', { required: 'Title is required' })}
+                {...register('title', { required: 'Titel ist erforderlich' })}
                 className={inputCls}
-                placeholder="e.g. Customer Churn Prediction"
+                placeholder="z.B. Kundenabwanderungsvorhersage"
               />
               {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
             </div>
@@ -326,7 +326,7 @@ export default function CanvasForm({ existing }: Props) {
 
             {/* Row 3: Stage + Health */}
             <div className="col-span-2">
-              <label className={labelCls}>Project Stage</label>
+              <label className={labelCls}>Project Phase</label>
               <div className="flex items-center gap-2">
                 <select {...register('status')} className={inputCls}>
                   {STATUSES.map((s) => <option key={s}>{s}</option>)}
@@ -337,7 +337,7 @@ export default function CanvasForm({ existing }: Props) {
               </div>
             </div>
             <div>
-              <label className={labelCls}>Health</label>
+              <label className={labelCls}>Project Status</label>
               <input type="hidden" {...register('projectHealth')} />
               <div className="flex gap-1.5 h-[38px]">
                 {PROJECT_HEALTH_OPTIONS.map((h) => (
@@ -385,7 +385,7 @@ export default function CanvasForm({ existing }: Props) {
                 {...register('businessProblem', { required: true })}
                 rows={3}
                 className={textareaCls}
-                placeholder="What specific business problem exists? What does it cost the organisation?"
+                placeholder="Welches konkrete Geschäftsproblem besteht? Was kostet es das Unternehmen?"
               />
             </div>
 
@@ -395,7 +395,7 @@ export default function CanvasForm({ existing }: Props) {
                 {...register('successMetrics')}
                 rows={3}
                 className={textareaCls}
-                placeholder="How will success be measured? SMART targets."
+                placeholder="Wie wird Erfolg gemessen? SMART-Ziele."
               />
             </div>
 
@@ -405,7 +405,7 @@ export default function CanvasForm({ existing }: Props) {
                 {...register('dataRequirements')}
                 rows={3}
                 className={textareaCls}
-                placeholder="What data is needed? Where does it live? What is the quality?"
+                placeholder="Welche Daten werden benötigt? Wo liegen sie? Was ist die Qualität?"
               />
             </div>
 
@@ -428,13 +428,13 @@ export default function CanvasForm({ existing }: Props) {
                   {FEASIBILITIES.map((f) => <option key={f}>{f}</option>)}
                 </select>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${FEASIBILITY_BG[currentFeas as keyof typeof FEASIBILITY_BG]}`}>
-                  {currentFeas === 'High' ? 'Easily doable' : currentFeas === 'Medium' ? 'Moderate effort' : 'Complex'}
+                  {currentFeas}
                 </span>
               </div>
             </div>
 
             <div className="md:col-span-2">
-              <label className={labelCls}>6 · Team Competencies Needed</label>
+              <label className={labelCls}>6 · Required Team Competencies</label>
               <CompetencySelect
                 value={watched.teamCompetencies ?? ''}
                 onChange={(v) => setValue('teamCompetencies', v)}
@@ -446,7 +446,7 @@ export default function CanvasForm({ existing }: Props) {
               <input
                 {...register('timeline')}
                 className={inputCls}
-                placeholder="e.g. 3–6 Months"
+                placeholder="z.B. 3–6 Monate"
                 list="timeline-options"
                 autoComplete="off"
               />
@@ -508,7 +508,7 @@ export default function CanvasForm({ existing }: Props) {
             <SliderField label="Business Impact" name="businessImpact" weight="40%" register={register} value={Number(watched.businessImpact ?? 7)} />
             <SliderField label="Feasibility"     name="feasibility"    weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
             <SliderField label="Strategic Fit"   name="strategicFit"   weight="20%" register={register} value={Number(watched.strategicFit ?? 7)} />
-            <SliderField label="Urgency"         name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
+            <SliderField label="Urgency"          name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
           </div>
         </section>
 
@@ -624,11 +624,11 @@ export default function CanvasForm({ existing }: Props) {
               />
             </div>
             <p className="text-[10px] text-slate-500">
-              Impact×40% + Feasibility×30% + Strategic Fit×20% + Urgency×10%
+              Impact×40% + Feasibility×30% + Strategic Fit×20% + Dringlichkeit×10%
             </p>
           </div>
           <div className="text-center min-w-[80px]">
-            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">3-Year ROI</p>
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">3-Y ROI</p>
             <p className={`text-3xl font-bold ${liveROI > 200 ? 'text-green-400' : liveROI > 0 ? 'text-amber-400' : 'text-red-400'}`}>
               {liveROI}%
             </p>
@@ -642,13 +642,13 @@ export default function CanvasForm({ existing }: Props) {
             onClick={() => navigate(-1)}
             className="text-sm border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg"
           >
-            Cancel
+            Abbrechen
           </button>
           <button
             type="submit"
             className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg transition-colors"
           >
-            {existing ? 'Save Changes' : 'Create Use Case'}
+            {existing ? 'Änderungen speichern' : 'Use Case erstellen'}
           </button>
         </div>
       </form>

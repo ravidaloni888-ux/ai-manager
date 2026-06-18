@@ -236,3 +236,12 @@ export type TrainingTopicKey = typeof TRAINING_TOPICS[number]['key']
 export type TrainingStatus = 'open' | 'planned' | 'done'
 export type TrainingMap = Partial<Record<string, Partial<Record<TrainingTopicKey, TrainingStatus>>>>
 export interface EnablementData { trainingMap: TrainingMap }
+
+export type MeetingStatus = 'active' | 'pending' | 'skip'
+export interface MeetingConfig {
+  status: MeetingStatus
+  dayOfWeek: number   // 0=Mon..4=Fri
+  startHour: number
+  startMinute: number
+}
+export interface MeetingsData { configs: Record<string, MeetingConfig> }

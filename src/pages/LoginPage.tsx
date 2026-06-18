@@ -71,7 +71,7 @@ export default function LoginPage() {
           <div>
             <p className="font-semibold text-slate-800">AI Manager</p>
             <p className="text-xs text-slate-400">
-              {forgotMode ? 'Reset your password' : 'Sign in to manage use cases'}
+              {forgotMode ? 'Reset Password' : 'Sign in to manage your use cases'}
             </p>
           </div>
         </div>
@@ -79,13 +79,13 @@ export default function LoginPage() {
         {resetSent ? (
           <div className="space-y-4">
             <p className="text-sm text-green-600">
-              Reset link sent to <strong>{email}</strong>. Check your inbox.
+              Reset link sent to <strong>{email}</strong>. Please check your inbox.
             </p>
             <button
               onClick={() => { setForgotMode(false); setResetSent(false) }}
               className="text-sm text-blue-600 hover:underline"
             >
-              Back to sign in
+              Back to login
             </button>
           </div>
         ) : forgotMode ? (
@@ -116,7 +116,7 @@ export default function LoginPage() {
               onClick={() => { setForgotMode(false); setError('') }}
               className="w-full text-sm text-slate-500 hover:text-slate-700"
             >
-              Back to sign in
+              Back to login
             </button>
           </form>
         ) : (

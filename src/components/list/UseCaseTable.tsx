@@ -35,10 +35,10 @@ import { useAuthStore } from '../../store/authStore'
 const ch = createColumnHelper<AIUseCase>()
 
 const GROUP_OPTIONS = [
-  { value: '', label: 'No grouping' },
+  { value: '', label: 'No Grouping' },
   { value: 'department', label: 'Department' },
-  { value: 'status', label: 'Stage' },
-  { value: 'projectHealth', label: 'Health' },
+  { value: 'status', label: 'Phase' },
+  { value: 'projectHealth', label: 'Project Health' },
   { value: 'aiApproach', label: 'AI Approach' },
 ]
 
@@ -91,7 +91,7 @@ export default function UseCaseTable() {
       filterFn: 'equals',
     }),
     ch.accessor('status', {
-      header: 'Stage',
+      header: 'Phase/Status',
       filterFn: 'equals',
       cell: (i) => (
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_BG[i.getValue() as Status]}`}>
@@ -100,7 +100,7 @@ export default function UseCaseTable() {
       ),
     }),
     ch.accessor('motivation', {
-      header: 'Motivation',
+      header: 'Motivation / Trigger',
       filterFn: motivationFilterFn,
       cell: (i) => {
         const v = (i.getValue() as string) ?? ''
@@ -117,7 +117,7 @@ export default function UseCaseTable() {
       },
     }),
     ch.accessor('projectHealth', {
-      header: 'Health',
+      header: 'Project Health',
       filterFn: 'equals',
       cell: (i) => {
         const v = (i.getValue() ?? 'On Track') as ProjectHealth
@@ -145,8 +145,8 @@ export default function UseCaseTable() {
         </span>
       ),
     }),
-    ch.accessor('businessImpact', { header: 'Impact', cell: (i) => <ScoreCell v={i.getValue()} /> }),
-    ch.accessor('feasibility', { header: 'Feasibility Score', cell: (i) => <ScoreCell v={i.getValue()} /> }),
+    ch.accessor('businessImpact', { header: 'Business Impact', cell: (i) => <ScoreCell v={i.getValue()} /> }),
+    ch.accessor('feasibility', { header: 'Feasibility', cell: (i) => <ScoreCell v={i.getValue()} /> }),
     ch.accessor('strategicFit', { header: 'Strategic Fit', cell: (i) => <ScoreCell v={i.getValue()} /> }),
     ch.accessor('urgency', { header: 'Urgency', cell: (i) => <ScoreCell v={i.getValue()} /> }),
     ch.accessor('priorityScore', {
@@ -173,7 +173,7 @@ export default function UseCaseTable() {
     }),
     ch.display({
       id: 'roi',
-      header: '3-Yr ROI',
+      header: '3-Y ROI',
       cell: (i) => {
         const roi = computeROI(i.row.original.estimatedCostK, i.row.original.expectedBenefitK)
         return (
@@ -277,25 +277,25 @@ export default function UseCaseTable() {
           value={statusFilter}
           onChange={(v) => setFilter('status', v)}
           options={STATUSES}
-          placeholder="All statuses"
+          placeholder="All Phases"
         />
         <FilterSelect
           value={deptFilter}
           onChange={(v) => setFilter('department', v)}
           options={DEPARTMENTS}
-          placeholder="All departments"
+          placeholder="All Departments"
         />
         <FilterSelect
           value={motivationFilter}
           onChange={(v) => setFilter('motivation', v)}
           options={MOTIVATIONS}
-          placeholder="All motivations"
+          placeholder="All Motivations"
         />
         <FilterSelect
           value={healthFilter}
           onChange={(v) => setFilter('projectHealth', v)}
           options={PROJECT_HEALTH_OPTIONS.map((h) => h.value)}
-          placeholder="All health"
+          placeholder="All Health"
         />
 
         {/* Group by */}
@@ -315,7 +315,7 @@ export default function UseCaseTable() {
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-            Clear filters
+            Reset filters
           </button>
         )}
 
@@ -419,7 +419,7 @@ export default function UseCaseTable() {
             {table.getRowModel().rows.length === 0 && (
               <tr>
                 <td colSpan={columns.length} className="text-center py-12 text-slate-400">
-                  No use cases match the current filters.
+                  No use cases found.
                 </td>
               </tr>
             )}
@@ -437,7 +437,7 @@ export default function UseCaseTable() {
                       >
                         <span>{row.getIsExpanded() ? '▼' : '▶'}</span>
                         <span>{String(row.groupingValue)}</span>
-                        <span className="font-normal text-slate-400">({row.subRows.length} cases)</span>
+                        <span className="font-normal text-slate-400">({row.subRows.length} entries)</span>
                       </button>
                     </td>
                   </tr>
