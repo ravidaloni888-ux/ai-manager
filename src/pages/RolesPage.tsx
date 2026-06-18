@@ -19,16 +19,16 @@ const ROLES: RoleDef[] = [
     id: 'ai_architect',
     number: 1,
     title: 'AI Architect',
-    responsibility: 'Technisches Fundament und Architektur aller AI-Lösungen. Interim: Governance & Compliance.',
-    interim: 'Technische Governance (EU AI Act, Risikoklassifizierung, Standards)',
+    responsibility: 'Technical foundation and architecture of all AI solutions. Interim: Governance & Compliance.',
+    interim: 'Technical governance (EU AI Act, risk classification, standards)',
     activities: [
-      'Entwicklung der technischen AI-Strategie und Referenzarchitektur',
-      'Definition von Standards, Frameworks und Technologie-Stack',
-      'Integration von AI-Lösungen in bestehende Systeme (CRM, ERP, Datenplattformen)',
-      'Sicherstellung von Skalierbarkeit, Sicherheit und Performance',
-      'Risikoklassifizierung nach EU AI Act (interim bis Rolle 7)',
-      'Technisches Review aller Use Cases vor Umsetzung',
-      'Aufbau und Pflege der MLOps-Infrastruktur',
+      'Develop the technical AI strategy and reference architecture',
+      'Define standards, frameworks and technology stack',
+      'Integrate AI solutions into existing systems (CRM, ERP, data platforms)',
+      'Ensure scalability, security and performance',
+      'Risk classification per EU AI Act (interim until Role 7 is filled)',
+      'Technical review of all use cases before implementation',
+      'Build and maintain MLOps infrastructure',
     ],
     color: { bg: 'bg-blue-50', text: 'text-blue-700', badgeBg: 'bg-blue-600', border: 'border-blue-200' },
   },
@@ -36,14 +36,14 @@ const ROLES: RoleDef[] = [
     id: 'data_engineer',
     number: 2,
     title: 'Data Engineer',
-    responsibility: 'Datenqualität und -verfügbarkeit als Grundlage für alle AI-Anwendungen.',
+    responsibility: 'Data quality and availability as the foundation for all AI applications.',
     activities: [
-      'Design und Betrieb von Datenpipelines (ETL/ELT)',
-      'Sicherstellung von Datenqualität, -konsistenz und -aktualität',
-      'Aufbau und Pflege des Feature Stores',
-      'Anbindung an interne Datenquellen und externe APIs',
-      'Zusammenarbeit mit IT und Fachbereichen zur Datenstrategie',
-      'Monitoring und Logging von Datenprozessen',
+      'Design and operate data pipelines (ETL/ELT)',
+      'Ensure data quality, consistency and freshness',
+      'Build and maintain the feature store',
+      'Connect to internal data sources and external APIs',
+      'Collaborate with IT and business units on data strategy',
+      'Monitor and log data processes',
     ],
     color: { bg: 'bg-cyan-50', text: 'text-cyan-700', badgeBg: 'bg-cyan-600', border: 'border-cyan-200' },
   },
@@ -51,16 +51,16 @@ const ROLES: RoleDef[] = [
     id: 'ai_business_analyst',
     number: 3,
     title: 'AI Business Analyst',
-    responsibility: 'Brücke zwischen Business und Technologie. Interim: Business-seitige Governance.',
-    interim: 'Use-Case-Transparenz, Stakeholder-Risikokommunikation',
+    responsibility: 'Bridge between business and technology. Interim: Business-side governance.',
+    interim: 'Use case transparency, stakeholder risk communication',
     activities: [
-      'Identifikation, Bewertung und Priorisierung von AI-Use-Cases nach ROI',
-      'Übersetzung von Business-Anforderungen in technische Spezifikationen',
-      'Stakeholder-Management mit Fachbereichen und C-Level',
-      'Business Cases und Impact-Analysen für AI-Projekte',
-      'Begleitung von Pilotprojekten und Erfolgsmessung (KPIs)',
-      'Dokumentation von Anforderungen und Prozessen',
-      'Interim: Risikobewertung und Transparenz zu Use Cases',
+      'Identify, evaluate and prioritise AI use cases by ROI',
+      'Translate business requirements into technical specifications',
+      'Stakeholder management with business units and C-level',
+      'Business cases and impact analyses for AI projects',
+      'Support pilot projects and measure success (KPIs)',
+      'Document requirements and processes',
+      'Interim: risk assessment and transparency for use cases',
     ],
     color: { bg: 'bg-amber-50', text: 'text-amber-700', badgeBg: 'bg-amber-500', border: 'border-amber-200' },
   },
@@ -68,14 +68,14 @@ const ROLES: RoleDef[] = [
     id: 'ml_ai_engineer',
     number: 4,
     title: 'ML / AI Engineer',
-    responsibility: 'Entwicklung, Training und Deployment von AI-Modellen und -Lösungen.',
+    responsibility: 'Development, training and deployment of AI models and solutions.',
     activities: [
-      'Entwicklung und Fine-Tuning von ML- und GenAI-Modellen',
-      'Prompt Engineering und RAG-Architekturen',
-      'Deployment und Monitoring von Modellen in Produktion',
-      'MLOps: Versionierung, Testing, CI/CD für AI-Pipelines',
-      'Evaluation von Modellperformance und Drift-Erkennung',
-      'Technische Umsetzung von Use Cases in enger Abstimmung mit dem Architect',
+      'Develop and fine-tune ML and GenAI models',
+      'Prompt engineering and RAG architectures',
+      'Deploy and monitor models in production',
+      'MLOps: versioning, testing, CI/CD for AI pipelines',
+      'Evaluate model performance and detect drift',
+      'Implement use cases in close collaboration with the Architect',
     ],
     color: { bg: 'bg-purple-50', text: 'text-purple-700', badgeBg: 'bg-purple-600', border: 'border-purple-200' },
   },
@@ -83,14 +83,14 @@ const ROLES: RoleDef[] = [
     id: 'ai_product_manager',
     number: 5,
     title: 'AI Product Manager',
-    responsibility: 'Use-Case-Roadmap und Delivery bei mehreren parallelen Projekten.',
+    responsibility: 'AI use case roadmap and delivery across multiple parallel projects.',
     activities: [
-      'Priorisierung und Pflege der AI-Use-Case-Roadmap',
-      'Erstellung von User Stories und Akzeptanzkriterien',
-      'Koordination zwischen Business Analyst, Engineers und Stakeholdern',
-      'Sprint-Planung und Fortschritts-Tracking',
-      'KPI-Messung und Reporting an das Management',
-      'Identifikation von Abhängigkeiten und Risiken im Projektportfolio',
+      'Prioritise and maintain the AI use case roadmap',
+      'Write user stories and acceptance criteria',
+      'Coordinate between business analyst, engineers and stakeholders',
+      'Sprint planning and progress tracking',
+      'KPI measurement and reporting to management',
+      'Identify dependencies and risks in the project portfolio',
     ],
     color: { bg: 'bg-green-50', text: 'text-green-700', badgeBg: 'bg-green-600', border: 'border-green-200' },
   },
@@ -98,14 +98,14 @@ const ROLES: RoleDef[] = [
     id: 'ai_enablement_specialist',
     number: 6,
     title: 'AI Enablement Specialist',
-    responsibility: 'Aufbau von AI-Kompetenz und Adoption im Unternehmen.',
+    responsibility: 'Building AI competency and adoption across the organisation.',
     activities: [
-      'Konzeption und Durchführung von AI-Trainings für alle Ebenen',
-      'Aufbau einer internen Community of Practice (AI Champions)',
-      'Entwicklung von Lernpfaden und Self-Service-Materialien',
-      'Change Management bei der Einführung neuer AI-Tools',
-      'Kommunikation von AI-Erfolgen und Best Practices intern',
-      'Bedarfsanalyse für Weiterbildung in Fachbereichen',
+      'Design and deliver AI training for all levels',
+      'Build an internal Community of Practice (AI Champions)',
+      'Develop learning paths and self-service materials',
+      'Change management for the introduction of new AI tools',
+      'Communicate AI successes and best practices internally',
+      'Assess upskilling needs across business units',
     ],
     color: { bg: 'bg-orange-50', text: 'text-orange-700', badgeBg: 'bg-orange-500', border: 'border-orange-200' },
   },
@@ -113,15 +113,15 @@ const ROLES: RoleDef[] = [
     id: 'ai_governance_specialist',
     number: 7,
     title: 'AI Governance & Compliance Specialist',
-    responsibility: 'Regulatorische Sicherheit und verantwortungsvoller AI-Einsatz.',
+    responsibility: 'Regulatory compliance and responsible AI deployment.',
     activities: [
-      'Umsetzung und Monitoring der Anforderungen aus dem EU AI Act',
-      'Risikoklassifizierung und Audit-Trails für AI-Systeme',
-      'Entwicklung unternehmensweiter AI-Richtlinien und Standards',
-      'Datenschutz-Compliance in Abstimmung mit Legal und DSGVO',
-      'Regelmäßige Audits der eingesetzten AI-Lösungen',
-      'Schulung des Teams zu ethischen AI-Prinzipien',
-      'Ansprechpartner für externe Prüfungen und Behörden',
+      'Implement and monitor EU AI Act requirements',
+      'Risk classification and audit trails for AI systems',
+      'Develop company-wide AI policies and standards',
+      'Data privacy compliance in alignment with legal and GDPR',
+      'Regular audits of deployed AI solutions',
+      'Train the team on ethical AI principles',
+      'Point of contact for external audits and regulatory authorities',
     ],
     color: { bg: 'bg-rose-50', text: 'text-rose-700', badgeBg: 'bg-rose-600', border: 'border-rose-200' },
   },
@@ -183,7 +183,7 @@ export default function RolesPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">AI Center of Excellence</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Rollen & Verantwortlichkeiten · 7 Positionen</p>
+          <p className="text-sm text-slate-500 mt-0.5">Roles & Responsibilities · 7 Positions</p>
         </div>
         {user && isDirty && (
           <button
@@ -199,9 +199,9 @@ export default function RolesPage() {
       {/* Interim governance banner */}
       {!role7Assigned && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-1.5">
-          <p className="text-sm font-semibold text-amber-800">Interim-Governance aktiv</p>
+          <p className="text-sm font-semibold text-amber-800">Interim Governance Active</p>
           <p className="text-xs text-amber-700">
-            Bis Rolle 7 besetzt ist, tragen folgende Rollen zusätzliche Governance-Verantwortung:
+            Until Role 7 is filled, the following roles carry additional governance responsibility:
           </p>
           <ul className="space-y-0.5">
             {interimRoles.map((r) => (
@@ -276,7 +276,7 @@ export default function RolesPage() {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
-                    {role.activities.length} Tätigkeiten
+                    {role.activities.length} Activities
                   </button>
                   {isExp && (
                     <ul className="mt-2.5 space-y-1.5">

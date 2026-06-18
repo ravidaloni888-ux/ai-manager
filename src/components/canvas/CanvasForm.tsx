@@ -642,13 +642,13 @@ export default function CanvasForm({ existing }: Props) {
             onClick={() => navigate(-1)}
             className="text-sm border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg"
           >
-            Abbrechen
+            Cancel
           </button>
           <button
             type="submit"
             className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg transition-colors"
           >
-            {existing ? 'Änderungen speichern' : 'Use Case erstellen'}
+            {existing ? 'Save Changes' : 'Create Use Case'}
           </button>
         </div>
       </form>

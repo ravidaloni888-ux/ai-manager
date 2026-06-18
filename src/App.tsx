@@ -9,6 +9,7 @@ import GovernancePage from './pages/GovernancePage'
 import EnablementPage from './pages/EnablementPage'
 import MeetingsPage from './pages/MeetingsPage'
 import RolesPage from './pages/RolesPage'
+import MaturityPage from './pages/MaturityPage'
 import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { useUseCasesStore } from './store/useCasesStore'
@@ -65,6 +66,7 @@ function AppRoutes() {
               <Route path="/enablement" element={<EnablementPage />} />
               <Route path="/meetings" element={<MeetingsPage />} />
               <Route path="/roles" element={<RolesPage />} />
+              <Route path="/maturity" element={<MaturityPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
               <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
             </Routes>

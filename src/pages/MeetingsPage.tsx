@@ -6,8 +6,8 @@ import { MeetingConfig, MeetingStatus, MeetingsData } from '../types'
 // ── Static data ─────────────────────────────────────────────────────────────
 const SLOT_H = 30          // px per 30-min slot
 const HOURS = Array.from({ length: 11 }, (_, i) => i + 8)  // 8..18
-const DAY_LABELS = ['Mo', 'Di', 'Mi', 'Do', 'Fr']
-const DAY_NAMES  = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag']
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+const DAY_NAMES  = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 const TIME_OPTS  = Array.from({ length: 20 }, (_, i) => {
   const h = 8 + Math.floor(i / 2), m = i % 2 === 0 ? 0 : 30
   return { h, m, v: `${h}:${m.toString().padStart(2, '0')}` }
@@ -24,43 +24,43 @@ interface Def {
 const DEFS: Def[] = [
   {
     id: 'trend_scouting', name: 'Trend Scouting',
-    cadence: 'weekly', cadenceLabel: 'Wöchentlich', durationMin: 30,
-    participants: 'KI-Manager (+ IT)', description: 'Neue KI-Tools, Papers und Wettbewerber screenen',
+    cadence: 'weekly', cadenceLabel: 'Weekly', durationMin: 30,
+    participants: 'AI Manager (+ IT)', description: 'Screen new AI tools, papers and competitors',
     bg: '#dbeafe', text: '#1e40af', border: '#3b82f6', badge: '#bfdbfe', badgeText: '#1d4ed8',
     defaultDay: 0, defaultHour: 9,
   },
   {
     id: 'use_case_review', name: 'Use Case Review',
-    cadence: 'biweekly', cadenceLabel: '2-wöchentlich', durationMin: 60,
-    participants: 'KI-Manager + Projektteams', description: 'Status aktiver Use Cases, Pilot-Fortschritt, Blocker',
+    cadence: 'biweekly', cadenceLabel: 'Biweekly', durationMin: 60,
+    participants: 'AI Manager + Project Teams', description: 'Active use case status, pilot progress, blockers',
     bg: '#dcfce7', text: '#14532d', border: '#22c55e', badge: '#bbf7d0', badgeText: '#166534',
     defaultDay: 2, defaultHour: 14,
   },
   {
     id: 'governance_review', name: 'Governance Review',
-    cadence: 'monthly', cadenceLabel: 'Monatlich', durationMin: 90,
-    participants: 'KI-Manager + DPO + Security', description: 'KI-Richtlinie, Compliance-Status, Rollen prüfen',
+    cadence: 'monthly', cadenceLabel: 'Monthly', durationMin: 90,
+    participants: 'AI Manager + DPO + Security', description: 'Review AI policy, compliance status, roles',
     bg: '#ffedd5', text: '#7c2d12', border: '#f97316', badge: '#fed7aa', badgeText: '#c2410c',
     defaultDay: 1, defaultHour: 10,
   },
   {
     id: 'tech_scouting_sync', name: 'Tech Scouting Sync',
-    cadence: 'monthly', cadenceLabel: 'Monatlich', durationMin: 60,
-    participants: 'KI-Manager + IT', description: 'Neue Technologien bewerten, Radar aktualisieren',
+    cadence: 'monthly', cadenceLabel: 'Monthly', durationMin: 60,
+    participants: 'AI Manager + IT', description: 'Evaluate new technologies, update radar',
     bg: '#ccfbf1', text: '#134e4a', border: '#14b8a6', badge: '#99f6e4', badgeText: '#0f766e',
     defaultDay: 0, defaultHour: 13,
   },
   {
-    id: 'ki_schulung', name: 'KI-Schulung / Enablement',
-    cadence: 'monthly', cadenceLabel: 'Monatlich', durationMin: 120,
-    participants: 'Alle relevanten Teams', description: 'Thema aus Topic Library · Workshop oder E-Learning',
+    id: 'ki_schulung', name: 'AI Training / Enablement',
+    cadence: 'monthly', cadenceLabel: 'Monthly', durationMin: 120,
+    participants: 'All relevant teams', description: 'Topic from library · workshop or e-learning',
     bg: '#f3e8ff', text: '#581c87', border: '#a855f7', badge: '#e9d5ff', badgeText: '#7e22ce',
     defaultDay: 4, defaultHour: 14,
   },
   {
-    id: 'ki_strategie', name: 'KI-Strategie Jour Fixe',
-    cadence: 'quarterly', cadenceLabel: 'Quartalsweise', durationMin: 120,
-    participants: 'C-Level + KI-Manager', description: 'Roadmap, KPIs, strategische Ausrichtung',
+    id: 'ki_strategie', name: 'AI Strategy Jour Fixe',
+    cadence: 'quarterly', cadenceLabel: 'Quarterly', durationMin: 120,
+    participants: 'C-Level + AI Manager', description: 'Roadmap, KPIs, strategic alignment',
     bg: '#1e293b', text: '#f8fafc', border: '#475569', badge: '#334155', badgeText: '#e2e8f0',
     defaultDay: 3, defaultHour: 10,
   },
@@ -70,7 +70,7 @@ const STATUS_NEXT: Record<MeetingStatus, MeetingStatus> = {
   active: 'pending', pending: 'skip', skip: 'active',
 }
 const STATUS_LABEL: Record<MeetingStatus, string> = {
-  active: '✓ Eingerichtet', pending: '⏳ Ausstehend', skip: '— Nicht relevant',
+  active: '✓ Active', pending: '⏳ Pending', skip: '— Skip',
 }
 const STATUS_CLS: Record<MeetingStatus, string> = {
   active: 'bg-green-100 text-green-700',
@@ -180,7 +180,7 @@ function MonthView({ data }: { data: MeetingsData }) {
   const today = now.getDate()
   const firstDow    = (new Date(year, month, 1).getDay() + 6) % 7  // Mon=0
   const daysInMonth = new Date(year, month + 1, 0).getDate()
-  const monthName   = new Date(year, month).toLocaleString('de-DE', { month: 'long', year: 'numeric' })
+  const monthName   = new Date(year, month).toLocaleString('en-US', { month: 'long', year: 'numeric' })
   const isQuarterMonth = [0, 3, 6, 9].includes(month) // Jan, Apr, Jul, Oct
 
   const cells: (number | null)[] = [
@@ -214,12 +214,12 @@ function MonthView({ data }: { data: MeetingsData }) {
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
       <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
         <p className="text-sm font-semibold text-slate-800 capitalize">{monthName}</p>
-        <p className="text-xs text-slate-400">Typischer Monatsüberblick</p>
+        <p className="text-xs text-slate-400">Typical month overview</p>
       </div>
       {/* Weekday headers */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}
         className="bg-slate-50 border-b border-slate-100">
-        {['Mo','Di','Mi','Do','Fr','Sa','So'].map(d => (
+        {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
           <div key={d} className="text-center py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{d}</div>
         ))}
       </div>
@@ -297,15 +297,15 @@ export default function MeetingsPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Regeltermine</h1>
+          <h1 className="text-xl font-bold text-slate-900">Regular Meetings</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Wiederkehrende KI-Meetings konfigurieren und im Überblick behalten
+            Configure and track recurring AI meetings
           </p>
         </div>
         {user && (
           <button onClick={save} disabled={saving}
             className="flex-shrink-0 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
-            {saving ? 'Speichern…' : 'Speichern'}
+            {saving ? 'Saving…' : 'Save'}
           </button>
         )}
       </div>
@@ -313,7 +313,7 @@ export default function MeetingsPage() {
       {/* KPI + legend row */}
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-4 border border-slate-200">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Eingerichtet</p>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Active</p>
           <p className="text-3xl font-bold text-slate-900 mt-1">
             {activeCount}<span className="text-base font-normal text-slate-400">/{DEFS.length}</span>
           </p>
@@ -323,7 +323,7 @@ export default function MeetingsPage() {
           </div>
         </div>
         <div className="col-span-3 bg-white rounded-xl p-4 border border-slate-200">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Alle Termine</p>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">All Meetings</p>
           <div className="flex flex-wrap gap-2">
             {DEFS.map(def => {
               const status = data.configs[def.id]?.status ?? 'pending'
@@ -348,7 +348,7 @@ export default function MeetingsPage() {
         {(['week', 'month'] as const).map(k => (
           <button key={k} onClick={() => setTab(k)}
             className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${tab === k ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
-            {k === 'week' ? 'Wochenansicht' : 'Monatsansicht'}
+            {k === 'week' ? 'Week View' : 'Month View'}
           </button>
         ))}
       </div>
@@ -359,8 +359,8 @@ export default function MeetingsPage() {
       {/* Config cards */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-700">Termindetails & Konfiguration</h2>
-          {!user && <p className="text-xs text-amber-600">Anmelden zum Bearbeiten</p>}
+          <h2 className="text-sm font-bold text-slate-700">Meeting Details & Configuration</h2>
+          {!user && <p className="text-xs text-amber-600">Sign in to edit</p>}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {DEFS.map(def => {
@@ -390,7 +390,7 @@ export default function MeetingsPage() {
                 </div>
                 {user && status !== 'skip' && (
                   <div className="flex items-center gap-2 pt-2 border-t border-slate-50 flex-wrap">
-                    <span className="text-[10px] text-slate-400 flex-shrink-0">Zeitpunkt:</span>
+                    <span className="text-[10px] text-slate-400 flex-shrink-0">Time:</span>
                     <select
                       value={cfg.dayOfWeek}
                       onChange={e => handleUpdate(def, { dayOfWeek: Number(e.target.value) })}

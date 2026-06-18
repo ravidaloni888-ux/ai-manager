@@ -50,7 +50,7 @@ export default function AppShell({ children }: AppShellProps) {
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
             Release 2
           </p>
-          <NavItem icon={<IconChartBar />} label="Maturity Assessment" disabled badge="R2" />
+          <NavItem to="/maturity" icon={<IconChartBar />} label="Maturity Assessment" />
           <NavItem to="/governance" icon={<IconBuilding />} label="AI Governance" />
           <NavItem to="/enablement" icon={<IconAcademic />} label="Enablement & Coaching" />
           <NavItem to="/meetings" icon={<IconCalendar />} label="Regular Meetings" />

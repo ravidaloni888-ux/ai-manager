@@ -8,41 +8,41 @@ import { GovernanceData, AIUseCase, EU_AI_ACT_BG, EuAiActRisk } from '../types'
 type Tab = 'steps' | 'richtlinie' | 'roles' | 'checklist'
 
 const RICHTLINIE_FIELDS: { key: keyof GovernanceData['richtlinie']; title: string; desc: string }[] = [
-  { key: 'zweck',                title: 'Zweck & Einsatzbereich',         desc: 'Wofür und in welchen Bereichen darf KI im Unternehmen eingesetzt werden?' },
-  { key: 'daten',                title: 'Daten & Datenschutz',            desc: 'Welche Daten dürfen genutzt werden und wie wird deren Schutz sichergestellt?' },
-  { key: 'transparenz',          title: 'Transparenz & Nachvollziehbarkeit', desc: 'Wie werden KI-Entscheidungen erklärbar und überprüfbar gemacht?' },
-  { key: 'verantwortlichkeiten', title: 'Verantwortlichkeiten & Governance', desc: 'Wer trägt die Verantwortung für Entwicklung, Einsatz und Kontrolle der KI?' },
-  { key: 'risikomanagement',     title: 'Risikomanagement & Compliance',  desc: 'Welche Risiken bestehen und wie werden gesetzliche Vorgaben eingehalten?' },
-  { key: 'ethik',                title: 'Ethik & Fairness',               desc: 'Wie wird sichergestellt, dass KI diskriminierungsfrei und verantwortungsvoll handelt?' },
-  { key: 'schulung',             title: 'Schulung & Awareness',           desc: 'Wie werden Mitarbeitende im sicheren und sinnvollen Umgang mit KI befähigt?' },
+  { key: 'zweck',                title: 'Purpose & Scope',                desc: 'For what purposes and in which areas may AI be used in the company?' },
+  { key: 'daten',                title: 'Data & Privacy',                 desc: 'Which data may be used and how is its protection ensured?' },
+  { key: 'transparenz',          title: 'Transparency & Explainability',  desc: 'How are AI decisions made explainable and auditable?' },
+  { key: 'verantwortlichkeiten', title: 'Responsibilities & Governance',  desc: 'Who is responsible for the development, deployment and control of AI?' },
+  { key: 'risikomanagement',     title: 'Risk Management & Compliance',   desc: 'What risks exist and how are legal requirements met?' },
+  { key: 'ethik',                title: 'Ethics & Fairness',              desc: 'How is it ensured that AI operates without discrimination and responsibly?' },
+  { key: 'schulung',             title: 'Training & Awareness',           desc: 'How are employees equipped to use AI safely and effectively?' },
 ]
 
 const ROLES: { key: keyof GovernanceData['roles']; title: string; desc: string; icon: string }[] = [
-  { key: 'aiOwner',  title: 'AI Owner',                    desc: 'Gesamtverantwortung für KI-Strategie und -Einsatz',           icon: '🎯' },
-  { key: 'dpo',      title: 'Datenschutzbeauftragter (DSB)', desc: 'DSGVO-Compliance, DSFA, personenbezogene Daten',           icon: '🔒' },
-  { key: 'security', title: 'IT Security',                  desc: 'Cybersicherheit, Zugriffskontrollen, Angriffssicherheit',   icon: '🛡️' },
-  { key: 'ethics',   title: 'Ethics & Bias Reviewer',       desc: 'Anti-Bias-Prüfung, Fairness, Diskriminierungsfreiheit',    icon: '⚖️' },
-  { key: 'business', title: 'Business Approval',            desc: 'Fachliche Freigabe vor Produktiveinsatz',                   icon: '✅' },
+  { key: 'aiOwner',  title: 'AI Owner',                       desc: 'Overall responsibility for AI strategy and deployment',      icon: '🎯' },
+  { key: 'dpo',      title: 'Data Protection Officer (DPO)',  desc: 'GDPR compliance, DPIA, personal data',                      icon: '🔒' },
+  { key: 'security', title: 'IT Security',                    desc: 'Cybersecurity, access controls, attack resilience',          icon: '🛡️' },
+  { key: 'ethics',   title: 'Ethics & Bias Reviewer',         desc: 'Anti-bias review, fairness, non-discrimination',            icon: '⚖️' },
+  { key: 'business', title: 'Business Approval',              desc: 'Business sign-off before production deployment',            icon: '✅' },
 ]
 
 const STEPS: { n: number; key: keyof GovernanceData['steps']; title: string; desc: string }[] = [
-  { n: 1, key: 'step1', title: 'Ziele und Use Cases definieren',       desc: 'Welche konkreten Geschäftsprobleme soll KI lösen?' },
-  { n: 2, key: 'step2', title: 'KI-Richtlinie formulieren',            desc: 'Zweck, Daten, Transparenz, Governance, Risiko, Ethik, Schulung' },
-  { n: 3, key: 'step3', title: 'Datenschutz & Rechtsvorschriften',     desc: 'DSGVO, EU AI Act, gesetzliche Grundlagen prüfen und dokumentieren' },
-  { n: 4, key: 'step4', title: 'Mitarbeitende schulen',                desc: 'KI-Kompetenz aufbauen, Awareness-Programm etablieren' },
-  { n: 5, key: 'step5', title: 'Maßnahmen zur Sicherheit umsetzen',   desc: 'Cybersicherheit, Zugriffskontrollen, Monitoring einrichten' },
-  { n: 6, key: 'step6', title: 'Risikomanagementsystem erweitern',    desc: 'KI-spezifische Risiken in bestehendes System integrieren' },
-  { n: 7, key: 'step7', title: 'Verantwortliche benennen',             desc: 'AI Owner, DSB, Security, Ethics, Business Sign-off definieren' },
-  { n: 8, key: 'step8', title: 'Pilotphase nutzen',                    desc: 'Use Cases schrittweise einführen, Learnings dokumentieren' },
-  { n: 9, key: 'step9', title: 'Dokumentation der Punkte 1–8',        desc: 'Audit-Trail erstellen, Nachweispflichten erfüllen' },
+  { n: 1, key: 'step1', title: 'Define goals and use cases',           desc: 'Which concrete business problems should AI solve?' },
+  { n: 2, key: 'step2', title: 'Formulate AI policy',                  desc: 'Purpose, data, transparency, governance, risk, ethics, training' },
+  { n: 3, key: 'step3', title: 'Data privacy & legal requirements',    desc: 'GDPR, EU AI Act — review and document legal foundations' },
+  { n: 4, key: 'step4', title: 'Train employees',                      desc: 'Build AI competency, establish awareness program' },
+  { n: 5, key: 'step5', title: 'Implement security measures',          desc: 'Cybersecurity, access controls, monitoring' },
+  { n: 6, key: 'step6', title: 'Extend risk management system',        desc: 'Integrate AI-specific risks into existing risk framework' },
+  { n: 7, key: 'step7', title: 'Assign responsible parties',           desc: 'Define AI Owner, DPO, Security, Ethics, Business Sign-off' },
+  { n: 8, key: 'step8', title: 'Use pilot phase',                      desc: 'Roll out use cases incrementally, document learnings' },
+  { n: 9, key: 'step9', title: 'Document steps 1–8',                   desc: 'Create audit trail, fulfil documentation obligations' },
 ]
 
 const COMPLIANCE_COLS: { key: keyof AIUseCase; short: string; title: string }[] = [
-  { key: 'complianceLegal',         short: 'Rechtlich', title: 'Einhaltung gesetzlicher Vorgaben (DSGVO, EU AI Act)' },
-  { key: 'compliancePersonalData',  short: 'Pers. Daten', title: 'Personenbezogene Daten & Rechtsgrundlage dokumentiert' },
-  { key: 'complianceDataMin',       short: 'Datenmin.', title: 'Datenminimierung & Zweckbindung sichergestellt' },
-  { key: 'complianceDocumentation', short: 'Doku.', title: 'Dokumentation & Nachweispflichten erfüllt' },
-  { key: 'complianceLiability',     short: 'Haftung', title: 'Haftung & Verantwortlichkeit geregelt' },
+  { key: 'complianceLegal',         short: 'Legal',       title: 'Compliance with legal requirements (GDPR, EU AI Act)' },
+  { key: 'compliancePersonalData',  short: 'Pers. Data',  title: 'Personal data & legal basis documented' },
+  { key: 'complianceDataMin',       short: 'Data Min.',   title: 'Data minimisation & purpose limitation ensured' },
+  { key: 'complianceDocumentation', short: 'Docs',        title: 'Documentation & proof obligations fulfilled' },
+  { key: 'complianceLiability',     short: 'Liability',   title: 'Liability & responsibility defined' },
 ]
 
 const DEFAULT: GovernanceData = {
@@ -77,10 +77,10 @@ export default function GovernancePage() {
   }
 
   const TABS: { id: Tab; label: string; badge: string }[] = [
-    { id: 'steps',     label: '9-Schritte Planung', badge: `${stepsCount}/9`   },
-    { id: 'richtlinie',label: 'KI-Richtlinie',      badge: `${richtCount}/7`   },
-    { id: 'roles',     label: 'Verantwortliche',     badge: `${rolesCount}/5`   },
-    { id: 'checklist', label: 'Datenschutz-Checkliste', badge: `${useCases.length}` },
+    { id: 'steps',     label: '9-Step Planning',        badge: `${stepsCount}/9`   },
+    { id: 'richtlinie',label: 'AI Policy',              badge: `${richtCount}/7`   },
+    { id: 'roles',     label: 'Responsible Parties',    badge: `${rolesCount}/5`   },
+    { id: 'checklist', label: 'Privacy Checklist',      badge: `${useCases.length}` },
   ]
 
   if (loading) return (
@@ -95,7 +95,7 @@ export default function GovernancePage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">AI Governance</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Strategische Planung · KI-Richtlinie · Datenschutz — K7.0069</p>
+          <p className="text-sm text-slate-500 mt-0.5">Strategic Planning · AI Policy · Data Privacy — K7.0069</p>
         </div>
         {user && (
           <button
@@ -110,9 +110,9 @@ export default function GovernancePage() {
 
       {/* KPI row */}
       <div className="grid grid-cols-3 gap-4">
-        <KpiCard label="Planung abgeschlossen" value={`${stepsCount} / 9`}   pct={stepsCount / 9}   color="blue"   />
-        <KpiCard label="KI-Richtlinie befüllt" value={`${richtCount} / 7`}   pct={richtCount / 7}   color="violet" />
-        <KpiCard label="Rollen besetzt"         value={`${rolesCount} / 5`}   pct={rolesCount / 5}   color="emerald"/>
+        <KpiCard label="Planning Complete"  value={`${stepsCount} / 9`}   pct={stepsCount / 9}   color="blue"   />
+        <KpiCard label="AI Policy Filled"   value={`${richtCount} / 7`}   pct={richtCount / 7}   color="violet" />
+        <KpiCard label="Roles Assigned"     value={`${rolesCount} / 5`}   pct={rolesCount / 5}   color="emerald"/>
       </div>
 
       {/* Tabs */}
@@ -193,7 +193,7 @@ function StepsTab({ steps, onChange, readonly }: {
     <div className="space-y-4">
       <div className="bg-white rounded-xl shadow-md p-5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-slate-700">Strategische Planung des Einsatzes</h3>
+          <h3 className="text-sm font-semibold text-slate-700">Strategic AI Deployment Planning</h3>
           <span className="text-sm font-bold text-blue-700">{pct}%</span>
         </div>
         <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-5">
@@ -258,7 +258,7 @@ function RichtlinieTab({ richtlinie, onChange, readonly }: {
             disabled={readonly}
             value={richtlinie[f.key]}
             onChange={(e) => onChange({ ...richtlinie, [f.key]: e.target.value })}
-            placeholder={readonly ? '—' : 'Antwort eingeben…'}
+            placeholder={readonly ? '—' : 'Enter your answer…'}
             className={textareaCls}
           />
         </div>
@@ -291,7 +291,7 @@ function RolesTab({ roles, onChange, readonly }: {
               disabled={readonly}
               value={roles[r.key]}
               onChange={(e) => onChange({ ...roles, [r.key]: e.target.value })}
-              placeholder={readonly ? 'Not assigned' : 'Name eingeben…'}
+              placeholder={readonly ? 'Not assigned' : 'Enter name…'}
               className={inputCls}
             />
           </div>

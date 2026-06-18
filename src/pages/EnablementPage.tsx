@@ -61,7 +61,7 @@ export default function EnablementPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-900">Enablement & Coaching</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Step 4 · Mitarbeitende schulen — 7 Kernthemen aus dem KI-Einführungsframework
+            Step 4 · Train employees — 7 core topics from the AI deployment framework
           </p>
         </div>
         {tab === 'map' && user && (
@@ -70,7 +70,7 @@ export default function EnablementPage() {
             disabled={saving}
             className="flex-shrink-0 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
-            {saving ? 'Speichern…' : 'Speichern'}
+            {saving ? 'Saving…' : 'Save'}
           </button>
         )}
       </div>
@@ -79,28 +79,28 @@ export default function EnablementPage() {
       {tab === 'map' && (
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-white rounded-xl p-4 border border-slate-200 space-y-2">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Gesamtbereitschaft</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Overall Readiness</p>
             <div className="flex items-end gap-2">
               <span className="text-3xl font-bold text-slate-900">{stats.pct}%</span>
-              <span className="text-xs text-slate-400 mb-1">{stats.done}/{stats.total} Schulungen</span>
+              <span className="text-xs text-slate-400 mb-1">{stats.done}/{stats.total} trainings</span>
             </div>
             <div className="w-full bg-slate-100 rounded-full h-2">
               <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${stats.pct}%` }} />
             </div>
           </div>
           <div className="bg-white rounded-xl p-4 border border-slate-200">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Themen vollständig</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Topics Complete</p>
             <p className="text-3xl font-bold text-slate-900 mt-1">
               {stats.topicsFull}<span className="text-base font-normal text-slate-400">/{TRAINING_TOPICS.length}</span>
             </p>
-            <p className="text-xs text-slate-400 mt-1">in allen Abteilungen abgeschlossen</p>
+            <p className="text-xs text-slate-400 mt-1">completed across all departments</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-slate-200">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Abteilungen voll geschult</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Departments Fully Trained</p>
             <p className="text-3xl font-bold text-slate-900 mt-1">
               {stats.deptsFull}<span className="text-base font-normal text-slate-400">/{DEPARTMENTS.length}</span>
             </p>
-            <p className="text-xs text-slate-400 mt-1">alle 7 Themen abgeschlossen</p>
+            <p className="text-xs text-slate-400 mt-1">all 7 topics completed</p>
           </div>
         </div>
       )}
@@ -123,7 +123,7 @@ export default function EnablementPage() {
         <div className="bg-white rounded-xl border border-slate-200">
           {!user && (
             <div className="px-4 py-2 bg-amber-50 border-b border-amber-100 text-xs text-amber-700 rounded-t-xl">
-              Nur zum Lesen — bitte anmelden, um den Schulungsstatus zu bearbeiten.
+              Read only — sign in to update training status.
             </div>
           )}
           <div className="overflow-x-auto">
@@ -131,7 +131,7 @@ export default function EnablementPage() {
               <thead>
                 <tr>
                   <th className="sticky left-0 z-10 bg-white text-left text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 border-b border-slate-100 min-w-[130px]">
-                    Abteilung
+                    Department
                   </th>
                   {TRAINING_TOPICS.map(t => {
                     const clr = TOPIC_CLR[t.color]
@@ -144,7 +144,7 @@ export default function EnablementPage() {
                     )
                   })}
                   <th className="text-right text-xs font-semibold text-slate-400 uppercase tracking-wide px-4 py-3 border-b border-slate-100 min-w-[88px]">
-                    % Fertig
+                    % Done
                   </th>
                 </tr>
               </thead>
@@ -168,9 +168,9 @@ export default function EnablementPage() {
                               onChange={e => setStatus(dept, topic.key, e.target.value as TrainingStatus)}
                               className={`w-full text-xs rounded px-1.5 py-1 border-0 cursor-pointer outline-none transition-all ${statusSelectCls(s)} ${!user ? 'opacity-60 cursor-not-allowed' : ''}`}
                             >
-                              <option value="open">— Offen</option>
-                              <option value="planned">⏳ Geplant</option>
-                              <option value="done">✓ Fertig</option>
+                              <option value="open">— Open</option>
+                              <option value="planned">⏳ Planned</option>
+                              <option value="done">✓ Done</option>
                             </select>
                           </td>
                         )
@@ -190,7 +190,7 @@ export default function EnablementPage() {
               <tfoot>
                 <tr>
                   <td className="sticky left-0 z-10 bg-slate-50 px-4 py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wide border-t border-slate-200">
-                    % Fertig
+                    % Done
                   </td>
                   {TRAINING_TOPICS.map(t => {
                     const done = DEPARTMENTS.filter(d => getStatus(data, d, t.key) === 'done').length
@@ -209,10 +209,10 @@ export default function EnablementPage() {
             </table>
           </div>
           <div className="px-4 py-2.5 border-t border-slate-100 flex flex-wrap gap-4 text-xs text-slate-400">
-            <span className="flex items-center gap-1.5"><span className="bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded text-[10px]">— Offen</span></span>
-            <span className="flex items-center gap-1.5"><span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[10px]">⏳ Geplant</span></span>
-            <span className="flex items-center gap-1.5"><span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[10px] font-semibold">✓ Fertig</span></span>
-            {user && <span className="ml-auto">Dropdown pro Zelle zum Setzen des Status</span>}
+            <span className="flex items-center gap-1.5"><span className="bg-slate-50 text-slate-400 px-1.5 py-0.5 rounded text-[10px]">— Open</span></span>
+            <span className="flex items-center gap-1.5"><span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[10px]">⏳ Planned</span></span>
+            <span className="flex items-center gap-1.5"><span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[10px] font-semibold">✓ Done</span></span>
+            {user && <span className="ml-auto">Click a cell to set the training status</span>}
           </div>
         </div>
       )}
@@ -236,7 +236,7 @@ export default function EnablementPage() {
                   <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">⏱ {topic.duration}</span>
                 </div>
                 <div className="pt-2 border-t border-slate-100">
-                  <span className="text-[10px] text-slate-300 uppercase tracking-wide">Quelle: velpTEC K7.0069 · Strategische Planung</span>
+                  <span className="text-[10px] text-slate-300 uppercase tracking-wide">Source: velpTEC K7.0069 · Strategic Planning</span>
                 </div>
               </div>
             )
