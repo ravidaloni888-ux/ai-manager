@@ -39,13 +39,17 @@ export const useStrategyStore = create<StrategyStore>()((set) => ({
       if (!error && data?.strategy_data) {
         const merged: StrategyData = { ...DEFAULT_STRATEGY, ...data.strategy_data }
         if (!merged.kpis?.length) merged.kpis = DEFAULT_STRATEGY.kpis
+        if (merged.focusAreas?.every((f) => f.priority === 'None' && !f.note)) merged.focusAreas = DEFAULT_STRATEGY.focusAreas
         lsSave(merged)
         set({ data: merged, loading: false })
         return
       }
     } catch {}
     const ls = lsLoad()
-    if (ls && !ls.kpis?.length) ls.kpis = DEFAULT_STRATEGY.kpis
+    if (ls) {
+      if (!ls.kpis?.length) ls.kpis = DEFAULT_STRATEGY.kpis
+      if (ls.focusAreas?.every((f) => f.priority === 'None' && !f.note)) ls.focusAreas = DEFAULT_STRATEGY.focusAreas
+    }
     set({ data: ls ?? DEFAULT_STRATEGY, loading: false })
   },
 
