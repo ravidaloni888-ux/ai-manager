@@ -57,6 +57,44 @@ export interface GovernanceData {
   }
 }
 
+export const RISK_CATEGORIES = [
+  'Bias & Fairness',
+  'Data Quality',
+  'Model Performance',
+  'Security & Privacy',
+  'Regulatory & Legal',
+  'Operational',
+  'Vendor & Technology',
+  'Transparency',
+] as const
+export type RiskCategory = typeof RISK_CATEGORIES[number]
+
+export const MITIGATION_STATUSES = ['None', 'Planned', 'In Progress', 'Implemented'] as const
+export type MitigationStatus = typeof MITIGATION_STATUSES[number]
+
+export const MITIGATION_BG: Record<MitigationStatus, string> = {
+  'None':         'bg-red-100 text-red-700',
+  'Planned':      'bg-slate-100 text-slate-600',
+  'In Progress':  'bg-amber-100 text-amber-700',
+  'Implemented':  'bg-green-100 text-green-700',
+}
+
+export interface AIRisk {
+  id: string
+  useCaseId: string
+  useCaseTitle: string
+  category: RiskCategory
+  title: string
+  description: string
+  likelihood: number
+  impact: number
+  mitigation: string
+  mitigationStatus: MitigationStatus
+  owner: string
+  residualLikelihood: number
+  residualImpact: number
+}
+
 export type Motivation =
   | 'Cost Reduction'
   | 'Time Saving'
