@@ -7,6 +7,7 @@ import KpiCard from '../components/dashboard/KpiCard'
 import StatusChart from '../components/dashboard/StatusChart'
 import DeptChart from '../components/dashboard/DeptChart'
 import ImpactMatrix from '../components/dashboard/ImpactMatrix'
+import EuAiActChart from '../components/dashboard/EuAiActChart'
 import { IconClipboard, IconRocket, IconStar, IconMoneybag, IconTrendingUp, IconPlus } from '../components/icons/NavIcons'
 import { useAuthStore } from '../store/authStore'
 
@@ -85,6 +86,9 @@ export default function DashboardPage() {
         <StatusChart useCases={useCases} />
         <DeptChart useCases={useCases} />
       </div>
+
+      {/* EU AI Act risk chart */}
+      <EuAiActChart useCases={useCases} />
 
       {/* Impact / Feasibility Matrix */}
       <ImpactMatrix useCases={useCases} />

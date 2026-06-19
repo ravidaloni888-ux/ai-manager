@@ -518,7 +518,7 @@ export default function CanvasForm({ existing }: Props) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>EU AI Act Risikostufe</label>
+              <label className={labelCls}>EU AI Act Risk Level</label>
               <div className="flex items-center gap-2">
                 <select {...register('euAiActRisk')} className={inputCls}>
                   {EU_AI_ACT_RISKS.map((r) => <option key={r}>{r}</option>)}
@@ -528,17 +528,38 @@ export default function CanvasForm({ existing }: Props) {
                 </span>
               </div>
             </div>
+            {watched.euAiActRisk === 'High Risk' || watched.euAiActRisk === 'Unacceptable Risk' ? (
+              <div className="col-span-2 flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <svg className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-orange-800">DPIA Required</p>
+                  <p className="text-xs text-orange-700 mt-0.5">
+                    This risk level triggers a mandatory Data Protection Impact Assessment (DPIA) under GDPR Article 35.
+                  </p>
+                  <a
+                    href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/how-do-we-do-a-dpia/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-orange-700 underline font-semibold mt-1 inline-block hover:text-orange-900"
+                  >
+                    ICO: How do we do a DPIA? →
+                  </a>
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <div>
-            <label className={labelCls}>Datenschutz-Checkliste</label>
+            <label className={labelCls}>Privacy Checklist</label>
             <div className="space-y-2">
               {[
-                { name: 'complianceLegal',         label: 'Einhaltung gesetzlicher Vorgaben (DSGVO, EU AI Act) geklärt' },
-                { name: 'compliancePersonalData',  label: 'Personenbezogene Daten & Rechtsgrundlage dokumentiert' },
-                { name: 'complianceDataMin',       label: 'Datenminimierung & Zweckbindung sichergestellt' },
-                { name: 'complianceDocumentation', label: 'Dokumentation & Nachweispflichten erfüllt' },
-                { name: 'complianceLiability',     label: 'Haftung & Verantwortlichkeit geregelt' },
+                { name: 'complianceLegal',         label: 'Legal requirements (GDPR, EU AI Act) reviewed and documented' },
+                { name: 'compliancePersonalData',  label: 'Personal data & legal basis for processing documented' },
+                { name: 'complianceDataMin',       label: 'Data minimisation & purpose limitation ensured' },
+                { name: 'complianceDocumentation', label: 'Documentation & audit trail requirements fulfilled' },
+                { name: 'complianceLiability',     label: 'Liability & accountability for AI errors clarified' },
               ].map((item) => (
                 <label key={item.name} className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-100 hover:bg-slate-50 cursor-pointer">
                   <input
@@ -553,55 +574,55 @@ export default function CanvasForm({ existing }: Props) {
           </div>
         </section>
 
-        {/* Section 5: Dokumentation (Step 9) */}
+        {/* Section 5: Documentation (Step 9) */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <div className="flex items-center gap-3">
-            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Dokumentation</h2>
-            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Step 9 · 9-Schritte-Framework</span>
+            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Documentation</h2>
+            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Step 9 · 9-Step Framework</span>
           </div>
-          <p className="text-xs text-slate-400 -mt-2">Formale Nachweisdokumentation für Compliance und Audit. Alle Felder optional.</p>
+          <p className="text-xs text-slate-400 -mt-2">Formal compliance and audit documentation. All fields optional.</p>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className={labelCls}>1 · Zielsetzung & Anwendungsbereich</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wofür wird die KI eingesetzt? Welche Modelle, Datenquellen und Technologien kommen zum Einsatz?</p>
-              <textarea {...register('docGoal')} rows={3} className={textareaCls} placeholder="Beschreibung des KI-Systems, unterstützte Prozesse und Entscheidungen…" />
+              <label className={labelCls}>1 · Goal & Scope</label>
+              <p className="text-xs text-slate-400 mb-1.5">What is this AI system used for? Which models, data sources and technologies are involved?</p>
+              <textarea {...register('docGoal')} rows={3} className={textareaCls} placeholder="Description of the AI system, supported processes and decisions…" />
             </div>
 
             <div>
-              <label className={labelCls}>2 · Datenbasis & Datenflüsse</label>
-              <p className="text-xs text-slate-400 mb-1.5">Welche Daten werden verwendet, woher stammen sie und wie werden sie verarbeitet?</p>
-              <textarea {...register('docDataBasis')} rows={3} className={textareaCls} placeholder="Datenquellen, Verarbeitungsschritte, Qualitätssicherung…" />
+              <label className={labelCls}>2 · Data Basis & Data Flows</label>
+              <p className="text-xs text-slate-400 mb-1.5">What data is used, where does it come from and how is it processed?</p>
+              <textarea {...register('docDataBasis')} rows={3} className={textareaCls} placeholder="Data sources, processing steps, quality assurance…" />
             </div>
 
             <div>
-              <label className={labelCls}>3 · Risikobewertung & Maßnahmen</label>
-              <p className="text-xs text-slate-400 mb-1.5">Welche Risiken wurden identifiziert und wie werden diese reduziert oder kontrolliert?</p>
-              <textarea {...register('docRiskMitigation')} rows={3} className={textareaCls} placeholder="Identifizierte Risiken, Gegenmaßnahmen, Restrisiko…" />
+              <label className={labelCls}>3 · Risk Assessment & Mitigations</label>
+              <p className="text-xs text-slate-400 mb-1.5">Which risks were identified and how are they reduced or controlled?</p>
+              <textarea {...register('docRiskMitigation')} rows={3} className={textareaCls} placeholder="Identified risks, countermeasures, residual risk…" />
             </div>
 
             <div>
-              <label className={labelCls}>4 · Erklärbarkeit & Entscheidungslogik</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wie lassen sich Ergebnisse der KI nachvollziehen und interpretieren?</p>
-              <textarea {...register('docExplainability')} rows={3} className={textareaCls} placeholder="Erklärbarkeitsansatz, Interpretierbarkeit für Endanwender…" />
+              <label className={labelCls}>4 · Explainability & Decision Logic</label>
+              <p className="text-xs text-slate-400 mb-1.5">How can AI results be understood and interpreted by end users?</p>
+              <textarea {...register('docExplainability')} rows={3} className={textareaCls} placeholder="Explainability approach, interpretability for end users…" />
             </div>
 
             <div>
-              <label className={labelCls}>5 · Betriebs- & Überwachungskonzept</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wie wird die KI im laufenden Betrieb überwacht, gewartet und verbessert?</p>
-              <textarea {...register('docOperations')} rows={3} className={textareaCls} placeholder="Monitoring, Wartungsintervalle, Verbesserungszyklus…" />
+              <label className={labelCls}>5 · Operations & Monitoring</label>
+              <p className="text-xs text-slate-400 mb-1.5">How is the AI monitored, maintained and improved in production?</p>
+              <textarea {...register('docOperations')} rows={3} className={textareaCls} placeholder="Monitoring, maintenance intervals, improvement cycle…" />
             </div>
 
             <div>
-              <label className={labelCls}>6 · Compliance & regulatorische Nachweise</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wie wird die Einhaltung von Gesetzen und internen Richtlinien dokumentiert?</p>
-              <textarea {...register('docRegulatory')} rows={3} className={textareaCls} placeholder="Nachweisführung, Prüfpfade, zuständige Stelle…" />
+              <label className={labelCls}>6 · Compliance & Regulatory Evidence</label>
+              <p className="text-xs text-slate-400 mb-1.5">How is compliance with laws and internal policies documented?</p>
+              <textarea {...register('docRegulatory')} rows={3} className={textareaCls} placeholder="Audit trail, evidence records, responsible party…" />
             </div>
 
             <div>
-              <label className={labelCls}>7 · Änderungs- & Versionsmanagement</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wie werden Anpassungen am Modell oder an den Daten nachvollziehbar festgehalten?</p>
-              <textarea {...register('docVersioning')} rows={3} className={textareaCls} placeholder="Versionierung, Änderungsprotokoll, Release-Prozess…" />
+              <label className={labelCls}>7 · Change & Version Management</label>
+              <p className="text-xs text-slate-400 mb-1.5">How are changes to the model or data recorded in a traceable way?</p>
+              <textarea {...register('docVersioning')} rows={3} className={textareaCls} placeholder="Versioning, change log, release process…" />
             </div>
           </div>
         </section>

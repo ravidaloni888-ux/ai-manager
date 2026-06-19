@@ -25,7 +25,9 @@ const ROLES: { key: keyof GovernanceData['roles']; title: string; desc: string; 
   { key: 'business', title: 'Business Approval',              desc: 'Business sign-off before production deployment',            icon: '✅' },
 ]
 
-const STEPS: { n: number; key: keyof GovernanceData['steps']; title: string; desc: string; details: string[] }[] = [
+const DPIA_URL = 'https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/how-do-we-do-a-dpia/'
+
+const STEPS: { n: number; key: keyof GovernanceData['steps']; title: string; desc: string; details: string[]; link?: { label: string; href: string } }[] = [
   {
     n: 1, key: 'step1', title: 'Define goals and use cases',
     desc: 'Which concrete business problems should AI solve?',
@@ -51,10 +53,11 @@ const STEPS: { n: number; key: keyof GovernanceData['steps']; title: string; des
     desc: 'GDPR, EU AI Act — review and document legal foundations',
     details: [
       'Classify each use case by EU AI Act risk category (Minimal / Limited / High / Unacceptable)',
-      'Conduct a DPIA (Data Protection Impact Assessment) for high-risk processing',
+      'Conduct a DPIA (Data Protection Impact Assessment) for high-risk processing under GDPR Art. 35',
       'Verify GDPR legal basis for all personal data used in AI systems',
       'Document findings per use case in the Privacy Checklist tab',
     ],
+    link: { label: 'ICO: How do we do a DPIA? →', href: DPIA_URL },
   },
   {
     n: 4, key: 'step4', title: 'Train employees',
@@ -345,6 +348,16 @@ function StepsTab({ steps, onChange, readonly }: {
                         </li>
                       ))}
                     </ul>
+                    {s.link && (
+                      <a
+                        href={s.link.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 mt-2.5 text-xs font-semibold text-blue-600 hover:text-blue-800 underline"
+                      >
+                        {s.link.label}
+                      </a>
+                    )}
                   </div>
                 )}
               </div>
