@@ -3,6 +3,9 @@ import { nanoid } from 'nanoid'
 import { AIUseCase } from '../types'
 import { supabase, rowToUseCase, useCaseToRow } from '../lib/supabase'
 import { dummyData } from '../data/dummyData'
+import { getDemoMode } from './demoStore'
+
+const DUMMY_IDS = new Set(dummyData.map((d) => d.id))
 
 interface UseCasesStore {
   useCases: AIUseCase[]
@@ -20,52 +23,31 @@ export const useUseCasesStore = create<UseCasesStore>()((set, get) => ({
   loading: true,
 
   init: async () => {
+    // Demo mode — serve seed data in-memory, skip all network calls
+    if (getDemoMode()) {
+      set({ useCases: dummyData, loading: false })
+      return
+    }
+
+    // Real workspace — load from Supabase, exclude dummy-seeded records
     let { data, error } = await supabase
       .from('ai_use_cases')
       .select('*')
       .order('created_at', { ascending: false })
 
     if (error || !data) {
-      console.error('Supabase load error:', error)
-      set({ useCases: dummyData, loading: false })
+      set({ useCases: [], loading: false })
       return
     }
 
-    if (data.length === 0) {
-      // First run — seed dummy data into the database
-      await supabase.from('ai_use_cases').insert(dummyData.map(useCaseToRow))
-      set({ useCases: dummyData, loading: false })
-    } else {
-      // Patch any existing records missing eu_ai_act_risk or motivation from dummy defaults
-      const dummyMap = new Map(dummyData.map((d) => [d.id, d]))
-      const toUpdate = data.filter((row) => {
-        const d = dummyMap.get(row.id as string)
-        return d && (!row.eu_ai_act_risk || !row.motivation)
-      })
-      if (toUpdate.length > 0) {
-        const patchIds = new Set(toUpdate.map((r) => r.id as string))
-        await Promise.all(
-          toUpdate.map((row) => {
-            const d = dummyMap.get(row.id as string)!
-            return supabase
-              .from('ai_use_cases')
-              .update({ eu_ai_act_risk: d.euAiActRisk, motivation: d.motivation ?? null })
-              .eq('id', row.id as string)
-          })
-        )
-        // merge patched values into in-memory rows
-        data = data.map((row) => {
-          if (!patchIds.has(row.id as string)) return row
-          const d = dummyMap.get(row.id as string)!
-          return { ...row, eu_ai_act_risk: d.euAiActRisk, motivation: d.motivation ?? null }
-        })
-      }
-      set({ useCases: data.map(rowToUseCase), loading: false })
-    }
+    // Filter out the pre-seeded dummy records so the real workspace starts clean
+    const userRows = data.filter((row) => !DUMMY_IDS.has(row.id as string))
+    set({ useCases: userRows.map(rowToUseCase), loading: false })
   },
 
   addUseCase: (uc) => {
     set((state) => ({ useCases: [...state.useCases, uc] }))
+    if (getDemoMode()) return
     supabase.from('ai_use_cases').insert(useCaseToRow(uc)).then(({ error }) => {
       if (error) console.error('Failed to save:', error)
     })
@@ -73,6 +55,7 @@ export const useUseCasesStore = create<UseCasesStore>()((set, get) => ({
 
   updateUseCase: (uc) => {
     set((state) => ({ useCases: state.useCases.map((u) => (u.id === uc.id ? uc : u)) }))
+    if (getDemoMode()) return
     supabase.from('ai_use_cases').update(useCaseToRow(uc)).eq('id', uc.id).then(({ error }) => {
       if (error) console.error('Failed to update:', error)
     })
@@ -80,6 +63,7 @@ export const useUseCasesStore = create<UseCasesStore>()((set, get) => ({
 
   deleteUseCase: (id) => {
     set((state) => ({ useCases: state.useCases.filter((u) => u.id !== id) }))
+    if (getDemoMode()) return
     supabase.from('ai_use_cases').delete().eq('id', id).then(({ error }) => {
       if (error) console.error('Failed to delete:', error)
     })
@@ -97,6 +81,7 @@ export const useUseCasesStore = create<UseCasesStore>()((set, get) => ({
       updatedAt: new Date().toISOString(),
     }
     set((state) => ({ useCases: [...state.useCases, copy] }))
+    if (getDemoMode()) return
     supabase.from('ai_use_cases').insert(useCaseToRow(copy)).then(({ error }) => {
       if (error) console.error('Failed to duplicate:', error)
     })

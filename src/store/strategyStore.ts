@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { StrategyData, DEFAULT_STRATEGY } from '../types'
 import { supabase } from '../lib/supabase'
+import { getDemoMode } from './demoStore'
 
 const LS_KEY = 'ai_strategy_v1'
 
@@ -30,6 +31,10 @@ export const useStrategyStore = create<StrategyStore>()((set) => ({
   saving: false,
 
   init: async () => {
+    if (getDemoMode()) {
+      set({ data: DEFAULT_STRATEGY, loading: false })
+      return
+    }
     try {
       const { data, error } = await supabase
         .from('ai_strategy')
@@ -58,9 +63,9 @@ export const useStrategyStore = create<StrategyStore>()((set) => ({
   },
 
   save: async (d: StrategyData) => {
-    set({ saving: true })
+    set({ saving: true, data: d })
+    if (getDemoMode()) { set({ saving: false }); return }
     lsSave(d)
-    set({ data: d })
     try {
       await supabase.from('ai_strategy').upsert({
         id: 'singleton',

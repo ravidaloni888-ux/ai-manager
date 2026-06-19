@@ -8,6 +8,7 @@ import {
 } from '../icons/NavIcons'
 import { useAuthStore } from '../../store/authStore'
 import BetaRequestModal from './BetaRequestModal'
+import DemoToggle from './DemoToggle'
 
 interface AppShellProps {
   children: ReactNode
@@ -83,7 +84,8 @@ export default function AppShell({ children }: AppShellProps) {
       {/* Main content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <div className="flex-shrink-0 flex items-center justify-end gap-2 px-6 py-3">
+        <div className="flex-shrink-0 flex items-center justify-end gap-3 px-6 py-3" style={{ background: '#1a2538' }}>
+          <DemoToggle />
           {user ? (
             <button
               onClick={() => navigate('/canvas/new')}
@@ -95,13 +97,13 @@ export default function AppShell({ children }: AppShellProps) {
             <>
               <button
                 onClick={() => setShowBeta(true)}
-                className="text-sm text-slate-600 hover:text-slate-900 border border-slate-300 hover:border-slate-400 px-4 py-2 rounded-lg transition-colors"
+                className="text-sm text-white/60 hover:text-white border border-white/20 hover:border-white/40 px-4 py-2 rounded-lg transition-colors"
               >
                 Request access
               </button>
               <button
                 onClick={() => navigate('/login')}
-                className="text-sm bg-[#1a2538] hover:bg-[#243044] text-white font-medium px-4 py-2 rounded-lg transition-colors"
+                className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg transition-colors"
               >
                 Login
               </button>

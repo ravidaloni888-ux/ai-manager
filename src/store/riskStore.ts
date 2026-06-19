@@ -2,8 +2,9 @@ import { create } from 'zustand'
 import { AIRisk } from '../types'
 import { seedRisks } from '../data/riskData'
 import { nanoid } from 'nanoid'
+import { getDemoMode } from './demoStore'
 
-const LS_KEY = 'ai_risks_v1'
+const LS_KEY = 'ai_user_risks_v1' // separate key from demo data
 
 function lsLoad(): AIRisk[] | null {
   try {
@@ -19,29 +20,42 @@ function lsSave(risks: AIRisk[]) {
 
 interface RiskStore {
   risks: AIRisk[]
+  init: () => void
   add: (r: Omit<AIRisk, 'id'>) => void
   update: (r: AIRisk) => void
   remove: (id: string) => void
 }
 
-const initial = lsLoad() ?? seedRisks
-
 export const useRiskStore = create<RiskStore>()((set, get) => ({
-  risks: initial,
+  risks: getDemoMode() ? seedRisks : (lsLoad() ?? []),
+
+  init: () => {
+    if (getDemoMode()) {
+      set({ risks: seedRisks })
+    } else {
+      set({ risks: lsLoad() ?? [] })
+    }
+  },
 
   add: (r) => {
+    if (getDemoMode()) return
     const next = [...get().risks, { ...r, id: nanoid() }]
     lsSave(next)
     set({ risks: next })
   },
 
   update: (r) => {
+    if (getDemoMode()) {
+      set({ risks: get().risks.map((x) => (x.id === r.id ? r : x)) })
+      return
+    }
     const next = get().risks.map((x) => (x.id === r.id ? r : x))
     lsSave(next)
     set({ risks: next })
   },
 
   remove: (id) => {
+    if (getDemoMode()) return
     const next = get().risks.filter((x) => x.id !== id)
     lsSave(next)
     set({ risks: next })
