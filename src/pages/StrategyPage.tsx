@@ -15,7 +15,7 @@ type Tab = 'vision' | 'focus' | 'roadmap' | 'investment'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'vision',     label: 'AI Vision'     },
   { id: 'focus',      label: 'Focus Areas'   },
-  { id: 'roadmap',    label: 'Roadmap'       },
+  { id: 'roadmap',    label: 'Timeline'      },
   { id: 'investment', label: 'Investment'    },
 ]
 
