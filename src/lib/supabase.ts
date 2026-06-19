@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { AIUseCase, ProjectHealth, EuAiActRisk, GovernanceData, EnablementData, TrainingMap, MeetingsData } from '../types'
+import { AIUseCase, ProjectHealth, EuAiActRisk, GovernanceData, EnablementData, TrainingMap, MeetingsData, AIRisk } from '../types'
 
 function legacyHealth(raw: string | undefined): ProjectHealth {
   if (raw === 'Green' || raw === 'On Track') return 'On Track'
@@ -167,6 +167,23 @@ export async function saveMeetings(d: MeetingsData): Promise<void> {
     configs: d.configs,
     updated_at: new Date().toISOString(),
   })
+}
+
+export async function loadRisks(): Promise<AIRisk[]> {
+  try {
+    const { data } = await supabase.from('ai_risks').select('risks').eq('id', 'singleton').single()
+    return (data?.risks as AIRisk[]) ?? []
+  } catch { return [] }
+}
+
+export async function saveRisks(risks: AIRisk[]): Promise<void> {
+  try {
+    await supabase.from('ai_risks').upsert({
+      id: 'singleton',
+      risks,
+      updated_at: new Date().toISOString(),
+    })
+  } catch {}
 }
 
 export async function saveGovernance(g: GovernanceData): Promise<void> {

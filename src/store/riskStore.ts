@@ -3,61 +3,43 @@ import { AIRisk } from '../types'
 import { seedRisks } from '../data/riskData'
 import { nanoid } from 'nanoid'
 import { getDemoMode } from './demoStore'
-
-const LS_KEY = 'ai_user_risks_v1' // separate key from demo data
-
-function lsLoad(): AIRisk[] | null {
-  try {
-    const raw = localStorage.getItem(LS_KEY)
-    if (!raw) return null
-    return JSON.parse(raw)
-  } catch { return null }
-}
-
-function lsSave(risks: AIRisk[]) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(risks)) } catch {}
-}
+import { loadRisks, saveRisks } from '../lib/supabase'
 
 interface RiskStore {
   risks: AIRisk[]
-  init: () => void
-  add: (r: Omit<AIRisk, 'id'>) => void
-  update: (r: AIRisk) => void
-  remove: (id: string) => void
+  init: () => Promise<void>
+  add: (r: Omit<AIRisk, 'id'>) => Promise<void>
+  update: (r: AIRisk) => Promise<void>
+  remove: (id: string) => Promise<void>
 }
 
 export const useRiskStore = create<RiskStore>()((set, get) => ({
-  risks: getDemoMode() ? seedRisks : (lsLoad() ?? []),
+  risks: [],
 
-  init: () => {
+  init: async () => {
     if (getDemoMode()) {
       set({ risks: seedRisks })
-    } else {
-      set({ risks: lsLoad() ?? [] })
-    }
-  },
-
-  add: (r) => {
-    if (getDemoMode()) return
-    const next = [...get().risks, { ...r, id: nanoid() }]
-    lsSave(next)
-    set({ risks: next })
-  },
-
-  update: (r) => {
-    if (getDemoMode()) {
-      set({ risks: get().risks.map((x) => (x.id === r.id ? r : x)) })
       return
     }
-    const next = get().risks.map((x) => (x.id === r.id ? r : x))
-    lsSave(next)
-    set({ risks: next })
+    const risks = await loadRisks()
+    set({ risks })
   },
 
-  remove: (id) => {
-    if (getDemoMode()) return
-    const next = get().risks.filter((x) => x.id !== id)
-    lsSave(next)
+  add: async (r) => {
+    const next = [...get().risks, { ...r, id: nanoid() }]
     set({ risks: next })
+    if (!getDemoMode()) await saveRisks(next)
+  },
+
+  update: async (r) => {
+    const next = get().risks.map((x) => (x.id === r.id ? r : x))
+    set({ risks: next })
+    if (!getDemoMode()) await saveRisks(next)
+  },
+
+  remove: async (id) => {
+    const next = get().risks.filter((x) => x.id !== id)
+    set({ risks: next })
+    if (!getDemoMode()) await saveRisks(next)
   },
 }))
