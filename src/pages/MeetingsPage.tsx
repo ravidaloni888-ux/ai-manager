@@ -64,6 +64,13 @@ const DEFS: Def[] = [
     bg: '#1e293b', text: '#f8fafc', border: '#475569', badge: '#334155', badgeText: '#e2e8f0',
     defaultDay: 3, defaultHour: 10,
   },
+  {
+    id: 'policy_review', name: 'AI Policy Review',
+    cadence: 'quarterly', cadenceLabel: 'Quarterly', durationMin: 90,
+    participants: 'AI Owner + Legal + DPO', description: 'Review AI policy for regulatory changes · Full rewrite in Q1',
+    bg: '#ede9fe', text: '#4c1d95', border: '#7c3aed', badge: '#ddd6fe', badgeText: '#5b21b6',
+    defaultDay: 2, defaultHour: 11,
+  },
 ]
 
 const STATUS_NEXT: Record<MeetingStatus, MeetingStatus> = {
