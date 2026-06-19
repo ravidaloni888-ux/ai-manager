@@ -2,20 +2,28 @@ import { useDemoStore } from '../../store/demoStore'
 import { useUseCasesStore } from '../../store/useCasesStore'
 import { useStrategyStore } from '../../store/strategyStore'
 import { useRiskStore } from '../../store/riskStore'
+import { useGovernanceStore } from '../../store/governanceStore'
+import { useEnablementStore } from '../../store/enablementStore'
+import { useMeetingsStore } from '../../store/meetingsStore'
 
 export default function DemoToggle() {
   const { demoMode, setDemoMode } = useDemoStore()
-  const initCases    = useUseCasesStore((s) => s.init)
-  const initStrategy = useStrategyStore((s) => s.init)
-  const initRisks    = useRiskStore((s) => s.init)
+  const initCases      = useUseCasesStore((s) => s.init)
+  const initStrategy   = useStrategyStore((s) => s.init)
+  const initRisks      = useRiskStore((s) => s.init)
+  const initGovernance = useGovernanceStore((s) => s.init)
+  const initEnablement = useEnablementStore((s) => s.init)
+  const initMeetings   = useMeetingsStore((s) => s.init)
 
   const switchTo = (demo: boolean) => {
     setDemoMode(demo)
-    // Re-initialise all data stores after the flag is written
     setTimeout(() => {
       initCases()
       initStrategy()
       initRisks()
+      initGovernance()
+      initEnablement()
+      initMeetings()
     }, 0)
   }
 

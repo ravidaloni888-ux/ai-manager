@@ -5,6 +5,16 @@ import {
 } from 'recharts'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
+import { useDemoStore } from '../store/demoStore'
+
+const DEMO_SCORES: Scores = {
+  strategy_0: 4, strategy_1: 4, strategy_2: 3,
+  people_0: 3, people_1: 2, people_2: 3,
+  technology_0: 4, technology_1: 3, technology_2: 3,
+  data_0: 3, data_1: 3, data_2: 2,
+  governance_0: 4, governance_1: 3, governance_2: 3,
+  adoption_0: 5, adoption_1: 4, adoption_2: 3,
+}
 
 type Scores = Record<string, number>
 
@@ -125,12 +135,19 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 export default function MaturityPage() {
   const user = useAuthStore((s) => s.user)
+  const demoMode = useDemoStore((s) => s.demoMode)
   const [scores, setScores] = useState<Scores>({})
   const [original, setOriginal] = useState<Scores>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
+    if (demoMode) {
+      setScores(DEMO_SCORES)
+      setOriginal(DEMO_SCORES)
+      setLoading(false)
+      return
+    }
     async function load() {
       try {
         const { data } = await supabase
@@ -145,7 +162,7 @@ export default function MaturityPage() {
       setLoading(false)
     }
     load()
-  }, [])
+  }, [demoMode])
 
   const isDirty = JSON.stringify(scores) !== JSON.stringify(original)
 

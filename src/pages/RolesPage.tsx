@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
+import { useDemoStore } from '../store/demoStore'
+
+const DEMO_ASSIGNMENTS: Assignments = {
+  ai_architect:              'Alexander Koch (Senior Solutions Architect)',
+  data_engineer:             'Priya Patel (Lead Data Engineer)',
+  ai_business_analyst:       'Marcus Schmidt (AI Business Analyst)',
+  ml_ai_engineer:            'Dr. Yuki Tanaka (ML Engineer)',
+  ai_product_manager:        'Emma Bauer (AI Product Manager)',
+  ai_enablement_specialist:  'Carlos Rodriguez (L&D Lead)',
+  ai_governance_specialist:  '',
+}
 
 type Assignments = Record<string, string>
 
@@ -129,6 +140,7 @@ const ROLES: RoleDef[] = [
 
 export default function RolesPage() {
   const user = useAuthStore((s) => s.user)
+  const demoMode = useDemoStore((s) => s.demoMode)
   const [assignments, setAssignments] = useState<Assignments>({})
   const [original, setOriginal] = useState<Assignments>({})
   const [loading, setLoading] = useState(true)
@@ -136,6 +148,12 @@ export default function RolesPage() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
 
   useEffect(() => {
+    if (demoMode) {
+      setAssignments(DEMO_ASSIGNMENTS)
+      setOriginal(DEMO_ASSIGNMENTS)
+      setLoading(false)
+      return
+    }
     async function load() {
       try {
         const { data } = await supabase
@@ -150,7 +168,7 @@ export default function RolesPage() {
       setLoading(false)
     }
     load()
-  }, [])
+  }, [demoMode])
 
   const isDirty = JSON.stringify(assignments) !== JSON.stringify(original)
 
