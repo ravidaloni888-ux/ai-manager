@@ -38,36 +38,33 @@ export default function AppShell({ children }: AppShellProps) {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-          <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
-            Core
-          </p>
           <NavItem to="/start" icon={<IconRocket />} label="Getting Started" />
           <NavItem to="/dashboard" icon={<IconDashboard />} label="Dashboard" />
-          <NavItem to="/use-cases" icon={<IconList />} label="AI Use Cases" />
-          <NavItem to="/settings" icon={<IconSettings />} label="Settings" />
-          <NavItem to="/about" icon={<IconInfo />} label="About" />
 
           <div className="pt-4" />
 
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
-            Release 2
-          </p>
-          <NavItem to="/maturity" icon={<IconChartBar />} label="Maturity Assessment" />
-          <NavItem to="/governance" icon={<IconBuilding />} label="AI Governance" />
-          <NavItem to="/enablement" icon={<IconAcademic />} label="Enablement & Coaching" />
-          <NavItem to="/meetings" icon={<IconCalendar />} label="Regular Meetings" />
-          <NavItem to="/roles" icon={<IconUsers />} label="Team & Roles" />
-
-          <div className="pt-4" />
-
-          <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
-            Release 3
+            AI Programme
           </p>
           <NavItem to="/strategy" icon={<IconMap />} label="Strategy Wizard" />
+          <NavItem to="/maturity" icon={<IconChartBar />} label="Maturity Assessment" />
+          <NavItem to="/governance" icon={<IconBuilding />} label="AI Governance" />
+          <NavItem to="/use-cases" icon={<IconList />} label="AI Use Cases" />
           <NavItem to="/risk" icon={<IconAlert />} label="Risk Manager" />
-          <NavItem to="/roi" icon={<IconCurrency />} label="ROI Calculator" />
           <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap Generator" />
+          <NavItem to="/roi" icon={<IconCurrency />} label="ROI Calculator" />
+          <NavItem to="/enablement" icon={<IconAcademic />} label="Enablement & Coaching" />
+          <NavItem to="/meetings" icon={<IconCalendar />} label="Regular Meetings" />
+
+          <div className="pt-4" />
+
+          <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
+            More
+          </p>
+          <NavItem to="/roles" icon={<IconUsers />} label="Team & Roles" />
           <NavItem to="/vendors" icon={<IconSearch />} label="Vendor Comparison" />
+          <NavItem to="/settings" icon={<IconSettings />} label="Settings" />
+          <NavItem to="/about" icon={<IconInfo />} label="About" />
         </nav>
 
         {/* Sidebar footer — user info when logged in */}
