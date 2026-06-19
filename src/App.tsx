@@ -16,6 +16,7 @@ import RiskPage from './pages/RiskPage'
 import RoiPage from './pages/RoiPage'
 import RoadmapPage from './pages/RoadmapPage'
 import VendorPage from './pages/VendorPage'
+import StartPage from './pages/StartPage'
 import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { useUseCasesStore } from './store/useCasesStore'
@@ -79,6 +80,7 @@ function AppRoutes() {
               <Route path="/roi" element={<RoiPage />} />
               <Route path="/roadmap" element={<RoadmapPage />} />
               <Route path="/vendors" element={<VendorPage />} />
+              <Route path="/start" element={<StartPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
               <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
             </Routes>

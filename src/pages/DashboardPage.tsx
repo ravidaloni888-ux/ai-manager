@@ -8,6 +8,7 @@ import StatusChart from '../components/dashboard/StatusChart'
 import DeptChart from '../components/dashboard/DeptChart'
 import ImpactMatrix from '../components/dashboard/ImpactMatrix'
 import EuAiActChart from '../components/dashboard/EuAiActChart'
+import StartBanner from '../components/dashboard/StartBanner'
 import { IconClipboard, IconRocket, IconStar, IconMoneybag, IconTrendingUp, IconPlus } from '../components/icons/NavIcons'
 import { useAuthStore } from '../store/authStore'
 
@@ -35,6 +36,9 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Getting Started banner */}
+      <StartBanner />
+
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
