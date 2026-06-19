@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   useReactTable,
@@ -60,6 +60,28 @@ export default function UseCaseTable() {
   const [expanded, setExpanded] = useState<ExpandedState>(true)
   const [showColMenu, setShowColMenu] = useState(false)
   const [groupBy, setGroupBy] = useState('')
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; row: AIUseCase } | null>(null)
+  const tableScrollRef = useRef<HTMLDivElement>(null)
+  const [showScrollHint, setShowScrollHint] = useState(true)
+
+  // Close context menu on click or Escape
+  useEffect(() => {
+    const onClick = () => setContextMenu(null)
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setContextMenu(null) }
+    window.addEventListener('click', onClick)
+    window.addEventListener('keydown', onKey)
+    return () => { window.removeEventListener('click', onClick); window.removeEventListener('keydown', onKey) }
+  }, [])
+
+  // Scroll hint — hide once user scrolls right
+  useEffect(() => {
+    const el = tableScrollRef.current
+    if (!el) return
+    const check = () => setShowScrollHint(el.scrollLeft < el.scrollWidth - el.clientWidth - 4)
+    el.addEventListener('scroll', check, { passive: true })
+    check()
+    return () => el.removeEventListener('scroll', check)
+  }, [])
 
   // Column drag-reorder
   const allColumnIds = [
@@ -361,8 +383,16 @@ export default function UseCaseTable() {
         </span>
       </div>
 
+      {/* Hint */}
+      {user && (
+        <p className="text-xs text-slate-400">
+          Double-click a row to edit · Right-click for more options · Scroll right for all fields
+        </p>
+      )}
+
       {/* Table */}
-      <div className="overflow-x-auto rounded-xl bg-white shadow-md">
+      <div className="relative">
+      <div ref={tableScrollRef} className="overflow-x-auto rounded-xl bg-white shadow-md">
         <table className="w-full text-sm border-collapse">
           <thead className="bg-slate-50 border-b border-slate-200">
             {table.getHeaderGroups().map((hg) => (
@@ -444,7 +474,16 @@ export default function UseCaseTable() {
                 )
               }
               return (
-                <tr key={row.id} className="hover:bg-slate-50 transition-colors">
+                <tr
+                  key={row.id}
+                  className={`hover:bg-slate-50 transition-colors ${user ? 'cursor-pointer' : ''}`}
+                  onDoubleClick={() => user && navigate(`/canvas/${row.original.id}`)}
+                  onContextMenu={(e) => {
+                    if (!user) return
+                    e.preventDefault()
+                    setContextMenu({ x: e.clientX, y: e.clientY, row: row.original })
+                  }}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className={`px-3 py-2.5 text-slate-700 ${cell.column.id === 'title' ? 'min-w-[200px]' : 'max-w-[220px] truncate'}`}>
                       {cell.getIsGrouped() ? (
@@ -462,6 +501,56 @@ export default function UseCaseTable() {
           </tbody>
         </table>
       </div>
+      {/* Scroll-right fade */}
+      {showScrollHint && (
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-20 rounded-r-xl"
+          style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.95))' }}>
+          <div className="absolute bottom-3 right-2 flex items-center gap-1 bg-white border border-slate-200 rounded-full px-2 py-0.5 shadow-sm">
+            <span className="text-[10px] text-slate-400 font-medium">scroll</span>
+            <svg className="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </div>
+        </div>
+      )}
+      </div>
+
+      {/* Context menu */}
+      {contextMenu && (
+        <div
+          className="fixed z-50 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 min-w-[160px]"
+          style={{
+            top: Math.min(contextMenu.y, window.innerHeight - 140),
+            left: Math.min(contextMenu.x, window.innerWidth - 180),
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p className="px-3 py-1 text-xs font-semibold text-slate-400 truncate max-w-[156px]">{contextMenu.row.title}</p>
+          <div className="border-t border-slate-100 my-1" />
+          <button
+            className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+            onClick={() => { navigate(`/canvas/${contextMenu.row.id}`); setContextMenu(null) }}
+          >
+            <span className="text-base">✏️</span> Edit
+          </button>
+          <button
+            className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+            onClick={() => { duplicateUseCase(contextMenu.row.id); setContextMenu(null) }}
+          >
+            <span className="text-base">📋</span> Duplicate
+          </button>
+          <div className="border-t border-slate-100 my-1" />
+          <button
+            className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            onClick={() => {
+              if (confirm(`Delete "${contextMenu.row.title}"?`)) deleteUseCase(contextMenu.row.id)
+              setContextMenu(null)
+            }}
+          >
+            <span className="text-base">🗑️</span> Delete
+          </button>
+        </div>
+      )}
     </div>
   )
 }
