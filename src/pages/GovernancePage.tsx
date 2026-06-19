@@ -25,16 +25,97 @@ const ROLES: { key: keyof GovernanceData['roles']; title: string; desc: string; 
   { key: 'business', title: 'Business Approval',              desc: 'Business sign-off before production deployment',            icon: '✅' },
 ]
 
-const STEPS: { n: number; key: keyof GovernanceData['steps']; title: string; desc: string }[] = [
-  { n: 1, key: 'step1', title: 'Define goals and use cases',           desc: 'Which concrete business problems should AI solve?' },
-  { n: 2, key: 'step2', title: 'Formulate AI policy',                  desc: 'Purpose, data, transparency, governance, risk, ethics, training' },
-  { n: 3, key: 'step3', title: 'Data privacy & legal requirements',    desc: 'GDPR, EU AI Act — review and document legal foundations' },
-  { n: 4, key: 'step4', title: 'Train employees',                      desc: 'Build AI competency, establish awareness program' },
-  { n: 5, key: 'step5', title: 'Implement security measures',          desc: 'Cybersecurity, access controls, monitoring' },
-  { n: 6, key: 'step6', title: 'Extend risk management system',        desc: 'Integrate AI-specific risks into existing risk framework' },
-  { n: 7, key: 'step7', title: 'Assign responsible parties',           desc: 'Define AI Owner, DPO, Security, Ethics, Business Sign-off' },
-  { n: 8, key: 'step8', title: 'Use pilot phase',                      desc: 'Roll out use cases incrementally, document learnings' },
-  { n: 9, key: 'step9', title: 'Document steps 1–8',                   desc: 'Create audit trail, fulfil documentation obligations' },
+const STEPS: { n: number; key: keyof GovernanceData['steps']; title: string; desc: string; details: string[] }[] = [
+  {
+    n: 1, key: 'step1', title: 'Define goals and use cases',
+    desc: 'Which concrete business problems should AI solve?',
+    details: [
+      'Collect 3–10 prioritised AI use cases from business units',
+      'Define measurable success criteria (KPIs) for each use case',
+      'Score and rank by business impact, feasibility and strategic fit',
+      'Document all use cases in the AI Canvas (this tool)',
+    ],
+  },
+  {
+    n: 2, key: 'step2', title: 'Formulate AI policy',
+    desc: 'Purpose, data, transparency, governance, risk, ethics, training',
+    details: [
+      'Draft the policy across all 7 dimensions (see AI Policy tab)',
+      'Get review and sign-off from Legal, Compliance and C-level',
+      'Publish internally so all employees know the boundaries',
+      'Review annually or after major regulatory changes',
+    ],
+  },
+  {
+    n: 3, key: 'step3', title: 'Data privacy & legal requirements',
+    desc: 'GDPR, EU AI Act — review and document legal foundations',
+    details: [
+      'Classify each use case by EU AI Act risk category (Minimal / Limited / High / Unacceptable)',
+      'Conduct a DPIA (Data Protection Impact Assessment) for high-risk processing',
+      'Verify GDPR legal basis for all personal data used in AI systems',
+      'Document findings per use case in the Privacy Checklist tab',
+    ],
+  },
+  {
+    n: 4, key: 'step4', title: 'Train employees',
+    desc: 'Build AI competency, establish awareness program',
+    details: [
+      'Identify skill gaps by role (managers, developers, end-users)',
+      'Design role-specific training paths covering the 7 K7.0069 topics',
+      'Appoint AI Champions as peer coaches within each department',
+      'Track completion using the Enablement & Coaching matrix',
+    ],
+  },
+  {
+    n: 5, key: 'step5', title: 'Implement security measures',
+    desc: 'Cybersecurity, access controls, monitoring',
+    details: [
+      'Conduct threat modelling for each AI system (prompt injection, data poisoning, model extraction)',
+      'Define access control per model, data source and environment',
+      'Enable logging and monitoring for all inference calls in production',
+      'Test adversarial robustness before go-live',
+    ],
+  },
+  {
+    n: 6, key: 'step6', title: 'Extend risk management system',
+    desc: 'Integrate AI-specific risks into existing risk framework',
+    details: [
+      'Catalogue AI-specific risks: hallucinations, bias, model drift, vendor lock-in',
+      'Integrate into the enterprise risk register with likelihood and impact ratings',
+      'Define monitoring thresholds and automated alerts',
+      'Establish escalation paths and incident response procedures',
+    ],
+  },
+  {
+    n: 7, key: 'step7', title: 'Assign responsible parties',
+    desc: 'Define AI Owner, DPO, Security, Ethics, Business Sign-off',
+    details: [
+      'Formally appoint AI Owner, DPO, IT Security, Ethics Reviewer and Business Sign-off',
+      'Document in the Responsible Parties tab with names and scope',
+      'Ensure no conflicts of interest (e.g. developer should not be sole auditor)',
+      'Communicate responsibilities to all relevant stakeholders',
+    ],
+  },
+  {
+    n: 8, key: 'step8', title: 'Use pilot phase',
+    desc: 'Roll out use cases incrementally, document learnings',
+    details: [
+      'Select 1–2 low-risk use cases as first pilots',
+      'Define clear success metrics and a time-boxed evaluation period',
+      'Collect structured feedback from users and affected stakeholders',
+      'Document learnings and gate criteria before scaling to production',
+    ],
+  },
+  {
+    n: 9, key: 'step9', title: 'Document steps 1–8',
+    desc: 'Create audit trail, fulfil documentation obligations',
+    details: [
+      'Maintain a central AI governance log with versioned records',
+      'Store policy decisions, risk assessments, training completion and role appointments',
+      'Ensure all records are timestamped and signed off — audit-ready',
+      'Schedule an annual governance review to keep documentation current',
+    ],
+  },
 ]
 
 const COMPLIANCE_COLS: { key: keyof AIUseCase; short: string; title: string }[] = [
@@ -187,8 +268,16 @@ function StepsTab({ steps, onChange, readonly }: {
   onChange: (s: GovernanceData['steps']) => void
   readonly: boolean
 }) {
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const done = Object.values(steps).filter(Boolean).length
   const pct = Math.round((done / 9) * 100)
+
+  const toggle = (key: string) => setExpanded((prev) => {
+    const next = new Set(prev)
+    next.has(key) ? next.delete(key) : next.add(key)
+    return next
+  })
+
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-xl shadow-md p-5">
@@ -199,33 +288,66 @@ function StepsTab({ steps, onChange, readonly }: {
         <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-5">
           <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
         </div>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {STEPS.map((s) => {
             const checked = steps[s.key]
+            const isExpanded = expanded.has(s.key)
             return (
-              <label
+              <div
                 key={s.key}
-                className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                  checked ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-100 hover:bg-slate-100'
-                } ${readonly ? 'cursor-default' : ''}`}
+                className={`rounded-lg border transition-colors ${
+                  checked ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-100'
+                }`}
               >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  disabled={readonly}
-                  onChange={(e) => onChange({ ...steps, [s.key]: e.target.checked })}
-                  className="mt-0.5 w-4 h-4 accent-blue-600 flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                      checked ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'
-                    }`}>{s.n}</span>
-                    <span className={`text-sm font-medium ${checked ? 'text-blue-800' : 'text-slate-700'}`}>{s.title}</span>
-                  </div>
-                  <p className="text-xs text-slate-400 mt-0.5 ml-7">{s.desc}</p>
+                {/* Main row */}
+                <div className="flex items-start gap-3 p-3">
+                  <label className="flex items-start gap-3 flex-1 min-w-0 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      disabled={readonly}
+                      onChange={(e) => onChange({ ...steps, [s.key]: e.target.checked })}
+                      className="mt-0.5 w-4 h-4 accent-blue-600 flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                          checked ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'
+                        }`}>{s.n}</span>
+                        <span className={`text-sm font-medium ${checked ? 'text-blue-800' : 'text-slate-700'}`}>{s.title}</span>
+                      </div>
+                      <p className="text-xs text-slate-400 mt-0.5 ml-7">{s.desc}</p>
+                    </div>
+                  </label>
+                  {/* Expand toggle */}
+                  <button
+                    onClick={() => toggle(s.key)}
+                    className="flex-shrink-0 p-1 rounded hover:bg-slate-200/60 transition-colors"
+                    title={isExpanded ? 'Hide details' : 'Show details'}
+                  >
+                    <svg
+                      className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                  </button>
                 </div>
-              </label>
+
+                {/* Expanded details */}
+                {isExpanded && (
+                  <div className="px-3 pb-3 ml-10">
+                    <ul className="space-y-1.5 border-t border-slate-200/70 pt-2.5">
+                      {s.details.map((d, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-slate-600 leading-snug">
+                          <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${checked ? 'bg-blue-400' : 'bg-slate-300'}`} />
+                          {d}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             )
           })}
         </div>
