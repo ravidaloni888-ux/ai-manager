@@ -97,10 +97,14 @@ export interface StrategyData {
 }
 
 export const DEFAULT_STRATEGY: StrategyData = {
-  vision: '',
+  vision: 'By 2029, AI will be embedded in every customer-facing and core operational process — enabling our teams to focus on high-value decisions while intelligent systems handle routine tasks, forecasting, and quality control at scale.',
   horizon: '3',
-  objectives: ['', '', ''],
-  challenge: '',
+  objectives: [
+    'Deploy AI in production across at least 12 use cases by Q4 2027, covering Sales, Operations and Finance',
+    'Achieve €2M in annual AI-driven cost savings and revenue uplift by end of 2027',
+    'Ensure 80+ employees are AI-literate and 5 certified AI Champions active across departments by Q1 2027',
+  ],
+  challenge: 'A key competitor launched an AI-powered pricing and service platform in Q1 2026, reducing our win rate by 11% in the enterprise segment. Manual processes in Operations and Finance are costing an estimated €4M per year in avoidable overhead. Without accelerating AI adoption now, the gap will widen.',
   focusAreas: [
     { theme: 'Customer Experience',    priority: 'High',   note: 'Chatbot rollout + personalised service automation across all touchpoints' },
     { theme: 'Operational Efficiency', priority: 'High',   note: 'Predictive maintenance, demand forecasting and invoice automation in scope' },
@@ -111,8 +115,8 @@ export const DEFAULT_STRATEGY: StrategyData = {
     { theme: 'Data & Analytics',       priority: 'Medium', note: 'Sentiment analysis and lead scoring to improve decision-making' },
     { theme: 'Sustainability',         priority: 'Low',    note: 'Energy forecasting pilot to support ESG reporting commitments' },
   ],
-  budgetTotalK: 0,
-  targetRoiPct: 0,
+  budgetTotalK: 2500,
+  targetRoiPct: 250,
   kpis: [
     { id: 'kpi-1', metric: 'Use cases in production',           current: '5',   target: '12',   deadline: 'Q4 2027' },
     { id: 'kpi-2', metric: 'AI-trained employees',              current: '12',  target: '80',   deadline: 'Q1 2027' },
