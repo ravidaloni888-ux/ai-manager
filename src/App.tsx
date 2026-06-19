@@ -67,6 +67,7 @@ function AppRoutes() {
               <Route path="/meetings" element={<MeetingsPage />} />
               <Route path="/roles" element={<RolesPage />} />
               <Route path="/maturity" element={<MaturityPage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
               <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
             </Routes>

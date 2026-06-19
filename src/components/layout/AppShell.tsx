@@ -4,7 +4,7 @@ import NavItem from './NavItem'
 import {
   IconDashboard, IconList, IconChartBar, IconMap,
   IconAlert, IconBuilding, IconCurrency, IconFlag, IconSearch,
-  IconBrain, IconPlus, IconSettings, IconAcademic, IconCalendar, IconUsers,
+  IconBrain, IconPlus, IconSettings, IconAcademic, IconCalendar, IconUsers, IconInfo,
 } from '../icons/NavIcons'
 import { useAuthStore } from '../../store/authStore'
 import BetaRequestModal from './BetaRequestModal'
@@ -44,6 +44,7 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/dashboard" icon={<IconDashboard />} label="Dashboard" />
           <NavItem to="/use-cases" icon={<IconList />} label="AI Use Cases" />
           <NavItem to="/settings" icon={<IconSettings />} label="Settings" />
+          <NavItem to="/about" icon={<IconInfo />} label="About" />
 
           <div className="pt-4" />
 
