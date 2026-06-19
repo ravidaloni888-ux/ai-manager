@@ -66,7 +66,7 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/risk" icon={<IconAlert />} label="Risk Manager" />
           <NavItem to="/roi" icon={<IconCurrency />} label="ROI Calculator" />
           <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap Generator" />
-          <NavItem icon={<IconSearch />} label="Vendor Comparison" disabled badge="R3" />
+          <NavItem to="/vendors" icon={<IconSearch />} label="Vendor Comparison" />
         </nav>
 
         {/* Sidebar footer — user info when logged in */}
