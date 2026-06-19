@@ -14,6 +14,7 @@ import AboutPage from './pages/AboutPage'
 import StrategyPage from './pages/StrategyPage'
 import RiskPage from './pages/RiskPage'
 import RoiPage from './pages/RoiPage'
+import RoadmapPage from './pages/RoadmapPage'
 import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { useUseCasesStore } from './store/useCasesStore'
@@ -75,6 +76,7 @@ function AppRoutes() {
               <Route path="/strategy" element={<StrategyPage />} />
               <Route path="/risk" element={<RiskPage />} />
               <Route path="/roi" element={<RoiPage />} />
+              <Route path="/roadmap" element={<RoadmapPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
               <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
             </Routes>

@@ -65,7 +65,7 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/strategy" icon={<IconMap />} label="Strategy Wizard" />
           <NavItem to="/risk" icon={<IconAlert />} label="Risk Manager" />
           <NavItem to="/roi" icon={<IconCurrency />} label="ROI Calculator" />
-          <NavItem icon={<IconFlag />} label="Roadmap Generator" disabled badge="R3" />
+          <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap Generator" />
           <NavItem icon={<IconSearch />} label="Vendor Comparison" disabled badge="R3" />
         </nav>
 
