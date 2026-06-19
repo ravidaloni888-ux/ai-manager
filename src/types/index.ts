@@ -71,6 +71,51 @@ export type Motivation =
   | 'Employee Experience'
   | 'Sustainability'
 
+export interface StrategyFocusArea {
+  theme: string
+  priority: 'High' | 'Medium' | 'Low' | 'None'
+  note: string
+}
+
+export interface StrategyKPI {
+  id: string
+  metric: string
+  current: string
+  target: string
+  deadline: string
+}
+
+export interface StrategyData {
+  vision: string
+  horizon: '1' | '2' | '3' | '5'
+  objectives: string[]
+  challenge: string
+  focusAreas: StrategyFocusArea[]
+  budgetTotalK: number
+  targetRoiPct: number
+  kpis: StrategyKPI[]
+}
+
+export const DEFAULT_STRATEGY: StrategyData = {
+  vision: '',
+  horizon: '3',
+  objectives: ['', '', ''],
+  challenge: '',
+  focusAreas: [
+    { theme: 'Customer Experience',    priority: 'None', note: '' },
+    { theme: 'Operational Efficiency', priority: 'None', note: '' },
+    { theme: 'Revenue Growth',         priority: 'None', note: '' },
+    { theme: 'Risk & Compliance',      priority: 'None', note: '' },
+    { theme: 'Innovation & R&D',       priority: 'None', note: '' },
+    { theme: 'HR & Talent',            priority: 'None', note: '' },
+    { theme: 'Data & Analytics',       priority: 'None', note: '' },
+    { theme: 'Sustainability',         priority: 'None', note: '' },
+  ],
+  budgetTotalK: 0,
+  targetRoiPct: 0,
+  kpis: [],
+}
+
 export interface AIUseCase {
   id: string
   title: string

@@ -1,0 +1,62 @@
+import { create } from 'zustand'
+import { StrategyData, DEFAULT_STRATEGY } from '../types'
+import { supabase } from '../lib/supabase'
+
+const LS_KEY = 'ai_strategy_v1'
+
+function lsLoad(): StrategyData | null {
+  try {
+    const raw = localStorage.getItem(LS_KEY)
+    if (!raw) return null
+    return { ...DEFAULT_STRATEGY, ...JSON.parse(raw) }
+  } catch { return null }
+}
+
+function lsSave(d: StrategyData) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(d)) } catch {}
+}
+
+interface StrategyStore {
+  data: StrategyData
+  loading: boolean
+  saving: boolean
+  init: () => Promise<void>
+  save: (d: StrategyData) => Promise<void>
+}
+
+export const useStrategyStore = create<StrategyStore>()((set) => ({
+  data: DEFAULT_STRATEGY,
+  loading: true,
+  saving: false,
+
+  init: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ai_strategy')
+        .select('*')
+        .eq('id', 'singleton')
+        .single()
+      if (!error && data?.strategy_data) {
+        const loaded: StrategyData = { ...DEFAULT_STRATEGY, ...data.strategy_data }
+        lsSave(loaded)
+        set({ data: loaded, loading: false })
+        return
+      }
+    } catch {}
+    set({ data: lsLoad() ?? DEFAULT_STRATEGY, loading: false })
+  },
+
+  save: async (d: StrategyData) => {
+    set({ saving: true })
+    lsSave(d)
+    set({ data: d })
+    try {
+      await supabase.from('ai_strategy').upsert({
+        id: 'singleton',
+        strategy_data: d,
+        updated_at: new Date().toISOString(),
+      })
+    } catch {}
+    set({ saving: false })
+  },
+}))

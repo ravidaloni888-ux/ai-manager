@@ -11,6 +11,7 @@ import MeetingsPage from './pages/MeetingsPage'
 import RolesPage from './pages/RolesPage'
 import MaturityPage from './pages/MaturityPage'
 import AboutPage from './pages/AboutPage'
+import StrategyPage from './pages/StrategyPage'
 import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { useUseCasesStore } from './store/useCasesStore'
@@ -69,6 +70,7 @@ function AppRoutes() {
               <Route path="/roles" element={<RolesPage />} />
               <Route path="/maturity" element={<MaturityPage />} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/strategy" element={<StrategyPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
               <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
             </Routes>

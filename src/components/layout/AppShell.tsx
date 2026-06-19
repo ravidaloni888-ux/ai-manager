@@ -62,7 +62,7 @@ export default function AppShell({ children }: AppShellProps) {
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
             Release 3
           </p>
-          <NavItem icon={<IconMap />} label="Strategy Wizard" disabled badge="R3" />
+          <NavItem to="/strategy" icon={<IconMap />} label="Strategy Wizard" />
           <NavItem icon={<IconAlert />} label="Risk Manager" disabled badge="R3" />
           <NavItem icon={<IconCurrency />} label="ROI Calculator" disabled badge="R3" />
           <NavItem icon={<IconFlag />} label="Roadmap Generator" disabled badge="R3" />
