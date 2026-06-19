@@ -113,7 +113,13 @@ export const DEFAULT_STRATEGY: StrategyData = {
   ],
   budgetTotalK: 0,
   targetRoiPct: 0,
-  kpis: [],
+  kpis: [
+    { id: 'kpi-1', metric: 'Use cases in production',           current: '5',   target: '12',   deadline: 'Q4 2027' },
+    { id: 'kpi-2', metric: 'AI-trained employees',              current: '12',  target: '80',   deadline: 'Q1 2027' },
+    { id: 'kpi-3', metric: 'Annual AI-driven savings (€k)',     current: '0',   target: '2000', deadline: 'Q4 2027' },
+    { id: 'kpi-4', metric: '% of key processes AI-supported',  current: '8%',  target: '30%',  deadline: 'Q2 2027' },
+    { id: 'kpi-5', metric: 'Avg. priority score across portfolio', current: '7.4', target: '8.0', deadline: 'Q4 2026' },
+  ],
 }
 
 export interface AIUseCase {

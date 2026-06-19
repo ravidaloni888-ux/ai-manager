@@ -37,13 +37,16 @@ export const useStrategyStore = create<StrategyStore>()((set) => ({
         .eq('id', 'singleton')
         .single()
       if (!error && data?.strategy_data) {
-        const loaded: StrategyData = { ...DEFAULT_STRATEGY, ...data.strategy_data }
-        lsSave(loaded)
-        set({ data: loaded, loading: false })
+        const merged: StrategyData = { ...DEFAULT_STRATEGY, ...data.strategy_data }
+        if (!merged.kpis?.length) merged.kpis = DEFAULT_STRATEGY.kpis
+        lsSave(merged)
+        set({ data: merged, loading: false })
         return
       }
     } catch {}
-    set({ data: lsLoad() ?? DEFAULT_STRATEGY, loading: false })
+    const ls = lsLoad()
+    if (ls && !ls.kpis?.length) ls.kpis = DEFAULT_STRATEGY.kpis
+    set({ data: ls ?? DEFAULT_STRATEGY, loading: false })
   },
 
   save: async (d: StrategyData) => {
