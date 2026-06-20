@@ -35,6 +35,11 @@ export default function AboutPage() {
           AI initiative — from the first idea to production and beyond. Built on the{' '}
           <span className="font-medium text-slate-700">velpTEC K7.0069</span> methodology.
         </p>
+        <p className="text-sm text-slate-600 leading-relaxed">
+          It's a <span className="font-medium text-slate-700">TypeScript/React</span> project built with{' '}
+          <span className="font-medium text-slate-700">Vite</span> and{' '}
+          <span className="font-medium text-slate-700">Tailwind CSS</span>.
+        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {FEATURES.map(({ icon, title, desc }) => (

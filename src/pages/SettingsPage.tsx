@@ -5,7 +5,7 @@ const LOCAL_PATH = '/Users/ra/Downloads/git/ai-manager'
 const GITHUB_URL = 'https://github.com/ravidaloni888-ux/ai-manager'
 const VERCEL_URL = 'https://vercel.com/info-11678597s-projects/ai-manager-new'
 const SUPABASE_URL = 'https://supabase.com/dashboard/project/zvmujqhjqgzujmrvdxbr'
-const LOCAL_URL = 'http://localhost:3001'
+const LOCAL_URL = 'http://localhost:3002'
 const LIVE_URL = 'https://ai-manager-new.vercel.app'
 
 function LinkCard({
