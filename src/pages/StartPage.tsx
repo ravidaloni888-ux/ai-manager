@@ -203,9 +203,8 @@ export default function StartPage() {
   const [expanded, setExpanded] = useState<StepId | null>(null)
 
   useEffect(() => {
-    const fresh = demoMode ? new Set<StepId>(ALL_STEP_IDS) : new Set<StepId>()
+    const fresh = loadProgress()
     setDone(fresh)
-    saveProgress(fresh)
   }, [demoMode])
 
   const toggle = (id: StepId) => {
