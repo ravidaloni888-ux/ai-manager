@@ -191,6 +191,7 @@ export function loadProgress(): Set<StepId> {
 }
 
 function saveProgress(done: Set<StepId>) {
+  if (getDemoMode()) return
   try { localStorage.setItem(LS_KEY, JSON.stringify([...done])) } catch {}
 }
 
