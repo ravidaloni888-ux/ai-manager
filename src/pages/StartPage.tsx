@@ -174,11 +174,18 @@ const PHASE_STYLE: Record<string, { bg: string; border: string; text: string; ba
 // ── localStorage ───────────────────────────────────────────────────────────
 const LS_KEY = 'ai_start_v1'
 
+const ALL_STEP_IDS: StepId[] = [
+  'vision', 'maturity', 'governance', 'roles',
+  'usecases', 'score', 'eu-act',
+  'risks', 'roadmap', 'roi',
+  'enablement', 'meetings',
+]
+
 export function loadProgress(): Set<StepId> {
   try {
     const raw = localStorage.getItem(LS_KEY)
-    return raw ? new Set<StepId>(JSON.parse(raw)) : new Set()
-  } catch { return new Set() }
+    return raw ? new Set<StepId>(JSON.parse(raw)) : new Set(ALL_STEP_IDS)
+  } catch { return new Set(ALL_STEP_IDS) }
 }
 
 function saveProgress(done: Set<StepId>) {
