@@ -1,5 +1,7 @@
 import { ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
+import { useWizardStore, ROUTE_STEPS } from '../../store/wizardStore'
+import { useDemoStore } from '../../store/demoStore'
 
 interface NavItemProps {
   to?: string
@@ -12,6 +14,10 @@ interface NavItemProps {
 export default function NavItem({ to, icon, label, disabled, badge }: NavItemProps) {
   const { search } = useLocation()
   const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
+  const demoMode = useDemoStore((s) => s.demoMode)
+  const done = useWizardStore((s) => s.done)
+  const steps = to ? ROUTE_STEPS[to] : undefined
+  const incomplete = !demoMode && !!steps && !steps.some((id) => done.has(id))
   if (disabled) {
     return (
       <div
@@ -36,7 +42,7 @@ export default function NavItem({ to, icon, label, disabled, badge }: NavItemPro
         `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
           isActive
             ? `bg-blue-600 text-white font-medium${fromWizard ? ' nav-pulse' : ''}`
-            : 'text-slate-300 hover:bg-white/10 hover:text-white'
+            : `hover:bg-white/10 hover:text-white ${incomplete ? 'text-slate-300/50' : 'text-slate-300'}`
         }`
       }
     >

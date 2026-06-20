@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getDemoMode, useDemoStore } from '../store/demoStore'
+import { useWizardStore } from '../store/wizardStore'
 
 // ── Step definitions ───────────────────────────────────────────────────────
 export type StepId =
@@ -189,7 +190,7 @@ export function loadProgress(): Set<StepId> {
   } catch { return new Set(ALL_STEP_IDS) }
 }
 
-function saveProgress(done: Set<StepId>) {
+export function saveProgress(done: Set<StepId>) {
   if (getDemoMode()) return
   try { localStorage.setItem(LS_KEY, JSON.stringify([...done])) } catch {}
 }
@@ -198,22 +199,10 @@ function saveProgress(done: Set<StepId>) {
 export default function StartPage() {
   const navigate = useNavigate()
   const demoMode = useDemoStore((s) => s.demoMode)
-  const [done, setDone] = useState<Set<StepId>>(loadProgress)
+  const { done, toggle, init } = useWizardStore()
   const [expanded, setExpanded] = useState<StepId | null>(null)
 
-  useEffect(() => {
-    const fresh = loadProgress()
-    setDone(fresh)
-  }, [demoMode])
-
-  const toggle = (id: StepId) => {
-    setDone((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      saveProgress(next)
-      return next
-    })
-  }
+  useEffect(() => { init() }, [demoMode])
 
   const completedCount = done.size
   const totalCount     = STEPS.length
