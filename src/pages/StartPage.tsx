@@ -185,9 +185,8 @@ const ALL_STEP_IDS: StepId[] = [
 export function loadProgress(): Set<StepId> {
   try {
     const raw = localStorage.getItem(LS_KEY)
-    if (raw) return new Set<StepId>(JSON.parse(raw))
-    return getDemoMode() ? new Set(ALL_STEP_IDS) : new Set()
-  } catch { return new Set() }
+    return raw ? new Set<StepId>(JSON.parse(raw)) : new Set(ALL_STEP_IDS)
+  } catch { return new Set(ALL_STEP_IDS) }
 }
 
 function saveProgress(done: Set<StepId>) {
