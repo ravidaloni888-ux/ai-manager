@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getDemoMode, useDemoStore } from '../store/demoStore'
 
 // ── Step definitions ───────────────────────────────────────────────────────
 export type StepId =
@@ -184,8 +185,9 @@ const ALL_STEP_IDS: StepId[] = [
 export function loadProgress(): Set<StepId> {
   try {
     const raw = localStorage.getItem(LS_KEY)
-    return raw ? new Set<StepId>(JSON.parse(raw)) : new Set(ALL_STEP_IDS)
-  } catch { return new Set(ALL_STEP_IDS) }
+    if (raw) return new Set<StepId>(JSON.parse(raw))
+    return getDemoMode() ? new Set(ALL_STEP_IDS) : new Set()
+  } catch { return new Set() }
 }
 
 function saveProgress(done: Set<StepId>) {
@@ -195,8 +197,15 @@ function saveProgress(done: Set<StepId>) {
 // ── Page ───────────────────────────────────────────────────────────────────
 export default function StartPage() {
   const navigate = useNavigate()
+  const demoMode = useDemoStore((s) => s.demoMode)
   const [done, setDone] = useState<Set<StepId>>(loadProgress)
   const [expanded, setExpanded] = useState<StepId | null>(null)
+
+  useEffect(() => {
+    const fresh = demoMode ? new Set<StepId>(ALL_STEP_IDS) : new Set<StepId>()
+    setDone(fresh)
+    saveProgress(fresh)
+  }, [demoMode])
 
   const toggle = (id: StepId) => {
     setDone((prev) => {
