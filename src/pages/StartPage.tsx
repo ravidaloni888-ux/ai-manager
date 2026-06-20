@@ -345,7 +345,7 @@ export default function StartPage() {
                         {/* Actions */}
                         <div className="flex items-center gap-3 mt-2.5">
                           <button
-                            onClick={() => navigate(step.to)}
+                            onClick={() => navigate(`${step.to}?from=wizard`)}
                             className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
                               isComplete
                                 ? 'text-slate-500 bg-slate-50 hover:bg-slate-100'

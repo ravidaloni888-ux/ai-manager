@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 
 interface NavItemProps {
   to?: string
@@ -10,6 +10,8 @@ interface NavItemProps {
 }
 
 export default function NavItem({ to, icon, label, disabled, badge }: NavItemProps) {
+  const { search } = useLocation()
+  const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
   if (disabled) {
     return (
       <div
@@ -33,7 +35,7 @@ export default function NavItem({ to, icon, label, disabled, badge }: NavItemPro
       className={({ isActive }) =>
         `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
           isActive
-            ? 'bg-blue-600 text-white font-medium'
+            ? `bg-blue-600 text-white font-medium${fromWizard ? ' nav-pulse' : ''}`
             : 'text-slate-300 hover:bg-white/10 hover:text-white'
         }`
       }
