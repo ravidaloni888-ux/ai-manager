@@ -18,6 +18,7 @@ import RoadmapPage from './pages/RoadmapPage'
 import VendorPage from './pages/VendorPage'
 import StartPage from './pages/StartPage'
 import QAPage from './pages/QAPage'
+import GlossaryPage from './pages/GlossaryPage'
 import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { useUseCasesStore } from './store/useCasesStore'
@@ -83,6 +84,7 @@ function AppRoutes() {
               <Route path="/vendors" element={<VendorPage />} />
               <Route path="/start" element={<StartPage />} />
               <Route path="/qa" element={<QAPage />} />
+              <Route path="/glossary" element={<GlossaryPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
               <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
             </Routes>

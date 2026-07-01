@@ -65,6 +65,7 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/roles" icon={<IconUsers />} label="Team & Roles" />
           <NavItem to="/vendors" icon={<IconSearch />} label="Vendor Comparison" />
           <NavItem to="/qa" icon={<IconClipboard />} label="AI Quality Assurance" />
+          <NavItem to="/glossary" icon={<IconSearch />} label="AI Glossary" />
           <NavItem to="/settings" icon={<IconSettings />} label="Settings" />
           <NavItem to="/about" icon={<IconInfo />} label="About" />
         </nav>
