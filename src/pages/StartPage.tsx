@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getDemoMode, useDemoStore } from '../store/demoStore'
-import { useWizardStore } from '../store/wizardStore'
-
-// ── Step definitions ───────────────────────────────────────────────────────
-export type StepId =
-  | 'vision' | 'maturity' | 'governance' | 'roles'
-  | 'usecases' | 'score' | 'eu-act'
-  | 'risks' | 'roadmap' | 'roi'
-  | 'enablement' | 'meetings'
+import { useDemoStore } from '../store/demoStore'
+import { useWizardStore, StepId } from '../store/wizardStore'
 
 interface Step {
   id: StepId
@@ -22,7 +15,7 @@ interface Step {
   cta: string
 }
 
-const STEPS: Step[] = [
+export const STEPS: Step[] = [
   // ── Phase 1 ──
   {
     id: 'vision',
@@ -173,27 +166,6 @@ const PHASE_STYLE: Record<string, { bg: string; border: string; text: string; ba
   'Operations & People':   { bg: 'bg-green-50',  border: 'border-green-200',  text: 'text-green-800',  badge: 'bg-green-100 text-green-700' },
 }
 
-// ── localStorage ───────────────────────────────────────────────────────────
-const LS_KEY = 'ai_start_v1'
-
-const ALL_STEP_IDS: StepId[] = [
-  'vision', 'maturity', 'governance', 'roles',
-  'usecases', 'score', 'eu-act',
-  'risks', 'roadmap', 'roi',
-  'enablement', 'meetings',
-]
-
-export function loadProgress(): Set<StepId> {
-  try {
-    const raw = localStorage.getItem(LS_KEY)
-    return raw ? new Set<StepId>(JSON.parse(raw)) : new Set(ALL_STEP_IDS)
-  } catch { return new Set(ALL_STEP_IDS) }
-}
-
-export function saveProgress(done: Set<StepId>) {
-  if (getDemoMode()) return
-  try { localStorage.setItem(LS_KEY, JSON.stringify([...done])) } catch {}
-}
 
 // ── Page ───────────────────────────────────────────────────────────────────
 export default function StartPage() {
@@ -332,7 +304,7 @@ export default function StartPage() {
                         {/* Actions */}
                         <div className="flex items-center gap-3 mt-2.5">
                           <button
-                            onClick={() => navigate(`${step.to}?from=wizard`)}
+                            onClick={() => navigate(`${step.to}?from=wizard&step=${step.id}`)}
                             className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
                               isComplete
                                 ? 'text-slate-500 bg-slate-50 hover:bg-slate-100'

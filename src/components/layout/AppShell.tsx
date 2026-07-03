@@ -9,6 +9,7 @@ import {
 import { useAuthStore } from '../../store/authStore'
 import BetaRequestModal from './BetaRequestModal'
 import DemoToggle from './DemoToggle'
+import WizardBanner from './WizardBanner'
 
 interface AppShellProps {
   children: ReactNode
@@ -113,6 +114,7 @@ export default function AppShell({ children }: AppShellProps) {
           )}
         </div>
 
+        <WizardBanner />
         <div className="flex-1 overflow-y-auto">
           {children}
         </div>

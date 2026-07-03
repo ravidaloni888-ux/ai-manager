@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { loadProgress } from '../../pages/StartPage'
+import { loadProgress } from '../../store/wizardStore'
 
 const TOTAL = 12
 
