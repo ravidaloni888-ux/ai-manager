@@ -138,6 +138,134 @@ const ROLES: RoleDef[] = [
   },
 ]
 
+// ── ISO 42001 §5.3 mapping ────────────────────────────────────────────────
+
+const ISO_REQUIREMENTS = [
+  {
+    clause: '§5.3 a)',
+    requirement: 'Ensure the AIMS conforms to the requirements of ISO 42001',
+    description: 'Top management must designate a person or team responsible for ensuring the AI Management System as a whole meets the standard.',
+    coveredBy: ['ai_governance_specialist', 'ai_architect'],
+    coveredLabel: 'AI Governance Specialist (primary) · AI Architect (interim)',
+  },
+  {
+    clause: '§5.3 b)',
+    requirement: 'Report on the performance of the AIMS to top management',
+    description: 'Regular reporting on AI system performance, risks, incidents, and objectives must be assigned to a named role.',
+    coveredBy: ['ai_governance_specialist', 'ai_product_manager'],
+    coveredLabel: 'AI Governance Specialist · AI Product Manager',
+  },
+  {
+    clause: '§5.3 c)',
+    requirement: 'Ensure AI policy and objectives are established and communicated',
+    description: 'A role must be accountable for the AI policy being documented, maintained, and communicated across the organisation.',
+    coveredBy: ['ai_governance_specialist', 'ai_business_analyst'],
+    coveredLabel: 'AI Governance Specialist · AI Business Analyst (interim)',
+  },
+  {
+    clause: '§5.3 d)',
+    requirement: 'Promote awareness of the AIMS throughout the organisation',
+    description: 'Someone must drive AI awareness, training, and a risk-aware culture — especially for teams working with or affected by AI systems.',
+    coveredBy: ['ai_enablement_specialist'],
+    coveredLabel: 'AI Enablement Specialist',
+  },
+  {
+    clause: '§5.3 e)',
+    requirement: 'Ensure AI system roles and responsibilities are assigned and communicated',
+    description: 'Accountability must be defined at the use-case level: who owns each AI system, who reviews outputs, who handles incidents.',
+    coveredBy: ['ai_product_manager', 'ai_governance_specialist'],
+    coveredLabel: 'AI Product Manager · AI Governance Specialist',
+  },
+]
+
+function Iso42001Section({ assignments }: { assignments: Assignments }) {
+  const [open, setOpen] = useState(false)
+
+  const covered = (roleIds: string[]) =>
+    roleIds.some((id) => assignments[id]?.trim())
+
+  return (
+    <section className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <span className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+          </span>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-slate-800">ISO 42001 · §5.3 Organisational Roles & Responsibilities</p>
+            <p className="text-xs text-slate-500 mt-0.5">5 mandatory role assignments required by the AI Management System standard</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+            ISO_REQUIREMENTS.every((r) => covered(r.coveredBy))
+              ? 'bg-green-100 text-green-700'
+              : 'bg-amber-100 text-amber-700'
+          }`}>
+            {ISO_REQUIREMENTS.filter((r) => covered(r.coveredBy)).length}/{ISO_REQUIREMENTS.length} assigned
+          </span>
+          <svg className={`w-4 h-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          </svg>
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t border-slate-100 divide-y divide-slate-50">
+          {/* Standard intro */}
+          <div className="px-5 py-3 bg-indigo-50">
+            <p className="text-xs text-indigo-700 leading-relaxed">
+              <span className="font-semibold">ISO 42001:2023 §5.3</span> requires top management to assign, communicate and ensure understanding of roles relevant to the AI Management System (AIMS). Each clause below must be covered by a named person or role — this is audited in certification.
+            </p>
+          </div>
+
+          {ISO_REQUIREMENTS.map((req) => {
+            const isCovered = covered(req.coveredBy)
+            return (
+              <div key={req.clause} className="px-5 py-4 flex items-start gap-4">
+                <div className="flex-shrink-0 mt-0.5">
+                  {isCovered ? (
+                    <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                      <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    </span>
+                  ) : (
+                    <span className="w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
+                      <svg className="w-3 h-3 text-amber-600" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+                      </svg>
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                    <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">{req.clause}</span>
+                    <p className="text-xs font-semibold text-slate-700">{req.requirement}</p>
+                  </div>
+                  <p className="text-xs text-slate-500 leading-relaxed mb-1.5">{req.description}</p>
+                  <p className="text-[10px] text-slate-400">
+                    <span className="font-semibold text-slate-500">Covered by: </span>
+                    {isCovered
+                      ? <span className="text-green-600 font-medium">{req.coveredLabel}</span>
+                      : <span className="text-amber-600 font-medium">⚠ No one assigned yet — assign roles above</span>
+                    }
+                  </p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </section>
+  )
+}
+
 export default function RolesPage() {
   const user = useAuthStore((s) => s.user)
   const demoMode = useDemoStore((s) => s.demoMode)
@@ -230,6 +358,9 @@ export default function RolesPage() {
           </ul>
         </div>
       )}
+
+      {/* ISO 42001 §5.3 Info */}
+      <Iso42001Section assignments={assignments} />
 
       {/* Role cards */}
       {loading ? (
