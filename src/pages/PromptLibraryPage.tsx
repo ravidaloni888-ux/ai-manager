@@ -443,6 +443,50 @@ export default function PromptLibraryPage() {
         )}
       </div>
 
+      {/* Aufnahmekriterien */}
+      <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
+        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">✅ Aufnahmekriterien</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-slate-700">Inhaltlich</p>
+            {[
+              'Echter, wiederkehrender Bedarf im Arbeitsalltag',
+              'Getestet und liefert zuverlässig gute Ergebnisse',
+              'Keine Dopplungen zu bestehenden Prompts',
+            ].map((c) => (
+              <div key={c} className="flex gap-2 text-xs text-slate-600">
+                <span className="text-green-500 flex-shrink-0 mt-0.5">✓</span>{c}
+              </div>
+            ))}
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-slate-700">Prozess</p>
+            {[
+              'Einreichung immer über die KI-Beauftragte — kein direktes Teilen',
+              'Entscheidung trifft ausschließlich die KI-Beauftragte',
+              'Prüffrist: max. 5 Werktage',
+              'Alle 6 Monate Überprüfung von Nutzung und Aktualität',
+            ].map((c) => (
+              <div key={c} className="flex gap-2 text-xs text-slate-600">
+                <span className="text-blue-500 flex-shrink-0 mt-0.5">→</span>{c}
+              </div>
+            ))}
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-slate-700">🔒 Datenschutz (K.O.-Kriterien)</p>
+            {[
+              'Keine personenbezogenen oder sensiblen Daten',
+              'Keine Kunden-, Mitarbeiter- oder Geschäftsgeheimnisse',
+              'Nur freigegebene KI-Tools laut Unternehmensrichtlinie',
+            ].map((c) => (
+              <div key={c} className="flex gap-2 text-xs text-slate-600">
+                <span className="text-red-400 flex-shrink-0 mt-0.5">✗</span>{c}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Search + Filter */}
       <div className="space-y-3">
         <input
