@@ -312,6 +312,84 @@ function AvvChecker() {
   )
 }
 
+const ART22_CHECKS = [
+  'Der Mensch erhält alle relevanten Informationen — nicht nur das KI-Ergebnis',
+  'Der Mensch kann die Empfehlung der KI tatsächlich überstimmen (kein sozialer/technischer Druck)',
+  'Die Entscheidung des Menschen wird dokumentiert — nicht nur das KI-Ergebnis',
+  'Es gibt Fälle, in denen Menschen tatsächlich abweichend von der KI entschieden haben',
+  'Die Zeit für die menschliche Prüfung ist ausreichend — kein "Fließband-Nicken"',
+]
+
+function Art22Checker() {
+  const [checked, setChecked] = useState<Record<number, boolean>>({})
+
+  const toggle = (i: number) => setChecked((prev) => ({ ...prev, [i]: !prev[i] }))
+  const passed = ART22_CHECKS.filter((_, i) => checked[i]).length
+  const all = ART22_CHECKS.length
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="px-5 py-4 border-b border-slate-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Art. 22 — Human-in-the-Loop-Qualität</p>
+              <p className="text-xs text-slate-500">EuGH C-634/21: Formale Kontrolle reicht nicht — der Mensch muss tatsächlich entscheiden</p>
+            </div>
+          </div>
+          {passed > 0 && (
+            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${
+              passed === all ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+            }`}>
+              {passed}/{all}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="px-5 py-4">
+        <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+          Prüfe ob dein Human-in-the-Loop-Prozess der Art. 22-Anforderung genügt:
+        </p>
+        <div className="space-y-1">
+          {ART22_CHECKS.map((check, i) => (
+            <label key={i} onClick={() => toggle(i)}
+              className="flex items-start gap-3 py-2.5 border-b border-slate-50 last:border-0 cursor-pointer group hover:bg-slate-50 -mx-5 px-5 rounded transition-colors">
+              <div className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
+                checked[i] ? 'bg-rose-600 border-rose-600' : 'border-slate-300 group-hover:border-rose-400'
+              }`}>
+                {checked[i] && (
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                )}
+              </div>
+              <p className={`text-xs leading-relaxed transition-colors ${checked[i] ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+                {check}
+              </p>
+            </label>
+          ))}
+        </div>
+        {passed === all && (
+          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
+            <p className="text-xs font-semibold text-green-700">✓ Alle Punkte erfüllt — Human-in-the-Loop-Prozess sieht gut aus</p>
+          </div>
+        )}
+        {passed > 0 && passed < all && (
+          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+            <p className="text-xs font-semibold text-amber-700">⚠ {all - passed} Punkt{all - passed > 1 ? 'e' : ''} noch offen — Prozess überprüfen</p>
+          </div>
+        )}
+        <p className="text-[10px] text-slate-400 mt-4">Diese Checkliste dient der Orientierung. Bei tatsächlichen Art. 22-Sachverhalten: Dreistufenmodell Stufe 3 → DSB/Anwalt.</p>
+      </div>
+    </div>
+  )
+}
+
 function DreistufenmodellSection() {
   const [activeStufe, setActiveStufe] = useState<Stufe>(null)
 
@@ -437,42 +515,7 @@ export default function DsgvoPage() {
           <DsfaChecker />
           <AvvChecker />
 
-          {/* Art. 22 Human-in-Loop check */}
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <span className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                  </svg>
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-slate-800">Art. 22 — Human-in-the-Loop-Qualität</p>
-                  <p className="text-xs text-slate-500">EuGH C-634/21: Formale Kontrolle reicht nicht — der Mensch muss tatsächlich entscheiden</p>
-                </div>
-              </div>
-            </div>
-            <div className="px-5 py-4">
-              <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-                Prüfe ob dein Human-in-the-Loop-Prozess dem Art. 22 Anforderung genügt:
-              </p>
-              <div className="space-y-2">
-                {[
-                  'Der Mensch erhält alle relevanten Informationen — nicht nur das KI-Ergebnis',
-                  'Der Mensch kann die Empfehlung der KI tatsächlich überstimmen (kein sozialer/technischer Druck)',
-                  'Die Entscheidung des Menschen wird dokumentiert — nicht nur das KI-Ergebnis',
-                  'Es gibt Fälle, in denen Menschen tatsächlich abweichend von der KI entschieden haben',
-                  'Die Zeit für die menschliche Prüfung ist ausreichend — kein "Fließband-Nicken"',
-                ].map((check, i) => (
-                  <div key={i} className="flex items-start gap-3 py-2 border-b border-slate-50 last:border-0">
-                    <div className="w-5 h-5 rounded-full border-2 border-slate-200 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-slate-700 leading-relaxed">{check}</p>
-                  </div>
-                ))}
-              </div>
-              <p className="text-[10px] text-slate-400 mt-4">Diese Checkliste dient der Orientierung. Bei tatsächlichen Art. 22-Sachverhalten: Dreistufenmodell Stufe 3 → DSB/Anwalt.</p>
-            </div>
-          </div>
+          <Art22Checker />
         </div>
       )}
 
