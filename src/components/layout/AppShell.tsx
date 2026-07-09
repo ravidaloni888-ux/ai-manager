@@ -68,6 +68,7 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/qa" icon={<IconClipboard />} label="AI Quality Assurance" />
           <NavItem to="/glossary" icon={<IconSearch />} label="AI Glossary" />
           <NavItem to="/prompts" icon={<IconStar />} label="Prompt-Bibliothek" />
+          <NavItem to="/eu-ai-act" icon={<IconFlag />} label="EU AI Act" />
           <NavItem to="/dsgvo" icon={<IconShield />} label="Data Privacy (GDPR)" />
           <NavItem to="/settings" icon={<IconSettings />} label="Settings" />
           <NavItem to="/about" icon={<IconInfo />} label="About" />
