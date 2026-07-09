@@ -20,61 +20,61 @@ const ARTICLES: Article[] = [
   {
     id: 'art3',
     tag: 'Art. 3',
-    title: 'Market-place Principle — GDPR applies globally',
-    summary: 'The GDPR applies to all organisations that actively offer goods or services to EU residents — regardless of where the organisation is based.',
-    details: 'US and Asian AI vendors also fall under the GDPR if they deliberately target the EU market. The place of establishment is irrelevant; what matters is whether the processing is directed at people in the EU.',
-    example: 'OpenAI is based in the US — the GDPR still applies because OpenAI actively targets the EU market.',
+    title: 'Marktortprinzip — DSGVO gilt weltweit',
+    summary: 'Die DSGVO gilt für alle Unternehmen, die Waren oder Dienste aktiv an EU-Bürger:innen richten — unabhängig vom Unternehmenssitz.',
+    details: 'Auch US-amerikanische oder asiatische KI-Anbieter fallen unter die DSGVO, wenn sie ihren Dienst gezielt auf dem EU-Markt anbieten. Das Marktortprinzip bedeutet: Der Sitz des Unternehmens ist irrelevant, entscheidend ist, ob die Verarbeitung auf Personen in der EU abzielt.',
+    example: 'OpenAI sitzt in den USA — DSGVO gilt trotzdem, weil OpenAI seinen Dienst gezielt auf dem EU-Markt anbietet.',
   },
   {
     id: 'art6',
     tag: 'Art. 6 + §26 BDSG',
-    title: 'Legal basis for employee data',
-    summary: 'Every data processing operation requires a legal basis. For employee data, §26 BDSG (German Employment Data Act) applies: processing is only lawful if it is necessary for the employment relationship — not merely useful.',
-    details: 'Three relevant bases: Art. 6(1)(b) (contract performance) — project assignment is part of the employment relationship. Art. 6(1)(c) (legal obligation) — e.g. documentation required by working-time law. §26 BDSG (employee data) — the decisive standard: "necessary", not "useful".',
-    warning: '"The system could be useful" is not enough. Processing must actually be necessary for carrying out the employment relationship.',
+    title: 'Rechtsgrundlage für Mitarbeiterdaten',
+    summary: 'Jede Datenverarbeitung braucht eine Rechtsgrundlage. Für Mitarbeiterdaten gilt §26 BDSG: Verarbeitung nur wenn für das Arbeitsverhältnis erforderlich — nicht nur nützlich.',
+    details: 'Drei relevante Grundlagen: Art. 6 Abs. 1 lit. b (Vertragserfüllung) — Projektzuweisung ist Teil des Arbeitsverhältnisses. Art. 6 lit. c (Rechtliche Verpflichtung) — z.B. Dokumentation nach ArbZG. §26 BDSG (Beschäftigtendaten) — Der entscheidende Maßstab: "erforderlich", nicht "nützlich".',
+    warning: 'Achtung: "Das System könnte nützlich sein" reicht nicht. Es muss für die Durchführung des Beschäftigungsverhältnisses tatsächlich erforderlich sein.',
   },
   {
     id: 'art22',
     tag: 'Art. 22',
-    title: 'Automated decisions — a human must genuinely decide',
-    summary: '"No person shall be subject to a decision based solely on automated processing which produces legal effects concerning them or similarly significantly affects them."',
-    details: 'The AI system may recommend — but the human must actually make the decision, not just formally rubber-stamp it. ECJ C-634/21 (SCHUFA ruling): even if a human formally decides, Art. 22 applies when a score materially pre-determines the outcome.',
-    warning: 'Human-in-the-loop is not enough if the human merely adopts the system\'s decision "pro forma". The human must make a meaningful, independent judgment.',
-    example: 'AI suggests a project assignment — the responsible manager must genuinely assess the fit, not just confirm the recommendation.',
+    title: 'Automatisierte Entscheidungen — Mensch muss tatsächlich entscheiden',
+    summary: '„Kein Mensch darf einer ausschließlich automatisierten Entscheidung unterworfen werden, die ihm gegenüber rechtliche Wirkung entfaltet oder ihn erheblich beeinträchtigt."',
+    details: 'Das KI-System darf empfehlen — aber der Mensch muss die Entscheidung tatsächlich treffen, nicht nur formal "nicken". EuGH C-634/21 (SCHUFA-Urteil): Auch wenn formal ein Mensch entscheidet, greift Art. 22, wenn ein Score die Entscheidung maßgeblich vorprägt.',
+    warning: 'Human-in-the-Loop reicht nicht, wenn der Mensch die Entscheidung des Systems nur "pro forma" übernimmt. Der Mensch muss maßgeblich entscheiden.',
+    example: 'KI schlägt Projektzuweisung vor — der zuständige Manager muss die Eignung tatsächlich beurteilen, nicht nur bestätigen.',
   },
   {
     id: 'art28',
     tag: 'Art. 28',
-    title: 'No DPA = unlawful processing',
-    summary: 'If an AI system runs on an external vendor\'s servers and processes personal data, the entire processing operation is unlawful without a Data Processing Agreement (DPA).',
-    details: 'This applies even to well-known vendors (Microsoft, Google, OpenAI) and even if the vendor "only stores" the data. A DPA does not transfer regulatory responsibility — it is a prerequisite for lawful processing. The operator always remains responsible.',
-    warning: '"We use a reputable cloud service — the vendor is responsible." — Wrong. The operator is responsible for the processing. The DPA is a prerequisite, not a liability transfer.',
-    example: 'External vendor + DPA in place = Lawful. External vendor + no DPA = Unlawful. Reputable vendor + no DPA = Still unlawful.',
+    title: 'Kein AVV = Rechtswidrige Verarbeitung',
+    summary: 'Wenn ein KI-System auf Servern eines externen Anbieters läuft und dabei personenbezogene Daten verarbeitet, ist ohne AVV die gesamte Verarbeitung rechtswidrig.',
+    details: 'Auch bei namhaften Anbietern (Microsoft, Google, OpenAI) und auch wenn der Anbieter die Daten "nur speichert". Ein AVV verschiebt keine regulatorische Verantwortung — er ist deren Voraussetzung. Der Betreiber bleibt immer verantwortlich.',
+    warning: '"Wir nutzen einen bekannten Cloud-Dienst — der Anbieter ist verantwortlich." — Falsch. Der Betreiber ist für die Verarbeitung verantwortlich.',
+    example: 'Externer Anbieter + AVV vorhanden = Rechtmäßig. Externer Anbieter + kein AVV = Rechtswidrig. Namhafter Anbieter + kein AVV = Trotzdem rechtswidrig.',
   },
   {
     id: 'art35',
     tag: 'Art. 35',
-    title: 'DPIA — assess first, deploy second',
-    summary: 'A Data Protection Impact Assessment (DPIA) is mandatory when processing is likely to result in a high risk to the rights and freedoms of natural persons.',
-    details: 'The DPIA must be completed BEFORE deployment — a retrospective DPIA does not fulfil its purpose. Triggers: employee data is systematically processed, AI-based profiling of persons takes place, or the system is newly deployed (not just a minor update).',
-    example: 'Possible triggers: employee data processing · AI profiling · new system deployment.',
+    title: 'DSFA — Erst prüfen, dann starten',
+    summary: 'Datenschutz-Folgenabschätzung ist Pflicht, wenn die Verarbeitung voraussichtlich ein hohes Risiko für die Rechte und Freiheiten natürlicher Personen hat.',
+    details: 'Die DSFA muss VOR dem Einsatz erfolgen — eine nachträgliche DSFA erfüllt ihren Zweck nicht. Auslöser: Mitarbeiterdaten werden systematisch verarbeitet, KI-gestütztes Profiling von Personen findet statt, oder das System wird neu eingesetzt (nicht nur geringfügig angepasst).',
+    example: 'Mögliche Ansatzpunkte: Mitarbeiterdaten-Verarbeitung · KI-Profiling · Neuer Systemeinsatz.',
   },
   {
     id: 'par87',
     tag: '§87 BetrVG',
-    title: 'Works council co-determination for AI in HR',
-    summary: 'AI systems capable of monitoring the behaviour or performance of employees require works council co-determination — independently of the GDPR.',
-    details: 'Where a works council exists: "Introduction and use of technical devices designed to monitor the behaviour or performance of employees" requires co-determination before deployment. This applies in parallel to the GDPR as independent employment law.',
-    warning: 'GDPR compliance alone is not sufficient. Even if all GDPR requirements are met, works council approval is still required before deployment.',
+    title: 'Mitbestimmung bei KI in der Personalplanung',
+    summary: 'KI-Systeme, die Verhalten oder Leistung von Mitarbeitenden überwachen können, sind mitbestimmungspflichtig — unabhängig von der DSGVO.',
+    details: 'Wenn ein Betriebsrat vorhanden ist: "Einführung und Anwendung von technischen Einrichtungen, die dazu bestimmt sind, das Verhalten oder die Leistung der Arbeitnehmer zu überwachen" — Zustimmungspflicht vor Einsatz. Das gilt parallel zur DSGVO als eigenständiges Arbeitsrecht.',
+    warning: 'DSGVO-Konformität allein reicht nicht. Selbst wenn die DSGVO-Anforderungen erfüllt sind, braucht es die Zustimmung des Betriebsrats.',
   },
 ]
 
 const DSFA_TRIGGERS = [
-  { id: 'employees', label: 'Employee data is systematically processed', risk: true },
-  { id: 'profiling', label: 'AI-based profiling of individuals takes place', risk: true },
-  { id: 'new', label: 'The system is newly deployed (not a minor update)', risk: true },
-  { id: 'decisions', label: 'The system makes or significantly influences decisions about individuals', risk: true },
-  { id: 'sensitive', label: 'Special categories of data are processed (health, origin, etc.)', risk: true },
+  { id: 'employees', label: 'Mitarbeiterdaten werden systematisch verarbeitet', risk: true },
+  { id: 'profiling', label: 'KI-gestütztes Profiling von Personen findet statt', risk: true },
+  { id: 'new', label: 'Das System wird neu eingesetzt (kein geringfügiges Update)', risk: true },
+  { id: 'decisions', label: 'Das System trifft oder beeinflusst erhebliche Entscheidungen über Personen', risk: true },
+  { id: 'sensitive', label: 'Es werden besondere Kategorien (Gesundheit, Herkunft etc.) verarbeitet', risk: true },
 ]
 
 const DREISTUFENMODELL = [
@@ -84,13 +84,13 @@ const DREISTUFENMODELL = [
     textColor: 'text-green-700',
     bgColor: 'bg-green-50',
     borderColor: 'border-green-200',
-    title: 'AI Officer decides independently',
-    merkmal: 'Reversible · clear sources · no personal harm',
+    title: 'KI-Beauftragter entscheidet selbst',
+    merkmal: 'Reversibel · klare Quellen · kein Personenschaden',
     tasks: [
-      { title: 'Classify risk level', desc: 'Use official resources (Bundesnetzagentur, EU checklists) to determine the risk category.' },
-      { title: 'Check DPA obligation', desc: 'External processing + personal data = DPA required. This classification is clear and can be made independently.' },
-      { title: 'Check Art. 50 EU AI Act', desc: 'Labelling obligation for chatbots — clearly regulated, no legal grey area.' },
-      { title: 'Inventory AI systems', desc: 'Capture, classify and document all AI systems — core task of the AI Officer.' },
+      { title: 'Risikoklasse einordnen', desc: 'Offizielle Ressourcen (Bundesnetzagentur, EU-Checklisten) nutzen.' },
+      { title: 'AVV-Pflicht prüfen', desc: 'Externe Verarbeitung + personenbezogene Daten = AVV nötig. Einordnung ist klar und selbst vorzunehmen.' },
+      { title: 'Art. 50 EU AI Act prüfen', desc: 'Kennzeichnungspflicht für Chatbots — klar geregelt, keine juristische Grauzone.' },
+      { title: 'KI-Systeme inventarisieren', desc: 'Systeme erfassen, klassifizieren und dokumentieren — Kernaufgabe des KI-Beauftragten.' },
     ],
   },
   {
@@ -99,13 +99,13 @@ const DREISTUFENMODELL = [
     textColor: 'text-amber-700',
     bgColor: 'bg-amber-50',
     borderColor: 'border-amber-200',
-    title: 'AI Officer flags — DPO/lawyer decides',
-    merkmal: 'Legal grey area · significant consequences',
+    title: 'KI-Beauftragter flaggt, DSB/Anwalt entscheidet',
+    merkmal: 'Rechtliche Grauzone · erhebliche Konsequenzen',
     tasks: [
-      { title: 'Clarify provider/operator roles', desc: 'For in-house development or customisation — who is legally responsible?' },
-      { title: 'High-risk borderline cases', desc: 'Classification unclear — Annex III criteria may be met.' },
-      { title: 'Copyright of AI-generated content', desc: 'For commercial use of AI-generated outputs.' },
-      { title: 'Negotiate DPA content', desc: 'Whether a DPA is needed: Level 1. What it should contain: Level 2.' },
+      { title: 'Rollenklärung Anbieter/Betreiber', desc: 'Bei Eigenentwicklung oder Anpassung — wer ist rechtlich verantwortlich?' },
+      { title: 'Hochrisiko-Grenzfall', desc: 'Einordnung unklar — Anhang-III-Tatbestand möglicherweise erfüllt.' },
+      { title: 'Urheberrecht KI-Inhalte', desc: 'Bei kommerzieller Nutzung KI-generierter Inhalte.' },
+      { title: 'AVV-Inhalte verhandeln', desc: 'Ob ein AVV nötig ist: Stufe 1. Was konkret darin steht: Stufe 2.' },
     ],
   },
   {
@@ -114,13 +114,13 @@ const DREISTUFENMODELL = [
     textColor: 'text-red-700',
     bgColor: 'bg-red-50',
     borderColor: 'border-red-200',
-    title: 'Always DPO/lawyer — no exceptions',
-    merkmal: 'Irreversible · personal consequences · unclear accountability',
+    title: 'Immer DSB/Anwalt — ohne Ausnahme',
+    merkmal: 'Irreversibel · Personenbezogene Konsequenz · Unklare Verantwortung',
     tasks: [
-      { title: 'Art. 22 — Automated individual decisions', desc: 'Legal effect · significant impact · no room for self-determination.' },
-      { title: 'Third-country transfer without legal basis', desc: 'Transfer of personal data to non-EU countries without a valid legal basis.' },
-      { title: 'AI in HR context', desc: 'Recruitment screening · dismissal · performance evaluation.' },
-      { title: 'Regulatory enquiries', desc: 'From Bundesnetzagentur or data protection authority — do not respond independently.' },
+      { title: 'Art. 22 — Automatisierte Einzelentscheidungen', desc: 'Rechtliche Wirkung · erhebliche Beeinträchtigung · kein Spielraum für Selbstentscheidung.' },
+      { title: 'Drittlandtransfer ohne Rechtsgrundlage', desc: 'Transfer personenbezogener Daten in Drittstaaten ohne gültige Grundlage.' },
+      { title: 'KI im HR-Kontext', desc: 'Bewerbungsscreening · Kündigung · Leistungsbewertung.' },
+      { title: 'Behördliche Anfragen', desc: 'Von Bundesnetzagentur oder Datenschutzaufsicht — nicht selbst beantworten.' },
     ],
   },
 ]
@@ -153,12 +153,12 @@ function ArticleCard({ article }: { article: Article }) {
           <p className="text-sm text-slate-600 leading-relaxed">{article.details}</p>
           {article.example && (
             <div className="bg-blue-50 border-l-4 border-blue-400 px-4 py-3 rounded-r-lg">
-              <p className="text-xs text-blue-700 leading-relaxed"><span className="font-semibold">Example:</span> {article.example}</p>
+              <p className="text-xs text-blue-700 leading-relaxed"><span className="font-semibold">Beispiel:</span> {article.example}</p>
             </div>
           )}
           {article.warning && (
             <div className="bg-amber-50 border-l-4 border-amber-400 px-4 py-3 rounded-r-lg">
-              <p className="text-xs text-amber-700 leading-relaxed"><span className="font-semibold">Note:</span> {article.warning}</p>
+              <p className="text-xs text-amber-700 leading-relaxed"><span className="font-semibold">Achtung:</span> {article.warning}</p>
             </div>
           )}
         </div>
@@ -184,8 +184,8 @@ function DsfaChecker() {
             </svg>
           </span>
           <div>
-            <p className="text-sm font-semibold text-slate-800">DPIA Trigger Check (Art. 35)</p>
-            <p className="text-xs text-slate-500">Check whether a Data Protection Impact Assessment is required</p>
+            <p className="text-sm font-semibold text-slate-800">DSFA-Trigger-Check (Art. 35)</p>
+            <p className="text-xs text-slate-500">Prüfe ob eine Datenschutz-Folgenabschätzung erforderlich ist</p>
           </div>
         </div>
       </div>
@@ -208,12 +208,12 @@ function DsfaChecker() {
       {triggersActive > 0 && (
         <div className={`mx-5 mb-5 px-4 py-3 rounded-lg ${required ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
           <p className={`text-sm font-semibold ${required ? 'text-red-700' : 'text-green-700'}`}>
-            {required ? '⚠ DPIA required' : '✓ DPIA likely not required'}
+            {required ? '⚠ DSFA erforderlich' : '✓ DSFA wahrscheinlich nicht erforderlich'}
           </p>
           <p className={`text-xs mt-1 leading-relaxed ${required ? 'text-red-600' : 'text-green-600'}`}>
             {required
-              ? `${triggersActive} trigger${triggersActive > 1 ? 's' : ''} active. The DPIA must be completed BEFORE deployment. DPO involvement recommended (Decision Model Level 2).`
-              : 'No triggers active. Note: a DPIA may still be required in scenarios not listed here.'}
+              ? `${triggersActive} Auslöser aktiv. Die DSFA muss VOR dem Systemeinsatz durchgeführt werden. Einbeziehung des DSB empfohlen (Dreistufenmodell Stufe 2).`
+              : 'Kein Auslöser aktiv. Beachte: Eine DSFA kann auch bei nicht aufgelisteten Szenarien erforderlich sein.'}
           </p>
         </div>
       )}
@@ -232,7 +232,7 @@ function AvvChecker() {
       ? { ok: true, text: 'Rechtmäßig. AVV vorhanden — Voraussetzung für die Verarbeitung ist erfüllt.' }
       : { ok: false, text: 'Rechtswidrig. Ohne AVV ist die gesamte Verarbeitung rechtswidrig — auch bei namhaften Anbietern.' }
     : external === false || personalData === false
-      ? { ok: true, text: external === false ? 'No external vendor — no DPA required.' : 'No personal data processed — no DPA required.' }
+      ? { ok: true, text: external === false ? 'Kein externer Anbieter — kein AVV erforderlich.' : 'Keine personenbezogenen Daten — kein AVV erforderlich.' }
       : null
 
   const reset = () => { setExternal(null); setPersonalData(null); setAvvExists(null) }
@@ -247,20 +247,20 @@ function AvvChecker() {
             </svg>
           </span>
           <div>
-            <p className="text-sm font-semibold text-slate-800">DPA Obligation Check (Art. 28)</p>
-            <p className="text-xs text-slate-500">Check whether a Data Processing Agreement is required</p>
+            <p className="text-sm font-semibold text-slate-800">AVV-Pflicht-Check (Art. 28)</p>
+            <p className="text-xs text-slate-500">Prüfe ob ein Auftragsverarbeitungsvertrag erforderlich ist</p>
           </div>
         </div>
       </div>
       <div className="px-5 py-4 space-y-4">
         {/* Q1 */}
         <div>
-          <p className="text-sm font-medium text-slate-700 mb-2">Does the AI system run on an external vendor's servers?</p>
+          <p className="text-sm font-medium text-slate-700 mb-2">Läuft das KI-System auf Servern eines externen Anbieters?</p>
           <div className="flex gap-2">
             {([true, false] as const).map((v) => (
               <button key={String(v)} onClick={() => { setExternal(v); setPersonalData(null); setAvvExists(null) }}
                 className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${external === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
-                {v ? 'Yes' : 'No'}
+                {v ? 'Ja' : 'Nein'}
               </button>
             ))}
           </div>
@@ -269,12 +269,12 @@ function AvvChecker() {
         {/* Q2 */}
         {external === true && (
           <div>
-            <p className="text-sm font-medium text-slate-700 mb-2">Does the processing involve personal data?</p>
+            <p className="text-sm font-medium text-slate-700 mb-2">Werden dabei personenbezogene Daten verarbeitet?</p>
             <div className="flex gap-2">
               {([true, false] as const).map((v) => (
                 <button key={String(v)} onClick={() => { setPersonalData(v); setAvvExists(null) }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${personalData === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
-                  {v ? 'Yes' : 'No'}
+                  {v ? 'Ja' : 'Nein'}
                 </button>
               ))}
             </div>
@@ -284,12 +284,12 @@ function AvvChecker() {
         {/* Q3 */}
         {showAvvQuestion && (
           <div>
-            <p className="text-sm font-medium text-slate-700 mb-2">Is a Data Processing Agreement (DPA) in place with the vendor?</p>
+            <p className="text-sm font-medium text-slate-700 mb-2">Ist ein AVV mit dem Anbieter vorhanden?</p>
             <div className="flex gap-2">
               {([true, false] as const).map((v) => (
                 <button key={String(v)} onClick={() => setAvvExists(v)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${avvExists === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
-                  {v ? 'Yes' : 'No'}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${avvExists === v ? 'bg-indind-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
+                  {v ? 'Ja' : 'Nein'}
                 </button>
               ))}
             </div>
@@ -302,9 +302,9 @@ function AvvChecker() {
               {result.ok ? '✓' : '✗'} {result.text}
             </p>
             {!result.ok && (
-              <p className="text-xs text-red-600 mt-1">→ Conclude a DPA with the vendor immediately or take the system offline until a DPA is in place.</p>
+              <p className="text-xs text-red-600 mt-1">→ AVV umgehend mit dem Anbieter abschließen oder System offline nehmen bis AVV vorliegt.</p>
             )}
-            <button onClick={reset} className="mt-2 text-xs text-slate-500 underline hover:text-slate-700">Check again</button>
+            <button onClick={reset} className="mt-2 text-xs text-slate-500 underline hover:text-slate-700">Neu prüfen</button>
           </div>
         )}
       </div>
@@ -313,11 +313,11 @@ function AvvChecker() {
 }
 
 const ART22_CHECKS = [
-  'The human receives all relevant information — not just the AI output',
-  'The human can genuinely override the AI recommendation (no social or technical pressure to conform)',
-  'The human\'s decision is documented — not just the AI result',
-  'There are documented cases where humans have actually decided differently from the AI',
-  'Sufficient time is allocated for human review — no assembly-line rubber-stamping',
+  'Der Mensch erhält alle relevanten Informationen — nicht nur das KI-Ergebnis',
+  'Der Mensch kann die Empfehlung der KI tatsächlich überstimmen (kein sozialer/technischer Druck)',
+  'Die Entscheidung des Menschen wird dokumentiert — nicht nur das KI-Ergebnis',
+  'Es gibt Fälle, in denen Menschen tatsächlich abweichend von der KI entschieden haben',
+  'Die Zeit für die menschliche Prüfung ist ausreichend — kein "Fließband-Nicken"',
 ]
 
 function Art22Checker() {
@@ -338,8 +338,8 @@ function Art22Checker() {
               </svg>
             </span>
             <div>
-              <p className="text-sm font-semibold text-slate-800">Art. 22 — Human-in-the-Loop Quality</p>
-              <p className="text-xs text-slate-500">ECJ C-634/21: Formal oversight is not enough — the human must genuinely decide</p>
+              <p className="text-sm font-semibold text-slate-800">Art. 22 — Human-in-the-Loop-Qualität</p>
+              <p className="text-xs text-slate-500">EuGH C-634/21: Formale Kontrolle reicht nicht — der Mensch muss tatsächlich entscheiden</p>
             </div>
           </div>
           {passed > 0 && (
@@ -353,7 +353,7 @@ function Art22Checker() {
       </div>
       <div className="px-5 py-4">
         <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-          Check whether your human-in-the-loop process meets the Art. 22 standard:
+          Prüfe ob dein Human-in-the-Loop-Prozess der Art. 22-Anforderung genügt:
         </p>
         <div className="space-y-1">
           {ART22_CHECKS.map((check, i) => (
@@ -376,15 +376,15 @@ function Art22Checker() {
         </div>
         {passed === all && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
-            <p className="text-xs font-semibold text-green-700">✓ All checks passed — human-in-the-loop process looks good</p>
+            <p className="text-xs font-semibold text-green-700">✓ Alle Punkte erfüllt — Human-in-the-Loop-Prozess sieht gut aus</p>
           </div>
         )}
         {passed > 0 && passed < all && (
           <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-            <p className="text-xs font-semibold text-amber-700">⚠ {all - passed} item{all - passed > 1 ? 's' : ''} still open — review your process</p>
+            <p className="text-xs font-semibold text-amber-700">⚠ {all - passed} Punkt{all - passed > 1 ? 'e' : ''} noch offen — Prozess überprüfen</p>
           </div>
         )}
-        <p className="text-[10px] text-slate-400 mt-4">This checklist is for guidance only. For actual Art. 22 matters: Decision Model Level 3 → DPO/lawyer.</p>
+        <p className="text-[10px] text-slate-400 mt-4">Diese Checkliste dient der Orientierung. Bei tatsächlichen Art. 22-Sachverhalten: Dreistufenmodell Stufe 3 → DSB/Anwalt.</p>
       </div>
     </div>
   )
@@ -398,8 +398,8 @@ function DreistufenmodellSection() {
       {/* Overview table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100">
-          <p className="text-sm font-semibold text-slate-800">Three-Level Decision Model — Who decides what?</p>
-          <p className="text-xs text-slate-500 mt-0.5">Click a level for details</p>
+          <p className="text-sm font-semibold text-slate-800">Dreistufenmodell — Wer entscheidet was?</p>
+          <p className="text-xs text-slate-500 mt-0.5">Klicke auf eine Stufe für Details</p>
         </div>
         <div className="divide-y divide-slate-50">
           {DREISTUFENMODELL.map((s) => (
@@ -452,27 +452,27 @@ export default function DsgvoPage() {
   const [activeTab, setActiveTab] = useState<'articles' | 'tools' | 'dreistufen'>('articles')
 
   const tabs: { id: typeof activeTab; label: string }[] = [
-    { id: 'articles', label: 'Article Reference' },
-    { id: 'tools', label: 'Compliance Checks' },
-    { id: 'dreistufen', label: 'Decision Model' },
+    { id: 'articles', label: 'Artikel-Referenz' },
+    { id: 'tools', label: 'Compliance-Checks' },
+    { id: 'dreistufen', label: 'Dreistufenmodell' },
   ]
 
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Data Privacy (GDPR)</h1>
+        <h1 className="text-2xl font-bold text-slate-800">DSGVO & Datenschutz</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Legal foundations for AI deployment — article reference, compliance checks and decision model
+          Rechtliche Grundlagen für den KI-Einsatz — Artikel-Referenz, Compliance-Checks und Entscheidungsmodell
         </p>
       </div>
 
       {/* Key metrics bar */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Key Articles', value: '6', sub: 'Art. 3 · 6 · 22 · 28 · 35 + §87 BetrVG' },
-          { label: 'Decision Model', value: '3', sub: 'Levels of decision responsibility' },
-          { label: 'Core principle', value: 'DPA', sub: 'No DPA = unlawful processing' },
+          { label: 'Relevante Artikel', value: '6', sub: 'Art. 3 · 6 · 22 · 28 · 35 + §87 BetrVG' },
+          { label: 'Dreistufenmodell', value: '3', sub: '3 Stufen zur Entscheidungsverantwortung' },
+          { label: 'Kerngrundsatz', value: 'AVV', sub: 'Kein AVV = rechtswidrige Verarbeitung' },
         ].map((m) => (
           <div key={m.label} className="bg-white rounded-xl shadow-sm px-5 py-4">
             <p className="text-2xl font-bold text-slate-800">{m.value}</p>
@@ -499,7 +499,7 @@ export default function DsgvoPage() {
         <div className="space-y-3">
           <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-3">
             <p className="text-xs text-blue-700 leading-relaxed">
-              <span className="font-semibold">GDPR structure:</span> Principles (Art. 1–7) → Rights (Art. 12–23) → Obligations (Art. 24–43) → Sanctions (Art. 77–84). Understanding the structure is the key to navigating every article.
+              <span className="font-semibold">DSGVO-Struktur:</span> Grundsätze (Art. 1–7) → Rechte (Art. 12–23) → Pflichten (Art. 24–43) → Sanktionen (Art. 77–84). Wer die Struktur kennt, findet jeden Artikel.
             </p>
           </div>
           {ARTICLES.map((a) => (
@@ -511,7 +511,7 @@ export default function DsgvoPage() {
       {/* Tab: Tools */}
       {activeTab === 'tools' && (
         <div className="space-y-4">
-          <p className="text-sm text-slate-500">Interactive checks for common compliance questions — not a substitute for legal advice.</p>
+          <p className="text-sm text-slate-500">Interaktive Checks für häufige Compliance-Fragen — kein Ersatz für rechtliche Beratung.</p>
           <DsfaChecker />
           <AvvChecker />
 
@@ -524,7 +524,7 @@ export default function DsgvoPage() {
         <div className="space-y-4">
           <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-3">
             <p className="text-xs text-slate-600 leading-relaxed">
-              The <span className="font-semibold">Three-Level Decision Model</span> answers: who decides what — and when is a DPO or lawyer required? The AI Officer is not the sole decision-maker. Level 1 = decide independently, Level 2 = flag and escalate, Level 3 = always involve DPO/lawyer.
+              Das <span className="font-semibold">Dreistufenmodell</span> beantwortet: Wer entscheidet was — und wann ist ein DSB oder Anwalt nötig? Der KI-Beauftragte ist nicht Alleinentscheider. Stufe 1 = selbst entscheiden, Stufe 2 = flaggen, Stufe 3 = immer eskalieren.
             </p>
           </div>
           <DreistufenmodellSection />
@@ -534,7 +534,7 @@ export default function DsgvoPage() {
       {/* Disclaimer */}
       <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
         <p className="text-xs text-slate-500 leading-relaxed">
-          <span className="font-semibold text-slate-600">Disclaimer:</span> All content is for guidance only and does not constitute legal advice. For specific legal questions: Data Protection Officer (DPO) or specialist data protection lawyer — per Decision Model Level 2/3.
+          <span className="font-semibold text-slate-600">Hinweis:</span> Alle Inhalte dienen der Orientierung und ersetzen keine Rechtsberatung. Bei konkreten Rechtsfragen: Datenschutzbeauftragter (DSB) oder Fachanwalt für Datenschutzrecht — gemäß Dreistufenmodell Stufe 2/3.
         </p>
       </div>
     </div>

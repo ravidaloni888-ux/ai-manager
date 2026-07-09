@@ -3,166 +3,166 @@ import { useState } from 'react'
 // ── Data ───────────────────────────────────────────────────────────────────
 
 const TIMELINE = [
-  { date: '1 Aug 2024', label: 'AI Act enters into force', highlight: false },
-  { date: '2 Feb 2025', label: 'Prohibitions (Art. 5) + AI literacy duty (Art. 4) — applies now', highlight: true },
-  { date: '2 Aug 2025', label: 'GPAI models (Chapter V)', highlight: false },
-  { date: '16/29 Jun 2026', label: 'Digital Omnibus: EP vote (423) + Council — only Official Journal pending (before 2.8.2026)', highlight: true },
-  { date: '2 Dec 2027', label: 'High-risk AI (Annex III) — delayed by Digital Omnibus', highlight: false },
-  { date: '2 Aug 2028', label: 'Full application + product-integrated AI (Annex I)', highlight: true },
+  { date: '1 Aug 2024', label: 'AI Act tritt in Kraft', highlight: false },
+  { date: '2 Feb 2025', label: 'Verbote (Art. 5) + Kompetenzpflicht (Art. 4) — gilt heute', highlight: true },
+  { date: '2 Aug 2025', label: 'GPAI-Modelle (Kap. V)', highlight: false },
+  { date: '16/29 Jun 2026', label: 'Digital Omnibus: EP-Abstimmung (423 Stimmen) + Ratsbeschluss — nur noch Amtsblatt ausstehend (vor 2.8.2026)', highlight: true },
+  { date: '2 Dec 2027', label: 'Hochrisiko-KI (Anhang III) — verschoben durch Digital Omnibus', highlight: false },
+  { date: '2 Aug 2028', label: 'Vollständige Anwendung + produktintegrierte KI (Anhang I)', highlight: true },
 ]
 
 const RISK_CLASSES = [
   {
     level: 1,
-    name: 'Unacceptable Risk',
+    name: 'Inakzeptables Risiko',
     color: 'bg-red-600',
     bg: 'bg-red-50',
     border: 'border-red-200',
     text: 'text-red-700',
     badge: 'bg-red-100 text-red-700',
-    summary: 'Prohibited practices — banned outright since 2 Feb 2025',
-    duties: 'Deployment and placing on the market are prohibited. Violations: fines up to €35M or 7% of global annual turnover.',
+    summary: 'Verbotene Praktiken — vollständig verboten seit 2. Feb 2025',
+    duties: 'Einsatz und Inverkehrbringen sind verboten. Verstöße: Bußgelder bis zu 35 Mio. € oder 7 % des weltweiten Jahresumsatzes.',
     examples: [
-      'Subliminal manipulation (AI influencing behaviour undetected)',
-      'Social scoring by public authorities',
-      'Real-time biometric remote identification in public spaces (with narrow exceptions)',
-      'Predictive policing based solely on personal characteristics',
-      'Emotion recognition at the workplace and in educational institutions',
+      'Unterschwellige Manipulation (KI beeinflusst Verhalten unbemerkt)',
+      'Social Scoring durch Behörden',
+      'Biometrische Echtzeit-Fernidentifizierung im öffentlichen Raum (mit engen Ausnahmen)',
+      'Prädiktive Polizeiarbeit allein auf Basis persönlicher Merkmale',
+      'Emotionserkennung am Arbeitsplatz und in Bildungseinrichtungen',
     ],
   },
   {
     level: 2,
-    name: 'High Risk',
+    name: 'Hohes Risiko',
     color: 'bg-orange-500',
     bg: 'bg-orange-50',
     border: 'border-orange-200',
     text: 'text-orange-700',
     badge: 'bg-orange-100 text-orange-700',
-    summary: 'Strict requirements for sensitive application areas (Art. 6–49)',
-    duties: 'Risk management, data quality, technical documentation, transparency, human oversight, accuracy & robustness, conformity assessment before market placement.',
+    summary: 'Strenge Anforderungen für sensible Anwendungsbereiche (Art. 6–49)',
+    duties: 'Risikomanagement, Datenqualität, technische Dokumentation, Transparenz, menschliche Aufsicht, Genauigkeit & Robustheit, Konformitätsbewertung vor Inverkehrbringen.',
     examples: [
-      'AI in medical devices',
-      'Biometric identification systems',
-      'Critical infrastructure',
-      'Education & vocational training',
-      'Employment & HR management',
-      'Access to essential services',
-      'Law enforcement, migration & asylum, justice',
+      'KI in Medizinprodukten',
+      'Biometrische Identifizierungssysteme',
+      'Kritische Infrastruktur',
+      'Bildung & Berufsausbildung',
+      'Beschäftigung & Personalmanagement',
+      'Zugang zu wesentlichen Dienstleistungen',
+      'Strafverfolgung, Migration & Asyl, Justiz',
     ],
   },
   {
     level: 3,
-    name: 'Limited Risk',
+    name: 'Begrenztes Risiko',
     color: 'bg-amber-400',
     bg: 'bg-amber-50',
     border: 'border-amber-200',
     text: 'text-amber-700',
     badge: 'bg-amber-100 text-amber-700',
-    summary: 'Transparency obligations for specific AI systems (Art. 50–51)',
-    duties: 'Users must be informed they are interacting with AI or that content is AI-generated. No further specific compliance requirements.',
+    summary: 'Transparenzpflichten für bestimmte KI-Systeme (Art. 50–51)',
+    duties: 'Nutzer müssen darüber informiert werden, dass sie mit KI interagieren oder Inhalte KI-generiert sind. Keine weiteren spezifischen Compliance-Anforderungen.',
     examples: [
-      'Chatbots (must disclose they are AI)',
-      'AI-generated content / deepfakes',
-      'Emotion recognition systems (if not prohibited)',
+      'Chatbots (müssen sich als KI zu erkennen geben)',
+      'KI-generierte Inhalte / Deepfakes',
+      'Emotionserkennung (sofern nicht verboten)',
     ],
   },
   {
     level: 4,
-    name: 'Minimal Risk',
+    name: 'Minimales Risiko',
     color: 'bg-green-500',
     bg: 'bg-green-50',
     border: 'border-green-200',
     text: 'text-green-700',
     badge: 'bg-green-100 text-green-700',
-    summary: 'Free use — no specific AI Act requirements',
-    duties: 'No specific obligations under the AI Act. General legal requirements still apply.',
+    summary: 'Freie Nutzung — keine spezifischen KI-Act-Anforderungen',
+    duties: 'Keine spezifischen Pflichten nach dem KI-Act. Allgemeine Rechtsvorschriften gelten weiterhin.',
     examples: [
-      'Spam filters',
-      'AI in video games',
-      'Content recommendation systems',
-      'Simple automation tools',
+      'Spam-Filter',
+      'KI in Videospielen',
+      'Inhaltsempfehlungssysteme',
+      'Einfache Automatisierungstools',
     ],
   },
 ]
 
 const ACTOR_ROLES = [
   {
-    role: 'Provider (Anbieter)',
+    role: 'Anbieter',
     art: 'Art. 3 Nr. 3',
-    definition: 'Develops and places an AI system on the market',
-    example: 'The software company that built the base system',
-    duties: 'Full Art. 16 obligations for high-risk AI: documentation, conformity assessment, CE marking, registration, post-market monitoring.',
+    definition: 'Entwickelt KI und bringt sie in Verkehr',
+    example: 'Das Softwarehaus, das das Basis-System gebaut hat',
+    duties: 'Vollständige Art. 16-Pflichten bei Hochrisiko-KI: Dokumentation, Konformitätsbewertung, CE-Kennzeichnung, Registrierung, Marktüberwachung nach Inverkehrbringen.',
   },
   {
-    role: 'Deployer (Betreiber)',
+    role: 'Betreiber',
     art: 'Art. 3 Nr. 4',
-    definition: 'Uses a third-party AI system under their own responsibility',
-    example: 'Dr. Seika — as long as the system remains unchanged. Private, non-professional use is explicitly excluded.',
-    duties: 'Art. 26 obligations: ensure intended use, appoint and train responsible persons (Art. 4), ensure human oversight (Art. 14), monitor input data, report incidents to provider.',
+    definition: 'Setzt ein fremdes KI-System in eigener Verantwortung ein',
+    example: 'Dr. Seika — solange das System unverändert bleibt. Private, nicht berufliche Nutzung ist ausdrücklich ausgenommen.',
+    duties: 'Art. 26-Pflichten: zweckgemäßen Einsatz sicherstellen, zuständige Personen benennen und schulen (Art. 4), menschliche Aufsicht gewährleisten (Art. 14), Inputdaten überwachen, Vorfälle an den Anbieter melden.',
   },
   {
-    role: 'Importer',
+    role: 'Importeur',
     art: 'Art. 3 Nr. 6',
-    definition: 'Brings AI from a third country into the EU',
-    example: 'EU subsidiary ("authorised representative") of a US or Chinese company',
-    duties: 'Verify that the provider has fulfilled Art. 16 obligations before placing on the EU market.',
+    definition: 'Bringt KI aus einem Drittstaat in die EU',
+    example: 'EU-Tochter ("Bevollmächtigter") eines US- oder chinesischen Unternehmens',
+    duties: 'Prüfen ob der Anbieter die Art. 16-Pflichten erfüllt hat, bevor die KI auf dem EU-Markt platziert wird.',
   },
   {
-    role: 'Distributor (Händler)',
+    role: 'Händler',
     art: 'Art. 3 Nr. 7',
-    definition: 'Makes AI available in the supply chain without modification',
-    example: 'Reseller distributing software licences (not established in the EU)',
-    duties: 'Verify CE marking and documentation; do not place on market if requirements are not met.',
+    definition: 'Stellt KI in der Lieferkette bereit, ohne Veränderung',
+    example: 'Reseller, der Softwarelizenzen weiterverkauft (nicht in der EU ansässig)',
+    duties: 'CE-Kennzeichnung und Dokumentation prüfen; nicht in Verkehr bringen, wenn Anforderungen nicht erfüllt sind.',
   },
 ]
 
 const ART25_TRIGGERS = [
   {
     id: 'modification',
-    title: 'Substantial modification',
-    desc: 'A high-risk AI system is substantially modified (e.g. retrained with own data) — Art. 25(1)(b)',
+    title: 'Erhebliche Veränderung',
+    desc: 'Ein Hochrisiko-KI-System wird erheblich verändert (z. B. mit eigenen Daten nachtrainiert) — Art. 25 Abs. 1 lit. b',
   },
   {
     id: 'purpose',
-    title: 'Change of intended purpose',
-    desc: 'A system is deployed for a materially different purpose than the provider intended',
+    title: 'Zweckänderung',
+    desc: 'Ein System wird für einen wesentlich anderen Zweck eingesetzt als vom Anbieter vorgesehen',
   },
   {
     id: 'own_brand',
-    title: 'Own-brand marketing',
-    desc: 'A system is placed on the market under the deployer\'s own name or trademark — unambiguous, no grey area',
+    title: 'Eigenvermarktung',
+    desc: 'Ein System wird unter eigenem Namen oder eigener Marke vermarktet — eindeutig, kein Graubereich',
   },
 ]
 
 const COPYRIGHT_RULES = [
   {
-    scenario: 'Purely AI-generated',
-    protection: 'None',
+    scenario: 'Rein KI-generiert',
+    protection: 'Kein Schutz',
     color: 'text-red-600',
     badge: 'bg-red-100 text-red-700',
-    detail: 'No human creative input → no copyright under §2 UrhG. Only "personal intellectual creations" are protected.',
+    detail: 'Kein menschlicher Gestaltungsanteil → kein Urheberrechtsschutz nach §2 UrhG. Nur "persönliche geistige Schöpfungen" sind geschützt.',
   },
   {
-    scenario: 'Human + AI',
-    protection: 'Depends on human input',
+    scenario: 'Mensch + KI',
+    protection: 'Abhängig vom menschlichen Anteil',
     color: 'text-amber-600',
     badge: 'bg-amber-100 text-amber-700',
-    detail: 'Prompt, selection, editing → the higher the human contribution, the more likely copyright protection exists.',
+    detail: 'Prompt, Auswahl, Bearbeitung → Je höher der menschliche Anteil, desto eher besteht Urheberrechtsschutz.',
   },
   {
-    scenario: 'AI as tool',
-    protection: 'Full protection',
+    scenario: 'KI als Werkzeug',
+    protection: 'Voller Schutz',
     color: 'text-green-600',
     badge: 'bg-green-100 text-green-700',
-    detail: 'AI used as a tool only, human creates the work → protected like any traditional creation.',
+    detail: 'KI nur als Werkzeug eingesetzt, Mensch schafft das Werk → geschützt wie eine herkömmliche Schöpfung.',
   },
 ]
 
 const LIABILITY_TABLE = [
-  { situation: 'AI error due to design defect', liable: 'Provider (Anbieter)' },
-  { situation: 'Misuse by deployer', liable: 'Deployer (Betreiber)' },
-  { situation: 'Project manager does not review AI output', liable: 'Project manager + firm' },
-  { situation: 'All three combined', liable: 'Joint and several liability' },
+  { situation: 'KI-Fehler durch Designmangel', liable: 'Anbieter' },
+  { situation: 'Fehleinsatz durch Betreiber', liable: 'Betreiber' },
+  { situation: 'Projektleiter prüft KI-Output nicht', liable: 'Projektleiter + Büro' },
+  { situation: 'Alle drei zusammen', liable: 'Gesamtschuldnerschaft' },
 ]
 
 // ── Components ─────────────────────────────────────────────────────────────
@@ -181,7 +181,7 @@ function RiskClassCard({ rc, expanded, onToggle }: {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className={`text-sm font-bold ${rc.text}`}>{rc.name}</p>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${rc.badge}`}>{rc.level === 1 ? 'BANNED' : rc.level === 2 ? 'STRICT' : rc.level === 3 ? 'TRANSPARENCY' : 'FREE'}</span>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${rc.badge}`}>{rc.level === 1 ? 'VERBOTEN' : rc.level === 2 ? 'STRENG' : rc.level === 3 ? 'TRANSPARENZ' : 'FREI'}</span>
           </div>
           <p className="text-xs text-slate-600 mt-0.5">{rc.summary}</p>
         </div>
@@ -192,11 +192,11 @@ function RiskClassCard({ rc, expanded, onToggle }: {
       {expanded && (
         <div className="px-5 py-4 bg-white space-y-3">
           <div>
-            <p className="text-xs font-semibold text-slate-600 mb-1">Obligations</p>
+            <p className="text-xs font-semibold text-slate-600 mb-1">Pflichten</p>
             <p className="text-xs text-slate-600 leading-relaxed">{rc.duties}</p>
           </div>
           <div>
-            <p className="text-xs font-semibold text-slate-600 mb-2">Examples</p>
+            <p className="text-xs font-semibold text-slate-600 mb-2">Beispiele</p>
             <ul className="space-y-1">
               {rc.examples.map((e) => (
                 <li key={e} className="flex items-start gap-2">
@@ -221,8 +221,8 @@ function Art25Checker() {
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-slate-100">
-        <p className="text-sm font-semibold text-slate-800">Art. 25 — Provider Role Transition Check</p>
-        <p className="text-xs text-slate-500 mt-0.5">When does a deployer become a provider (with full Art. 16 obligations)?</p>
+        <p className="text-sm font-semibold text-slate-800">Art. 25 — Rollenübergang-Check</p>
+        <p className="text-xs text-slate-500 mt-0.5">Wann wird ein Betreiber zum Anbieter (mit allen Art. 16-Pflichten)?</p>
       </div>
       <div className="px-5 py-4 space-y-3">
         {ART25_TRIGGERS.map((t) => (
@@ -243,13 +243,13 @@ function Art25Checker() {
       </div>
       {activeCount > 0 && (
         <div className="mx-5 mb-5 px-4 py-3 rounded-lg bg-orange-50 border border-orange-200">
-          <p className="text-sm font-semibold text-orange-700">⚠ Role transition — you are now a Provider</p>
-          <p className="text-xs text-orange-600 mt-1">All Art. 16 provider obligations apply. This includes documentation, conformity assessment, CE marking, and registration in the EU database. Consult a specialist lawyer (Decision Model Level 3).</p>
+          <p className="text-sm font-semibold text-orange-700">⚠ Rollenübergang — Sie sind jetzt Anbieter</p>
+          <p className="text-xs text-orange-600 mt-1">Alle Art. 16-Anbieterpflichten gelten. Dazu gehören Dokumentation, Konformitätsbewertung, CE-Kennzeichnung und Registrierung in der EU-Datenbank. Fachanwalt hinzuziehen (Dreistufenmodell Stufe 3).</p>
         </div>
       )}
       {activeCount === 0 && (
         <div className="mx-5 mb-5 px-4 py-3 rounded-lg bg-slate-50 border border-slate-200">
-          <p className="text-xs text-slate-500">Select any trigger above to check whether a role transition applies.</p>
+          <p className="text-xs text-slate-500">Wählen Sie oben einen Auslöser aus, um zu prüfen ob ein Rollenübergang vorliegt.</p>
         </div>
       )}
     </div>
@@ -263,10 +263,10 @@ export default function EuAiActPage() {
   const [expandedRisk, setExpandedRisk] = useState<number | null>(null)
 
   const tabs: { id: typeof activeTab; label: string }[] = [
-    { id: 'overview', label: 'Risk Classes & Timeline' },
-    { id: 'roles', label: 'Actor Roles' },
-    { id: 'copyright', label: 'Copyright' },
-    { id: 'liability', label: 'Liability' },
+    { id: 'overview', label: 'Risikoklassen & Zeitplan' },
+    { id: 'roles', label: 'Akteursrollen' },
+    { id: 'copyright', label: 'Urheberrecht' },
+    { id: 'liability', label: 'Haftung' },
   ]
 
   return (
@@ -275,16 +275,16 @@ export default function EuAiActPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-800">EU AI Act</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Risk-based product regulation for AI systems — structure, actor roles, copyright and liability
+          Risikobasiertes Produktrecht für KI-Systeme — Struktur, Akteursrollen, Urheberrecht und Haftung
         </p>
       </div>
 
       {/* Key facts */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { value: '4', label: 'Risk classes', sub: 'Unacceptable · High · Limited · Minimal' },
-          { value: 'Feb 25', label: 'Already in force', sub: 'Art. 5 (prohibitions) + Art. 4 (AI literacy)' },
-          { value: '≠', label: 'AI Act ≠ GDPR', sub: 'Applies regardless of personal data processing' },
+          { value: '4', label: '4 Risikoklassen', sub: 'Verboten · Hochrisiko · Begrenztes Risiko · Minimal' },
+          { value: 'Feb 25', label: 'Bereits in Kraft', sub: 'Art. 5 (Verbote) + Art. 4 (KI-Kompetenz)' },
+          { value: '≠', label: 'AI Act ≠ DSGVO', sub: 'Gilt unabhängig von der Verarbeitung personenbezogener Daten' },
         ].map((m) => (
           <div key={m.label} className="bg-white rounded-xl shadow-sm px-5 py-4">
             <p className="text-2xl font-bold text-slate-800">{m.value}</p>
@@ -297,7 +297,7 @@ export default function EuAiActPage() {
       {/* Important banner */}
       <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-3">
         <p className="text-xs text-red-700 leading-relaxed">
-          <span className="font-semibold">Important:</span> Many organisations believe the AI Act does not yet apply. Art. 5 and Art. 4 have been fully in force since February 2025 — without any transition period. A system that processes no personal data is still covered by the AI Act.
+          <span className="font-semibold">Wichtig:</span> Viele Betreiber glauben, der AI Act gelte noch nicht. Art. 5 und Art. 4 gelten seit Februar 2025 — vollständig und ohne Übergangsfrist. Ein System, das keine personenbezogenen Daten verarbeitet, fällt trotzdem unter den AI Act.
         </p>
       </div>
 
@@ -316,22 +316,22 @@ export default function EuAiActPage() {
         <div className="space-y-6">
           {/* Structure */}
           <div className="bg-white rounded-xl shadow-sm px-5 py-4">
-            <p className="text-sm font-semibold text-slate-800 mb-3">AI Act Logic: Prohibited → High-risk → Transparency → GPAI → Sanctions</p>
+            <p className="text-sm font-semibold text-slate-800 mb-3">KI-Act-Logik: Verboten → Hochrisiko → Transparenz → GPAI → Sanktionen</p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-slate-100">
-                    <th className="text-left py-2 pr-4 font-semibold text-slate-600 whitespace-nowrap">Chapter</th>
-                    <th className="text-left py-2 font-semibold text-slate-600">Content</th>
+                    <th className="text-left py-2 pr-4 font-semibold text-slate-600 whitespace-nowrap">Kapitel</th>
+                    <th className="text-left py-2 font-semibold text-slate-600">Inhalt</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {[
-                    { ch: 'Art. 5', c: 'Prohibited practices' },
-                    { ch: 'Art. 6–49', c: 'High-risk AI — the core of the regulation' },
-                    { ch: 'Art. 50–51', c: 'Transparency obligations' },
-                    { ch: 'Art. 52–56', c: 'GPAI models / Foundation models' },
-                    { ch: 'Art. 99–101', c: 'Sanctions up to €35M or 7% turnover' },
+                    { ch: 'Art. 5', c: 'Verbotene Praktiken' },
+                    { ch: 'Art. 6–49', c: 'Hochrisiko-KI — das Herzstück' },
+                    { ch: 'Art. 50–51', c: 'Transparenzpflichten' },
+                    { ch: 'Art. 52–56', c: 'GPAI-Modelle / Foundation Models' },
+                    { ch: 'Art. 99–101', c: 'Sanktionen bis zu 35 Mio. € oder 7 % Umsatz' },
                   ].map((r) => (
                     <tr key={r.ch}>
                       <td className="py-2 pr-4 font-mono text-slate-500 whitespace-nowrap">{r.ch}</td>
@@ -346,7 +346,7 @@ export default function EuAiActPage() {
           {/* Timeline */}
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
-              <p className="text-sm font-semibold text-slate-800">Timeline — what applies when?</p>
+              <p className="text-sm font-semibold text-slate-800">Zeitplan — was gilt wann?</p>
             </div>
             <div className="divide-y divide-slate-50">
               {TIMELINE.map((item) => (
@@ -362,32 +362,32 @@ export default function EuAiActPage() {
           <div className="grid grid-cols-2 gap-3">
             {[
               {
-                num: '1', name: 'Unacceptable Risk', color: 'bg-red-600', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700',
-                plain: 'Banned. These AI systems are not allowed at all.',
-                law: 'Art. 5 · in force Feb 2025',
-                penalty: 'Up to €35M or 7% turnover',
-                examples: ['Social scoring', 'Subliminal manipulation', 'Real-time biometric ID in public'],
+                num: '1', name: 'Inakzeptables Risiko', color: 'bg-red-600', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700',
+                plain: '1. Verboten. Diese KI-Systeme sind grundsätzlich nicht erlaubt.',
+                law: 'Art. 5 · gilt ab Feb 2025',
+                penalty: 'Bis zu 35 Mio. € oder 7 % Umsatz',
+                examples: ['Social Scoring', 'Unterschwellige Manipulation', 'Biometrische Echtzeit-ID im öffentlichen Raum'],
               },
               {
-                num: '2', name: 'High Risk', color: 'bg-orange-500', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700',
-                plain: 'Allowed — but only with strict documentation, oversight and conformity checks before going live.',
-                law: 'Art. 6–49 + Annex III · Dec 2027',
-                penalty: 'Non-compliance = no market access',
-                examples: ['HR & recruitment AI', 'Credit scoring', 'AI in education', 'Medical AI'],
+                num: '2', name: 'Hohes Risiko', color: 'bg-orange-500', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700',
+                plain: '2. Erlaubt — aber nur mit strenger Dokumentation, Aufsicht und Konformitätsprüfung vor dem Einsatz.',
+                law: 'Art. 6–49 + Anhang III · Dez 2027',
+                penalty: 'Kein Marktzugang ohne Konformität',
+                examples: ['KI im HR & Recruiting', 'Kreditscoring', 'KI in Bildung', 'Medizinische KI'],
               },
               {
-                num: '3', name: 'Limited Risk', color: 'bg-amber-400', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700',
-                plain: 'Allowed — but users must be told they are interacting with AI.',
-                law: 'Art. 50 · in force Aug 2026',
-                penalty: 'Fine for missing disclosure',
-                examples: ['Chatbots', 'AI-generated images/text', 'Deepfakes'],
+                num: '3', name: 'Begrenztes Risiko', color: 'bg-amber-400', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700',
+                plain: '3. Erlaubt — aber Nutzer müssen darauf hingewiesen werden, dass sie mit KI interagieren.',
+                law: 'Art. 50 · gilt ab Aug 2026',
+                penalty: 'Bußgeld bei fehlender Kennzeichnung',
+                examples: ['Chatbots', 'KI-generierte Bilder/Texte', 'Deepfakes'],
               },
               {
-                num: '4', name: 'Minimal Risk', color: 'bg-green-500', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700',
-                plain: 'Freely usable. No specific AI Act requirements.',
-                law: 'No specific obligations',
-                penalty: 'None under AI Act',
-                examples: ['Spam filters', 'Recommendation engines', 'AI in games'],
+                num: '4', name: 'Minimales Risiko', color: 'bg-green-500', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700',
+                plain: '4. Frei nutzbar. Keine spezifischen KI-Act-Anforderungen.',
+                law: 'Keine spezifischen Pflichten',
+                penalty: 'Keine nach dem KI-Act',
+                examples: ['Spam-Filter', 'Empfehlungssysteme', 'KI in Spielen'],
               },
             ].map((rc) => (
               <div key={rc.num} className={`rounded-xl border ${rc.border} ${rc.bg} p-4 flex flex-col gap-2`}>
@@ -411,7 +411,7 @@ export default function EuAiActPage() {
 
           {/* Risk classes — detail cards */}
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-slate-700">Detailed view — click to expand</p>
+            <p className="text-sm font-semibold text-slate-700">Detailansicht — zum Aufklappen</p>
             {RISK_CLASSES.map((rc) => (
               <RiskClassCard
                 key={rc.level}
@@ -424,10 +424,10 @@ export default function EuAiActPage() {
 
           {/* Key question */}
           <div className="bg-white rounded-xl shadow-sm px-5 py-4">
-            <p className="text-sm font-semibold text-slate-800 mb-2">The key question for every AI Officer</p>
+            <p className="text-sm font-semibold text-slate-800 mb-2">Vier Risikoklassen</p>
             <div className="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3">
-              <p className="text-sm font-semibold text-slate-700">"Are we dealing with a high-risk AI system?"</p>
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed">Read Art. 6 and Annex III. This is the critical breakpoint in AI management — for limited-risk systems the obligations are manageable (Art. 4 + Art. 50). For high-risk systems the compliance burden is substantial — CE marking, documentation, conformity assessment.</p>
+              <p className="text-sm font-semibold text-slate-700">"Haben wir es mit einem Hochrisiko-KI-System zu tun?"</p>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">Art. 6 und Anhang III lesen. Das ist die entscheidende Sollbruchstelle im KI-Management — bei Systemen mit begrenztem Risiko sind die Pflichten überschaubar (Art. 4 + Art. 50). Bei Hochrisiko-Systemen ist der Compliance-Aufwand erheblich — CE-Kennzeichnung, Dokumentation, Konformitätsbewertung.</p>
             </div>
           </div>
         </div>
@@ -438,7 +438,7 @@ export default function EuAiActPage() {
         <div className="space-y-4">
           <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-3">
             <p className="text-xs text-blue-700 leading-relaxed">
-              <span className="font-semibold">Key principle:</span> The role determines the obligations — not the system. The same AI system creates different obligation catalogues for providers and deployers.
+              <span className="font-semibold">Merksatz:</span> Die Rolle bestimmt die Pflichten — nicht das System. Dasselbe KI-System erzeugt für Betreiber und Anbieter unterschiedliche Pflichtenkataloge.
             </p>
           </div>
 
@@ -450,8 +450,8 @@ export default function EuAiActPage() {
               </div>
               <div className="px-5 py-4 space-y-2">
                 <p className="text-xs text-slate-600 leading-relaxed"><span className="font-semibold text-slate-700">Definition:</span> {r.definition}</p>
-                <p className="text-xs text-slate-600 leading-relaxed"><span className="font-semibold text-slate-700">Example:</span> {r.example}</p>
-                <p className="text-xs text-slate-600 leading-relaxed"><span className="font-semibold text-slate-700">Obligations:</span> {r.duties}</p>
+                <p className="text-xs text-slate-600 leading-relaxed"><span className="font-semibold text-slate-700">Beispiel:</span> {r.example}</p>
+                <p className="text-xs text-slate-600 leading-relaxed"><span className="font-semibold text-slate-700">Pflichten:</span> {r.duties}</p>
               </div>
             </div>
           ))}
@@ -465,25 +465,25 @@ export default function EuAiActPage() {
         <div className="space-y-4">
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
-              <p className="text-sm font-semibold text-slate-800">§44b UrhG — Can AI be trained on copyrighted material?</p>
+              <p className="text-sm font-semibold text-slate-800">§44b UrhG — Darf KI mit urheberrechtlich geschütztem Material trainiert werden?</p>
             </div>
             <div className="px-5 py-4 space-y-3">
               <p className="text-xs text-slate-600 leading-relaxed">
-                §44b UrhG permits Text and Data Mining (TDM) "to extract information, in particular about patterns, trends and correlations" — unless rights holders have declared a usage reservation (opt-out).
+                §44b UrhG erlaubt Text and Data Mining (TDM) "um daraus Informationen insbesondere über Muster, Trends und Korrelationen zu gewinnen" — es sei denn, die Rechteinhaber haben einen Nutzungsvorbehalt (Opt-Out) ausgesprochen.
               </p>
               <div className="bg-amber-50 border-l-4 border-amber-400 px-4 py-3 rounded-r-lg">
-                <p className="text-xs text-amber-700 leading-relaxed"><span className="font-semibold">Opt-out must be machine-readable:</span> robots.txt, TDM Reservation Protocol or IPTC/XMP metadata. A statement in Terms & Conditions or an imprint is not sufficient (OLG Hamburg, Dec. 2025).</p>
+                <p className="text-xs text-amber-700 leading-relaxed"><span className="font-semibold">Opt-Out muss maschinenlesbar sein:</span> robots.txt, TDM Reservation Protocol oder IPTC/XMP-Metadaten. Eine Erklärung in AGB oder im Impressum reicht nicht (OLG Hamburg, Dez. 2025).</p>
               </div>
               <div className="bg-red-50 border-l-4 border-red-400 px-4 py-3 rounded-r-lg">
-                <p className="text-xs text-red-700 leading-relaxed"><span className="font-semibold">LG München I, Nov. 2025:</span> Permanent embedding of complete works in model parameters = reproduction — goes beyond the TDM exception.</p>
+                <p className="text-xs text-red-700 leading-relaxed"><span className="font-semibold">LG München I, Nov. 2025:</span> Dauerhafte Einbettung vollständiger Werke in Modellparameter = Vervielfältigung — geht über die TDM-Ausnahme hinaus.</p>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
-              <p className="text-sm font-semibold text-slate-800">Who owns AI-generated content? (§2 UrhG)</p>
-              <p className="text-xs text-slate-500 mt-0.5">Only "personal intellectual creations" are protected under German copyright law</p>
+              <p className="text-sm font-semibold text-slate-800">Wem gehört, was die KI schreibt? (§2 UrhG)</p>
+              <p className="text-xs text-slate-500 mt-0.5">Nach deutschem Urheberrecht schützt §2 UrhG nur "persönliche geistige Schöpfungen"</p>
             </div>
             <div className="divide-y divide-slate-50">
               {COPYRIGHT_RULES.map((r) => (
@@ -505,32 +505,32 @@ export default function EuAiActPage() {
         <div className="space-y-4">
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
-              <p className="text-sm font-semibold text-slate-800">Product Liability for AI (ProdHaftG / EU Directive 2024/2853)</p>
+              <p className="text-sm font-semibold text-slate-800">Produkthaftung für KI (ProdHaftG / EU-Richtlinie 2024/2853)</p>
             </div>
             <div className="px-5 py-4 space-y-3">
               <p className="text-xs text-slate-600 leading-relaxed">
-                The Product Liability Act (ProdHaftG, 1989) makes manufacturers liable for defective <strong>products</strong> — without proof of fault. The problem: ProdHaftG was designed for physical products. Software — especially learning software — does not fit well.
+                Das Produkthaftungsgesetz (ProdHaftG, 1989) macht Hersteller für fehlerhafte <strong>Produkte</strong> haftbar — ohne Verschuldensnachweis. Das Problem: Das ProdHaftG wurde für physische Produkte entwickelt. Software — und erst recht lernende Software — passt nicht gut in diesen Rahmen.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="bg-slate-50 rounded-lg px-4 py-3">
-                  <p className="text-xs font-semibold text-slate-700 mb-1">New EU Product Liability Directive 2024/2853</p>
-                  <p className="text-xs text-slate-500 leading-relaxed">Explicitly covers software (including AI systems) as a "product". Transposition deadline: <strong>9 December 2026</strong>.</p>
+                  <p className="text-xs font-semibold text-slate-700 mb-1">Neue EU-Produkthaftungsrichtlinie 2024/2853</p>
+                  <p className="text-xs text-slate-500 leading-relaxed">Erfasst Software (einschließlich KI-Systeme) ausdrücklich als "Produkt". Umsetzungsfrist: <strong>9. Dezember 2026</strong>.</p>
                 </div>
                 <div className="bg-slate-50 rounded-lg px-4 py-3">
-                  <p className="text-xs font-semibold text-slate-700 mb-1">Continuous learning</p>
-                  <p className="text-xs text-slate-500 leading-relaxed">Manufacturers are also liable for defects arising from <strong>continuous learning</strong> after market placement.</p>
+                  <p className="text-xs font-semibold text-slate-700 mb-1">Kontinuierliches Lernen</p>
+                  <p className="text-xs text-slate-500 leading-relaxed">Hersteller haften auch für Fehler, die aus <strong>kontinuierlichem Lernen</strong> nach Inverkehrbringen entstehen.</p>
                 </div>
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-                <p className="text-xs font-semibold text-amber-700 mb-1">AI Liability Directive — withdrawn</p>
-                <p className="text-xs text-amber-600 leading-relaxed">The EU Commission drafted an AI Liability Directive (2022) with burden-of-proof reversal. It was officially withdrawn in <strong>February 2025</strong>. There is currently no specific AI liability framework at EU level.</p>
+                <p className="text-xs font-semibold text-amber-700 mb-1">KI-Haftungsrichtlinie — zurückgezogen</p>
+                <p className="text-xs text-amber-600 leading-relaxed">Die EU-Kommission hat 2022 einen Entwurf für eine KI-Haftungsrichtlinie vorgelegt (Kernidee: Beweislastumkehr). Sie wurde im <strong>Februar 2025</strong> offiziell zurückgezogen. Eine spezifische KI-Haftungsregelung auf EU-Ebene gibt es derzeit nicht.</p>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
-              <p className="text-sm font-semibold text-slate-800">Who is liable today?</p>
+              <p className="text-sm font-semibold text-slate-800">Wer haftet heute?</p>
             </div>
             <div className="divide-y divide-slate-50">
               {LIABILITY_TABLE.map((row) => (
@@ -544,7 +544,7 @@ export default function EuAiActPage() {
 
           <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
             <p className="text-xs text-slate-500 leading-relaxed">
-              <span className="font-semibold text-slate-600">Note:</span> Liability questions are Decision Model Level 3 — always involve a specialist lawyer. This overview is for orientation only and does not constitute legal advice.
+              <span className="font-semibold text-slate-600">Hinweis:</span> Haftungsfragen sind Dreistufenmodell Stufe 3 — immer einen Fachanwalt hinzuziehen. Diese Übersicht dient der Orientierung und stellt keine Rechtsberatung dar.
             </p>
           </div>
         </div>
