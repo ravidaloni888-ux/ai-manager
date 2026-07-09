@@ -551,6 +551,9 @@ export default function EuAiActPage() {
       {/* Tab: Overview */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
+          {/* Decision Tree */}
+          <RiskDecisionTree />
+
           {/* Structure */}
           <div className="bg-white rounded-xl shadow-sm px-5 py-4">
             <p className="text-sm font-semibold text-slate-800 mb-3">KI-Act-Logik: Verboten → Hochrisiko → Transparenz → GPAI → Sanktionen</p>
@@ -594,9 +597,6 @@ export default function EuAiActPage() {
               ))}
             </div>
           </div>
-
-          {/* Decision Tree */}
-          <RiskDecisionTree />
 
           {/* Risk classes — simple overview grid */}
           <div className="grid grid-cols-2 gap-3">
