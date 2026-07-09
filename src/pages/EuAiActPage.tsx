@@ -358,9 +358,60 @@ export default function EuAiActPage() {
             </div>
           </div>
 
-          {/* Risk classes */}
+          {/* Risk classes — simple overview grid */}
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              {
+                num: '1', name: 'Unacceptable Risk', color: 'bg-red-600', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700',
+                plain: 'Banned. These AI systems are not allowed at all.',
+                law: 'Art. 5 · in force Feb 2025',
+                penalty: 'Up to €35M or 7% turnover',
+                examples: ['Social scoring', 'Subliminal manipulation', 'Real-time biometric ID in public'],
+              },
+              {
+                num: '2', name: 'High Risk', color: 'bg-orange-500', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700',
+                plain: 'Allowed — but only with strict documentation, oversight and conformity checks before going live.',
+                law: 'Art. 6–49 + Annex III · Dec 2027',
+                penalty: 'Non-compliance = no market access',
+                examples: ['HR & recruitment AI', 'Credit scoring', 'AI in education', 'Medical AI'],
+              },
+              {
+                num: '3', name: 'Limited Risk', color: 'bg-amber-400', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700',
+                plain: 'Allowed — but users must be told they are interacting with AI.',
+                law: 'Art. 50 · in force Aug 2026',
+                penalty: 'Fine for missing disclosure',
+                examples: ['Chatbots', 'AI-generated images/text', 'Deepfakes'],
+              },
+              {
+                num: '4', name: 'Minimal Risk', color: 'bg-green-500', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700',
+                plain: 'Freely usable. No specific AI Act requirements.',
+                law: 'No specific obligations',
+                penalty: 'None under AI Act',
+                examples: ['Spam filters', 'Recommendation engines', 'AI in games'],
+              },
+            ].map((rc) => (
+              <div key={rc.num} className={`rounded-xl border ${rc.border} ${rc.bg} p-4 flex flex-col gap-2`}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-6 h-6 rounded-full ${rc.color} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>{rc.num}</span>
+                  <p className={`text-sm font-bold ${rc.text}`}>{rc.name}</p>
+                </div>
+                <p className="text-xs text-slate-700 leading-relaxed font-medium">{rc.plain}</p>
+                <p className="text-[10px] text-slate-500 font-mono">{rc.law}</p>
+                <ul className="space-y-0.5 mt-1">
+                  {rc.examples.map((e) => (
+                    <li key={e} className="flex items-center gap-1.5">
+                      <span className={`w-1 h-1 rounded-full flex-shrink-0 ${rc.color}`} />
+                      <span className="text-[11px] text-slate-600">{e}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Risk classes — detail cards */}
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-slate-700">Four Risk Classes</p>
+            <p className="text-sm font-semibold text-slate-700">Detailed view — click to expand</p>
             {RISK_CLASSES.map((rc) => (
               <RiskClassCard
                 key={rc.level}
