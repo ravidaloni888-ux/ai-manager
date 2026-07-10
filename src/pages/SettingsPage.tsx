@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { IconGithub, IconGlobe, IconFolder, IconCopy, IconDatabase } from '../components/icons/NavIcons'
+import { supabase } from '../lib/supabase'
+import { useAuthStore } from '../store/authStore'
 
 const LOCAL_PATH = '/Users/ra/Downloads/git/ai-manager'
 const GITHUB_URL = 'https://github.com/ravidaloni888-ux/ai-manager'
@@ -61,6 +63,37 @@ function LinkCard({
         )}
       </button>
     </div>
+  )
+}
+
+function ResetButton() {
+  const user = useAuthStore((s) => s.user)
+  const [status, setStatus] = useState<'idle' | 'confirm' | 'loading' | 'done'>('idle')
+
+  const handleReset = async () => {
+    if (!user) return
+    setStatus('loading')
+    await supabase.from('ai_use_cases').delete().eq('user_id', user.id)
+    await supabase.from('ai_strategy').delete().eq('user_id', user.id)
+    localStorage.removeItem('ai_start_v1')
+    setStatus('done')
+    setTimeout(() => window.location.reload(), 800)
+  }
+
+  if (status === 'done') return <p className="text-xs text-green-600 font-medium">Zurückgesetzt — Seite lädt neu…</p>
+  if (status === 'loading') return <p className="text-xs text-slate-500">Wird gelöscht…</p>
+  if (status === 'confirm') return (
+    <div className="flex items-center gap-3">
+      <p className="text-xs text-red-600 font-medium">Wirklich alle Daten löschen?</p>
+      <button onClick={handleReset} className="text-xs bg-red-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-red-700">Ja, löschen</button>
+      <button onClick={() => setStatus('idle')} className="text-xs text-slate-500 hover:text-slate-700 underline">Abbrechen</button>
+    </div>
+  )
+  return (
+    <button onClick={() => setStatus('confirm')}
+      className="text-xs border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-medium transition-colors">
+      Account zurücksetzen (leerer Zustand)
+    </button>
   )
 }
 
@@ -141,6 +174,17 @@ export default function SettingsPage() {
               <span className="text-xs font-semibold text-slate-700 font-mono">{item.value}</span>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Gefahrenzone</h2>
+        <div className="bg-white rounded-xl shadow-sm px-4 py-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-slate-800">Account zurücksetzen</p>
+            <p className="text-xs text-slate-500 mt-0.5">Löscht alle Use Cases, Strategy-Daten und den Wizard-Fortschritt — sieht danach aus wie ein leerer Account.</p>
+          </div>
+          <ResetButton />
         </div>
       </section>
 
