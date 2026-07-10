@@ -120,15 +120,15 @@ function PilotWizard({ useCases }: { useCases: AIUseCase[] }) {
 
       {/* Scoring table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="px-5 py-3 border-b border-slate-100 grid gap-2" style={{ gridTemplateColumns: '1fr repeat(4, auto)' }}>
+        <div className="px-5 py-3 border-b border-slate-100 grid gap-2" style={{ gridTemplateColumns: '1fr repeat(4, 160px)' }}>
           <span className="text-xs font-semibold text-slate-500">Use Case</span>
           {PILOT_CRITERIA.map((c) => (
-            <span key={c.key} className="text-[10px] font-semibold text-slate-400 text-center whitespace-nowrap px-2">{c.label}<br /><span className="text-slate-300">{Math.round(c.weight * 100)}%</span></span>
+            <span key={c.key} className="text-[10px] font-semibold text-slate-400 text-center whitespace-nowrap">{c.label}<br /><span className="text-slate-300">{Math.round(c.weight * 100)}%</span></span>
           ))}
         </div>
         <div className="divide-y divide-slate-50">
           {useCases.map((uc) => (
-            <div key={uc.id} className="px-5 py-3 grid items-center gap-2" style={{ gridTemplateColumns: '1fr repeat(4, auto)' }}>
+            <div key={uc.id} className="px-5 py-3 grid items-center gap-2" style={{ gridTemplateColumns: '1fr repeat(4, 160px)' }}>
               <div>
                 <p className="text-xs font-semibold text-slate-800 leading-tight">{uc.title}</p>
                 <p className="text-[10px] text-slate-400">{uc.department} · {uc.status}</p>
