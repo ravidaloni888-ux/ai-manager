@@ -5,7 +5,7 @@ import PipelineView from '../components/list/PipelineView'
 import { useUseCasesStore } from '../store/useCasesStore'
 import { AIUseCase } from '../types'
 
-type View = 'table' | 'pipeline'
+type View = 'table' | 'pipeline' | 'pilot'
 
 function IconTable() {
   return (
@@ -20,6 +20,170 @@ function IconPipeline() {
     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" />
     </svg>
+  )
+}
+
+function IconPilot() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+    </svg>
+  )
+}
+
+// ── Pilot Selection Wizard ─────────────────────────────────────────────────
+
+const PILOT_CRITERIA = [
+  { key: 'businessImpact', label: 'Geschäftlicher Nutzen', weight: 0.35, desc: 'Wie groß ist der erwartete Mehrwert?' },
+  { key: 'feasibility',    label: 'Umsetzbarkeit',         weight: 0.30, desc: 'Daten vorhanden, technisch machbar?' },
+  { key: 'strategicFit',  label: 'Strategische Passung',   weight: 0.20, desc: 'Passt zur KI-Vision des Unternehmens?' },
+  { key: 'urgency',        label: 'Dringlichkeit',          weight: 0.15, desc: 'Zeitdruck oder Wettbewerbsdruck?' },
+] as const
+
+type CriteriaKey = typeof PILOT_CRITERIA[number]['key']
+
+function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hover, setHover] = useState(0)
+  const stars = [2, 5, 8] // low / medium / high mapped to 1–10 scale
+  const labels = ['Niedrig', 'Mittel', 'Hoch']
+  const currentIdx = stars.indexOf(value)
+
+  return (
+    <div className="flex gap-1">
+      {stars.map((v, i) => (
+        <button
+          key={v}
+          onMouseEnter={() => setHover(i + 1)}
+          onMouseLeave={() => setHover(0)}
+          onClick={() => onChange(v)}
+          className={`px-2 py-1 rounded text-[10px] font-semibold border transition-colors ${
+            (hover ? hover > i : currentIdx > i - 1)
+              ? 'bg-blue-600 border-blue-600 text-white'
+              : 'border-slate-200 text-slate-400 hover:border-blue-300'
+          }`}
+        >
+          {labels[i]}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function PilotWizard({ useCases }: { useCases: AIUseCase[] }) {
+  const [scores, setScores] = useState<Record<string, Record<CriteriaKey, number>>>(() => {
+    const init: Record<string, Record<CriteriaKey, number>> = {}
+    useCases.forEach((uc) => {
+      init[uc.id] = {
+        businessImpact: uc.businessImpact || 5,
+        feasibility:    uc.feasibility    || 5,
+        strategicFit:   uc.strategicFit   || 5,
+        urgency:        uc.urgency        || 5,
+      }
+    })
+    return init
+  })
+  const [showResult, setShowResult] = useState(false)
+
+  const setScore = (ucId: string, key: CriteriaKey, val: number) => {
+    setScores((prev) => ({ ...prev, [ucId]: { ...prev[ucId], [key]: val } }))
+    setShowResult(false)
+  }
+
+  const ranked = [...useCases]
+    .map((uc) => {
+      const s = scores[uc.id] ?? { businessImpact: 5, feasibility: 5, strategicFit: 5, urgency: 5 }
+      const total = PILOT_CRITERIA.reduce((sum, c) => sum + s[c.key] * c.weight, 0)
+      const isQuickWin = s.feasibility >= 8 && s.businessImpact >= 5
+      return { uc, total, isQuickWin }
+    })
+    .sort((a, b) => b.total - a.total)
+
+  const quickWin  = ranked.find((r) => r.isQuickWin) ?? ranked[0]
+  const strategic = ranked.find((r) => r !== quickWin) ?? ranked[1]
+
+  if (useCases.length < 2) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm px-6 py-12 text-center">
+        <p className="text-slate-500 text-sm">Mindestens 2 Use Cases erforderlich um Piloten auszuwählen.</p>
+        <p className="text-slate-400 text-xs mt-1">Erstelle Use Cases über "New Use Case" (oben rechts).</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Intro */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4">
+        <p className="text-sm font-semibold text-blue-800">Pilot-Auswahl: Die besten 2 Use Cases finden</p>
+        <p className="text-xs text-blue-600 mt-1">Bewerte jeden Use Case nach 4 Kriterien — der Wizard empfiehlt einen <strong>Quick Win</strong> und einen <strong>strategischen Piloten</strong>.</p>
+      </div>
+
+      {/* Scoring table */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="px-5 py-3 border-b border-slate-100 grid gap-2" style={{ gridTemplateColumns: '1fr repeat(4, auto)' }}>
+          <span className="text-xs font-semibold text-slate-500">Use Case</span>
+          {PILOT_CRITERIA.map((c) => (
+            <span key={c.key} className="text-[10px] font-semibold text-slate-400 text-center whitespace-nowrap px-2">{c.label}<br /><span className="text-slate-300">{Math.round(c.weight * 100)}%</span></span>
+          ))}
+        </div>
+        <div className="divide-y divide-slate-50">
+          {useCases.map((uc) => (
+            <div key={uc.id} className="px-5 py-3 grid items-center gap-2" style={{ gridTemplateColumns: '1fr repeat(4, auto)' }}>
+              <div>
+                <p className="text-xs font-semibold text-slate-800 leading-tight">{uc.title}</p>
+                <p className="text-[10px] text-slate-400">{uc.department} · {uc.status}</p>
+              </div>
+              {PILOT_CRITERIA.map((c) => (
+                <div key={c.key} className="flex justify-center">
+                  <StarRating
+                    value={scores[uc.id]?.[c.key] ?? 5}
+                    onChange={(v) => setScore(uc.id, c.key, v)}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button onClick={() => setShowResult(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors">
+          Empfehlung anzeigen →
+        </button>
+      </div>
+
+      {/* Result */}
+      {showResult && (
+        <div className="grid grid-cols-2 gap-4">
+          {[
+            { tag: '⚡ Quick Win', tagColor: 'bg-green-100 text-green-700 border-green-200', card: 'border-green-200 bg-green-50', entry: quickWin,
+              desc: 'Hohe Umsetzbarkeit, schneller sichtbarer Erfolg — ideal als erstes Pilotprojekt.' },
+            { tag: '🎯 Strategischer Pilot', tagColor: 'bg-blue-100 text-blue-700 border-blue-200', card: 'border-blue-200 bg-blue-50', entry: strategic,
+              desc: 'Höchste Gesamtbewertung — langfristig am wertvollsten für die KI-Strategie.' },
+          ].map(({ tag, tagColor, card, entry, desc }) => entry && (
+            <div key={tag} className={`rounded-xl border ${card} px-5 py-4 space-y-2`}>
+              <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full border ${tagColor}`}>{tag}</span>
+              <p className="text-sm font-bold text-slate-800">{entry.uc.title}</p>
+              <p className="text-xs text-slate-500">{entry.uc.department} · {entry.uc.status}</p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(entry.total / 10) * 100}%` }} />
+                </div>
+                <span className="text-xs font-mono font-semibold text-slate-600">{entry.total.toFixed(1)}/10</span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">{desc}</p>
+              {PILOT_CRITERIA.map((c) => (
+                <div key={c.key} className="flex justify-between text-[10px]">
+                  <span className="text-slate-500">{c.label}</span>
+                  <span className="font-semibold text-slate-700">{scores[entry.uc.id]?.[c.key] === 8 ? 'Hoch' : scores[entry.uc.id]?.[c.key] === 5 ? 'Mittel' : 'Niedrig'}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -195,6 +359,16 @@ export default function ListPage() {
           >
             <IconPipeline /> Pipeline
           </button>
+          <button
+            onClick={() => setView('pilot')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              view === 'pilot'
+                ? 'bg-white text-slate-800 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <IconPilot /> Pilot-Auswahl
+          </button>
         </div>
       </div>
 
@@ -202,6 +376,7 @@ export default function ListPage() {
 
       {view === 'table' && <UseCaseTable />}
       {view === 'pipeline' && <PipelineView useCases={useCases} onEdit={handleEdit} />}
+      {view === 'pilot' && <PilotWizard useCases={useCases} />}
     </div>
   )
 }
