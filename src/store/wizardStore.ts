@@ -33,8 +33,8 @@ export function loadProgress(): Set<StepId> {
   try {
     if (getDemoMode()) return new Set(ALL_STEP_IDS)
     const raw = localStorage.getItem(LS_KEY)
-    return raw ? new Set<StepId>(JSON.parse(raw)) : new Set(ALL_STEP_IDS)
-  } catch { return new Set(ALL_STEP_IDS) }
+    return raw ? new Set<StepId>(JSON.parse(raw)) : new Set()
+  } catch { return new Set() }
 }
 
 export function saveProgress(done: Set<StepId>) {
