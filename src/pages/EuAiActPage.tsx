@@ -545,11 +545,25 @@ export default function EuAiActPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">EU AI Act</h1>
-        <p className="text-sm text-slate-500 mt-0.5">
-          Risikobasiertes Produktrecht für KI-Systeme — Struktur, Akteursrollen, Urheberrecht und Haftung
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">EU AI Act</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            Risikobasiertes Produktrecht für KI-Systeme — Struktur, Akteursrollen, Urheberrecht und Haftung
+          </p>
+        </div>
+        <div className="flex-shrink-0 text-right">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 border border-green-200 text-xs text-green-700 font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+            Stand: Juli 2026
+          </span>
+          <p className="text-[10px] text-slate-400 mt-1">
+            Quelle:{' '}
+            <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689" target="_blank" rel="noopener noreferrer" className="underline hover:text-slate-600">
+              EUR-Lex · VO 2024/1689
+            </a>
+          </p>
+        </div>
       </div>
 
       {/* Key facts */}
