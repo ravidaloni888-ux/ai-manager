@@ -123,6 +123,27 @@ export default function SettingsPage() {
         />
       </section>
 
+      <section className="space-y-3">
+        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Tech Stack</h2>
+        <div className="bg-white rounded-xl shadow-sm divide-y divide-slate-50">
+          {[
+            { label: 'Sprache', value: 'TypeScript 5' },
+            { label: 'Framework', value: 'React 18' },
+            { label: 'Build Tool', value: 'Vite' },
+            { label: 'Styling', value: 'Tailwind CSS v3' },
+            { label: 'Routing', value: 'React Router v6' },
+            { label: 'State', value: 'Zustand' },
+            { label: 'Datenbank', value: 'Supabase (PostgreSQL)' },
+            { label: 'Hosting', value: 'Vercel' },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center justify-between px-4 py-2.5">
+              <span className="text-xs text-slate-500">{item.label}</span>
+              <span className="text-xs font-semibold text-slate-700 font-mono">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
     </div>
   )
 }
