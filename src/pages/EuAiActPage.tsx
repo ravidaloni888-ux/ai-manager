@@ -158,6 +158,42 @@ const COPYRIGHT_RULES = [
   },
 ]
 
+const AI_ACT_GOALS = [
+  { title: 'Schutz von Grundrechten, Demokratie, Rechtsstaatlichkeit', desc: 'Würde, Freiheit, Gleichheit, Privatsphäre, Nichtdiskriminierung — greift z.B. bei Bias-Risiken in HR-KI.', icon: '⚖️' },
+  { title: 'Schutz von Gesundheit und Sicherheit', desc: 'Begründet die strenge Regulierung von Medizin-KI, Industrie-KI und autonomem Fahren.', icon: '🛡️' },
+  { title: 'Förderung von Innovation und Wettbewerbsfähigkeit', desc: 'Regulatory Sandboxes (Art. 57), KMU-Erleichterungen, gestaffelte Anforderungen.', icon: '🚀' },
+  { title: 'Stärkung des Vertrauens in KI', desc: 'Transparenzpflichten, Kennzeichnung, Risikomanagement — damit KI gesellschaftlich akzeptabel wird.', icon: '🤝' },
+  { title: 'Funktionierender Binnenmarkt für KI', desc: 'Einheitliche Regeln in allen 27 EU-Staaten — kein "Forum Shopping" zwischen Mitgliedstaaten. CE-Kennzeichnung gilt EU-weit.', icon: '🇪🇺' },
+]
+
+const OMNIBUS_CHANGES = [
+  { label: 'Neue Fristen', detail: 'Hochrisiko-Pflichten (Anhang III) verschoben auf 2.12.2027 · Anhang I (Produkte) auf 2.8.2028' },
+  { label: 'SMC-Kategorie', detail: 'KMU-Erleichterungen ausgeweitet auf "Small Mid-Cap"-Unternehmen (bis ~500 MA / 100 Mio. € Umsatz)' },
+  { label: 'Neues Verbot (Art. 5)', detail: 'KI-generierte intime Bilder ohne Einwilligung (Deepfake-Nudifier) ausdrücklich verboten' },
+]
+
+const KMU_BENEFITS = [
+  {
+    num: '1', title: 'Bevorzugter Zugang zu KI-Reallaboren (Sandbox)',
+    points: ['Tests in kontrollierten Umgebungen — Rechtssicherheit beim Erproben', 'Austausch mit Behörden, Förderung von Innovation', 'Kostenloser Zugang für KMU und Start-ups (Art. 57)'],
+  },
+  {
+    num: '2', title: 'Vereinfachte Dokumentation bei Hochrisiko-KI',
+    points: ['Vereinfachtes Formular für technische Dokumentation (Anhang IV)', 'Kommission erstellt Template speziell für kleine Unternehmen', 'Weniger Bürokratie — gleiche Sicherheitsanforderungen'],
+  },
+  {
+    num: '3', title: 'Niedrigere Bußobergrenzen',
+    points: ['Es gilt jeweils der niedrigere Betrag: Fixsumme oder prozentualer Umsatzanteil', 'Beispiel: Mittelständler mit 30 Mio. € Umsatz zahlt max. 0,9 Mio. € (3 %) statt 15 Mio. €', 'Kleinstunternehmen mit 1 Mio. € Umsatz: max. 30.000 € (Art. 99)'],
+  },
+]
+
+const ART50_DUTIES = [
+  { title: 'Interaktive KI', desc: 'Chatbots und KI-Assistenten müssen sich als KI zu erkennen geben — Nutzer dürfen nicht glauben, mit einem Menschen zu sprechen.' },
+  { title: 'Synthetische Inhalte', desc: 'KI-generierte Bilder, Audio, Video und Text müssen als solche gekennzeichnet werden.' },
+  { title: 'Emotionserkennung', desc: 'Betreiber eines Emotionserkennungssystems informieren die davon betroffenen natürlichen Personen über den Betrieb des Systems.' },
+  { title: 'Wasserzeichen (Art. 50 Abs. 2)', desc: 'Ausgaben des KI-Systems müssen in einem maschinenlesbaren Format gekennzeichnet und als künstlich erzeugt oder manipuliert erkennbar sein.' },
+]
+
 const LIABILITY_TABLE = [
   { situation: 'KI-Fehler durch Designmangel', liable: 'Anbieter' },
   { situation: 'Fehleinsatz durch Betreiber', liable: 'Betreiber' },
@@ -593,6 +629,86 @@ export default function EuAiActPage() {
                 <div key={item.date} className={`flex items-start gap-4 px-5 py-3 ${item.highlight ? 'bg-blue-50' : ''}`}>
                   <span className="text-xs font-mono text-slate-500 whitespace-nowrap mt-0.5 min-w-[90px]">{item.date}</span>
                   <p className={`text-xs leading-relaxed ${item.highlight ? 'font-semibold text-blue-700' : 'text-slate-600'}`}>{item.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 5 Ziele */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <p className="text-sm font-semibold text-slate-800">Die 5 Ziele des EU AI Act</p>
+              <p className="text-xs text-slate-500 mt-0.5">Erwägungsgrund 1 — hilft beim sinnvollen Auslegen des AI Act</p>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {AI_ACT_GOALS.map((g) => (
+                <div key={g.title} className="flex items-start gap-3 px-5 py-3">
+                  <span className="text-lg flex-shrink-0">{g.icon}</span>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-800">{g.title}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{g.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Digital Omnibus */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">NEU</span>
+                <p className="text-sm font-semibold text-slate-800">Digital Omnibus — Was hat sich geändert?</p>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">EP 16.6.2026 (423 Stimmen) · Rat 29.6.2026 · Amtsblatt-Veröffentlichung vor 2.8.2026 erwartet</p>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {OMNIBUS_CHANGES.map((c) => (
+                <div key={c.label} className="flex items-start gap-4 px-5 py-3">
+                  <span className="text-xs font-bold text-blue-700 whitespace-nowrap mt-0.5 min-w-[140px]">{c.label}</span>
+                  <p className="text-xs text-slate-600 leading-relaxed">{c.detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* KMU & SMC */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <p className="text-sm font-semibold text-slate-800">KMU & Small Mid-Caps — Wer profitiert?</p>
+              <p className="text-xs text-slate-500 mt-0.5">Durch Digital Omnibus auf SMC ausgeweitet · Art. 57, Art. 99</p>
+            </div>
+            <div className="grid grid-cols-1 gap-0 divide-y divide-slate-50">
+              {KMU_BENEFITS.map((b) => (
+                <div key={b.num} className="px-5 py-4 flex items-start gap-4">
+                  <span className="w-7 h-7 rounded-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">{b.num}</span>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-800 mb-1">{b.title}</p>
+                    <ul className="space-y-0.5">
+                      {b.points.map((p) => (
+                        <li key={p} className="flex items-start gap-1.5">
+                          <span className="mt-1.5 w-1 h-1 rounded-full bg-slate-400 flex-shrink-0" />
+                          <span className="text-xs text-slate-600">{p}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Art. 50 — 4 Transparenzpflichten */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <p className="text-sm font-semibold text-slate-800">Art. 50 — Die 4 Transparenzpflichten</p>
+              <p className="text-xs text-slate-500 mt-0.5">Gilt ab 2.8.2026 · Bundesnetzagentur ist zuständige Aufsichtsbehörde in Deutschland</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 p-4">
+              {ART50_DUTIES.map((d) => (
+                <div key={d.title} className="border border-amber-200 bg-amber-50 rounded-lg px-4 py-3">
+                  <p className="text-xs font-semibold text-amber-800 mb-1">{d.title}</p>
+                  <p className="text-xs text-slate-600 leading-relaxed">{d.desc}</p>
                 </div>
               ))}
             </div>
