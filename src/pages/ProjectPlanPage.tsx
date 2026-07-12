@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useUseCasesStore } from '../store/useCasesStore'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -178,7 +180,16 @@ function QuestionCard({
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
+function euAiActRiskToLevel(risk?: string): RiskLevel {
+  if (risk === 'High Risk' || risk === 'Unacceptable Risk') return 'high'
+  if (risk === 'Limited Risk') return 'limited'
+  if (risk === 'Minimal Risk') return 'minimal'
+  return null
+}
+
 export default function ProjectPlanPage() {
+  const [searchParams] = useSearchParams()
+  const { useCases } = useUseCasesStore()
   const [step, setStep] = useState<Step>('form')
   const [form, setForm] = useState<FormData>({ name: '', description: '' })
   const [answers, setAnswers] = useState<Answers>({
@@ -192,6 +203,21 @@ export default function ProjectPlanPage() {
   const [qIndex, setQIndex] = useState(0)
   const [plan, setPlan] = useState<Phase[] | null>(null)
   const [checked, setChecked] = useState<Record<string, boolean>>({})
+
+  // Pre-fill from URL param ?ucid=<id>
+  useEffect(() => {
+    const ucid = searchParams.get('ucid')
+    if (!ucid) return
+    const uc = useCases.find((u) => u.id === ucid)
+    if (!uc) return
+    setForm({ name: uc.title, description: uc.businessProblem ?? '' })
+    setAnswers((prev) => ({
+      ...prev,
+      riskLevel: euAiActRiskToLevel(uc.euAiActRisk),
+      personalData: uc.compliancePersonalData ?? null,
+    }))
+    setStep('questions')
+  }, [searchParams, useCases])
 
   const totalItems = plan?.reduce((sum, p) => sum + p.items.length, 0) ?? 0
   const doneCount = Object.values(checked).filter(Boolean).length
