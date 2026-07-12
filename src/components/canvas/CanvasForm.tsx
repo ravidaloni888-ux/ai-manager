@@ -162,6 +162,7 @@ function SliderField({
 export default function CanvasForm({ existing }: Props) {
   const navigate = useNavigate()
   const { addUseCase, updateUseCase } = useUseCasesStore()
+  const [savedId, setSavedId] = useState<string | null>(null)
 
   const defaultValues: FormData = existing ?? {
     title: '',
@@ -241,15 +242,49 @@ export default function CanvasForm({ existing }: Props) {
     }
     if (existing) {
       updateUseCase(uc)
+      navigate('/use-cases')
     } else {
       addUseCase(uc)
+      setSavedId(uc.id)
     }
-    navigate('/use-cases')
   }
 
   const currentStatus = watched.status ?? 'Idea'
   const currentApproach = watched.aiApproach ?? 'Supervised Learning'
   const currentFeas = watched.technicalFeasibility ?? 'Medium'
+
+  if (savedId) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 p-8">
+        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+          <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
+        <div className="text-center">
+          <p className="text-xl font-bold text-slate-800">Use Case erstellt</p>
+          <p className="text-sm text-slate-500 mt-1">Möchtest du direkt einen Compliance-Projektplan dafür erstellen?</p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={() => navigate('/use-cases')}
+            className="px-5 py-2.5 rounded-lg text-sm font-medium border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors"
+          >
+            Zur Use-Case-Liste
+          </button>
+          <button
+            onClick={() => navigate(`/project-plan?ucid=${savedId}`)}
+            className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+            </svg>
+            Projektplan erstellen
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -509,68 +544,6 @@ export default function CanvasForm({ existing }: Props) {
             <SliderField label="Feasibility"     name="feasibility"    weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
             <SliderField label="Strategic Fit"   name="strategicFit"   weight="20%" register={register} value={Number(watched.strategicFit ?? 7)} />
             <SliderField label="Urgency"          name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
-          </div>
-        </section>
-
-        {/* Section 4: Governance & Compliance */}
-        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
-          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Governance & Compliance</h2>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>EU AI Act Risk Level</label>
-              <div className="flex items-center gap-2">
-                <select {...register('euAiActRisk')} className={inputCls}>
-                  {EU_AI_ACT_RISKS.map((r) => <option key={r}>{r}</option>)}
-                </select>
-                <span className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap ${EU_AI_ACT_BG[(watched.euAiActRisk ?? 'Minimal Risk') as EuAiActRisk]}`}>
-                  {watched.euAiActRisk ?? 'Minimal Risk'}
-                </span>
-              </div>
-            </div>
-            {watched.euAiActRisk === 'High Risk' || watched.euAiActRisk === 'Unacceptable Risk' ? (
-              <div className="col-span-2 flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                <svg className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                </svg>
-                <div>
-                  <p className="text-sm font-semibold text-orange-800">DPIA Required</p>
-                  <p className="text-xs text-orange-700 mt-0.5">
-                    This risk level triggers a mandatory Data Protection Impact Assessment (DPIA) under GDPR Article 35.
-                  </p>
-                  <a
-                    href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/how-do-we-do-a-dpia/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs text-orange-700 underline font-semibold mt-1 inline-block hover:text-orange-900"
-                  >
-                    ICO: How do we do a DPIA? →
-                  </a>
-                </div>
-              </div>
-            ) : null}
-          </div>
-
-          <div>
-            <label className={labelCls}>Privacy Checklist</label>
-            <div className="space-y-2">
-              {[
-                { name: 'complianceLegal',         label: 'Legal requirements (GDPR, EU AI Act) reviewed and documented' },
-                { name: 'compliancePersonalData',  label: 'Personal data & legal basis for processing documented' },
-                { name: 'complianceDataMin',       label: 'Data minimisation & purpose limitation ensured' },
-                { name: 'complianceDocumentation', label: 'Documentation & audit trail requirements fulfilled' },
-                { name: 'complianceLiability',     label: 'Liability & accountability for AI errors clarified' },
-              ].map((item) => (
-                <label key={item.name} className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-100 hover:bg-slate-50 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    {...register(item.name as keyof FormData)}
-                    className="w-4 h-4 accent-blue-600 flex-shrink-0"
-                  />
-                  <span className="text-sm text-slate-700">{item.label}</span>
-                </label>
-              ))}
-            </div>
           </div>
         </section>
 
