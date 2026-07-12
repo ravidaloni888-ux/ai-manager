@@ -187,8 +187,7 @@ function euAiActRiskToLevel(risk?: string): RiskLevel {
   return null
 }
 
-export default function ProjectPlanPage() {
-  const [searchParams] = useSearchParams()
+export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
   const { useCases } = useUseCasesStore()
   const [step, setStep] = useState<Step>('form')
   const [form, setForm] = useState<FormData>({ name: '', description: '' })
@@ -204,9 +203,8 @@ export default function ProjectPlanPage() {
   const [plan, setPlan] = useState<Phase[] | null>(null)
   const [checked, setChecked] = useState<Record<string, boolean>>({})
 
-  // Pre-fill from URL param ?ucid=<id>
+  // Pre-fill from ucid prop
   useEffect(() => {
-    const ucid = searchParams.get('ucid')
     if (!ucid) return
     const uc = useCases.find((u) => u.id === ucid)
     if (!uc) return
@@ -217,7 +215,7 @@ export default function ProjectPlanPage() {
       personalData: uc.compliancePersonalData ?? null,
     }))
     setStep('questions')
-  }, [searchParams, useCases])
+  }, [ucid, useCases])
 
   const totalItems = plan?.reduce((sum, p) => sum + p.items.length, 0) ?? 0
   const doneCount = Object.values(checked).filter(Boolean).length
@@ -568,4 +566,10 @@ export default function ProjectPlanPage() {
       )}
     </div>
   )
+}
+
+export default function ProjectPlanPage() {
+  const [searchParams] = useSearchParams()
+  const ucid = searchParams.get('ucid')
+  return <ProjectPlanContent ucid={ucid} />
 }
