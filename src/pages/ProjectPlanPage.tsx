@@ -258,6 +258,19 @@ export default function ProjectPlanPage() {
     setChecked({})
   }
 
+  const goBack = () => {
+    if (step === 'plan') {
+      setStep('questions')
+      setQIndex(5)
+    } else if (step === 'questions') {
+      if (qIndex === 0) {
+        setStep('form')
+      } else {
+        setQIndex(qIndex - 1)
+      }
+    }
+  }
+
   const boolQuestions: { key: keyof Answers; q: string; sub?: string; yes: string; no: string }[] = [
     {
       key: 'personalData',
@@ -311,23 +324,35 @@ export default function ProjectPlanPage() {
 
       {/* Progress indicator */}
       <div className="flex items-center gap-3">
-        {(['form', 'questions', 'plan'] as Step[]).map((s, i) => (
-          <div key={s} className="flex items-center gap-3">
-            <div className={`flex items-center gap-2`}>
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                step === s ? 'bg-blue-600 text-white' :
-                (step === 'questions' && s === 'form') || step === 'plan' ? 'bg-green-500 text-white' :
-                'bg-slate-100 text-slate-400'
-              }`}>
-                {((step === 'questions' && s === 'form') || step === 'plan') && s !== 'plan' ? '✓' : i + 1}
-              </div>
-              <span className={`text-xs font-medium ${step === s ? 'text-slate-800' : 'text-slate-400'}`}>
-                {s === 'form' ? 'Use Case' : s === 'questions' ? 'Fragen' : 'Projektplan'}
-              </span>
+        {(['form', 'questions', 'plan'] as Step[]).map((s, i) => {
+          const isCompleted = (step === 'questions' && s === 'form') || (step === 'plan' && s !== 'plan')
+          const isClickable = isCompleted || (step === 'plan' && s === 'questions')
+          return (
+            <div key={s} className="flex items-center gap-3">
+              <button
+                type="button"
+                disabled={!isClickable}
+                onClick={() => {
+                  if (s === 'form') { setStep('form') }
+                  else if (s === 'questions') { setStep('questions'); setQIndex(5) }
+                }}
+                className={`flex items-center gap-2 ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
+                  step === s ? 'bg-blue-600 text-white' :
+                  isCompleted ? 'bg-green-500 text-white' :
+                  'bg-slate-100 text-slate-400'
+                }`}>
+                  {isCompleted && (s as string) !== 'plan' ? '✓' : i + 1}
+                </div>
+                <span className={`text-xs font-medium ${step === s ? 'text-slate-800' : isCompleted ? 'text-green-600 underline-offset-2' : 'text-slate-400'}`}>
+                  {s === 'form' ? 'Use Case' : s === 'questions' ? 'Fragen' : 'Projektplan'}
+                </span>
+              </button>
+              {i < 2 && <div className={`h-px w-8 ${isCompleted ? 'bg-green-400' : 'bg-slate-200'}`} />}
             </div>
-            {i < 2 && <div className={`h-px w-8 ${(step === 'plan' || (step === 'questions' && s === 'form')) ? 'bg-green-400' : 'bg-slate-200'}`} />}
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Step 1: Form */}
@@ -370,14 +395,26 @@ export default function ProjectPlanPage() {
             <p className="text-sm font-semibold text-slate-800">{form.name}</p>
           </div>
 
-          {/* Progress dots */}
-          <div className="flex items-center gap-2">
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className={`w-2 h-2 rounded-full transition-colors ${
-                i < qIndex ? 'bg-green-500' : i === qIndex ? 'bg-blue-600' : 'bg-slate-200'
-              }`} />
-            ))}
-            <span className="text-xs text-slate-400 ml-1">Frage {qIndex + 1} von 6</span>
+          {/* Progress dots + back */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className={`w-2 h-2 rounded-full transition-colors ${
+                  i < qIndex ? 'bg-green-500' : i === qIndex ? 'bg-blue-600' : 'bg-slate-200'
+                }`} />
+              ))}
+              <span className="text-xs text-slate-400 ml-1">Frage {qIndex + 1} von 6</span>
+            </div>
+            <button
+              type="button"
+              onClick={goBack}
+              className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+              Zurück
+            </button>
           </div>
 
           {qIndex === 0 && (
@@ -428,6 +465,18 @@ export default function ProjectPlanPage() {
           {/* Summary header */}
           <div className="bg-white rounded-xl shadow-sm px-5 py-4 flex items-center gap-6">
             <div className="flex-1">
+              <div className="flex items-center gap-2 mb-0.5">
+                <button
+                  type="button"
+                  onClick={goBack}
+                  className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                  Fragen bearbeiten
+                </button>
+              </div>
               <p className="text-xs text-slate-500">Projektplan für</p>
               <p className="text-base font-bold text-slate-800">{form.name}</p>
               {form.description && <p className="text-xs text-slate-500 mt-0.5">{form.description}</p>}
