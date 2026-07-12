@@ -125,6 +125,22 @@ const DREISTUFENMODELL = [
   },
 ]
 
+const DSGVO_GRUNDSAETZE = [
+  { art: 'Art. 5 lit. a', name: 'Rechtmäßigkeit, Verarbeitung nach Treu und Glauben, Transparenz', short: 'Rechtmäßigkeit', desc: 'Es muss eine Rechtsgrundlage geben (Art. 6). Die Verarbeitung darf die betroffene Person nicht täuschen oder überraschen.' },
+  { art: 'Art. 5 lit. b', name: 'Zweckbindung', short: 'Zweckbindung', desc: 'Daten dürfen nur für den festgelegten, eindeutigen und legitimen Zweck erhoben und verarbeitet werden. Keine "Vorratsdatenhaltung".' },
+  { art: 'Art. 5 lit. c', name: 'Datenminimierung', short: 'Datenminimierung', desc: 'Nur die Daten verarbeiten, die für den Zweck tatsächlich erforderlich sind — nicht alle, die nützlich sein könnten.' },
+  { art: 'Art. 5 lit. d', name: 'Richtigkeit', short: 'Richtigkeit', desc: 'Daten müssen sachlich richtig und aktuell sein. Unrichtige Daten sind zu berichtigen oder zu löschen (→ Betroffenenrechte Art. 16).' },
+  { art: 'Art. 5 lit. e', name: 'Speicherbegrenzung', short: 'Speicherbegrenzung', desc: 'Daten dürfen nur so lange gespeichert werden, wie es für den Zweck erforderlich ist. Danach: Löschen oder Anonymisieren.' },
+  { art: 'Art. 5 lit. f', name: 'Integrität und Vertraulichkeit', short: 'Integrität', desc: 'Angemessene technische und organisatorische Maßnahmen (TOMs) zum Schutz vor unbefugtem Zugriff, Verlust oder Zerstörung (→ Art. 32).' },
+  { art: 'Art. 5 Abs. 2', name: 'Rechenschaftspflicht', short: 'Rechenschaft', desc: 'Der Verantwortliche muss die Einhaltung aller Grundsätze nachweisen können — nicht nur einhalten, sondern dokumentieren.', highlight: true },
+]
+
+const BIAS_TYPES = [
+  { type: 'Historical Bias', icon: '📜', desc: 'Die Trainingsdaten spiegeln vergangene Diskriminierung wider. Das Modell lernt und reproduziert diese Muster. Beispiel: Einstellungsdaten, bei denen Frauen historisch unterrepräsentiert waren, führen zu KI-Systemen, die Männer bevorzugen.', color: 'border-red-200 bg-red-50', badge: 'bg-red-100 text-red-700' },
+  { type: 'Representation Bias', icon: '📊', desc: 'Bestimmte Gruppen sind in den Trainingsdaten unter- oder überrepräsentiert. Das Modell funktioniert für diese Gruppen schlechter. Beispiel: Gesichtserkennung, die bei dunklen Hauttönen mehr Fehler macht, weil Trainingsdaten überproportional helle Hauttöne enthalten.', color: 'border-amber-200 bg-amber-50', badge: 'bg-amber-100 text-amber-700' },
+  { type: 'Measurement Bias', icon: '📏', desc: 'Die gewählten Messgrößen oder Labels selbst sind verzerrt. Beispiel: "Kreditwürdigkeit" gemessen an historischen Zahlungsverhalten, das selbst durch ungleichen Zugang zu Finanzprodukten geprägt ist.', color: 'border-violet-200 bg-violet-50', badge: 'bg-violet-100 text-violet-700' },
+]
+
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 function ArticleCard({ article }: { article: Article }) {
@@ -502,9 +518,52 @@ export default function DsgvoPage() {
               <span className="font-semibold">DSGVO-Struktur:</span> Grundsätze (Art. 1–7) → Rechte (Art. 12–23) → Pflichten (Art. 24–43) → Sanktionen (Art. 77–84). Wer die Struktur kennt, findet jeden Artikel.
             </p>
           </div>
+
+          {/* 7 Grundsätze Art. 5 */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <p className="text-sm font-semibold text-slate-800">Art. 5 — Die 7 Datenschutz-Grundsätze</p>
+              <p className="text-xs text-slate-500 mt-0.5">Das Fundament der DSGVO — jede Verarbeitung personenbezogener Daten muss alle 7 Grundsätze einhalten</p>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {DSGVO_GRUNDSAETZE.map((g, i) => (
+                <div key={g.art} className={`flex items-start gap-4 px-5 py-3 ${g.highlight ? 'bg-violet-50' : ''}`}>
+                  <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${g.highlight ? 'bg-violet-600' : 'bg-blue-500'}`}>{i + 1}</span>
+                    <span className="text-[9px] font-mono text-slate-400 whitespace-nowrap">{g.art}</span>
+                  </div>
+                  <div>
+                    <p className={`text-xs font-semibold mb-0.5 ${g.highlight ? 'text-violet-700' : 'text-slate-700'}`}>{g.short}</p>
+                    <p className="text-[10px] text-slate-400 mb-0.5 font-medium">{g.name}</p>
+                    <p className="text-xs text-slate-500 leading-relaxed">{g.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {ARTICLES.map((a) => (
             <ArticleCard key={a.id} article={a} />
           ))}
+
+          {/* Bias-Typen */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <p className="text-sm font-semibold text-slate-800">KI-Bias — 3 Typen, die die DSGVO berühren</p>
+              <p className="text-xs text-slate-500 mt-0.5">Verzerrungen in KI-Systemen sind nicht nur ein technisches Problem — sie verstoßen oft gegen Art. 5 lit. d (Richtigkeit) und Art. 22 DSGVO</p>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {BIAS_TYPES.map((b) => (
+                <div key={b.type} className={`px-5 py-4 border-l-4 ${b.color}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">{b.icon}</span>
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${b.badge}`}>{b.type}</span>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed">{b.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

@@ -194,6 +194,117 @@ const ART50_DUTIES = [
   { title: 'Wasserzeichen (Art. 50 Abs. 2)', desc: 'Ausgaben des KI-Systems müssen in einem maschinenlesbaren Format gekennzeichnet und als künstlich erzeugt oder manipuliert erkennbar sein.' },
 ]
 
+const BETREIBER_DUTIES = [
+  { num: 1, art: 'Art. 26 Abs. 1', title: 'Zweckgemäßer Einsatz', desc: 'Das KI-System nur gemäß der Gebrauchsanweisung des Anbieters und für den vorgesehenen Zweck einsetzen. Eigenmächtige Zweckerweiterung löst Art. 25 (Rollenübergang) aus.' },
+  { num: 2, art: 'Art. 26 Abs. 2', title: 'Zuständige Person benennen + schulen', desc: 'Eine zuständige natürliche Person benennen, die die menschliche Aufsicht über das KI-System ausübt. Diese Person muss ausreichend KI-Kompetenz (Art. 4) haben und entsprechend geschult sein.' },
+  { num: 3, art: 'Art. 26 Abs. 3', title: 'Menschliche Aufsicht gewährleisten', desc: 'Sicherstellen, dass die im Betrieb eingesetzten natürlichen Personen die Kompetenz haben, das KI-System zu überwachen, Ergebnisse zu interpretieren und ggf. einzugreifen (Art. 14).' },
+  { num: 4, art: 'Art. 26 Abs. 4', title: 'Inputdaten überwachen', desc: 'Die dem System zugeführten Daten auf Relevanz und Repräsentativität prüfen, soweit dies vom Betreiber kontrollierbar ist. Schlechte Inputdaten führen zu schlechten (oder diskriminierenden) Ergebnissen.' },
+  { num: 5, art: 'Art. 26 Abs. 5', title: 'Protokollierung / Logs aufbewahren', desc: 'Die automatisch erzeugten Logs (soweit zugänglich) mindestens 6 Monate aufbewahren. Bei hochriskanten Entscheidungen ist eine längere Aufbewahrungspflicht zu prüfen (Beweissicherung, DSGVO Art. 5 lit. e).' },
+  { num: 6, art: 'Art. 26 Abs. 6', title: 'Schwerwiegende Vorfälle melden', desc: 'Schwerwiegende Vorfälle und Fehlfunktionen dem Anbieter und ggf. der nationalen Marktüberwachungsbehörde (Bundesnetzagentur in Deutschland) melden.' },
+  { num: 7, art: 'Art. 27', title: 'FRIA — Grundrechte-Folgenabschätzung', desc: 'Betreiber von Hochrisiko-KI, die Behörden sind oder Dienstleistungen im öffentlichen Interesse erbringen, müssen vor Inbetriebnahme eine Grundrechte-Folgenabschätzung (Fundamental Rights Impact Assessment) durchführen und veröffentlichen.', highlight: true },
+]
+
+const HUNDERT_TAGE = [
+  {
+    phase: '1',
+    label: 'Sehen',
+    days: 'Tag 1–30',
+    color: 'bg-blue-600',
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
+    text: 'text-blue-700',
+    desc: 'Vollständigen Überblick über den KI-Einsatz im Unternehmen gewinnen',
+    steps: [
+      'KI-Inventar erstellen — alle eingesetzten KI-Systeme erfassen (auch Shadow AI)',
+      'Risikoklassen gemäß Art. 6 + Anhang III vorläufig einordnen',
+      'Anbieter-Betreiber-Verhältnis für jedes System klären',
+      'Bestehende Verträge (AVV, Lizenzverträge) auf KI-Act-Klauseln prüfen',
+      'Erste Stakeholder identifizieren (IT, Recht, HR, Betriebsrat)',
+    ],
+  },
+  {
+    phase: '2',
+    label: 'Strukturieren',
+    days: 'Tag 31–70',
+    color: 'bg-amber-500',
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
+    text: 'text-amber-700',
+    desc: 'Governance-Rahmen aufbauen und Compliance-Lücken schließen',
+    steps: [
+      'KI-Beauftragten formal benennen und Rolle intern kommunizieren',
+      'Governance-Dokumente erstellen: KI-Richtlinie, Nutzungsrichtlinien, Eskalationspfade',
+      'Art. 4-Schulungen für Mitarbeitende planen und starten',
+      'DSFA und FRIA (Art. 27) für Hochrisiko-Systeme anstoßen',
+      'Betriebsrat einbinden (§87 BetrVG) — vor Ausweitung des Einsatzes',
+      'Meldeprozess für KI-Vorfälle etablieren (intern + extern)',
+    ],
+  },
+  {
+    phase: '3',
+    label: 'Wirksam werden',
+    days: 'Tag 71–100',
+    color: 'bg-green-600',
+    bg: 'bg-green-50',
+    border: 'border-green-200',
+    text: 'text-green-700',
+    desc: 'KI-Governance in den Regelbetrieb überführen',
+    steps: [
+      'KI-Register finalisieren und laufend aktualisieren',
+      'Monitoring-Prozesse etablieren: Wer prüft was, wie oft?',
+      'Schulungen abschließen — Dokumentation für Art. 4-Nachweis sichern',
+      'Reporting-Rhythmus mit Geschäftsführung und Betriebsrat festlegen',
+      'Erste Konformitätsprüfung für Hochrisiko-Systeme einleiten',
+      'Quick Wins kommunizieren — KI-Governance als Wettbewerbsvorteil positionieren',
+    ],
+  },
+]
+
+const FALLSTUDIEN = [
+  {
+    id: 'clearview',
+    company: 'Clearview AI',
+    year: '2023',
+    verdict: 'Bußgelder in 5 EU-Ländern (je 20–30 Mio. €)',
+    bg: 'bg-red-50',
+    border: 'border-red-200',
+    badge: 'bg-red-100 text-red-700',
+    problem: 'Clearview AI scrapt öffentlich zugängliche Fotos aus dem Internet (Social Media, Nachrichtenseiten) und erstellt daraus ein biometrisches Datenbank-System, das Gesichter in Echtzeit identifizieren kann.',
+    violations: [
+      'Keine Rechtsgrundlage für biometrische Datenverarbeitung (Art. 9 DSGVO)',
+      'Verletzt Art. 5 EU AI Act: Biometrische Echtzeit-Fernidentifizierung im öffentlichen Raum',
+      'Keine Datenschutzinformation an Betroffene (Art. 13/14 DSGVO)',
+      'Widerspruch gegen Verarbeitung ignoriert (Art. 21 DSGVO)',
+    ],
+    lesson: 'Scraping öffentlicher Daten begründet keine Rechtsgrundlage. "Öffentlich" ≠ "frei verwendbar". Biometrische Systeme unterliegen Art. 9 DSGVO und Art. 5 AI Act.',
+  },
+  {
+    id: 'aircanada',
+    company: 'Air Canada Chatbot',
+    year: '2024',
+    verdict: 'Zivilgericht Kanada: Air Canada haftet für falsche KI-Auskunft',
+    bg: 'bg-orange-50',
+    border: 'border-orange-200',
+    badge: 'bg-orange-100 text-orange-700',
+    problem: 'Ein KI-Chatbot auf der Air Canada Website gab einem Kunden falsche Auskunft über eine Trauerrabatt-Richtlinie. Air Canada argumentierte, der Chatbot sei eine eigenständige "juristische Person" und für seine Aussagen selbst verantwortlich.',
+    violations: [
+      'Betreiber versuchte, Haftung auf den Chatbot selbst abzuwälzen',
+      'Gericht: Ein Unternehmen ist für alle seine Kommunikationskanäle verantwortlich — inkl. KI',
+      'Art. 22 DSGVO (relevant bei Automatisierung) + allgemeines Vertragsrecht',
+    ],
+    lesson: 'Der Betreiber kann die Haftung nicht auf das KI-System oder den Anbieter "auslagern". Was der Chatbot sagt, sagt das Unternehmen. Menschliche Aufsicht und klare Eskalationspfade sind Pflicht.',
+  },
+]
+
+const PARALLELES_RECHT = [
+  { law: 'EU AI Act', applies: 'Jedes KI-System in der EU (unabhängig von Daten)', focus: 'Risikoklassen, Pflichten für Anbieter/Betreiber, CE-Kennzeichnung', color: 'bg-blue-50 border-blue-200 text-blue-700' },
+  { law: 'DSGVO', applies: 'Wenn personenbezogene Daten verarbeitet werden', focus: 'Rechtsgrundlage, Betroffenenrechte, Datenschutz by Design, DSFA', color: 'bg-violet-50 border-violet-200 text-violet-700' },
+  { law: 'ProdHaftG / RL 2024', applies: 'KI als Produkt — bei Schäden durch fehlerhafte KI', focus: 'Schadensersatz ohne Verschuldensnachweis, gilt ab 9. Dez 2026', color: 'bg-orange-50 border-orange-200 text-orange-700' },
+  { law: 'DSA', applies: 'Sehr große Online-Plattformen (>45 Mio. EU-Nutzer)', focus: 'Algorithmische Transparenz, Risikobewertung, Systemaudits', color: 'bg-cyan-50 border-cyan-200 text-cyan-700' },
+  { law: 'BetrVG §87', applies: 'Wenn Betriebsrat vorhanden + KI überwacht Mitarbeitende', focus: 'Mitbestimmungspflicht vor Einführung und Ausweitung', color: 'bg-amber-50 border-amber-200 text-amber-700' },
+  { law: 'UrhG / §44b', applies: 'KI-Training + Verwertung KI-generierter Inhalte', focus: 'TDM-Ausnahme, Opt-Out, Schutzfähigkeit KI-Outputs', color: 'bg-green-50 border-green-200 text-green-700' },
+]
+
 const LIABILITY_TABLE = [
   { situation: 'KI-Fehler durch Designmangel', liable: 'Anbieter' },
   { situation: 'Fehleinsatz durch Betreiber', liable: 'Betreiber' },
@@ -532,14 +643,15 @@ function Art25Checker() {
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function EuAiActPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'roles' | 'copyright' | 'liability'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'roles' | 'copyright' | 'liability' | 'planung'>('overview')
   const [expandedRisk, setExpandedRisk] = useState<number | null>(null)
 
   const tabs: { id: typeof activeTab; label: string }[] = [
     { id: 'overview', label: 'Risikoklassen & Zeitplan' },
     { id: 'roles', label: 'Akteursrollen' },
     { id: 'copyright', label: 'Urheberrecht' },
-    { id: 'liability', label: 'Haftung' },
+    { id: 'liability', label: 'Haftung & Fallstudien' },
+    { id: 'planung', label: '100-Tage-Plan' },
   ]
 
   return (
@@ -792,6 +904,25 @@ export default function EuAiActPage() {
             ))}
           </div>
 
+          {/* Paralleles Recht */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <p className="text-sm font-semibold text-slate-800">Rechtliche Einordnung — AI Act ist nicht allein</p>
+              <p className="text-xs text-slate-500 mt-0.5">Der EU AI Act ist eine EU-Verordnung (nicht Richtlinie) — gilt direkt, ohne nationale Umsetzung. Er gilt parallel zu anderen Rechtsrahmen.</p>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {PARALLELES_RECHT.map((r) => (
+                <div key={r.law} className="flex items-start gap-4 px-5 py-3">
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded border whitespace-nowrap flex-shrink-0 mt-0.5 ${r.color}`}>{r.law}</span>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-700">{r.applies}</p>
+                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{r.focus}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Key question */}
           <div className="bg-white rounded-xl shadow-sm px-5 py-4">
             <p className="text-sm font-semibold text-slate-800 mb-2">Vier Risikoklassen</p>
@@ -827,6 +958,28 @@ export default function EuAiActPage() {
           ))}
 
           <Art25Checker />
+
+          {/* Betreiber 7 Pflichten + FRIA */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <p className="text-sm font-semibold text-slate-800">Art. 26 — Die 7 Betreiberpflichten (Hochrisiko-KI)</p>
+              <p className="text-xs text-slate-500 mt-0.5">Gilt für jeden, der ein Hochrisiko-KI-System in eigener Verantwortung einsetzt — inkl. Art. 27 FRIA</p>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {BETREIBER_DUTIES.map((d) => (
+                <div key={d.num} className={`flex items-start gap-4 px-5 py-3 ${d.highlight ? 'bg-violet-50' : ''}`}>
+                  <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${d.highlight ? 'bg-violet-600' : 'bg-slate-400'}`}>{d.num}</span>
+                    <span className="text-[9px] font-mono text-slate-400 whitespace-nowrap">{d.art}</span>
+                  </div>
+                  <div>
+                    <p className={`text-xs font-semibold mb-0.5 ${d.highlight ? 'text-violet-700' : 'text-slate-700'}`}>{d.title}</p>
+                    <p className="text-xs text-slate-500 leading-relaxed">{d.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -912,10 +1065,98 @@ export default function EuAiActPage() {
             </div>
           </div>
 
+          {/* Fallstudien */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <p className="text-sm font-semibold text-slate-800">Fallstudien — Reale KI-Haftungsfälle</p>
+              <p className="text-xs text-slate-500 mt-0.5">Was passiert, wenn KI-Compliance missachtet wird</p>
+            </div>
+            <div className="divide-y divide-slate-100">
+              {FALLSTUDIEN.map((f) => (
+                <div key={f.id} className={`px-5 py-4 ${f.bg}`}>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${f.badge}`}>{f.year}</span>
+                    <p className="text-sm font-semibold text-slate-800">{f.company}</p>
+                  </div>
+                  <p className="text-xs font-semibold text-slate-700 mb-1">Ergebnis: {f.verdict}</p>
+                  <p className="text-xs text-slate-600 leading-relaxed mb-2">{f.problem}</p>
+                  <ul className="space-y-1 mb-3">
+                    {f.violations.map((v) => (
+                      <li key={v} className="flex items-start gap-2">
+                        <span className="mt-1.5 w-1 h-1 rounded-full bg-red-400 flex-shrink-0" />
+                        <span className="text-xs text-slate-600">{v}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className={`border ${f.border} rounded-lg px-3 py-2`}>
+                    <p className="text-xs font-semibold text-slate-700">Lektion:</p>
+                    <p className="text-xs text-slate-600 leading-relaxed">{f.lesson}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
             <p className="text-xs text-slate-500 leading-relaxed">
               <span className="font-semibold text-slate-600">Hinweis:</span> Haftungsfragen sind Dreistufenmodell Stufe 3 — immer einen Fachanwalt hinzuziehen. Diese Übersicht dient der Orientierung und stellt keine Rechtsberatung dar.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Tab: 100-Tage-Plan */}
+      {activeTab === 'planung' && (
+        <div className="space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-3">
+            <p className="text-xs text-blue-700 leading-relaxed">
+              <span className="font-semibold">Ziel:</span> In 100 Tagen von "wir wissen nicht was wir haben" zu "wir haben Governance und können das nachweisen". Für neu bestellte KI-Beauftragte oder Unternehmen, die gerade erst anfangen.
+            </p>
+          </div>
+
+          {HUNDERT_TAGE.map((phase) => (
+            <div key={phase.phase} className={`rounded-xl border ${phase.border} overflow-hidden`}>
+              <div className={`px-5 py-4 ${phase.bg} flex items-center gap-4`}>
+                <span className={`w-10 h-10 rounded-full ${phase.color} text-white text-lg font-bold flex items-center justify-center flex-shrink-0`}>{phase.phase}</span>
+                <div>
+                  <p className={`text-base font-bold ${phase.text}`}>{phase.label}</p>
+                  <p className="text-xs text-slate-600">{phase.days} — {phase.desc}</p>
+                </div>
+              </div>
+              <div className="bg-white px-5 py-4">
+                <ul className="space-y-2">
+                  {phase.steps.map((step, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className={`mt-0.5 w-5 h-5 rounded-full ${phase.color} text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0`}>{i + 1}</span>
+                      <span className="text-xs text-slate-600 leading-relaxed">{step}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+
+          <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
+            <p className="text-xs font-semibold text-slate-700 mb-2">Nach 100 Tagen sollten Sie haben:</p>
+            <ul className="space-y-1.5">
+              {[
+                'KI-Register (vollständig, aktuell)',
+                'Governance-Dokumentation (KI-Richtlinie, Nutzungsregeln)',
+                'Schulungsnachweis für Art. 4 (Kompetenzpflicht)',
+                'DSFA/FRIA für alle Hochrisiko-Systeme eingeleitet',
+                'Meldeprozess für KI-Vorfälle etabliert',
+                'Betriebsrat eingebunden (falls vorhanden)',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2">
+                  <span className="mt-0.5 w-4 h-4 rounded-full bg-green-500 flex-shrink-0 flex items-center justify-center">
+                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </span>
+                  <span className="text-xs text-slate-600">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
