@@ -22,6 +22,7 @@ import GlossaryPage from './pages/GlossaryPage'
 import PromptLibraryPage from './pages/PromptLibraryPage'
 import DsgvoPage from './pages/DsgvoPage'
 import EuAiActPage from './pages/EuAiActPage'
+import ProjectPlanPage from './pages/ProjectPlanPage'
 import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { useUseCasesStore } from './store/useCasesStore'
@@ -91,6 +92,7 @@ function AppRoutes() {
               <Route path="/prompts" element={<PromptLibraryPage />} />
               <Route path="/dsgvo" element={<DsgvoPage />} />
               <Route path="/eu-ai-act" element={<EuAiActPage />} />
+              <Route path="/project-plan" element={<ProjectPlanPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
               <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
             </Routes>

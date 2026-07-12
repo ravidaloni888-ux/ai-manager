@@ -54,6 +54,7 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/use-cases" icon={<IconList />} label="AI Use Cases" />
           <NavItem to="/risk" icon={<IconAlert />} label="Risk Manager" />
           <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap Generator" />
+          <NavItem to="/project-plan" icon={<IconClipboard />} label="Projektplan-Generator" />
           <NavItem to="/roi" icon={<IconCurrency />} label="ROI Calculator" />
           <NavItem to="/enablement" icon={<IconAcademic />} label="Enablement & Coaching" />
           <NavItem to="/meetings" icon={<IconCalendar />} label="Regular Meetings" />
