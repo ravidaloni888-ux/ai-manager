@@ -141,6 +141,277 @@ const BIAS_TYPES = [
   { type: 'Measurement Bias', icon: '📏', desc: 'Die gewählten Messgrößen oder Labels selbst sind verzerrt. Beispiel: "Kreditwürdigkeit" gemessen an historischen Zahlungsverhalten, das selbst durch ungleichen Zugang zu Finanzprodukten geprägt ist.', color: 'border-violet-200 bg-violet-50', badge: 'bg-violet-100 text-violet-700' },
 ]
 
+// ── Dreistufen Wizard ──────────────────────────────────────────────────────
+
+type DWNodeId = 'q1' | 'q2' | 'q3' | 'q4' | 'q5' | 'q6' | 'r1' | 'r2' | 'r3'
+
+interface DWNode {
+  id: DWNodeId
+  type: 'question' | 'result'
+  text?: string
+  sub?: string
+  hints?: string[]
+  yes?: DWNodeId
+  no?: DWNodeId
+  result?: {
+    stufe: 1 | 2 | 3
+    title: string
+    desc: string
+    action: string
+    color: string
+    bg: string
+    border: string
+    text: string
+  }
+}
+
+const DW_NODES: Record<DWNodeId, DWNode> = {
+  q1: {
+    id: 'q1', type: 'question',
+    text: 'Geht es um eine automatisierte Einzelentscheidung mit rechtlicher oder erheblicher Wirkung?',
+    sub: 'Art. 22 DSGVO — die häufigste Stufe-3-Situation.',
+    hints: [
+      'KI trifft oder prägt eine Entscheidung über eine Person (z.B. Kreditvergabe, Einstellung, Kündigung)',
+      'Auch wenn formal ein Mensch "klickt" — aber de facto nur die KI-Empfehlung übernimmt',
+      'EuGH C-634/21 (SCHUFA): Schon ein Score kann Art. 22 auslösen',
+    ],
+    yes: 'r3', no: 'q2',
+  },
+  q2: {
+    id: 'q2', type: 'question',
+    text: 'Liegt eine behördliche Anfrage vor oder ist eine Aufsichtsbehörde involviert?',
+    sub: 'Datenschutzaufsicht, Bundesnetzagentur oder andere Behörden — nie selbst beantworten.',
+    hints: [
+      'Anfrage oder Bescheid von einer Datenschutzaufsichtsbehörde (z.B. BayLDA, LfDI)',
+      'Anfrage der Bundesnetzagentur als KI-Aufsichtsbehörde nach dem EU AI Act',
+      'Beschwerden von Betroffenen, die formal eingereicht wurden',
+    ],
+    yes: 'r3', no: 'q3',
+  },
+  q3: {
+    id: 'q3', type: 'question',
+    text: 'Handelt es sich um KI im HR-Bereich? (Bewerbungsscreening, Leistungsbewertung, Kündigung)',
+    sub: 'HR-KI kombiniert Art. 22, §26 BDSG und §87 BetrVG — immer Stufe 3.',
+    hints: [
+      'KI analysiert oder bewertet Bewerber, Mitarbeitende oder deren Leistung',
+      'KI-gestützte Entscheidungsvorschläge im Personalmanagement',
+      'Monitoring-Systeme, die Mitarbeitende beobachten',
+    ],
+    yes: 'r3', no: 'q4',
+  },
+  q4: {
+    id: 'q4', type: 'question',
+    text: 'Geht es um einen Drittlandtransfer personenbezogener Daten ohne klare Rechtsgrundlage?',
+    sub: 'Transfer in Länder ohne Angemessenheitsbeschluss (USA, China etc.) ohne SCCs oder andere Grundlage.',
+    hints: [
+      'Daten werden an Server oder Anbieter außerhalb der EU/EWR übermittelt',
+      'Kein gültiger Angemessenheitsbeschluss (z.B. EU-US Data Privacy Framework)',
+      'Keine Standardvertragsklauseln (SCCs) oder andere Garantien vorhanden',
+    ],
+    yes: 'r3', no: 'q5',
+  },
+  q5: {
+    id: 'q5', type: 'question',
+    text: 'Liegt eine rechtliche Grauzone vor oder sind erhebliche / irreversible Konsequenzen möglich?',
+    sub: 'Wenn Unsicherheit besteht — flaggen statt selbst entscheiden.',
+    hints: [
+      'Rollenklärung unklar: Bin ich Anbieter oder Betreiber nach Art. 25 EU AI Act?',
+      'Hochrisiko-Grenzfall: Anhang-III-Tatbestand möglicherweise erfüllt, aber nicht eindeutig',
+      'Konsequenz bei Fehler wäre erheblich (finanziell, reputationsbezogen, für Betroffene)',
+      'Neue Situation ohne klaren Präzedenzfall oder etablierte Praxis',
+    ],
+    yes: 'r2', no: 'q6',
+  },
+  q6: {
+    id: 'q6', type: 'question',
+    text: 'Geht es um AVV-Inhalte oder kommerzielle Nutzung KI-generierter Inhalte (Urheberrecht)?',
+    sub: 'Ob ein AVV nötig ist: Stufe 1. Was konkret drin steht oder was mit dem Output gemacht wird: Stufe 2.',
+    hints: [
+      'Verhandlung von AVV-Klauseln mit Anbietern',
+      'Kommerzielle Nutzung KI-generierter Texte, Bilder oder Code',
+      'Einbindung KI-generierter Inhalte in Produkte oder Veröffentlichungen',
+    ],
+    yes: 'r2', no: 'r1',
+  },
+  r1: {
+    id: 'r1', type: 'result',
+    result: {
+      stufe: 1,
+      title: 'Stufe 1 — KI-Beauftragter entscheidet selbst',
+      desc: 'Die Situation ist klar geregelt, reversibel und ohne erhebliche Konsequenzen. Sie können selbst entscheiden — dokumentieren Sie Ihre Entscheidung und die herangezogenen Quellen.',
+      action: 'Selbst entscheiden · Offizielle Ressourcen nutzen (Bundesnetzagentur, EU-Checklisten) · Entscheidung dokumentieren',
+      color: 'bg-green-500', bg: 'bg-green-50', border: 'border-green-300', text: 'text-green-700',
+    },
+  },
+  r2: {
+    id: 'r2', type: 'result',
+    result: {
+      stufe: 2,
+      title: 'Stufe 2 — KI-Beauftragter flaggt, DSB/Anwalt entscheidet',
+      desc: 'Sie haben die richtige Frage gestellt — das ist die Aufgabe des KI-Beauftragten. Die Entscheidung selbst liegt beim Datenschutzbeauftragten oder Fachanwalt. Bereiten Sie den Sachverhalt auf und übergeben Sie.',
+      action: 'Sachverhalt dokumentieren · DSB informieren · Ggf. externen Datenschutzanwalt einschalten · Nicht selbst entscheiden',
+      color: 'bg-amber-400', bg: 'bg-amber-50', border: 'border-amber-300', text: 'text-amber-700',
+    },
+  },
+  r3: {
+    id: 'r3', type: 'result',
+    result: {
+      stufe: 3,
+      title: 'Stufe 3 — Immer DSB/Anwalt — ohne Ausnahme',
+      desc: 'Dieser Fall hat rechtliche, irreversible oder behördliche Relevanz. Keine Selbstentscheidung — auch nicht auf Druck. Der KI-Beauftragte flaggt und eskaliert, entscheidet aber nicht.',
+      action: 'Sofort eskalieren · DSB und ggf. Fachanwalt einschalten · Vorgang dokumentieren · Bis zur Klärung: Einsatz ggf. pausieren',
+      color: 'bg-red-500', bg: 'bg-red-50', border: 'border-red-300', text: 'text-red-700',
+    },
+  },
+}
+
+const DW_QUESTION_ORDER: DWNodeId[] = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6']
+
+function DreistufenWizard() {
+  const [answers, setAnswers] = useState<Partial<Record<DWNodeId, boolean>>>({})
+  const [currentNode, setCurrentNode] = useState<DWNodeId>('q1')
+  const [done, setDone] = useState(false)
+  const [resultId, setResultId] = useState<DWNodeId | null>(null)
+
+  const answer = (nodeId: DWNodeId, yes: boolean) => {
+    const node = DW_NODES[nodeId]
+    setAnswers((prev) => ({ ...prev, [nodeId]: yes }))
+    const next = yes ? node.yes! : node.no!
+    const nextNode = DW_NODES[next]
+    if (nextNode.type === 'result') {
+      setResultId(next)
+      setDone(true)
+    } else {
+      setCurrentNode(next as DWNodeId)
+    }
+  }
+
+  const reset = () => {
+    setAnswers({})
+    setCurrentNode('q1')
+    setDone(false)
+    setResultId(null)
+  }
+
+  const answeredQuestions = DW_QUESTION_ORDER.filter((id) => id in answers)
+  const result = resultId ? DW_NODES[resultId].result! : null
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <p className="text-sm font-semibold text-slate-800">Dreistufenmodell-Check — Wer entscheidet?</p>
+          <p className="text-xs text-slate-500 mt-0.5">Beantworte 1–6 Fragen um die richtige Eskalationsstufe zu ermitteln</p>
+        </div>
+        {(Object.keys(answers).length > 0 || done) && (
+          <button onClick={reset} className="text-xs text-slate-400 hover:text-slate-600 underline flex-shrink-0">
+            Neu starten
+          </button>
+        )}
+      </div>
+
+      <div className="px-5 py-4 space-y-4">
+        {/* Progress dots */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {DW_QUESTION_ORDER.map((id, i) => {
+            const answered = id in answers
+            const isCurrent = currentNode === id && !done
+            const ans = answers[id]
+            return (
+              <div key={id} className="flex items-center gap-1.5">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors ${
+                  answered
+                    ? ans ? 'bg-green-500 text-white' : 'bg-slate-400 text-white'
+                    : isCurrent ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 text-slate-400'
+                }`}>
+                  {answered ? (ans ? '✓' : '✗') : i + 1}
+                </div>
+                {i < DW_QUESTION_ORDER.length - 1 && (
+                  <div className={`h-px w-3 ${answered ? 'bg-slate-300' : 'bg-slate-100'}`} />
+                )}
+              </div>
+            )
+          })}
+          {done && result && (
+            <>
+              <div className="h-px w-3 bg-slate-300" />
+              <div className={`w-6 h-6 rounded-full ${result.color} flex items-center justify-center text-white text-[10px] font-bold`}>
+                {result.stufe}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Answered history */}
+        {answeredQuestions.map((id) => {
+          const node = DW_NODES[id]
+          const ans = answers[id]
+          return (
+            <div key={id} className="flex items-start gap-3 py-2 border-b border-slate-50">
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded flex-shrink-0 mt-0.5 ${ans ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+                {ans ? 'Ja' : 'Nein'}
+              </span>
+              <p className="text-xs text-slate-500 leading-relaxed">{node.text}</p>
+            </div>
+          )
+        })}
+
+        {/* Current question */}
+        {!done && (() => {
+          const node = DW_NODES[currentNode]
+          return (
+            <div className="space-y-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-4">
+                <p className="text-sm font-semibold text-slate-800 leading-snug">{node.text}</p>
+                {node.sub && <p className="text-xs text-blue-600 mt-1">{node.sub}</p>}
+                {node.hints && (
+                  <ul className="mt-3 space-y-1">
+                    {node.hints.map((h) => (
+                      <li key={h} className="flex items-start gap-2">
+                        <span className="mt-1.5 w-1 h-1 rounded-full bg-blue-400 flex-shrink-0" />
+                        <span className="text-xs text-slate-600">{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => answer(currentNode, true)}
+                  className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors">
+                  Ja
+                </button>
+                <button onClick={() => answer(currentNode, false)}
+                  className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+                  Nein
+                </button>
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* Result */}
+        {done && result && (
+          <div className={`rounded-xl border ${result.border} ${result.bg} px-5 py-4 space-y-3`}>
+            <div className="flex items-center gap-3">
+              <span className={`w-10 h-10 rounded-full ${result.color} flex items-center justify-center text-white text-base font-bold flex-shrink-0`}>
+                {result.stufe}
+              </span>
+              <p className={`text-base font-bold ${result.text}`}>{result.title}</p>
+            </div>
+            <p className="text-sm text-slate-700 leading-relaxed">{result.desc}</p>
+            <div className="bg-white/70 rounded-lg px-3 py-2">
+              <p className="text-xs font-semibold text-slate-600 mb-0.5">Nächster Schritt:</p>
+              <p className="text-xs text-slate-600 leading-relaxed">{result.action}</p>
+            </div>
+            <p className="text-[10px] text-slate-400">Dieser Check dient der Erstorientierung und ersetzt keine Rechtsberatung.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 function ArticleCard({ article }: { article: Article }) {
@@ -586,6 +857,7 @@ export default function DsgvoPage() {
               Das <span className="font-semibold">Dreistufenmodell</span> beantwortet: Wer entscheidet was — und wann ist ein DSB oder Anwalt nötig? Der KI-Beauftragte ist nicht Alleinentscheider. Stufe 1 = selbst entscheiden, Stufe 2 = flaggen, Stufe 3 = immer eskalieren.
             </p>
           </div>
+          <DreistufenWizard />
           <DreistufenmodellSection />
         </div>
       )}
