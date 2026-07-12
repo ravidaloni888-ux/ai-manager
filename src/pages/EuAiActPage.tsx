@@ -943,6 +943,8 @@ export default function EuAiActPage() {
             </p>
           </div>
 
+          <Art25Checker />
+
           {ACTOR_ROLES.map((r) => (
             <div key={r.role} className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3">
@@ -956,8 +958,6 @@ export default function EuAiActPage() {
               </div>
             </div>
           ))}
-
-          <Art25Checker />
 
           {/* Betreiber 7 Pflichten + FRIA */}
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
