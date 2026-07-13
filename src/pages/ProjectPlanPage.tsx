@@ -114,7 +114,7 @@ function generatePlan(form: FormData, answers: Answers): Phase[] {
     { id: 'p1_risk', text: 'Risikoklasse nach EU AI Act formal einordnen und dokumentieren (Art. 6 + Anhang III)', law: 'Art. 6 EU AI Act', priority: 'high', done: false },
 
     // ── Anbieter-spezifisch ──
-    ...(isAnbieter ? [
+    ...(isAnbieter && isHighRisk ? [
       { id: 'p1_a_qms', text: 'Qualitätsmanagementsystem (QMS) aufbauen (Art. 17) — Verantwortlichkeiten, Prozesse, Ressourcen, Risikobehandlung', law: 'Art. 17 EU AI Act', priority: 'high' as const, done: false },
     ] : []),
     ...(isAnbieter && isHighRisk ? [
@@ -134,7 +134,9 @@ function generatePlan(form: FormData, answers: Answers): Phase[] {
     // ── Betreiber-spezifisch ──
     ...(isBetreiber ? [
       { id: 'p1_b_rolle', text: 'Betreiberpflichten Art. 26 vollständig klären — Nutzung nur wie vom Anbieter vorgesehen, Änderungen am Zweck = neue Anbieterrolle', law: 'Art. 26 EU AI Act', priority: 'high' as const, done: false },
-      { id: 'p1_b_fria', text: 'FRIA (Grundrechte-Folgenabschätzung Art. 27) prüfen — Pflicht für öffentliche Stellen; empfohlen für alle High-Risk-Betreiber', law: 'Art. 27 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
+    ...(isBetreiber && isHighRisk ? [
+      { id: 'p1_b_fria', text: 'FRIA (Grundrechte-Folgenabschätzung Art. 27) prüfen — Pflicht für öffentliche Stellen bei Hochrisiko-KI; empfohlen für alle High-Risk-Betreiber', law: 'Art. 27 EU AI Act', priority: 'high' as const, done: false },
     ] : []),
     ...(isBetreiber && isHighRisk ? [
       { id: 'p1_b_tech', text: 'Technische Dokumentation und EU-Konformitätserklärung vom Anbieter anfordern und prüfen (Art. 13 Abs. 1 lit. b)', law: 'Art. 13 EU AI Act', done: false },
@@ -214,7 +216,9 @@ function generatePlan(form: FormData, answers: Answers): Phase[] {
     // ── Gemeinsam ──
     { id: 'p3_feedback', text: 'Feedback-Kanal für Nutzer einrichten — Meldung von Fehlern und Auffälligkeiten', done: false },
     { id: 'p3_vorfall', text: 'Vorfallsprotokoll anlegen — schwerwiegende Fehler und Beinahe-Vorfälle dokumentieren', done: false },
-    { id: 'p3_meldung', text: 'Meldeprozess einrichten: intern eskalieren → Bundesnetzagentur. Fristen: 2 Tage (krit. Infrastruktur), 10 Tage (Tod), 15 Tage (sonstige). Beinahe-Vorfälle ebenfalls meldepflichtig.', law: 'Art. 73 EU AI Act', priority: 'high' as const, done: false },
+    ...(isHighRisk ? [
+      { id: 'p3_meldung', text: 'Meldeprozess für schwerwiegende Vorfälle einrichten: intern → Bundesnetzagentur. Fristen: 2 Tage (krit. Infrastruktur), 10 Tage (Tod), 15 Tage (sonstige). Beinahe-Vorfälle ebenfalls meldepflichtig.', law: 'Art. 73 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
     ...(commercialOutput ? [
       { id: 'p3_urhg', text: 'Urheberrecht klären: KI-generierte Inhalte kennzeichnen, Schutzfähigkeit prüfen (§44b UrhG)', law: '§44b UrhG', done: false },
     ] : []),
