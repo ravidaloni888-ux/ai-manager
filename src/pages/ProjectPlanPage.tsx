@@ -184,6 +184,150 @@ function getLawUrl(law: string): string | null {
   return null
 }
 
+// ── Risk Detector ──────────────────────────────────────────────────────────
+
+interface RiskDetection {
+  level: RiskLevel
+  reason: string
+  law: string
+  detail?: string
+}
+
+function detectRisk(name: string, description: string): RiskDetection | null {
+  const text = (name + ' ' + description).toLowerCase()
+
+  // Unacceptable Risk (Art. 5) — shown as high risk with warning
+  const unacceptable: { kw: string[]; reason: string; detail: string }[] = [
+    {
+      kw: ['social scoring', 'soziales scoring', 'bürger bewerten', 'sozialkreditsystem'],
+      reason: 'Verdacht: Verbotenes KI-System — Soziales Scoring',
+      detail: 'Soziales Scoring durch staatliche Stellen ist nach EU AI Act verboten.',
+    },
+    {
+      kw: ['emotion erkennen', 'emotion detection', 'emotionserkennung arbeitsplatz', 'gefühle erkennen mitarbeiter', 'gefühle erkennen schüler'],
+      reason: 'Verdacht: Verbotenes KI-System — Emotionserkennung',
+      detail: 'Emotionserkennung am Arbeitsplatz oder in Bildungseinrichtungen ist verboten.',
+    },
+    {
+      kw: ['unterschwellig manipul', 'subliminal'],
+      reason: 'Verdacht: Verbotenes KI-System — Unterschwellige Manipulation',
+      detail: 'Unterschwellige Techniken zur Verhaltensmanipulation sind verboten.',
+    },
+  ]
+
+  for (const cat of unacceptable) {
+    if (cat.kw.some((k) => text.includes(k))) {
+      return { level: 'high', reason: cat.reason, law: 'Art. 5 EU AI Act', detail: cat.detail }
+    }
+  }
+
+  // High Risk — Anhang III
+  const highRisk: { kw: string[]; reason: string; law: string; detail: string }[] = [
+    {
+      kw: ['biometri', 'gesichtserkennung', 'face recognition', 'fingerabdruck', 'iris-scan', 'ganganalyse'],
+      reason: 'Hohes Risiko erkannt: Biometrische Identifizierung',
+      law: 'Anhang III Nr. 1 EU AI Act',
+      detail: 'Biometrische Identifizierung oder Kategorisierung natürlicher Personen ist Hochrisiko-KI.',
+    },
+    {
+      kw: ['krankenhaus', 'radiologie', 'ct-', 'röntgen', 'mrt', 'diagnose', 'patient', 'medizinisch', 'klinik', 'medizinprodukt', 'onkologie', 'pathologie', 'healthcare', 'befund', 'behandlungsplan', 'therapie'],
+      reason: 'Hohes Risiko erkannt: Medizin / Patientenversorgung',
+      law: 'Art. 6 Abs. 1 EU AI Act i.V.m. MDR',
+      detail: 'KI als Sicherheitskomponente in Medizinprodukten oder zur Unterstützung klinischer Entscheidungen ist Hochrisiko. MDR/IVDR-Konformität und ggf. Notified Body erforderlich.',
+    },
+    {
+      kw: ['epa', 'elektronische patientenakte', 'patientendaten'],
+      reason: 'Hohes Risiko erkannt: Verarbeitung von Patientendaten (EPA)',
+      law: 'Art. 6 Abs. 1 EU AI Act i.V.m. MDR',
+      detail: 'KI-Systeme, die auf die Elektronische Patientenakte zugreifen und klinische oder administrative Entscheidungen treffen, gelten als Hochrisiko.',
+    },
+    {
+      kw: ['bewerbung', 'lebenslauf', 'cv ', 'resume', 'recruiting', 'rekrutier', 'personalentscheid', 'kündigung', 'beförderung', 'attrition', 'mitarbeiter screening', 'hr-', 'human resources'],
+      reason: 'Hohes Risiko erkannt: HR / Beschäftigung',
+      law: 'Anhang III Nr. 4 EU AI Act',
+      detail: 'KI für Einstellung, Beförderung, Kündigung oder Überwachung von Beschäftigten ist Hochrisiko. Betriebsrat einbinden (§87 BetrVG), DSFA prüfen (Art. 35 DSGVO).',
+    },
+    {
+      kw: ['kredit', 'kreditwürdig', 'bonität', 'kreditvergabe', 'darlehen', 'finanzier', 'credit scoring', 'credit risk', 'kreditrisik'],
+      reason: 'Hohes Risiko erkannt: Kreditvergabe / Finanzdienstleistungen',
+      law: 'Anhang III Nr. 5 EU AI Act',
+      detail: 'KI zur Beurteilung der Kreditwürdigkeit oder Kreditvergabe ist Hochrisiko. Betrifft auch Scoring-Systeme, die Zugang zu wesentlichen Dienstleistungen beeinflussen.',
+    },
+    {
+      kw: ['betrug', 'fraud', 'betrugserkennung', 'fraud detection', 'zahlungsausfall'],
+      reason: 'Hohes Risiko erkannt: Betrugserkennung im Finanzbereich',
+      law: 'Anhang III Nr. 5 EU AI Act',
+      detail: 'Betrugserkennung mit direkten Auswirkungen auf Personen (Kontosperrung, Ablehnung) ist Hochrisiko-KI.',
+    },
+    {
+      kw: ['sozialleistung', 'bürgergeld', 'hartz', 'sozialhilfe', 'arbeitslosengeld', 'notaufnahme', 'rettung', 'emergency service'],
+      reason: 'Hohes Risiko erkannt: Wesentliche öffentliche Dienstleistungen',
+      law: 'Anhang III Nr. 5 EU AI Act',
+      detail: 'KI bei der Vergabe von Sozialleistungen oder im Notfalleinsatz ist Hochrisiko.',
+    },
+    {
+      kw: ['polizei', 'strafverfolgung', 'kriminalität vorhersage', 'predictive policing', 'verdächtig', 'law enforcement'],
+      reason: 'Hohes Risiko erkannt: Strafverfolgung',
+      law: 'Anhang III Nr. 6 EU AI Act',
+      detail: 'KI in der Strafverfolgung — z.B. zur Vorhersage von Straftaten oder Täterprofilierung — ist Hochrisiko.',
+    },
+    {
+      kw: ['migration', 'asyl', 'visa', 'grenzkon', 'aufenthalts', 'border control'],
+      reason: 'Hohes Risiko erkannt: Migration / Grenzkontrolle',
+      law: 'Anhang III Nr. 7 EU AI Act',
+      detail: 'KI in Migration, Asyl- oder Visaverfahren und Grenzkontrollen ist Hochrisiko.',
+    },
+    {
+      kw: ['gericht', 'urteil', 'rechtsprechung', 'strafmaß', 'richter', 'justiz', 'legal judgment'],
+      reason: 'Hohes Risiko erkannt: Rechtspflege',
+      law: 'Anhang III Nr. 8 EU AI Act',
+      detail: 'KI zur Unterstützung von Richtern oder in der Strafjustiz ist Hochrisiko.',
+    },
+    {
+      kw: ['studienplatzvergabe', 'hochschulzulassung', 'abitur', 'prüfungsauswertung', 'student admission', 'noten automatisch', 'bildungseinrichtung bewertung'],
+      reason: 'Hohes Risiko erkannt: Bildung / Prüfungswesen',
+      law: 'Anhang III Nr. 3 EU AI Act',
+      detail: 'KI zur Zulassung, Bewertung oder Überwachung in Bildungseinrichtungen ist Hochrisiko.',
+    },
+  ]
+
+  for (const cat of highRisk) {
+    if (cat.kw.some((k) => text.includes(k))) {
+      return { level: 'high', reason: cat.reason, law: cat.law, detail: cat.detail }
+    }
+  }
+
+  // Limited Risk (Art. 50)
+  const limitedRisk: { kw: string[]; reason: string; law: string; detail: string }[] = [
+    {
+      kw: ['chatbot', 'chat bot', 'virtueller assistent', 'sprachassistent', 'konversations', 'fragen beantwort', 'ihre fragen', 'dialog-system', 'voice bot'],
+      reason: 'Begrenztes Risiko: Konversations-KI / Chatbot',
+      law: 'Art. 50 Abs. 1 EU AI Act',
+      detail: 'Chatbots und KI-Systeme im Dialog mit Menschen müssen sich als KI kennzeichnen. Nutzer sind vor Interaktionsbeginn zu informieren.',
+    },
+    {
+      kw: ['texte generier', 'text generier', 'inhalte generier', 'content generier', 'zusammenfassung', 'meeting summary', 'protokoll', 'brief erstell', 'gpt', 'llm', 'sprachmodell', 'generative', 'deepfake', 'bild generier', 'video generier'],
+      reason: 'Begrenztes Risiko: Generative KI / Synthesized Content',
+      law: 'Art. 50 Abs. 2 EU AI Act',
+      detail: 'KI-generierte Texte, Bilder oder Videos müssen als synthetisch gekennzeichnet werden (Ausnahme: offensichtlich kreative Werke).',
+    },
+    {
+      kw: ['sentiment', 'stimmungsanalyse', 'kundenbewertung analyse', 'social media analyse', 'review analyse'],
+      reason: 'Begrenztes Risiko: Stimmungsanalyse / NLP',
+      law: 'Art. 50 EU AI Act',
+      detail: 'Reine Analysetools ohne direkte Entscheidungswirkung auf Personen sind in der Regel begrenztes oder minimales Risiko.',
+    },
+  ]
+
+  for (const cat of limitedRisk) {
+    if (cat.kw.some((k) => text.includes(k))) {
+      return { level: 'limited', reason: cat.reason, law: cat.law, detail: cat.detail }
+    }
+  }
+
+  return null
+}
+
 // ── Components ─────────────────────────────────────────────────────────────
 
 function QuestionCard({
@@ -460,32 +604,100 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
             </button>
           </div>
 
-          {qIndex === 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 space-y-3">
-              <div>
-                <p className="text-sm font-semibold text-slate-800">Welche Risikoklasse hat das KI-System?</p>
-                <p className="text-xs text-blue-600 mt-1">Falls noch unklar: EU AI Act Risikoklassen-Check verwenden.</p>
-              </div>
-              <div className="space-y-2">
-                {[
-                  { level: 'high' as RiskLevel, label: 'Hohes Risiko', sub: 'Anhang III — HR, Kredit, Medizin, Bildung, Strafverfolgung etc.', color: 'border-orange-300 bg-orange-50 hover:bg-orange-100' },
-                  { level: 'limited' as RiskLevel, label: 'Begrenztes Risiko', sub: 'Chatbots, KI-generierte Inhalte — Art. 50 Transparenzpflicht', color: 'border-amber-300 bg-amber-50 hover:bg-amber-100' },
-                  { level: 'minimal' as RiskLevel, label: 'Minimales Risiko', sub: 'Spam-Filter, Empfehlungssysteme, interne Tools ohne Personenbezug', color: 'border-green-300 bg-green-50 hover:bg-green-100' },
-                ].map((opt) => (
-                  <button key={opt.level} onClick={() => answerRisk(opt.level)}
-                    className={`w-full flex items-start gap-3 px-4 py-3 border rounded-lg text-left transition-colors ${opt.color}`}>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-slate-800">{opt.label}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{opt.sub}</p>
+          {qIndex === 0 && (() => {
+            const detected = detectRisk(form.name, form.description)
+            const detectedUrl = detected ? getLawUrl(detected.law) : null
+            return (
+              <div className="space-y-3">
+                {/* Auto-detection banner */}
+                {detected && (
+                  <div className={`rounded-xl border px-4 py-3 space-y-2 ${
+                    detected.level === 'high' ? 'bg-orange-50 border-orange-300' :
+                    detected.level === 'limited' ? 'bg-amber-50 border-amber-300' :
+                    'bg-green-50 border-green-300'
+                  }`}>
+                    <div className="flex items-start gap-2">
+                      <span className="text-sm">🔍</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-slate-800">{detected.reason}</p>
+                        {detected.detail && (
+                          <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{detected.detail}</p>
+                        )}
+                        {detectedUrl ? (
+                          <a href={detectedUrl} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 hover:text-blue-800 underline underline-offset-2 mt-1">
+                            {detected.law}
+                            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                          </a>
+                        ) : (
+                          <p className="text-[11px] font-mono text-slate-500 mt-1">{detected.law}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => answerRisk(detected.level)}
+                        className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                          detected.level === 'high' ? 'bg-orange-500 hover:bg-orange-600 text-white' :
+                          detected.level === 'limited' ? 'bg-amber-500 hover:bg-amber-600 text-white' :
+                          'bg-green-600 hover:bg-green-700 text-white'
+                        }`}
+                      >
+                        Übernehmen →
+                      </button>
                     </div>
-                    <svg className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                    </svg>
-                  </button>
-                ))}
+                  </div>
+                )}
+
+                {/* Manual selection */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 space-y-3">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">Welche Risikoklasse hat das KI-System?</p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      {detected ? 'Erkennung oben bestätigen oder manuell korrigieren:' : 'Keine automatische Erkennung — bitte manuell wählen:'}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      {
+                        level: 'high' as RiskLevel,
+                        label: 'Hohes Risiko',
+                        sub: 'Anhang III — HR, Kredit, Medizin, Bildung, Strafverfolgung etc.',
+                        color: detected?.level === 'high'
+                          ? 'border-orange-400 bg-orange-100 ring-2 ring-orange-300'
+                          : 'border-orange-300 bg-orange-50 hover:bg-orange-100',
+                      },
+                      {
+                        level: 'limited' as RiskLevel,
+                        label: 'Begrenztes Risiko',
+                        sub: 'Chatbots, KI-generierte Inhalte — Art. 50 Transparenzpflicht',
+                        color: detected?.level === 'limited'
+                          ? 'border-amber-400 bg-amber-100 ring-2 ring-amber-300'
+                          : 'border-amber-300 bg-amber-50 hover:bg-amber-100',
+                      },
+                      {
+                        level: 'minimal' as RiskLevel,
+                        label: 'Minimales Risiko',
+                        sub: 'Spam-Filter, Empfehlungssysteme, interne Tools ohne Personenbezug',
+                        color: detected?.level === 'minimal'
+                          ? 'border-green-400 bg-green-100 ring-2 ring-green-300'
+                          : 'border-green-300 bg-green-50 hover:bg-green-100',
+                      },
+                    ].map((opt) => (
+                      <button key={opt.level} onClick={() => answerRisk(opt.level)}
+                        className={`w-full flex items-start gap-3 px-4 py-3 border rounded-lg text-left transition-colors ${opt.color}`}>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-slate-800">{opt.label}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">{opt.sub}</p>
+                        </div>
+                        <svg className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            )
+          })()}
 
           {qIndex > 0 && qIndex <= 6 && (() => {
             const q = boolQuestions[qIndex - 1]
