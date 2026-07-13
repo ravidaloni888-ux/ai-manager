@@ -5,6 +5,7 @@ import { useUseCasesStore } from '../store/useCasesStore'
 // ── Types ──────────────────────────────────────────────────────────────────
 
 type RiskLevel = 'high' | 'limited' | 'minimal' | null
+type AkteurRolle = 'anbieter' | 'betreiber' | null
 type Step = 'form' | 'questions' | 'plan'
 
 interface FormData {
@@ -13,13 +14,70 @@ interface FormData {
 }
 
 interface Answers {
+  akteurRolle: AkteurRolle
   riskLevel: RiskLevel
   personalData: boolean | null
   hrContext: boolean | null
-  externalProvider: boolean | null
+  externalProvider: boolean | null  // only relevant for Betreiber
   worksCouncil: boolean | null
   commercialOutput: boolean | null
-  notifiedBody: boolean | null
+  notifiedBody: boolean | null      // only relevant for Anbieter + High Risk
+}
+
+interface BoolQuestion {
+  key: keyof Answers
+  q: string
+  sub?: string
+  yes: string
+  no: string
+}
+
+function getBoolQuestions(answers: Answers): BoolQuestion[] {
+  const qs: BoolQuestion[] = [
+    {
+      key: 'personalData',
+      q: 'Werden personenbezogene Daten verarbeitet?',
+      sub: 'Namen, E-Mails, Mitarbeiterdaten, Kundenprofile, IP-Adressen — alles was einer Person zugeordnet werden kann.',
+      yes: 'Ja, personenbezogene Daten', no: 'Nein, nur anonyme Daten',
+    },
+    {
+      key: 'hrContext',
+      q: 'Wird das System im HR-Kontext eingesetzt?',
+      sub: 'Bewerbungsscreening, Leistungsbewertung, Kündigung, Monitoring von Mitarbeitenden.',
+      yes: 'Ja, HR-Kontext', no: 'Nein',
+    },
+  ]
+  if (answers.akteurRolle === 'betreiber') {
+    qs.push({
+      key: 'externalProvider',
+      q: 'Kommt das KI-System von einem externen Anbieter?',
+      sub: 'Cloud-Dienste (OpenAI, Microsoft Copilot, Google etc.) oder zugekaufte Software mit KI-Komponente.',
+      yes: 'Ja, externer Anbieter', no: 'Nein, Eigenentwicklung durch uns',
+    })
+  }
+  qs.push(
+    {
+      key: 'worksCouncil',
+      q: 'Gibt es einen Betriebsrat im Unternehmen?',
+      sub: '§87 BetrVG: Mitbestimmungspflicht bei technischen Überwachungseinrichtungen.',
+      yes: 'Ja, Betriebsrat vorhanden', no: 'Nein',
+    },
+    {
+      key: 'commercialOutput',
+      q: 'Werden KI-generierte Inhalte kommerziell genutzt oder veröffentlicht?',
+      sub: 'Texte, Bilder, Code oder andere Outputs die in Produkte oder Publikationen einfließen.',
+      yes: 'Ja, Inhalte werden genutzt / veröffentlicht', no: 'Nein, nur interne Nutzung',
+    },
+  )
+  if (answers.akteurRolle === 'anbieter' && answers.riskLevel === 'high') {
+    qs.push({
+      key: 'notifiedBody',
+      q: 'Ist das System biometrisch oder unterliegt es sektoralen Harmonisierungsvorschriften?',
+      sub: 'Biometrische Fernidentifizierung (Anhang III Nr. 1) oder KI als Sicherheitskomponente in Produkten unter MDR, Maschinenverordnung o.ä. → dann ist ein externer Notified Body (Anhang VII) Pflicht.',
+      yes: 'Ja — Biometrie oder sektorale Vorschriften', no: 'Nein — Standard Hochrisiko (Anhang VI intern)',
+    })
+  }
+  return qs
 }
 
 interface TodoItem {
@@ -44,25 +102,51 @@ interface Phase {
 // ── Plan Generator ─────────────────────────────────────────────────────────
 
 function generatePlan(form: FormData, answers: Answers): Phase[] {
-  const { riskLevel, personalData, hrContext, externalProvider, worksCouncil, commercialOutput, notifiedBody } = answers
+  const { akteurRolle, riskLevel, personalData, hrContext, externalProvider, worksCouncil, commercialOutput, notifiedBody } = answers
   const isHighRisk = riskLevel === 'high'
   const isLimited = riskLevel === 'limited'
+  const isAnbieter = akteurRolle === 'anbieter'
+  const isBetreiber = akteurRolle === 'betreiber'
+
+  // ── Phase 1: Rechtliche & Compliance-Prüfung ──────────────────────────────
 
   const phase1: TodoItem[] = [
-    { id: 'p1_risk', text: `Risikoklasse nach EU AI Act formal einordnen (Art. 6 + Anhang III)`, law: 'EU AI Act Art. 6', priority: 'high' as const, done: false },
-    { id: 'p1_role', text: 'Rolle klären: Sind wir Anbieter oder Betreiber? (Art. 3 Nr. 3/4 EU AI Act)', law: 'Art. 3 EU AI Act', priority: 'high' as const, done: false },
+    { id: 'p1_risk', text: 'Risikoklasse nach EU AI Act formal einordnen und dokumentieren (Art. 6 + Anhang III)', law: 'Art. 6 EU AI Act', priority: 'high', done: false },
+
+    // ── Anbieter-spezifisch ──
+    ...(isAnbieter ? [
+      { id: 'p1_a_qms', text: 'Qualitätsmanagementsystem (QMS) aufbauen (Art. 17) — Verantwortlichkeiten, Prozesse, Ressourcen, Risikobehandlung', law: 'Art. 17 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
+    ...(isAnbieter && isHighRisk ? [
+      { id: 'p1_a_data', text: 'Datenverwaltungspraktiken festlegen (Art. 10) — Trainings-, Validierungs- und Testdaten, Qualitätskriterien, Bias-Prüfung vor Training', law: 'Art. 10 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_a_techdoku', text: 'Technische Dokumentation nach Anhang IV erstellen (Art. 11) — Systembeschreibung, Architektur, Designentscheidungen, Performance-Metriken', law: 'Art. 11 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_a_transparency', text: 'Transparenzanforderungen ins Design einbauen (Art. 13) — Betreiber muss System interpretieren und korrekt einsetzen können', law: 'Art. 13 EU AI Act', done: false },
+      { id: 'p1_a_oversight', text: 'Menschliche Aufsicht ins System einbauen (Art. 14) — Override-Mechanismus, Kill-Switch, Monitoring-Schnittstelle für Betreiber', law: 'Art. 14 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_a_robustness', text: 'Genauigkeit, Robustheit und Cybersicherheit sicherstellen (Art. 15) — Leistungsgrenzen dokumentieren, Angriffsvektoren analysieren', law: 'Art. 15 EU AI Act', done: false },
+      { id: 'p1_a_konf_weg', text: `Konformitätsbewertungsverfahren wählen: ${notifiedBody ? 'Anhang VII — Notified Body erforderlich (Biometrie / sektorale Vorschriften MDR etc.)' : 'Anhang VI — internes Verfahren (Regelfall Hochrisiko)'}`, law: 'Art. 43 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_a_konf', text: 'Konformitätsbewertung durchführen — alle 8 Anforderungen (Art. 9–15, 17) nachweislich erfüllen', law: 'Art. 43 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_a_erklaerung', text: 'EU-Konformitätserklärung (Art. 47) erstellen und von zeichnungsberechtigter Person unterzeichnen lassen', law: 'Art. 47 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
+    ...(isAnbieter && isLimited ? [
+      { id: 'p1_a_art50', text: 'Transparenzpflicht Art. 50 Abs. 1 im System verankern — KI muss sich vor Interaktion als KI kennzeichnen', law: 'Art. 50 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
+
+    // ── Betreiber-spezifisch ──
+    ...(isBetreiber ? [
+      { id: 'p1_b_rolle', text: 'Betreiberpflichten Art. 26 vollständig klären — Nutzung nur wie vom Anbieter vorgesehen, Änderungen am Zweck = neue Anbieterrolle', law: 'Art. 26 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_b_fria', text: 'FRIA (Grundrechte-Folgenabschätzung Art. 27) prüfen — Pflicht für öffentliche Stellen; empfohlen für alle High-Risk-Betreiber', law: 'Art. 27 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
+    ...(isBetreiber && isHighRisk ? [
+      { id: 'p1_b_tech', text: 'Technische Dokumentation und EU-Konformitätserklärung vom Anbieter anfordern und prüfen (Art. 13 Abs. 1 lit. b)', law: 'Art. 13 EU AI Act', done: false },
+    ] : []),
+    ...(isBetreiber && isLimited ? [
+      { id: 'p1_b_art50', text: 'Prüfen ob Anbieter Art. 50-Kennzeichnung (KI als KI erkennbar) korrekt implementiert hat — ggf. nachfordern', law: 'Art. 50 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
+
+    // ── Gemeinsam ──
     ...(personalData ? [
       { id: 'p1_rechtsgrundlage', text: 'Rechtsgrundlage für Datenverarbeitung prüfen (Art. 6 DSGVO / §26 BDSG)', law: 'Art. 6 DSGVO', priority: 'high' as const, done: false },
-      { id: 'p1_dsfa', text: 'DSFA-Pflicht prüfen (Art. 35 DSGVO) — bei systematischer Verarbeitung oder Profiling', law: 'Art. 35 DSGVO', priority: 'high' as const, done: false },
-    ] : []),
-    ...(isHighRisk ? [
-      { id: 'p1_fria', text: 'FRIA (Grundrechte-Folgenabschätzung Art. 27) prüfen und ggf. anstoßen', law: 'Art. 27 EU AI Act', priority: 'high' as const, done: false },
-      { id: 'p1_konformitaet_weg', text: `Konformitätsbewertungsverfahren wählen: ${notifiedBody ? 'Anhang VII (Notified Body erforderlich — Biometrie / sektorale Vorschriften)' : 'Anhang VI (internes Verfahren, Regelfall)'}`, law: 'Art. 43 EU AI Act', priority: 'high' as const, done: false },
-      { id: 'p1_konformitaet', text: 'Konformitätsbewertung durchführen — 8 Anforderungen (Art. 9–15, 17) prüfen, Technische Dokumentation Anhang IV erstellen', law: 'Art. 43 EU AI Act', priority: 'high' as const, done: false },
-      { id: 'p1_konformerklaerung', text: 'EU-Konformitätserklärung (Art. 47) erstellen und von zeichnungsberechtigter Person unterzeichnen lassen', law: 'Art. 47 EU AI Act', done: false },
-    ] : []),
-    ...(isLimited ? [
-      { id: 'p1_art50', text: 'Transparenzpflicht nach Art. 50 prüfen — KI muss sich als KI kennzeichnen', law: 'Art. 50 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_dsfa', text: 'DSFA-Pflicht prüfen (Art. 35 DSGVO) — bei systematischer Verarbeitung, Profiling oder Hochrisiko-KI', law: 'Art. 35 DSGVO', priority: 'high' as const, done: false },
     ] : []),
     ...(hrContext ? [
       { id: 'p1_art22', text: 'Art. 22 DSGVO prüfen — automatisierte Entscheidung mit erheblicher Wirkung?', law: 'Art. 22 DSGVO', priority: 'high' as const, done: false },
@@ -71,91 +155,139 @@ function generatePlan(form: FormData, answers: Answers): Phase[] {
     ...(worksCouncil && !hrContext ? [
       { id: 'p1_betrvg_gen', text: 'Betriebsrat informieren — prüfen ob Mitbestimmungsrecht besteht (§87 BetrVG)', law: '§87 BetrVG', done: false },
     ] : []),
-    { id: 'p1_dreistufen', text: 'Offene Rechtsfragen identifizieren und nach Dreistufenmodell eskalieren (DSB/Anwalt)', done: false },
+    { id: 'p1_dreistufen', text: 'Offene Rechtsfragen nach Dreistufenmodell eskalieren (DSB → Fachanwalt → Behörde)', done: false },
   ]
 
+  // ── Phase 2: Technische & Organisatorische Vorbereitung ───────────────────
+
   const phase2: TodoItem[] = [
-    ...(externalProvider ? [
-      { id: 'p2_avv', text: 'AVV mit KI-Anbieter abschließen (Art. 28 DSGVO) — falls personenbezogene Daten verarbeitet werden', law: 'Art. 28 DSGVO', priority: 'high' as const, done: false },
-      { id: 'p2_vertrag', text: 'Vertrag auf KI-Act-Klauseln prüfen: Anbieter-Pflichten, Haftung, technische Dokumentation', done: false },
-      { id: 'p2_drittland', text: 'Drittlandtransfer prüfen — Serverstandort klären, ggf. SCCs oder DPF nötig', law: 'Art. 46 DSGVO', done: false },
+    // ── Anbieter-spezifisch ──
+    ...(isAnbieter && isHighRisk ? [
+      { id: 'p2_a_logging', text: 'Logging-System aufbauen (Art. 12) — automatische Protokollierung: Eingabe, Ausgabe, Zeitstempel, System-Version. Aufbewahrung mind. 6 Monate. Pseudonymisierung direkte Personenbezüge.', law: 'Art. 12 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p2_a_instructions', text: 'Gebrauchsanweisung für Betreiber erstellen (Art. 13 Abs. 3) — Zweck, Grenzen, Monitoring-Hinweise, Kontaktdaten Anbieter', law: 'Art. 13 EU AI Act', priority: 'high' as const, done: false },
     ] : []),
-    ...(isHighRisk ? [
-      { id: 'p2_doku', text: 'Technische Dokumentation nach Anhang IV erstellen (bei Hochrisiko-KI Pflicht)', law: 'Anhang IV EU AI Act', priority: 'high' as const, done: false },
-      { id: 'p2_logs', text: 'Logging-Infrastruktur einrichten — automatische Protokollierung gemäß Art. 12', law: 'Art. 12 EU AI Act', done: false },
-      { id: 'p2_aufsicht', text: 'Menschliche Aufsicht konzipieren — wer überwacht, wie oft, wie wird eingegriffen? (Art. 14)', law: 'Art. 14 EU AI Act', priority: 'high' as const, done: false },
+
+    // ── Betreiber-spezifisch ──
+    ...(isBetreiber && externalProvider && personalData ? [
+      { id: 'p2_b_avv', text: 'AVV mit KI-Anbieter abschließen (Art. 28 DSGVO) — Pflicht wenn personenbezogene Daten verarbeitet werden', law: 'Art. 28 DSGVO', priority: 'high' as const, done: false },
     ] : []),
-    { id: 'p2_schulung', text: `Schulung für alle Nutzer planen — KI-Kompetenz nach Art. 4 EU AI Act nachweisen`, law: 'Art. 4 EU AI Act', priority: 'high' as const, done: false },
-    { id: 'p2_zustaendig', text: 'Zuständige Person für KI-Aufsicht benennen und schulen (Art. 26 Abs. 2)', law: 'Art. 26 EU AI Act', done: false },
-    { id: 'p2_beschaeftigte_info', text: 'Beschäftigte und ihre Vertretung informieren — Ob und Wie des KI-Einsatzes, bevor die KI in Betrieb geht (Art. 26)', law: 'Art. 26 EU AI Act', priority: 'high' as const, done: false },
+    ...(isBetreiber && externalProvider ? [
+      { id: 'p2_b_vertrag', text: 'Vertrag auf KI-Act-Klauseln prüfen: Anbieter-Pflichten, Haftung, Zugang zu technischer Dokumentation, Vorfallmeldepflichten', done: false },
+      { id: 'p2_b_drittland', text: 'Drittlandtransfer prüfen — Serverstandort klären, ggf. SCCs (Art. 46 DSGVO) oder Data Privacy Framework nötig', law: 'Art. 46 DSGVO', done: false },
+    ] : []),
+    ...(isBetreiber ? [
+      { id: 'p2_b_info', text: 'Beschäftigte und ihre Vertretung informieren — über Ob und Wie des KI-Einsatzes, bevor die KI in Betrieb geht (Art. 26 Abs. 6)', law: 'Art. 26 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p2_b_aufsicht', text: 'Aufsichtsperson benennen (Art. 26 Abs. 2) — wer überwacht den Einsatz, wer darf eingreifen?', law: 'Art. 26 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
+    ...(isBetreiber && isHighRisk ? [
+      { id: 'p2_b_logs', text: 'Logs vom Anbieter-System aufbewahren (Art. 26 Abs. 5) — mind. 6 Monate, Zugriff bei Vorfällen sicherstellen', law: 'Art. 26 EU AI Act', done: false },
+    ] : []),
+
+    // ── Gemeinsam ──
+    { id: 'p2_schulung', text: 'Schulung für alle Nutzer planen — KI-Kompetenz nach Art. 4 EU AI Act nachweisen', law: 'Art. 4 EU AI Act', priority: 'high' as const, done: false },
     { id: 'p2_register', text: 'KI-System ins interne KI-Register aufnehmen', done: false },
-    ...(isHighRisk ? [
-      { id: 'p2_logging', text: 'Logging-Infrastruktur einrichten — automatische Protokollierung (Eingabe, Ausgabe, Zeitstempel, System-Version). Aufbewahrung mind. 6 Monate (Art. 12). Pseudonymisierung direkte Personenbezüge beim Schreiben des Logs.', law: 'Art. 12 EU AI Act', priority: 'high' as const, done: false },
-    ] : []),
     ...(personalData ? [
       { id: 'p2_verzeichnis', text: 'Verzeichnis der Verarbeitungstätigkeiten (VVT) aktualisieren (Art. 30 DSGVO)', law: 'Art. 30 DSGVO', done: false },
     ] : []),
   ]
 
+  // ── Phase 3: Pilotbetrieb ─────────────────────────────────────────────────
+
   const phase3: TodoItem[] = [
     { id: 'p3_scope', text: 'Pilotscope definieren — welche Nutzer, welche Daten, welcher Zeitraum', done: false },
     { id: 'p3_monitoring', text: 'Monitoring-Prozess aufsetzen: Wer prüft Outputs wie häufig?', priority: 'medium' as const, done: false },
-    { id: 'p3_schwellwerte', text: 'Schwellwerte für automatischen Eingriff definieren (z.B.: Klassifikationsgenauigkeit < 90 % → Untersuchung; < 85 % → Deaktivierung; Drift-Indikator > 0,3 → Re-Training-Prüfung)', priority: 'high' as const, done: false },
-    ...(isHighRisk ? [
-      { id: 'p3_inputdaten', text: 'Inputdaten auf Relevanz und Repräsentativität prüfen (Art. 26 Abs. 4)', law: 'Art. 26 EU AI Act', done: false },
-      { id: 'p3_bias', text: 'Bias-Prüfung: Werden Gruppen systematisch benachteiligt? (Historical / Representation / Measurement Bias)', priority: 'high' as const, done: false },
-      { id: 'p3_drift_baseline', text: 'Verhaltens-Baseline dokumentieren — Ausgangszustand des Systems für spätere Drift-Erkennung festhalten (Datendrift, Konzeptdrift, Lerndrift)', done: false },
+    { id: 'p3_schwellwerte', text: 'Schwellwerte definieren: Klassifikationsgenauigkeit < 90 % → Untersuchung; < 85 % → Deaktivierung; Drift > 0,3 → Re-Training-Prüfung', priority: 'high' as const, done: false },
+
+    // ── Anbieter-spezifisch ──
+    ...(isAnbieter && isHighRisk ? [
+      { id: 'p3_a_bias', text: 'Bias-Prüfung der Trainingsdaten (Art. 10 Abs. 2) — Historical Bias, Representation Bias, Measurement Bias', law: 'Art. 10 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p3_a_pmm_plan', text: 'Post-Market-Monitoring-Plan (Art. 72) entwickeln — welche Metriken, Erfassungsintervall, Reporting-Empfänger, Eskalationspfade', law: 'Art. 72 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p3_a_drift', text: 'Verhaltens-Baseline dokumentieren — Ausgangszustand für spätere Drift-Erkennung (Datendrift, Konzeptdrift, Lerndrift)', done: false },
     ] : []),
+
+    // ── Betreiber-spezifisch ──
+    ...(isBetreiber && isHighRisk ? [
+      { id: 'p3_b_inputdaten', text: 'Inputdaten auf Relevanz und Repräsentativität prüfen (Art. 26 Abs. 4) — keine ungeeigneten Daten in das System einspeisen', law: 'Art. 26 EU AI Act', done: false },
+      { id: 'p3_b_bias', text: 'Bias bei Inputs und Outputs beobachten — systematische Benachteiligung von Gruppen erkennen und melden', priority: 'high' as const, done: false },
+    ] : []),
+
+    // ── Gemeinsam ──
     { id: 'p3_feedback', text: 'Feedback-Kanal für Nutzer einrichten — Meldung von Fehlern und Auffälligkeiten', done: false },
-    { id: 'p3_vorfall', text: 'Vorfallsprotokoll anlegen — was wird wie dokumentiert bei schwerwiegenden Fehlern und Beinahe-Vorfällen?', done: false },
-    { id: 'p3_meldung_prozess', text: 'Meldeprozess für schwerwiegende Vorfälle einrichten: intern eskalieren, dann Bundesnetzagentur. Fristen: 2 Tage (kritische Infrastruktur), 10 Tage (Tod), 15 Tage (sonstige). Beinahe-Vorfälle sind ebenfalls meldepflichtig.', law: 'Art. 73 EU AI Act', priority: 'high' as const, done: false },
+    { id: 'p3_vorfall', text: 'Vorfallsprotokoll anlegen — schwerwiegende Fehler und Beinahe-Vorfälle dokumentieren', done: false },
+    { id: 'p3_meldung', text: 'Meldeprozess einrichten: intern eskalieren → Bundesnetzagentur. Fristen: 2 Tage (krit. Infrastruktur), 10 Tage (Tod), 15 Tage (sonstige). Beinahe-Vorfälle ebenfalls meldepflichtig.', law: 'Art. 73 EU AI Act', priority: 'high' as const, done: false },
     ...(commercialOutput ? [
-      { id: 'p3_urhg', text: 'Urheberrecht klären: KI-generierte Inhalte kennzeichnen, Schutzfähigkeit prüfen (§2 UrhG, §44b UrhG)', law: '§44b UrhG', done: false },
+      { id: 'p3_urhg', text: 'Urheberrecht klären: KI-generierte Inhalte kennzeichnen, Schutzfähigkeit prüfen (§44b UrhG)', law: '§44b UrhG', done: false },
     ] : []),
   ]
 
+  // ── Phase 4: Rollout & laufender Betrieb ──────────────────────────────────
+
   const phase4: TodoItem[] = [
     { id: 'p4_schulung_abschluss', text: 'Schulungen abschließen und Teilnahme für Art. 4-Nachweis dokumentieren', law: 'Art. 4 EU AI Act', priority: 'high' as const, done: false },
-    ...(isHighRisk ? [
-      { id: 'p4_ce', text: 'CE-Kennzeichnung sicherstellen (bei Hochrisiko-KI Pflicht vor Inverkehrbringen)', law: 'Art. 48 EU AI Act', priority: 'high' as const, done: false },
-      { id: 'p4_eu_db', text: 'Registrierung in der EU-Datenbank für Hochrisiko-KI (Art. 49)', law: 'Art. 49 EU AI Act', done: false },
+
+    // ── Anbieter-spezifisch ──
+    ...(isAnbieter && isHighRisk ? [
+      { id: 'p4_a_ce', text: 'CE-Kennzeichnung anbringen (Art. 48) — Pflicht vor Inverkehrbringen oder Inbetriebnahme', law: 'Art. 48 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p4_a_eu_db', text: 'Hochrisiko-KI in EU-Datenbank registrieren (Art. 49 Abs. 1) — vor Inverkehrbringen', law: 'Art. 49 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p4_a_pmm', text: 'Post-Market-Monitoring-System aktiv betreiben (Art. 72) — Logs sammeln, Drift analysieren, Incidents melden', law: 'Art. 72 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p4_a_logs', text: 'Logs min. 6 Monate aufbewahren (Art. 12) — regelmäßige Prüfung, Aufbewahrungsfristen sicherstellen', law: 'Art. 12 EU AI Act', done: false },
+      { id: 'p4_a_aenderung', text: 'Prozess für wesentliche Änderungen definieren (Art. 43 Abs. 4) — neue Konformitätsbewertung auslösen wenn Systemverhalten sich grundlegend ändert', law: 'Art. 43 EU AI Act', done: false },
     ] : []),
-    { id: 'p4_pmm', text: 'Post-Market-Monitoring-System (Art. 72) etablieren: Sammeln (Logs, Metriken) → Analysieren (Drift, Bias) → Schwellwerte → Reporting (wöchentlich operativ / quartalsweise Trends / jährlich Management) → Eingriff', law: 'Art. 72 EU AI Act', priority: 'high' as const, done: false },
-    { id: 'p4_logs_check', text: 'Logs regelmäßig prüfen — mind. alle 3 Monate. Aufbewahrungsfristen (min. 6 Monate Art. 12) sicherstellen.', law: 'Art. 12 EU AI Act', done: false },
+    ...(isAnbieter ? [
+      { id: 'p4_a_markt', text: 'Marktüberwachungsbehörde auf Anfrage unterstützen — technische Dokumentation, Logs, Zugänge bereitstellen (Art. 74)', law: 'Art. 74 EU AI Act', done: false },
+    ] : []),
+
+    // ── Betreiber-spezifisch ──
+    ...(isBetreiber && isHighRisk ? [
+      { id: 'p4_b_eu_db', text: 'Registrierung in EU-Datenbank als Betreiber prüfen (Art. 49 Abs. 2) — bestimmte Betreiber müssen sich ebenfalls registrieren', law: 'Art. 49 EU AI Act', done: false },
+      { id: 'p4_b_pmm', text: 'PMM-Bericht an Anbieter: Auffälligkeiten, Vorfälle und Systemverhalten strukturiert zurückmelden (Art. 72 Abs. 4)', law: 'Art. 72 EU AI Act', done: false },
+    ] : []),
+    ...(isBetreiber ? [
+      { id: 'p4_b_anbieter_kontakt', text: 'Anbieter bei schwerwiegenden Vorfällen unverzüglich informieren — Anbieter-Meldepflicht wird dadurch ausgelöst (Art. 73)', law: 'Art. 73 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
+
+    // ── Gemeinsam ──
     { id: 'p4_reporting', text: 'Reporting-Rhythmus mit Geschäftsführung festlegen (Quartalsreport KI-Governance)', done: false },
-    { id: 'p4_update', text: 'Prozess für KI-System-Updates definieren — wann ist eine wesentliche Änderung (Art. 43 Abs. 4) erreicht und eine neue Konformitätsbewertung nötig?', law: 'Art. 43 EU AI Act', done: false },
     ...(worksCouncil ? [
       { id: 'p4_br_update', text: 'Betriebsrat über Rollout informieren — laufende Mitbestimmung sicherstellen', law: '§87 BetrVG', done: false },
     ] : []),
-    { id: 'p4_review', text: `Jahresreview einplanen: Use Case "${form.name}" — noch aktuell, noch konform?`, done: false },
+    { id: 'p4_review', text: `Jahresreview: Use Case "${form.name}" — noch aktuell, noch konform, Rolle noch korrekt?`, done: false },
   ]
 
   return [
     {
       id: 'phase1',
       title: 'Phase 1 — Rechtliche & Compliance-Prüfung',
-      subtitle: 'Vor dem Start: Einordnung, Pflichten klären, Eskalationen anstoßen',
+      subtitle: isAnbieter
+        ? 'Anbieter: QMS, Technische Dokumentation, Konformitätsbewertung vorbereiten'
+        : 'Betreiber: Pflichten Art. 26 klären, FRIA, Anbieter-Dokumentation prüfen',
       color: 'bg-blue-600', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700',
       items: phase1,
     },
     {
       id: 'phase2',
       title: 'Phase 2 — Technische & Organisatorische Vorbereitung',
-      subtitle: 'Verträge, Dokumentation, Schulungen, Register — bevor der Pilot startet',
+      subtitle: isAnbieter
+        ? 'Anbieter: Logging, Gebrauchsanweisung, Schulungen — vor Markteinführung'
+        : 'Betreiber: Verträge, Mitarbeiter-Info, Aufsichtsperson — vor Pilot',
       color: 'bg-amber-500', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700',
       items: phase2,
     },
     {
       id: 'phase3',
       title: 'Phase 3 — Pilotbetrieb',
-      subtitle: 'Kontrollierter Einsatz mit Monitoring, Feedback und Fehlerdokumentation',
+      subtitle: isAnbieter
+        ? 'Anbieter: Bias-Prüfung, PMM-Plan, Baseline — im kontrollierten Betrieb'
+        : 'Betreiber: Inputdaten-Kontrolle, Monitoring, Vorfallsmeldung',
       color: 'bg-violet-600', bg: 'bg-violet-50', border: 'border-violet-200', text: 'text-violet-700',
       items: phase3,
     },
     {
       id: 'phase4',
       title: 'Phase 4 — Rollout & laufender Betrieb',
-      subtitle: 'Vollbetrieb, Nachweise sichern, Governance im Regelbetrieb verankern',
+      subtitle: isAnbieter
+        ? 'Anbieter: CE-Kennzeichnung, EU-DB-Registrierung, PMM-System, Marktüberwachung'
+        : 'Betreiber: EU-DB prüfen, Vorfälle melden, PMM-Berichte an Anbieter',
       color: 'bg-green-600', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700',
       items: phase4,
     },
@@ -369,6 +501,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
   const [step, setStep] = useState<Step>('form')
   const [form, setForm] = useState<FormData>({ name: '', description: '' })
   const [answers, setAnswers] = useState<Answers>({
+    akteurRolle: null,
     riskLevel: null,
     personalData: null,
     hrContext: null,
@@ -394,6 +527,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
       riskLevel: euAiActRiskToLevel(uc.euAiActRisk),
       personalData: uc.compliancePersonalData ?? null,
     }))
+    setQIndex(0)
     setStep('questions')
   }, [ucid, useCases])
 
@@ -409,16 +543,22 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
     setStep('questions')
   }
 
+  const answerRolle = (rolle: AkteurRolle) => {
+    setAnswers((a) => ({ ...a, akteurRolle: rolle }))
+    setQIndex(1)
+  }
+
   const answerRisk = (level: RiskLevel) => {
     setAnswers((a) => ({ ...a, riskLevel: level }))
-    setQIndex(1)
+    setQIndex(2)
   }
 
   const answerBool = (key: keyof Answers, val: boolean) => {
     const next = { ...answers, [key]: val }
     setAnswers(next)
-    const maxQ = next.riskLevel === 'high' ? 6 : 5
-    if (qIndex < maxQ) {
+    const bqs = getBoolQuestions(next)
+    const boolIdx = qIndex - 2  // qIndex 0=Rolle, 1=Risiko, 2+=Bool
+    if (boolIdx < bqs.length - 1) {
       setQIndex(qIndex + 1)
     } else {
       const generated = generatePlan(form, next)
@@ -433,16 +573,19 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
   const reset = () => {
     setStep('form')
     setForm({ name: '', description: '' })
-    setAnswers({ riskLevel: null, personalData: null, hrContext: null, externalProvider: null, worksCouncil: null, commercialOutput: null, notifiedBody: null })
+    setAnswers({ akteurRolle: null, riskLevel: null, personalData: null, hrContext: null, externalProvider: null, worksCouncil: null, commercialOutput: null, notifiedBody: null })
     setQIndex(0)
     setPlan(null)
     setChecked({})
+    setNotes({})
+    setShowNote({})
   }
 
   const goBack = () => {
     if (step === 'plan') {
+      const bqs = getBoolQuestions(answers)
       setStep('questions')
-      setQIndex(5)
+      setQIndex(1 + bqs.length)  // last bool question index
     } else if (step === 'questions') {
       if (qIndex === 0) {
         setStep('form')
@@ -452,44 +595,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
     }
   }
 
-  const boolQuestions: { key: keyof Answers; q: string; sub?: string; yes: string; no: string }[] = [
-    {
-      key: 'personalData',
-      q: 'Werden personenbezogene Daten verarbeitet?',
-      sub: 'Namen, E-Mails, Mitarbeiterdaten, Kundenprofile, IP-Adressen — alles was einer Person zugeordnet werden kann.',
-      yes: 'Ja, personenbezogene Daten', no: 'Nein, nur anonyme Daten',
-    },
-    {
-      key: 'hrContext',
-      q: 'Wird das System im HR-Kontext eingesetzt?',
-      sub: 'Bewerbungsscreening, Leistungsbewertung, Kündigung, Monitoring von Mitarbeitenden.',
-      yes: 'Ja, HR-Kontext', no: 'Nein',
-    },
-    {
-      key: 'externalProvider',
-      q: 'Kommt das KI-System von einem externen Anbieter?',
-      sub: 'Cloud-Dienste (OpenAI, Microsoft Copilot, Google etc.) oder zugekaufte Software mit KI-Komponente.',
-      yes: 'Ja, externer Anbieter', no: 'Nein, Eigenentwicklung',
-    },
-    {
-      key: 'worksCouncil',
-      q: 'Gibt es einen Betriebsrat im Unternehmen?',
-      sub: '§87 BetrVG: Mitbestimmungspflicht bei technischen Überwachungseinrichtungen.',
-      yes: 'Ja, Betriebsrat vorhanden', no: 'Nein',
-    },
-    {
-      key: 'commercialOutput',
-      q: 'Werden KI-generierte Inhalte kommerziell genutzt oder veröffentlicht?',
-      sub: 'Texte, Bilder, Code oder andere Outputs die in Produkte oder Publikationen einfließen.',
-      yes: 'Ja, Inhalte werden genutzt / veröffentlicht', no: 'Nein, nur interne Nutzung',
-    },
-    {
-      key: 'notifiedBody',
-      q: 'Ist das System biometrisch oder unterliegt es sektoralen Harmonisierungsvorschriften?',
-      sub: 'Biometrische Fernidentifizierung (Anhang III Nr. 1) oder KI als Sicherheitskomponente in Produkten unter MDR, Maschinenverordnung o.ä. → dann ist ein externer Notified Body (Anhang VII) Pflicht.',
-      yes: 'Ja — Biometrie oder sektorale Vorschriften', no: 'Nein — Standard Hochrisiko (Anhang VI intern)',
-    },
-  ]
+  const boolQuestions = getBoolQuestions(answers)
 
   return (
     <div className="p-6 space-y-6">
@@ -521,7 +627,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
                 disabled={!isClickable}
                 onClick={() => {
                   if (s === 'form') { setStep('form') }
-                  else if (s === 'questions') { setStep('questions'); setQIndex(5) }
+                  else if (s === 'questions') { setStep('questions'); setQIndex(1 + getBoolQuestions(answers).length) }
                 }}
                 className={`flex items-center gap-2 ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
               >
@@ -585,12 +691,12 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
           {/* Progress dots + back */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {Array.from({ length: answers.riskLevel === 'high' ? 7 : 6 }, (_, i) => (
+              {Array.from({ length: 2 + boolQuestions.length }, (_, i) => (
                 <div key={i} className={`w-2 h-2 rounded-full transition-colors ${
                   i < qIndex ? 'bg-green-500' : i === qIndex ? 'bg-blue-600' : 'bg-slate-200'
                 }`} />
               ))}
-              <span className="text-xs text-slate-400 ml-1">Frage {qIndex + 1} von {answers.riskLevel === 'high' ? 7 : 6}</span>
+              <span className="text-xs text-slate-400 ml-1">Frage {qIndex + 1} von {2 + boolQuestions.length}</span>
             </div>
             <button
               type="button"
@@ -604,7 +710,41 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
             </button>
           </div>
 
-          {qIndex === 0 && (() => {
+          {/* Q0: Akteurrolle */}
+          {qIndex === 0 && (
+            <div className="bg-white border border-slate-200 rounded-xl px-5 py-4 space-y-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-800">In welcher Rolle setzt ihr das KI-System ein?</p>
+                <p className="text-xs text-slate-500 mt-1">Das ist die wichtigste Weichenstellung im EU AI Act — Anbieter und Betreiber haben grundlegend verschiedene Pflichten (Art. 3 Nr. 3/4).</p>
+              </div>
+              <div className="space-y-2">
+                <button onClick={() => answerRolle('anbieter')}
+                  className="w-full flex items-start gap-4 px-4 py-4 border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-xl text-left transition-colors group">
+                  <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg flex-shrink-0 mt-0.5">🏭</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-slate-800">Anbieter <span className="text-xs font-normal text-blue-600 ml-1">Art. 3 Nr. 3 EU AI Act</span></p>
+                    <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">Wir <strong>entwickeln</strong> das KI-System selbst und bringen es in Verkehr oder nehmen es in Betrieb — als Produkt oder interne Lösung.</p>
+                    <p className="text-[10px] text-blue-600 mt-1.5 font-medium">Pflichten: QMS · Technische Dokumentation · Konformitätsbewertung · CE-Kennzeichnung · EU-DB-Registrierung</p>
+                  </div>
+                  <svg className="w-4 h-4 text-slate-400 mt-1 flex-shrink-0 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                </button>
+                <button onClick={() => answerRolle('betreiber')}
+                  className="w-full flex items-start gap-4 px-4 py-4 border-2 border-violet-200 bg-violet-50 hover:bg-violet-100 rounded-xl text-left transition-colors group">
+                  <div className="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center text-lg flex-shrink-0 mt-0.5">🏢</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-slate-800">Betreiber <span className="text-xs font-normal text-violet-600 ml-1">Art. 3 Nr. 4 EU AI Act</span></p>
+                    <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">Wir <strong>nutzen</strong> ein KI-System — zugekauft oder eigenentwickelt — unter eigener Verantwortung in unserem Kontext.</p>
+                    <p className="text-[10px] text-violet-600 mt-1.5 font-medium">Pflichten: Art. 26 Nutzungspflichten · FRIA Art. 27 · Menschliche Aufsicht · Beschäftigte informieren · Vorfälle melden</p>
+                  </div>
+                  <svg className="w-4 h-4 text-slate-400 mt-1 flex-shrink-0 group-hover:text-violet-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                </button>
+              </div>
+              <p className="text-[10px] text-slate-400 leading-relaxed">Tipp: Wer ein bestehendes KI-System wesentlich verändert (Zweck oder Funktion), wechselt in die Anbieterrolle.</p>
+            </div>
+          )}
+
+          {/* Q1: Risikoklasse */}
+          {qIndex === 1 && (() => {
             const detected = detectRisk(form.name, form.description)
             const detectedUrl = detected ? getLawUrl(detected.law) : null
             return (
@@ -699,8 +839,9 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
             )
           })()}
 
-          {qIndex > 0 && qIndex <= 6 && (() => {
-            const q = boolQuestions[qIndex - 1]
+          {qIndex >= 2 && (() => {
+            const q = boolQuestions[qIndex - 2]
+            if (!q) return null
             return (
               <QuestionCard
                 question={q.q}
@@ -755,6 +896,9 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
             {[
+              answers.akteurRolle === 'anbieter'
+                ? { label: '🏭 Anbieter (Art. 3 Nr. 3)', color: 'bg-blue-100 text-blue-800 border border-blue-300' }
+                : { label: '🏢 Betreiber (Art. 3 Nr. 4)', color: 'bg-violet-100 text-violet-800 border border-violet-300' },
               { label: answers.riskLevel === 'high' ? 'Hohes Risiko' : answers.riskLevel === 'limited' ? 'Begrenztes Risiko' : 'Minimales Risiko', color: answers.riskLevel === 'high' ? 'bg-orange-100 text-orange-700' : answers.riskLevel === 'limited' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700' },
               ...(answers.personalData ? [{ label: 'Personenbezogene Daten', color: 'bg-violet-100 text-violet-700' }] : []),
               ...(answers.hrContext ? [{ label: 'HR-Kontext', color: 'bg-red-100 text-red-700' }] : []),
