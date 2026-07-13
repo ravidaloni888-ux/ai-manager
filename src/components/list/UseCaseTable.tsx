@@ -89,7 +89,7 @@ export default function UseCaseTable() {
     'businessImpact', 'feasibility', 'strategicFit', 'urgency', 'priorityScore',
     'estimatedCostK', 'expectedBenefitK', 'roi',
     'successMetrics', 'dataRequirements', 'teamCompetencies', 'timeline',
-    'actions',
+    'createdAt', 'actions',
   ]
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(allColumnIds)
   const dragColId = useRef<string | null>(null)
@@ -209,6 +209,20 @@ export default function UseCaseTable() {
     ch.accessor('dataRequirements', { header: 'Data Requirements' }),
     ch.accessor('teamCompetencies', { header: 'Team Competencies' }),
     ch.accessor('timeline', { header: 'Timeline' }),
+    ch.accessor('createdAt', {
+      header: 'Erstellt am',
+      cell: (i) => {
+        const v = i.getValue()
+        if (!v) return null
+        const d = new Date(v)
+        return (
+          <span className="text-slate-500 tabular-nums text-xs whitespace-nowrap">
+            {d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+          </span>
+        )
+      },
+      sortingFn: 'datetime',
+    }),
     ch.display({
       id: 'actions',
       header: '',
