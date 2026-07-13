@@ -19,6 +19,7 @@ interface Answers {
   externalProvider: boolean | null
   worksCouncil: boolean | null
   commercialOutput: boolean | null
+  notifiedBody: boolean | null
 }
 
 interface TodoItem {
@@ -43,7 +44,7 @@ interface Phase {
 // ── Plan Generator ─────────────────────────────────────────────────────────
 
 function generatePlan(form: FormData, answers: Answers): Phase[] {
-  const { riskLevel, personalData, hrContext, externalProvider, worksCouncil, commercialOutput } = answers
+  const { riskLevel, personalData, hrContext, externalProvider, worksCouncil, commercialOutput, notifiedBody } = answers
   const isHighRisk = riskLevel === 'high'
   const isLimited = riskLevel === 'limited'
 
@@ -56,7 +57,9 @@ function generatePlan(form: FormData, answers: Answers): Phase[] {
     ] : []),
     ...(isHighRisk ? [
       { id: 'p1_fria', text: 'FRIA (Grundrechte-Folgenabschätzung Art. 27) prüfen und ggf. anstoßen', law: 'Art. 27 EU AI Act', priority: 'high' as const, done: false },
-      { id: 'p1_konformitaet', text: 'Konformitätsbewertung vorbereiten (Anhang VI / Art. 43)', law: 'Art. 43 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_konformitaet_weg', text: `Konformitätsbewertungsverfahren wählen: ${notifiedBody ? 'Anhang VII (Notified Body erforderlich — Biometrie / sektorale Vorschriften)' : 'Anhang VI (internes Verfahren, Regelfall)'}`, law: 'Art. 43 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_konformitaet', text: 'Konformitätsbewertung durchführen — 8 Anforderungen (Art. 9–15, 17) prüfen, Technische Dokumentation Anhang IV erstellen', law: 'Art. 43 EU AI Act', priority: 'high' as const, done: false },
+      { id: 'p1_konformerklaerung', text: 'EU-Konformitätserklärung (Art. 47) erstellen und von zeichnungsberechtigter Person unterzeichnen lassen', law: 'Art. 47 EU AI Act', done: false },
     ] : []),
     ...(isLimited ? [
       { id: 'p1_art50', text: 'Transparenzpflicht nach Art. 50 prüfen — KI muss sich als KI kennzeichnen', law: 'Art. 50 EU AI Act', priority: 'high' as const, done: false },
@@ -84,21 +87,28 @@ function generatePlan(form: FormData, answers: Answers): Phase[] {
     ] : []),
     { id: 'p2_schulung', text: `Schulung für alle Nutzer planen — KI-Kompetenz nach Art. 4 EU AI Act nachweisen`, law: 'Art. 4 EU AI Act', priority: 'high' as const, done: false },
     { id: 'p2_zustaendig', text: 'Zuständige Person für KI-Aufsicht benennen und schulen (Art. 26 Abs. 2)', law: 'Art. 26 EU AI Act', done: false },
+    { id: 'p2_beschaeftigte_info', text: 'Beschäftigte und ihre Vertretung informieren — Ob und Wie des KI-Einsatzes, bevor die KI in Betrieb geht (Art. 26)', law: 'Art. 26 EU AI Act', priority: 'high' as const, done: false },
     { id: 'p2_register', text: 'KI-System ins interne KI-Register aufnehmen', done: false },
+    ...(isHighRisk ? [
+      { id: 'p2_logging', text: 'Logging-Infrastruktur einrichten — automatische Protokollierung (Eingabe, Ausgabe, Zeitstempel, System-Version). Aufbewahrung mind. 6 Monate (Art. 12). Pseudonymisierung direkte Personenbezüge beim Schreiben des Logs.', law: 'Art. 12 EU AI Act', priority: 'high' as const, done: false },
+    ] : []),
     ...(personalData ? [
       { id: 'p2_verzeichnis', text: 'Verzeichnis der Verarbeitungstätigkeiten (VVT) aktualisieren (Art. 30 DSGVO)', law: 'Art. 30 DSGVO', done: false },
     ] : []),
   ]
 
   const phase3: TodoItem[] = [
-    { id: 'p3_scope', text: 'Pilotscope definieren — welche Nutzer, welche Daten, welche Zeitraum', done: false },
+    { id: 'p3_scope', text: 'Pilotscope definieren — welche Nutzer, welche Daten, welcher Zeitraum', done: false },
     { id: 'p3_monitoring', text: 'Monitoring-Prozess aufsetzen: Wer prüft Outputs wie häufig?', priority: 'medium' as const, done: false },
+    { id: 'p3_schwellwerte', text: 'Schwellwerte für automatischen Eingriff definieren (z.B.: Klassifikationsgenauigkeit < 90 % → Untersuchung; < 85 % → Deaktivierung; Drift-Indikator > 0,3 → Re-Training-Prüfung)', priority: 'high' as const, done: false },
     ...(isHighRisk ? [
       { id: 'p3_inputdaten', text: 'Inputdaten auf Relevanz und Repräsentativität prüfen (Art. 26 Abs. 4)', law: 'Art. 26 EU AI Act', done: false },
       { id: 'p3_bias', text: 'Bias-Prüfung: Werden Gruppen systematisch benachteiligt? (Historical / Representation / Measurement Bias)', priority: 'high' as const, done: false },
+      { id: 'p3_drift_baseline', text: 'Verhaltens-Baseline dokumentieren — Ausgangszustand des Systems für spätere Drift-Erkennung festhalten (Datendrift, Konzeptdrift, Lerndrift)', done: false },
     ] : []),
     { id: 'p3_feedback', text: 'Feedback-Kanal für Nutzer einrichten — Meldung von Fehlern und Auffälligkeiten', done: false },
-    { id: 'p3_vorfall', text: 'Vorfallsprotokoll anlegen — was wird wie dokumentiert bei schwerwiegenden Fehlern?', done: false },
+    { id: 'p3_vorfall', text: 'Vorfallsprotokoll anlegen — was wird wie dokumentiert bei schwerwiegenden Fehlern und Beinahe-Vorfällen?', done: false },
+    { id: 'p3_meldung_prozess', text: 'Meldeprozess für schwerwiegende Vorfälle einrichten: intern eskalieren, dann Bundesnetzagentur. Fristen: 2 Tage (kritische Infrastruktur), 10 Tage (Tod), 15 Tage (sonstige). Beinahe-Vorfälle sind ebenfalls meldepflichtig.', law: 'Art. 73 EU AI Act', priority: 'high' as const, done: false },
     ...(commercialOutput ? [
       { id: 'p3_urhg', text: 'Urheberrecht klären: KI-generierte Inhalte kennzeichnen, Schutzfähigkeit prüfen (§2 UrhG, §44b UrhG)', law: '§44b UrhG', done: false },
     ] : []),
@@ -110,9 +120,10 @@ function generatePlan(form: FormData, answers: Answers): Phase[] {
       { id: 'p4_ce', text: 'CE-Kennzeichnung sicherstellen (bei Hochrisiko-KI Pflicht vor Inverkehrbringen)', law: 'Art. 48 EU AI Act', priority: 'high' as const, done: false },
       { id: 'p4_eu_db', text: 'Registrierung in der EU-Datenbank für Hochrisiko-KI (Art. 49)', law: 'Art. 49 EU AI Act', done: false },
     ] : []),
-    { id: 'p4_logs_check', text: 'Logs regelmäßig prüfen — mind. alle 3 Monate', done: false },
+    { id: 'p4_pmm', text: 'Post-Market-Monitoring-System (Art. 72) etablieren: Sammeln (Logs, Metriken) → Analysieren (Drift, Bias) → Schwellwerte → Reporting (wöchentlich operativ / quartalsweise Trends / jährlich Management) → Eingriff', law: 'Art. 72 EU AI Act', priority: 'high' as const, done: false },
+    { id: 'p4_logs_check', text: 'Logs regelmäßig prüfen — mind. alle 3 Monate. Aufbewahrungsfristen (min. 6 Monate Art. 12) sicherstellen.', law: 'Art. 12 EU AI Act', done: false },
     { id: 'p4_reporting', text: 'Reporting-Rhythmus mit Geschäftsführung festlegen (Quartalsreport KI-Governance)', done: false },
-    { id: 'p4_update', text: 'Prozess für KI-System-Updates definieren — wann ist eine Neuprüfung nötig?', done: false },
+    { id: 'p4_update', text: 'Prozess für KI-System-Updates definieren — wann ist eine wesentliche Änderung (Art. 43 Abs. 4) erreicht und eine neue Konformitätsbewertung nötig?', law: 'Art. 43 EU AI Act', done: false },
     ...(worksCouncil ? [
       { id: 'p4_br_update', text: 'Betriebsrat über Rollout informieren — laufende Mitbestimmung sicherstellen', law: '§87 BetrVG', done: false },
     ] : []),
@@ -198,6 +209,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
     externalProvider: null,
     worksCouncil: null,
     commercialOutput: null,
+    notifiedBody: null,
   })
   const [qIndex, setQIndex] = useState(0)
   const [plan, setPlan] = useState<Phase[] | null>(null)
@@ -237,7 +249,8 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
   const answerBool = (key: keyof Answers, val: boolean) => {
     const next = { ...answers, [key]: val }
     setAnswers(next)
-    if (qIndex < 5) {
+    const maxQ = next.riskLevel === 'high' ? 6 : 5
+    if (qIndex < maxQ) {
       setQIndex(qIndex + 1)
     } else {
       const generated = generatePlan(form, next)
@@ -250,7 +263,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
   const reset = () => {
     setStep('form')
     setForm({ name: '', description: '' })
-    setAnswers({ riskLevel: null, personalData: null, hrContext: null, externalProvider: null, worksCouncil: null, commercialOutput: null })
+    setAnswers({ riskLevel: null, personalData: null, hrContext: null, externalProvider: null, worksCouncil: null, commercialOutput: null, notifiedBody: null })
     setQIndex(0)
     setPlan(null)
     setChecked({})
@@ -299,6 +312,12 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
       q: 'Werden KI-generierte Inhalte kommerziell genutzt oder veröffentlicht?',
       sub: 'Texte, Bilder, Code oder andere Outputs die in Produkte oder Publikationen einfließen.',
       yes: 'Ja, Inhalte werden genutzt / veröffentlicht', no: 'Nein, nur interne Nutzung',
+    },
+    {
+      key: 'notifiedBody',
+      q: 'Ist das System biometrisch oder unterliegt es sektoralen Harmonisierungsvorschriften?',
+      sub: 'Biometrische Fernidentifizierung (Anhang III Nr. 1) oder KI als Sicherheitskomponente in Produkten unter MDR, Maschinenverordnung o.ä. → dann ist ein externer Notified Body (Anhang VII) Pflicht.',
+      yes: 'Ja — Biometrie oder sektorale Vorschriften', no: 'Nein — Standard Hochrisiko (Anhang VI intern)',
     },
   ]
 
@@ -396,12 +415,12 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
           {/* Progress dots + back */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {[0, 1, 2, 3, 4, 5].map((i) => (
+              {Array.from({ length: answers.riskLevel === 'high' ? 7 : 6 }, (_, i) => (
                 <div key={i} className={`w-2 h-2 rounded-full transition-colors ${
                   i < qIndex ? 'bg-green-500' : i === qIndex ? 'bg-blue-600' : 'bg-slate-200'
                 }`} />
               ))}
-              <span className="text-xs text-slate-400 ml-1">Frage {qIndex + 1} von 6</span>
+              <span className="text-xs text-slate-400 ml-1">Frage {qIndex + 1} von {answers.riskLevel === 'high' ? 7 : 6}</span>
             </div>
             <button
               type="button"
@@ -442,7 +461,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
             </div>
           )}
 
-          {qIndex > 0 && qIndex <= 5 && (() => {
+          {qIndex > 0 && qIndex <= 6 && (() => {
             const q = boolQuestions[qIndex - 1]
             return (
               <QuestionCard
@@ -504,6 +523,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
               ...(answers.externalProvider ? [{ label: 'Externer Anbieter', color: 'bg-blue-100 text-blue-700' }] : []),
               ...(answers.worksCouncil ? [{ label: 'Betriebsrat', color: 'bg-slate-100 text-slate-700' }] : []),
               ...(answers.commercialOutput ? [{ label: 'Kommerzielle Outputs', color: 'bg-cyan-100 text-cyan-700' }] : []),
+              ...(answers.notifiedBody ? [{ label: 'Notified Body (Anhang VII)', color: 'bg-orange-100 text-orange-700' }] : []),
             ].map((tag) => (
               <span key={tag.label} className={`text-xs font-semibold px-2.5 py-1 rounded-full ${tag.color}`}>{tag.label}</span>
             ))}

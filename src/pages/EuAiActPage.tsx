@@ -305,6 +305,46 @@ const PARALLELES_RECHT = [
   { law: 'UrhG / §44b', applies: 'KI-Training + Verwertung KI-generierter Inhalte', focus: 'TDM-Ausnahme, Opt-Out, Schutzfähigkeit KI-Outputs', color: 'bg-green-50 border-green-200 text-green-700' },
 ]
 
+// ── Tag 6 · Konformität, Transparenz, Monitoring ───────────────────────────
+
+const KONFORMITAET_SCHRITTE = [
+  { num: 1, title: 'Risikoklasse bestätigen', desc: 'Ist es wirklich Hochrisiko nach Art. 6 + Anhang III?', law: 'Art. 6 + Anhang III' },
+  { num: 2, title: 'Konformitätsbewertungsverfahren wählen', desc: 'Anhang VI (intern, Regelfall) oder Anhang VII (extern, bei Biometrie oder sektoralen Vorschriften wie MDR)?', law: 'Art. 43 Abs. 1+2' },
+  { num: 3, title: 'Prüfung gegen die 8 Anforderungen (Abschnitt 2)', desc: 'Art. 9 Risikomanagement · Art. 10 Daten-Governance · Art. 11 Technische Doku · Art. 12 Logging · Art. 13 Transparenz · Art. 14 Menschliche Aufsicht · Art. 15 Cybersicherheit · Art. 17 Qualitätsmanagement', law: 'Art. 9–17' },
+  { num: 4, title: 'Technische Dokumentation finalisieren', desc: 'Anhang-IV-konform: Systembeschreibung, Architektur, Entwicklungsprozess, Trainingsdaten, Validierung, Testergebnisse', law: 'Anhang IV' },
+  { num: 5, title: '(Nur Anhang VII) Notified Body einbinden', desc: 'QM-Audit, Doku-Prüfung, ggf. System-Tests, Zertifikat-Erteilung. In Deutschland: TÜV Süd, TÜV Rheinland, DEKRA', law: 'Anhang VII', optional: true },
+  { num: 6, title: 'EU-Konformitätserklärung (Art. 47) erstellen und unterzeichnen', desc: 'Anbieter-ID, System-ID, angewandte Normen, Datum, Unterschrift einer zeichnungsberechtigten Person. Rechtlich bindendes Dokument — Grundlage für CE-Kennzeichnung.', law: 'Art. 47' },
+  { num: 7, title: 'CE-Kennzeichnung anbringen + EU-Datenbank-Registrierung', desc: 'Vor Inverkehrbringen. Typische Dauer für ein Hochrisiko-System: 6–18 Monate von der Risikoklassifizierung bis zur Markteinführung.', law: 'Art. 48+49' },
+]
+
+const TRANSPARENZ_PFADE = [
+  { von: 'Anbieter', an: 'Betreiber', pflicht: 'Bedienungsanleitung — sachgerechten Einsatz ermöglichen', frage: 'Was muss darin stehen?', law: 'Art. 13' },
+  { von: 'Betreiber', an: 'Beschäftigte', pflicht: 'Information vor KI-Einsatz — Ob und Wie, bevor die KI läuft', frage: 'Wann muss informiert werden?', law: 'Art. 26' },
+  { von: 'Betreiber', an: 'Betroffene', pflicht: 'Information bei automatisierter Entscheidung', frage: 'Wer ist Adressat?', law: 'Art. 26' },
+  { von: 'Anbieter', an: 'Nutzer (UI)', pflicht: 'KI-Hinweis bei Interaktion', frage: 'Auch bei begrenzt-riskanten?', law: 'Art. 50' },
+  { von: 'Anbieter', an: 'Welt', pflicht: 'Kennzeichnung KI-generierter Inhalte (maschinenlesbar)', frage: 'Was ist KI-generiert?', law: 'Art. 50' },
+]
+
+const PMM_ELEMENTE = [
+  { num: 1, title: 'Sammeln', desc: 'Logs aus dem Betrieb, Performance-Metriken, Bewertungen, Vorfallsmeldungen' },
+  { num: 2, title: 'Analysieren', desc: 'Modell-Drift, Bias-Indikatoren, Genauigkeitsmetriken' },
+  { num: 3, title: 'Schwellwerte', desc: 'Ab welchem Wert wird eingegriffen? Klassifikationsgenauigkeit < 90 % → Untersuchung · < 85 % → automatische Deaktivierung · Drift-Indikator > 0,3 → Re-Training-Prüfung' },
+  { num: 4, title: 'Reporting', desc: 'Operativ wöchentlich · Trends quartalsweise · Management-Review jährlich' },
+  { num: 5, title: 'Eingriff', desc: 'Modell-Update, Systemanpassung, im Extremfall Deaktivierung' },
+]
+
+const MELDEPFLICHT_FRISTEN = [
+  { typ: 'Weitverbreitete Beeinträchtigung oder kritische Infrastruktur', frist: '2 Tage', color: 'bg-red-100 text-red-700 border-red-200' },
+  { typ: 'Tod einer Person', frist: '10 Tage', color: 'bg-orange-100 text-orange-700 border-orange-200' },
+  { typ: 'Sonstige schwerwiegende Vorfälle', frist: '15 Tage', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+]
+
+const DRIFT_TYPEN = [
+  { name: 'Datendrift', desc: 'Eingangsdaten ändern sich — neue Patientengruppen, andere Krankheitsbilder, neue Medikamente', icon: '📊' },
+  { name: 'Konzeptdrift', desc: 'Was als "richtige Antwort" gilt, ändert sich — neue medizinische Leitlinien, aktualisierte Protokolle', icon: '💡' },
+  { name: 'Lerndrift (Behavioral Drift)', desc: 'Das Modell lernt aus Bewertungen, die durch Verzerrungen geprägt sind — "freundlich = richtig". KI-Agenten verändern ihr Verhaltensprofil durch akkumulierte Erfahrung. Kandidat für Art. 3(23) "wesentliche Änderung".', icon: '🔄' },
+]
+
 const LIABILITY_TABLE = [
   { situation: 'KI-Fehler durch Designmangel', liable: 'Anbieter' },
   { situation: 'Fehleinsatz durch Betreiber', liable: 'Betreiber' },
@@ -643,12 +683,13 @@ function Art25Checker() {
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function EuAiActPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'roles' | 'copyright' | 'liability' | 'planung'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'roles' | 'copyright' | 'liability' | 'planung' | 'konformitaet'>('overview')
   const [expandedRisk, setExpandedRisk] = useState<number | null>(null)
 
   const tabs: { id: typeof activeTab; label: string }[] = [
     { id: 'overview', label: 'Risikoklassen & Zeitplan' },
     { id: 'roles', label: 'Akteursrollen' },
+    { id: 'konformitaet', label: 'Konformität & Monitoring' },
     { id: 'copyright', label: 'Urheberrecht' },
     { id: 'liability', label: 'Haftung & Fallstudien' },
     { id: 'planung', label: '100-Tage-Plan' },
@@ -1102,6 +1143,196 @@ export default function EuAiActPage() {
               <span className="font-semibold text-slate-600">Hinweis:</span> Haftungsfragen sind Dreistufenmodell Stufe 3 — immer einen Fachanwalt hinzuziehen. Diese Übersicht dient der Orientierung und stellt keine Rechtsberatung dar.
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Tab: Konformität & Monitoring */}
+      {activeTab === 'konformitaet' && (
+        <div className="space-y-8">
+
+          {/* Konformitätsbewertung 7 Schritte */}
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-800">Konformitätsbewertung — 7 Schritte (Art. 43 + 47)</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Gilt für Hochrisiko-KI-Systeme. Pflicht des <strong>Anbieters</strong> vor Inverkehrbringen. Typische Dauer: 6–18 Monate.</p>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-2">
+              <p className="text-xs text-blue-700"><span className="font-semibold">Wesentliche Änderung (Art. 43 Abs. 4):</span> Bei wesentlicher Änderung muss die Konformitätsbewertung wiederholt werden. Lernende Systeme sind in einer schwierigen Position — jedes Modell-Update aus Nutzerbewertungen kann eine wesentliche Änderung sein. Faustregel: Wenn sich Risikomanagement, Datenbasis, Architektur oder Genauigkeit relevant verändern, ist neu zu bewerten.</p>
+            </div>
+            <div className="space-y-2">
+              {KONFORMITAET_SCHRITTE.map((s) => (
+                <div key={s.num} className={`flex gap-4 bg-white rounded-xl border px-5 py-4 ${s.optional ? 'border-dashed border-slate-300 opacity-80' : 'border-slate-200'}`}>
+                  <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold text-white ${s.optional ? 'bg-slate-400' : 'bg-slate-700'}`}>{s.num}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-semibold text-slate-800">{s.title}</p>
+                      {s.optional && <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-medium">Nur Anhang VII</span>}
+                      <span className="text-[10px] font-mono text-slate-400">{s.law}</span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Anhang VI vs VII */}
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              <div className="bg-green-50 border border-green-200 rounded-xl px-5 py-4">
+                <p className="text-sm font-bold text-green-700">Anhang VI — Die Regel</p>
+                <p className="text-xs text-slate-600 mt-1">Internes Verfahren durch den Anbieter selbst. Gilt für alle Hochrisiko-Systeme nach Anhang III. Art. 43 Abs. 1 + 2 regelt die Zuordnung.</p>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4">
+                <p className="text-sm font-bold text-blue-700">Anhang VII — Die Ausnahme</p>
+                <p className="text-xs text-slate-600 mt-1">Notified Body erforderlich bei Biometrie (Anhang III Nr. 1) oder KI als Sicherheitskomponente in Produkten unter sektoralen Harmonisierungsvorschriften (MDR, Maschinenverordnung u.a.).</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Transparenz Art. 13 */}
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-800">Transparenzpflichten — Art. 13 EU AI Act</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Transparenz ist kein einheitlicher Block — je nach Akteur und Adressat gelten unterschiedliche Pflichten.</p>
+            </div>
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200">
+                    <th className="text-left px-4 py-2.5 font-semibold text-slate-700">Wer informiert wen?</th>
+                    <th className="text-left px-4 py-2.5 font-semibold text-slate-700">Pflicht</th>
+                    <th className="text-left px-4 py-2.5 font-semibold text-slate-700">Rechtsgrundlage</th>
+                    <th className="text-left px-4 py-2.5 font-semibold text-slate-700">Schlüsselfrage</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {TRANSPARENZ_PFADE.map((p, i) => (
+                    <tr key={i} className="hover:bg-slate-50">
+                      <td className="px-4 py-3 font-medium text-slate-700 whitespace-nowrap">{p.von} → {p.an}</td>
+                      <td className="px-4 py-3 text-slate-600">{p.pflicht}</td>
+                      <td className="px-4 py-3 font-mono text-slate-400">{p.law}</td>
+                      <td className="px-4 py-3 text-slate-500 italic">{p.frage}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+              <p className="text-xs text-amber-700"><span className="font-semibold">Art. 26 Informationspflicht Betreiber:</span> Vor dem Einsatz von Hochrisiko-KI müssen Beschäftigte und ihre Vertretung informiert werden — über das <strong>Ob</strong> (KI wird eingesetzt) und das <strong>Wie</strong> (was tut sie konkret). Timing: bevor die KI in Betrieb geht, nicht hinterher. Eigenständige Pflicht — kein Bestandteil der DSGVO oder des BetrVG.</p>
+            </div>
+          </div>
+
+          {/* Logging Art. 12 */}
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-800">Logging & das Black-Box-Problem — Art. 12</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Hochrisiko-KI-Systeme müssen automatisch Logs erzeugen. Der <strong>Anbieter</strong> stellt das Logging-System bereit — der <strong>Betreiber</strong> sorgt für die operative Aufbewahrung (mind. 6 Monate).</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-4">
+                <p className="text-xs font-bold text-green-700 mb-2">Was rekonstruierbar ist (Betreiber)</p>
+                <ul className="space-y-1.5 text-xs text-slate-600">
+                  {['Welcher Input wurde eingegeben', 'Welcher Output wurde ausgegeben', 'Zu welchem Zeitpunkt', 'Von welchem System, welcher Version', 'Welche menschliche Entscheidung folgte daraufhin'].map((i) => (
+                    <li key={i} className="flex items-start gap-2"><span className="text-green-500 mt-0.5">✓</span>{i}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-4">
+                <p className="text-xs font-bold text-red-700 mb-2">Was nicht rekonstruierbar ist (Modell)</p>
+                <ul className="space-y-1.5 text-xs text-slate-600">
+                  {['Warum das Modell genau diesen Output produzierte (interne Gewichte, Attention-Muster)', 'Ob ein anderer Output bei identischem Input möglich gewesen wäre (stochastische Sampling-Entscheidungen)'].map((i) => (
+                    <li key={i} className="flex items-start gap-2"><span className="text-red-400 mt-0.5">✗</span>{i}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl px-5 py-4 space-y-2">
+              <p className="text-xs font-semibold text-slate-700">Spannung: AI Act vs. DSGVO Art. 5 Abs. 1 lit. e</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-blue-50 rounded-lg px-3 py-2.5">
+                  <p className="text-[10px] font-bold text-blue-700 mb-1">AI Act Art. 12</p>
+                  <p className="text-[10px] text-slate-600">Will <strong>lange</strong> Aufbewahrung — mindestens 6 Monate, in der Praxis oft länger</p>
+                </div>
+                <div className="bg-violet-50 rounded-lg px-3 py-2.5">
+                  <p className="text-[10px] font-bold text-violet-700 mb-1">DSGVO Art. 5 Abs. 1 lit. e</p>
+                  <p className="text-[10px] text-slate-600">Will <strong>kurze</strong> Aufbewahrung — Speicherbegrenzung: nicht länger als nötig</p>
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-500 leading-relaxed"><span className="font-semibold">Lösungswege:</span> (1) Pseudonymisierung — direkte Personenbezüge beim Schreiben des Logs ersetzen, Mapping streng zugriffsbeschränkt. (2) Aufbewahrungsstaffeln — pseudonymisierte Logs bis zum Ende der AI-Act-Frist aufbewahren, danach Anonymisierung statt Löschung. (3) Betroffenenrechte dokumentieren — Löschansprüche nach Art. 17 DSGVO bestehen weiter (z.B. durch Widerruf). EDPB + AI Office gemeinsames Papier für 2026 angekündigt.</p>
+            </div>
+          </div>
+
+          {/* Post-Market-Monitoring Art. 72 */}
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-800">Post-Market-Monitoring — Art. 72</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Art. 72 verlangt vom Anbieter ein System zur Beobachtung nach dem Inverkehrbringen. Betreiber liefern die Daten.</p>
+            </div>
+            <div className="grid grid-cols-5 gap-2">
+              {PMM_ELEMENTE.map((e) => (
+                <div key={e.num} className="bg-white border border-slate-200 rounded-xl px-3 py-4 text-center">
+                  <div className="w-8 h-8 rounded-full bg-violet-600 text-white text-sm font-bold flex items-center justify-center mx-auto mb-2">{e.num}</div>
+                  <p className="text-xs font-bold text-slate-800 mb-1">{e.title}</p>
+                  <p className="text-[10px] text-slate-500 leading-relaxed">{e.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-slate-700">Drift-Typen — was überwacht werden muss:</p>
+              <div className="grid grid-cols-3 gap-3">
+                {DRIFT_TYPEN.map((d) => (
+                  <div key={d.name} className="bg-white border border-slate-200 rounded-xl px-4 py-4">
+                    <p className="text-lg mb-1">{d.icon}</p>
+                    <p className="text-xs font-bold text-slate-800 mb-1">{d.name}</p>
+                    <p className="text-[10px] text-slate-500 leading-relaxed">{d.desc}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                <p className="text-xs text-red-700 leading-relaxed"><span className="font-semibold">Achtung Behavioral Drift bei KI-Agenten:</span> Ein Agent verändert sein Verhaltensprofil durch akkumulierte Erfahrung — gespeicherte Interaktionsmuster, neue Werkzeugkombinationen, emergente Strategien. Kein einzelner Änderungsmoment. Es braucht eine dokumentierte Verhaltens-Baseline und definierte Schwellwerte, ab denen eine wesentliche Veränderung nach Art. 3(23) geprüft wird.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Meldepflicht Art. 73 */}
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-800">Meldepflicht bei schwerwiegenden Vorfällen — Art. 73</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Art. 3 Nr. 49 — schwerwiegend ist ein Ereignis, das zu einem der folgenden Punkte führt <em>oder geführt haben könnte</em>. Meldebehörde in Deutschland: <strong>Bundesnetzagentur</strong>.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { num: 1, label: 'Tod / Gesundheit', desc: 'Tod oder schwere Beeinträchtigung der Gesundheit einer Person', color: 'bg-red-600' },
+                { num: 2, label: 'Infrastruktur', desc: 'Schwere und unumkehrbare Beeinträchtigung der Verwaltung kritischer Infrastruktur', color: 'bg-red-600' },
+                { num: 3, label: 'Grundrechtsverletzung', desc: 'Schwerwiegende Verletzung von Grundrechten betroffener Personen', color: 'bg-orange-600' },
+                { num: 4, label: 'Schwere Sach- oder Umweltschäden', desc: 'Erhebliche und unumkehrbare Schäden an Eigentum oder der Umwelt', color: 'bg-orange-600' },
+              ].map((e) => (
+                <div key={e.num} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                  <div className={`${e.color} text-white px-4 py-2`}>
+                    <p className="text-xs font-bold">{e.num}. {e.label}</p>
+                  </div>
+                  <p className="px-4 py-3 text-xs text-slate-600">{e.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50 border-b border-slate-200 px-4 py-2.5">
+                <p className="text-xs font-semibold text-slate-700">Meldefristen nach Art. 73 (ab Kenntnisnahme)</p>
+              </div>
+              <table className="w-full text-xs">
+                <tbody className="divide-y divide-slate-100">
+                  {MELDEPFLICHT_FRISTEN.map((f) => (
+                    <tr key={f.typ}>
+                      <td className="px-4 py-3 text-slate-600">{f.typ}</td>
+                      <td className="px-4 py-3"><span className={`font-bold px-2 py-0.5 rounded border ${f.color}`}>{f.frist}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+              <p className="text-xs text-blue-700"><span className="font-semibold">Wichtig — Beinahe-Vorfälle:</span> Die Meldepflicht bezieht sich nicht nur auf tatsächliche Schäden, sondern auch auf Beinahe-Vorfälle, die zu einem schwerwiegenden Ereignis hätten führen können. Die Fristen sind einzuhalten.</p>
+            </div>
+          </div>
+
         </div>
       )}
 
