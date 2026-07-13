@@ -162,6 +162,28 @@ function generatePlan(form: FormData, answers: Answers): Phase[] {
   ]
 }
 
+// ── Law URL helper ─────────────────────────────────────────────────────────
+
+function getLawUrl(law: string): string | null {
+  const l = law.toLowerCase()
+  if (l.includes('eu ai act') || l.includes('anhang')) {
+    return 'https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32024R1689'
+  }
+  if (l.includes('dsgvo')) {
+    return 'https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679'
+  }
+  if (l.includes('bdsg')) {
+    return 'https://www.gesetze-im-internet.de/bdsg_2018/'
+  }
+  if (l.includes('betrvg')) {
+    return 'https://www.gesetze-im-internet.de/betrvg/'
+  }
+  if (l.includes('urhg')) {
+    return 'https://www.gesetze-im-internet.de/urhg/'
+  }
+  return null
+}
+
 // ── Components ─────────────────────────────────────────────────────────────
 
 function QuestionCard({
@@ -214,6 +236,8 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
   const [qIndex, setQIndex] = useState(0)
   const [plan, setPlan] = useState<Phase[] | null>(null)
   const [checked, setChecked] = useState<Record<string, boolean>>({})
+  const [notes, setNotes] = useState<Record<string, string>>({})
+  const [showNote, setShowNote] = useState<Record<string, boolean>>({})
 
   // Pre-fill from ucid prop
   useEffect(() => {
@@ -256,6 +280,8 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
       const generated = generatePlan(form, next)
       setPlan(generated)
       setChecked({})
+      setNotes({})
+      setShowNote({})
       setStep('plan')
     }
   }
@@ -547,31 +573,85 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
                   </span>
                 </div>
                 <div className="bg-white divide-y divide-slate-50">
-                  {phase.items.map((item) => (
-                    <label key={item.id} onClick={() => toggleItem(item.id)}
-                      className="flex items-start gap-3 px-5 py-3 cursor-pointer hover:bg-slate-50 transition-colors group">
-                      <div className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
-                        checked[item.id] ? 'bg-green-500 border-green-500' : 'border-slate-300 group-hover:border-green-400'
-                      }`}>
-                        {checked[item.id] && (
-                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                          </svg>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-xs leading-relaxed ${checked[item.id] ? 'line-through text-slate-400' : 'text-slate-700'}`}>
-                          {item.text}
-                          {item.priority === 'high' && !checked[item.id] && (
-                            <span className="ml-2 text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600 no-underline" style={{ textDecoration: 'none' }}>PRIO</span>
+                  {phase.items.map((item) => {
+                    const lawUrl = item.law ? getLawUrl(item.law) : null
+                    const noteVisible = showNote[item.id]
+                    const noteText = notes[item.id] ?? ''
+                    return (
+                      <div key={item.id} className="px-5 py-3 hover:bg-slate-50 transition-colors group">
+                        <div className="flex items-start gap-3 cursor-pointer" onClick={() => toggleItem(item.id)}>
+                          <div className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
+                            checked[item.id] ? 'bg-green-500 border-green-500' : 'border-slate-300 group-hover:border-green-400'
+                          }`}>
+                            {checked[item.id] && (
+                              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-xs leading-relaxed ${checked[item.id] ? 'line-through text-slate-400' : 'text-slate-700'}`}>
+                              {item.text}
+                              {item.priority === 'high' && !checked[item.id] && (
+                                <span className="ml-2 text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600">PRIO</span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Law link + Begründung toggle */}
+                        <div className="ml-8 mt-1.5 flex items-center gap-3 flex-wrap">
+                          {item.law && (
+                            lawUrl ? (
+                              <a
+                                href={lawUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-[10px] text-blue-500 hover:text-blue-700 font-mono underline underline-offset-2 flex items-center gap-0.5"
+                              >
+                                {item.law}
+                                <svg className="w-2.5 h-2.5 inline" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                              </a>
+                            ) : (
+                              <span className="text-[10px] text-slate-400 font-mono">{item.law}</span>
+                            )
                           )}
-                        </p>
-                        {item.law && (
-                          <p className="text-[10px] text-slate-400 font-mono mt-0.5">{item.law}</p>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setShowNote((p) => ({ ...p, [item.id]: !p[item.id] })) }}
+                            className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
+                              noteText
+                                ? 'border-amber-300 text-amber-600 bg-amber-50 hover:bg-amber-100'
+                                : 'border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300'
+                            }`}
+                          >
+                            {noteText ? '📝 Begründung' : '+ Begründung'}
+                          </button>
+                        </div>
+
+                        {/* Begründung textarea */}
+                        {noteVisible && (
+                          <div className="ml-8 mt-2" onClick={(e) => e.stopPropagation()}>
+                            <textarea
+                              value={noteText}
+                              onChange={(e) => setNotes((p) => ({ ...p, [item.id]: e.target.value }))}
+                              placeholder="Begründung eingeben — z.B. warum diese Anforderung nicht zutrifft oder abgelehnt wurde …"
+                              rows={2}
+                              className="w-full text-xs px-3 py-2 border border-amber-200 bg-amber-50 rounded-lg text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
+                            />
+                          </div>
+                        )}
+
+                        {/* Show saved note when collapsed */}
+                        {!noteVisible && noteText && (
+                          <p className="ml-8 mt-1 text-[10px] text-amber-700 italic bg-amber-50 rounded px-2 py-1">
+                            {noteText}
+                          </p>
                         )}
                       </div>
-                    </label>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )
