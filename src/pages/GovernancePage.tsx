@@ -661,6 +661,41 @@ function AimsTab({
         )
       })}
 
+      {/* ISO Norm-Familie */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+        <p className="text-sm font-semibold text-slate-800 mb-3">Relevante ISO-Normen für KI-Beauftragte</p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-slate-100">
+                <th className="text-left py-2 pr-4 font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Norm</th>
+                <th className="text-left py-2 pr-4 font-semibold text-slate-500 uppercase tracking-wide">Was sie regelt</th>
+                <th className="text-left py-2 font-semibold text-slate-500 uppercase tracking-wide">Funktion für den KIB</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {[
+                { norm: 'ISO/IEC 42001', title: 'AIMS — KI-Managementsystem', fn: 'Kernstandard · EN-Übernahme 2026 (nicht OJEU-gelistet)', highlight: true },
+                { norm: 'ISO/IEC 23894', title: 'KI-Risikomanagement',         fn: 'Ergänzt Klausel 6 · für Risikobeurteilung' },
+                { norm: 'ISO/IEC 42005', title: 'AI System Impact Assessment (2025)', fn: 'Prozessrahmen für Impact Assessment (A.5)' },
+                { norm: 'ISO/IEC 27001', title: 'ISMS — Informationssicherheit', fn: 'HLS-kompatibel · oft schon im Haus' },
+                { norm: 'ISO 9001',      title: 'QMS — Qualitätsmanagement',   fn: 'Integrationsgrundlage · oft schon im Haus' },
+                { norm: 'ISO 13485',     title: 'QMS Medizinprodukte',         fn: 'Relevant für Radiologie-KI / MDR — ergänzt 42001' },
+              ].map((r) => (
+                <tr key={r.norm} className={r.highlight ? 'bg-blue-50' : ''}>
+                  <td className="py-2 pr-4 font-mono font-semibold text-slate-700 whitespace-nowrap">{r.norm}</td>
+                  <td className="py-2 pr-4 text-slate-600">{r.title}</td>
+                  <td className="py-2 text-slate-500">{r.fn}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-xs text-slate-400 mt-3 italic">
+          Technische Detail-Normen (ISO/IEC 5338 KI-Lifecycle, ISO/IEC 24029 Robustness) → kann der KIB an Spezialisten delegieren.
+        </p>
+      </div>
+
       {/* SoA reminder */}
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
         <p className="font-semibold mb-1">Statement of Applicability (SoA) — Herzstück des AIMS</p>
