@@ -696,13 +696,86 @@ function AimsTab({
         </p>
       </div>
 
-      {/* SoA reminder */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-        <p className="font-semibold mb-1">Statement of Applicability (SoA) — Herzstück des AIMS</p>
-        <p className="text-xs leading-relaxed">
-          Das SoA dokumentiert für alle Anhang-A-Controls (A.2–A.10), ob sie anwendbar sind (mit Umsetzungsverweis) oder nicht anwendbar (mit Begründung — Pflicht, nicht Kür). Kein SoA = kein ISO 42001. Erster Griff jedes externen Auditors.
-        </p>
-      </div>
+      {/* SoA reminder + example */}
+      <SoaExample />
+    </div>
+  )
+}
+
+function SoaExample() {
+  const [open, setOpen] = useState(false)
+
+  const SOA_ROWS: {
+    control: string
+    title: string
+    applicable: boolean
+    justification: string
+  }[] = [
+    { control: 'A.2',     title: 'Richtlinien im Zusammenhang mit KI',  applicable: true,  justification: 'KI-Nutzungsrichtlinie verabschiedet und intern veröffentlicht (Stand Juli 2026).' },
+    { control: 'A.5',     title: 'Auswirkungsbewertung (Impact Assessment)', applicable: true, justification: 'FRIA für Radiologie-KI (uc-024) und EPA-Agent (uc-023) durchgeführt. Chatbot (uc-022) geplant Q3 2026.' },
+    { control: 'A.6',     title: 'KI-Systemlebenszyklus',               applicable: true,  justification: 'Lifecycle dokumentiert in Use-Case-Steckbriefen. Validierungsdokumentation für uc-022 ausstehend.' },
+    { control: 'A.6.2.5', title: 'Generative KI-Modelle',               applicable: false, justification: 'Krankenhaus St. Ulrich betreibt keine generativen KI-Systeme. Status: 2026, jährlich zu überprüfen.' },
+    { control: 'A.7',     title: 'Daten für KI-Systeme',                applicable: true,  justification: 'Trainingsdaten-Herkunft (Provenance) beim Anbieter Indien angefordert — Rückmeldung ausstehend.' },
+    { control: 'A.8',     title: 'Informationen für interessierte Parteien', applicable: true, justification: 'Patienten-Disclosure für Chatbot implementiert (EU AI Act Art. 50). Systeminformation für Radiologie-KI in Vorbereitung.' },
+    { control: 'A.9',     title: 'Verantwortungsvolle Nutzung',         applicable: true,  justification: 'Ethische Nutzungsleitlinien im KI-Governance-Dokument verankert.' },
+    { control: 'A.10',    title: 'Beziehungen zu Dritten',              applicable: true,  justification: 'Anbietervertrag Radiologie-KI (Indien) mit MDR-Konformitätsnachweis-Klausel versehen.' },
+  ]
+
+  return (
+    <div className="border border-amber-200 rounded-xl overflow-hidden">
+      {/* Header — always visible */}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between bg-amber-50 px-4 py-3 text-left"
+      >
+        <div>
+          <p className="text-sm font-semibold text-amber-800">Statement of Applicability (SoA) — Herzstück des AIMS</p>
+          <p className="text-xs text-amber-700 mt-0.5">
+            Kein SoA = kein ISO 42001 · Erster Griff jedes externen Auditors
+          </p>
+        </div>
+        <span className="text-amber-600 text-sm font-medium shrink-0 ml-4">
+          {open ? '▲ Beispiel schließen' : '▼ Beispiel anzeigen'}
+        </span>
+      </button>
+
+      {/* Expandable SoA example table */}
+      {open && (
+        <div className="bg-white px-4 py-3">
+          <p className="text-xs text-slate-500 mb-3">
+            Beispiel-SoA · Krankenhaus St. Ulrich · Stand Juli 2026 — alle Anhang-A-Controls müssen bewertet sein
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="text-left px-3 py-2 font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Control</th>
+                  <th className="text-left px-3 py-2 font-semibold text-slate-500 uppercase tracking-wide">Titel</th>
+                  <th className="text-center px-3 py-2 font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Anwendbar</th>
+                  <th className="text-left px-3 py-2 font-semibold text-slate-500 uppercase tracking-wide">Begründung / Umsetzungsnachweis</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {SOA_ROWS.map((r) => (
+                  <tr key={r.control} className={r.applicable ? '' : 'bg-red-50'}>
+                    <td className="px-3 py-2 font-mono text-slate-600 whitespace-nowrap">{r.control}</td>
+                    <td className="px-3 py-2 text-slate-700">{r.title}</td>
+                    <td className="px-3 py-2 text-center">
+                      {r.applicable
+                        ? <span className="text-green-600 font-semibold">✓ Ja</span>
+                        : <span className="text-red-500 font-semibold">✗ Nein</span>}
+                    </td>
+                    <td className="px-3 py-2 text-slate-500 leading-relaxed">{r.justification}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-slate-400 mt-2 italic">
+            „Nicht anwendbar" muss immer begründet werden — die Begründungstiefe zeigt den Reifegrad der Organisation.
+          </p>
+        </div>
+      )}
     </div>
   )
 }
