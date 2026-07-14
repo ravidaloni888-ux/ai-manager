@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useRiskStore } from '../store/riskStore'
 import { useUseCasesStore } from '../store/useCasesStore'
@@ -64,7 +64,8 @@ const BLANK_RISK: Omit<AIRisk, 'id'> = {
 }
 
 export default function RiskPage() {
-  const { risks, add, update, remove } = useRiskStore()
+  const { risks, init, add, update, remove } = useRiskStore()
+  useEffect(() => { init() }, [init])
   const { useCases } = useUseCasesStore()
   const user = useAuthStore((s) => s.user)
   const [tab, setTab] = useState<Tab>('register')
