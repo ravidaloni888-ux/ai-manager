@@ -45,6 +45,11 @@ export const EU_AI_ACT_BG: Record<EuAiActRisk, string> = {
   'Unacceptable Risk': 'bg-red-100 text-red-700',
 }
 
+export interface AimsClause {
+  status: 'not_started' | 'in_progress' | 'done'
+  note: string
+}
+
 export interface GovernanceData {
   richtlinie: {
     zweck: string; daten: string; transparenz: string
@@ -54,6 +59,10 @@ export interface GovernanceData {
   steps: {
     step1: boolean; step2: boolean; step3: boolean; step4: boolean; step5: boolean
     step6: boolean; step7: boolean; step8: boolean; step9: boolean
+  }
+  aims?: {
+    kl4: AimsClause; kl5: AimsClause; kl6: AimsClause; kl7: AimsClause
+    kl8: AimsClause; kl9: AimsClause; kl10: AimsClause
   }
 }
 

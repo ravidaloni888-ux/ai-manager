@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { useGovernanceStore } from '../store/governanceStore'
 import { useUseCasesStore } from '../store/useCasesStore'
 import { useAuthStore } from '../store/authStore'
-import { GovernanceData, AIUseCase, EU_AI_ACT_BG, EuAiActRisk } from '../types'
+import { GovernanceData, AimsClause, AIUseCase, EU_AI_ACT_BG, EuAiActRisk } from '../types'
 
-type Tab = 'steps' | 'richtlinie' | 'roles' | 'checklist'
+type Tab = 'steps' | 'richtlinie' | 'roles' | 'checklist' | 'aims'
 
 const RICHTLINIE_FIELDS: { key: keyof GovernanceData['richtlinie']; title: string; desc: string }[] = [
   { key: 'zweck',                title: 'Purpose & Scope',                desc: 'For what purposes and in which areas may AI be used in the company?' },
@@ -26,6 +26,34 @@ const ROLES: { key: keyof GovernanceData['roles']; title: string; desc: string; 
 ]
 
 const DPIA_URL = 'https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/how-do-we-do-a-dpia/'
+
+type AimsKey = 'kl4' | 'kl5' | 'kl6' | 'kl7' | 'kl8' | 'kl9' | 'kl10'
+
+const AIMS_CLAUSES: {
+  key: AimsKey
+  kl: string
+  title: string
+  desc: string
+  coveredBy?: string
+}[] = [
+  { key: 'kl4',  kl: '4',  title: 'Kontext der Organisation', desc: 'Scope festlegen, KI-Systeme inventarisieren, Stakeholder-Analyse, interne & externe Anforderungen', coveredBy: 'Use Case Liste' },
+  { key: 'kl5',  kl: '5',  title: 'Führung & KI-Politik',     desc: 'Top-Management-Commitment, schriftliche KI-Politik, Rollen & Verantwortlichkeiten. Kl. 5.3 = normativer Anker des KI-Beauftragten', coveredBy: 'AI Policy Tab' },
+  { key: 'kl6',  kl: '6',  title: 'Planung & Impact Assessment', desc: 'Risikobewertung für KI-Systeme, KI-Folgenabschätzung (A.5) für Betroffene, KI-Ziele festlegen' },
+  { key: 'kl7',  kl: '7',  title: 'Kompetenz & Training',     desc: 'KI-Kompetenzen sicherstellen, dokumentierte Nachweise. Deckungsgleich mit EU AI Act Art. 4.', coveredBy: 'Enablement' },
+  { key: 'kl8',  kl: '8',  title: 'Betrieb & KI-Lebenszyklus', desc: 'Datenerfassung → Training → Validierung → Betrieb → Ausmusterung. Anhang-A-Controls operationalisieren.', coveredBy: 'Use Case Steckbriefe' },
+  { key: 'kl9',  kl: '9',  title: 'Monitoring & Audit',       desc: 'Modellleistung überwachen (Drift, Bias), internes Audit (QMB), Managementbewertung. Brücke zu EU AI Act Art. 72.' },
+  { key: 'kl10', kl: '10', title: 'Verbesserung & Vorfälle',  desc: 'Nichtkonformitäten bearbeiten, Vorfallregister führen, Modell-Updates als wesentliche Änderung prüfen (Art. 6/83).' },
+]
+
+const AIMS_DEFAULT: NonNullable<GovernanceData['aims']> = {
+  kl4:  { status: 'not_started', note: '' },
+  kl5:  { status: 'not_started', note: '' },
+  kl6:  { status: 'not_started', note: '' },
+  kl7:  { status: 'not_started', note: '' },
+  kl8:  { status: 'not_started', note: '' },
+  kl9:  { status: 'not_started', note: '' },
+  kl10: { status: 'not_started', note: '' },
+}
 
 const STEPS: { n: number; key: keyof GovernanceData['steps']; title: string; desc: string; details: string[]; link?: { label: string; href: string } }[] = [
   {
@@ -153,6 +181,8 @@ export default function GovernancePage() {
   const stepsCount   = Object.values(local.steps).filter(Boolean).length
   const richtCount   = Object.values(local.richtlinie).filter((v) => v.trim().length > 0).length
   const rolesCount   = Object.values(local.roles).filter((v) => v.trim().length > 0).length
+  const aimsData     = local.aims ?? AIMS_DEFAULT
+  const aimsCount    = Object.values(aimsData).filter((c) => c.status === 'done').length
 
   const handleSave = async () => {
     await save(local)
@@ -161,10 +191,11 @@ export default function GovernancePage() {
   }
 
   const TABS: { id: Tab; label: string; badge: string }[] = [
-    { id: 'steps',     label: '9-Step Planning',        badge: `${stepsCount}/9`   },
-    { id: 'richtlinie',label: 'AI Policy',              badge: `${richtCount}/7`   },
-    { id: 'roles',     label: 'Responsible Parties',    badge: `${rolesCount}/5`   },
+    { id: 'steps',     label: '9-Step Planning',        badge: `${stepsCount}/9`    },
+    { id: 'richtlinie',label: 'AI Policy',              badge: `${richtCount}/7`    },
+    { id: 'roles',     label: 'Responsible Parties',    badge: `${rolesCount}/5`    },
     { id: 'checklist', label: 'Privacy Checklist',      badge: `${useCases.length}` },
+    { id: 'aims',      label: 'ISO 42001 AIMS',         badge: `${aimsCount}/7`     },
   ]
 
   if (loading) return (
@@ -241,6 +272,13 @@ export default function GovernancePage() {
       )}
       {tab === 'checklist' && (
         <ChecklistTab useCases={useCases} navigate={navigate} />
+      )}
+      {tab === 'aims' && (
+        <AimsTab
+          aims={aimsData}
+          onChange={(aims) => setLocal((p) => ({ ...p, aims }))}
+          readonly={!user}
+        />
       )}
     </div>
   )
@@ -503,6 +541,132 @@ function ChecklistTab({ useCases, navigate }: { useCases: AIUseCase[]; navigate:
             })}
           </tbody>
         </table>
+      </div>
+    </div>
+  )
+}
+
+// ─── ISO 42001 AIMS Tab ───────────────────────────────────────────────────────
+function AimsTab({
+  aims,
+  onChange,
+  readonly,
+}: {
+  aims: NonNullable<GovernanceData['aims']>
+  onChange: (aims: NonNullable<GovernanceData['aims']>) => void
+  readonly: boolean
+}) {
+  const doneCount = Object.values(aims).filter((c) => c.status === 'done').length
+  const pct = Math.round((doneCount / 7) * 100)
+
+  const STATUS_LABELS: Record<AimsClause['status'], string> = {
+    not_started: 'Nicht begonnen',
+    in_progress: 'In Arbeit',
+    done: 'Erledigt',
+  }
+  const STATUS_COLORS: Record<AimsClause['status'], string> = {
+    not_started: 'bg-slate-100 text-slate-500',
+    in_progress: 'bg-amber-100 text-amber-700',
+    done: 'bg-green-100 text-green-700',
+  }
+  const STATUS_DOT: Record<AimsClause['status'], string> = {
+    not_started: 'bg-slate-300',
+    in_progress: 'bg-amber-400',
+    done: 'bg-green-500',
+  }
+
+  const update = (key: AimsKey, patch: Partial<AimsClause>) =>
+    onChange({ ...aims, [key]: { ...aims[key], ...patch } })
+
+  return (
+    <div className="space-y-4">
+      {/* Header card */}
+      <div className="bg-white rounded-xl shadow-sm p-5 border border-slate-100">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-base font-semibold text-slate-800">ISO/IEC 42001 · AIMS Readiness</h2>
+            <p className="text-sm text-slate-500 mt-0.5">
+              Artificial Intelligence Management System — Klauseln 4–10 (High-Level Structure)
+            </p>
+          </div>
+          <div className="text-right shrink-0">
+            <p className="text-2xl font-bold text-blue-700">{doneCount}/7</p>
+            <p className="text-xs text-slate-400">Klauseln erledigt</p>
+          </div>
+        </div>
+        <div className="mt-3 w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-blue-500 rounded-full transition-all"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <div className="mt-3 flex gap-2 text-xs text-slate-500 flex-wrap">
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" />Erledigt</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />In Arbeit</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-300 inline-block" />Nicht begonnen</span>
+          <span className="ml-auto italic">ISO 42001 ≠ EU AI Act Konformitätsbewertung — zwei verschiedene Risikosubjekte</span>
+        </div>
+      </div>
+
+      {/* Clause rows */}
+      {AIMS_CLAUSES.map((cl) => {
+        const clause = aims[cl.key]
+        return (
+          <div key={cl.key} className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
+            <div className="flex items-start gap-3">
+              {/* Status dot */}
+              <div className={`mt-1 w-3 h-3 rounded-full shrink-0 ${STATUS_DOT[clause.status]}`} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-mono text-slate-400">Kl. {cl.kl}</span>
+                  <span className="font-semibold text-slate-800 text-sm">{cl.title}</span>
+                  {cl.coveredBy && (
+                    <span className="text-xs bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full">
+                      → {cl.coveredBy}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{cl.desc}</p>
+                {clause.note && (
+                  <p className="text-xs text-slate-600 mt-1.5 bg-slate-50 rounded px-2 py-1 italic">{clause.note}</p>
+                )}
+                {!readonly && (
+                  <textarea
+                    placeholder="Notiz / Nachweise…"
+                    value={clause.note}
+                    onChange={(e) => update(cl.key, { note: e.target.value })}
+                    rows={1}
+                    className="mt-2 w-full text-xs border border-slate-200 rounded-lg px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-blue-400 text-slate-700 placeholder:text-slate-300"
+                  />
+                )}
+              </div>
+              {/* Status selector */}
+              {!readonly ? (
+                <select
+                  value={clause.status}
+                  onChange={(e) => update(cl.key, { status: e.target.value as AimsClause['status'] })}
+                  className={`text-xs font-medium px-2 py-1 rounded-full border-0 shrink-0 cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-400 ${STATUS_COLORS[clause.status]}`}
+                >
+                  <option value="not_started">Nicht begonnen</option>
+                  <option value="in_progress">In Arbeit</option>
+                  <option value="done">Erledigt</option>
+                </select>
+              ) : (
+                <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ${STATUS_COLORS[clause.status]}`}>
+                  {STATUS_LABELS[clause.status]}
+                </span>
+              )}
+            </div>
+          </div>
+        )
+      })}
+
+      {/* SoA reminder */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+        <p className="font-semibold mb-1">Statement of Applicability (SoA) — Herzstück des AIMS</p>
+        <p className="text-xs leading-relaxed">
+          Das SoA dokumentiert für alle Anhang-A-Controls (A.2–A.10), ob sie anwendbar sind (mit Umsetzungsverweis) oder nicht anwendbar (mit Begründung — Pflicht, nicht Kür). Kein SoA = kein ISO 42001. Erster Griff jedes externen Auditors.
+        </p>
       </div>
     </div>
   )

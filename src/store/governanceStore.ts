@@ -24,6 +24,15 @@ export const DEMO_GOVERNANCE: GovernanceData = {
     step1: true, step2: true, step3: true, step4: true, step5: true,
     step6: false, step7: true, step8: false, step9: false,
   },
+  aims: {
+    kl4:  { status: 'done',        note: 'Scope defined: 4 AI systems in operation (Radiologie-KI, EPA-Agent, Chatbot, Verbrauchsmaterialien). Stakeholder map documented.' },
+    kl5:  { status: 'done',        note: 'KI-Politik signed off by GF. KI-Beauftragter role established per Klausel 5.3.' },
+    kl6:  { status: 'in_progress', note: 'Risk assessment completed for Hochrisiko-Systeme. Impact Assessment (A.5) for Radiologie-KI pending.' },
+    kl7:  { status: 'in_progress', note: 'Training matrix active (see Enablement). 68% completion — ISO 42001 §7.2 requires 100% for go-live roles.' },
+    kl8:  { status: 'in_progress', note: 'KI-Lebenszyklus documented for Radiologie-KI and EPA-Agent. Validierungsdokumentation for Chatbot pending.' },
+    kl9:  { status: 'not_started', note: '' },
+    kl10: { status: 'not_started', note: '' },
+  },
 }
 
 interface GovernanceStore {
