@@ -61,11 +61,36 @@ function RpzBadge({ rpz }: { rpz: number }) {
   return <span className={`text-xs px-2 py-0.5 rounded border font-bold ${cls}`}>RPZ {rpz}</span>
 }
 
-function BaeTab({ useCases, isDemo }: { useCases: AIUseCase[]; isDemo: boolean }) {
+function BaeTab({ useCases, isDemo, onAddToRegister }: { useCases: AIUseCase[]; isDemo: boolean; onAddToRegister: (r: Omit<AIRisk, 'id'>) => void }) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [customRisiken, setCustomRisiken] = useState<Record<string, RisikoEntry[]>>({})
   const [addingFor, setAddingFor] = useState<string | null>(null)
   const [form, setForm] = useState<Omit<RisikoEntry, 'id' | 'auto'>>(EMPTY_RISIKO)
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
+
+  const handleAddToRegister = (r: RisikoEntry, uc: AIUseCase) => {
+    const categoryMap: Record<RisikoArt, RiskCategory> = {
+      'Bias':               'Bias & Fairness',
+      'Technischer Fehler': 'Model Performance',
+      'Ethisches Risiko':   'Regulatory & Legal',
+      'Sicherheitsrisiko':  'Security & Privacy',
+    }
+    onAddToRegister({
+      useCaseId: uc.id,
+      useCaseTitle: uc.title,
+      category: categoryMap[r.art],
+      title: r.beschreibung.slice(0, 80),
+      description: r.beschreibung,
+      b: r.b, a: r.a, e: r.e,
+      mitigation: '',
+      mitigationStatus: 'None',
+      owner: '',
+      residualB: Math.max(1, r.b - 2),
+      residualA: Math.max(1, r.a - 2),
+      residualE: Math.max(1, r.e - 2),
+    })
+    setAddedIds((prev) => new Set(prev).add(r.id))
+  }
 
   const addCustom = (ucId: string) => {
     if (!form.beschreibung.trim()) return
@@ -161,6 +186,7 @@ function BaeTab({ useCases, isDemo }: { useCases: AIUseCase[]; isDemo: boolean }
                         <th className="text-center px-2 py-2 font-mono text-slate-400 text-[10px]">A</th>
                         <th className="text-center px-2 py-2 font-mono text-slate-400 text-[10px]">E</th>
                         <th className="text-center px-3 py-2 font-mono text-slate-400 text-[10px]">RPZ</th>
+                        <th className="px-2 py-2 text-[10px]"></th>
                         {!isDemo && <th className="px-2 py-2 text-[10px]"></th>}
                       </tr>
                     </thead>
@@ -182,6 +208,18 @@ function BaeTab({ useCases, isDemo }: { useCases: AIUseCase[]; isDemo: boolean }
                             <td className="px-2 py-2.5 text-center font-mono text-slate-600">{r.a}</td>
                             <td className="px-2 py-2.5 text-center font-mono text-slate-600">{r.e}</td>
                             <td className={`px-3 py-2.5 text-center font-mono ${rpzCls}`}>{r.b}×{r.a}×{r.e}={rpz}</td>
+                            <td className="px-2 py-2.5 text-center">
+                              {addedIds.has(r.id) ? (
+                                <span className="text-[10px] text-green-600 font-semibold">✓ Added</span>
+                              ) : (
+                                <button
+                                  onClick={() => handleAddToRegister(r, uc)}
+                                  className="text-[10px] text-blue-600 hover:text-blue-800 font-semibold whitespace-nowrap px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                                >
+                                  + Register
+                                </button>
+                              )}
+                            </td>
                             {!isDemo && (
                               <td className="px-2 py-2.5 text-center">
                                 {!r.auto && <button onClick={() => removeCustom(uc.id, r.id)} className="text-slate-300 hover:text-red-400 text-xs">✕</button>}
@@ -351,7 +389,7 @@ export default function RiskPage() {
 
       {tab === 'register' && <RegisterTab risks={risks} useCases={useCases} user={!!user} onUpdate={update} onDelete={remove} />}
       {tab === 'heatmap'  && <HeatMapTab  risks={risks} />}
-      {tab === 'bae'      && <BaeTab useCases={useCases} isDemo={demoMode} />}
+      {tab === 'bae'      && <BaeTab useCases={useCases} isDemo={demoMode} onAddToRegister={(r) => { add(r); setTab('register') }} />}
     </div>
   )
 }
