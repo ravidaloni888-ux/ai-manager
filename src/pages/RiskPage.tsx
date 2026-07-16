@@ -9,12 +9,11 @@ import {
 } from '../types'
 import { nanoid } from 'nanoid'
 import { getDemoMode, useDemoStore } from '../store/demoStore'
-import { deriveRisikoEntries, deriveAIRisks } from '../lib/deriveRisks'
+import { deriveRisikoEntries, deriveAIRisks, RISIKOART_META, RisikoArt } from '../lib/deriveRisks'
 
 type Tab = 'register' | 'heatmap' | 'bae'
 
 // ─── B×A×E types & data ───────────────────────────────────────────────────────
-type RisikoArt = 'Bias' | 'Technischer Fehler' | 'Ethisches Risiko' | 'Sicherheitsrisiko'
 type RpzStatus = 'low' | 'medium' | 'high'
 interface RisikoEntry { id: string; beschreibung: string; art: RisikoArt; b: number; a: number; e: number; auto?: boolean }
 
@@ -108,6 +107,22 @@ function BaeTab({ useCases, isDemo, onAddToRegister }: { useCases: AIUseCase[]; 
           <span className="px-2 py-1 rounded bg-green-50 border border-green-200 text-green-700">RPZ &lt; 50 = akzeptabel</span>
           <span className="px-2 py-1 rounded bg-amber-50 border border-amber-200 text-amber-700">50–125 = prüfen</span>
           <span className="px-2 py-1 rounded bg-red-50 border border-red-200 text-red-700">&gt; 125 = Maßnahmen erforderlich</span>
+        </div>
+      </div>
+
+      {/* 4 Risikoarten */}
+      <div className="bg-white rounded-xl shadow-md p-5">
+        <p className="text-xs font-mono uppercase tracking-widest text-slate-400 mb-3">4 KI-Risikoarten</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {(Object.entries(RISIKOART_META) as [RisikoArt, typeof RISIKOART_META[RisikoArt]][]).map(([art, meta]) => (
+            <div key={art} className={`rounded-lg border p-3 ${RISIKOART_CFG[art].cls}`}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${RISIKOART_CFG[art].dot}`} />
+                <p className="text-xs font-bold">{art}</p>
+              </div>
+              <p className="text-[10px] leading-relaxed opacity-80">{meta.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
 
