@@ -579,7 +579,40 @@ export default function CanvasForm({ existing }: Props) {
           </div>
         </section>
 
-        {/* Section 5: Documentation (Step 9) */}
+        {/* Section 5: Privacy & Compliance Checklist */}
+        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Privacy &amp; Compliance Checklist</h2>
+            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Governance</span>
+          </div>
+          <p className="text-xs text-slate-400 -mt-2">Check each item once verified. Results appear in Governance → Privacy Checklist.</p>
+          <div className="space-y-3">
+            {([
+              { key: 'complianceLegal',         label: 'Legal basis confirmed', desc: 'GDPR legal basis (Art. 6 / Art. 9) and EU AI Act classification documented' },
+              { key: 'compliancePersonalData',  label: 'Personal data & legal basis documented', desc: 'All personal data flows identified, DPIA completed if required' },
+              { key: 'complianceDataMin',       label: 'Data minimisation & purpose limitation ensured', desc: 'Only data strictly necessary for the stated purpose is processed' },
+              { key: 'complianceDocumentation', label: 'Documentation & proof obligations fulfilled', desc: 'Technical documentation, audit trail and record of processing activities in place' },
+              { key: 'complianceLiability',     label: 'Liability & responsibility defined', desc: 'Roles for AI Owner, DPO and business sponsor documented and signed off' },
+            ] as { key: string; label: string; desc: string }[]).map(({ key, label, desc }) => {
+              const checked = !!(watched[key as keyof typeof watched])
+              return (
+                <label key={key} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${checked ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'}`}>
+                  <input
+                    type="checkbox"
+                    {...register(key as keyof FormData)}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-400 cursor-pointer"
+                  />
+                  <div>
+                    <p className={`text-sm font-medium ${checked ? 'text-emerald-700' : 'text-slate-700'}`}>{label}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{desc}</p>
+                  </div>
+                </label>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* Section 6: Documentation (Step 9) */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <div className="flex items-center gap-3">
             <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Documentation</h2>

@@ -5,35 +5,258 @@ import { useUseCasesStore } from '../store/useCasesStore'
 import { useAuthStore } from '../store/authStore'
 import {
   AIRisk, AIUseCase, RiskCategory, MitigationStatus,
-  RISK_CATEGORIES, MITIGATION_STATUSES, MITIGATION_BG,
+  RISK_CATEGORIES, MITIGATION_STATUSES, MITIGATION_BG, EU_AI_ACT_BG, EuAiActRisk,
 } from '../types'
 import { nanoid } from 'nanoid'
+import { getDemoMode, useDemoStore } from '../store/demoStore'
 
-type Tab = 'register' | 'heatmap'
+type Tab = 'register' | 'heatmap' | 'bae'
+
+// ─── B×A×E types & data ───────────────────────────────────────────────────────
+type RisikoArt = 'Bias' | 'Technischer Fehler' | 'Ethisches Risiko' | 'Sicherheitsrisiko'
+type RpzStatus = 'low' | 'medium' | 'high'
+interface RisikoEntry { id: string; beschreibung: string; art: RisikoArt; b: number; a: number; e: number; auto?: boolean }
+
+const RPZ_STATUS = (rpz: number): RpzStatus => rpz < 50 ? 'low' : rpz <= 125 ? 'medium' : 'high'
+
+const RISIKOART_CFG: Record<RisikoArt, { cls: string; dot: string }> = {
+  'Bias':               { cls: 'bg-amber-100 text-amber-700 border-amber-300',    dot: 'bg-amber-400'  },
+  'Technischer Fehler': { cls: 'bg-blue-100 text-blue-700 border-blue-300',       dot: 'bg-blue-400'   },
+  'Ethisches Risiko':   { cls: 'bg-violet-100 text-violet-700 border-violet-300', dot: 'bg-violet-400' },
+  'Sicherheitsrisiko':  { cls: 'bg-red-100 text-red-700 border-red-300',          dot: 'bg-red-400'    },
+}
+
+const EMPTY_RISIKO: Omit<RisikoEntry, 'id' | 'auto'> = { beschreibung: '', art: 'Bias', b: 5, a: 5, e: 5 }
+
+const NIST_TRIAS = [
+  { label: 'Harm to People',       desc: 'Individuum: Rechte, Gesundheit, wirtschaftliche Chancen. Diskriminierung. Demokratische Teilhabe.' },
+  { label: 'Harm to Organization', desc: 'Geschäftsbetrieb, Reputation, finanzielle Verluste, Sicherheitsverletzungen, Compliance-Strafen.' },
+  { label: 'Harm to Ecosystem',    desc: 'Globales Finanzsystem, Lieferketten, vernetzte Systeme, natürliche Ressourcen, Umwelt.' },
+]
+
+function deriveRisiken(uc: AIUseCase): RisikoEntry[] {
+  const euRisk = uc.euAiActRisk
+  const bBase = euRisk === 'Unacceptable Risk' ? 10 : euRisk === 'High Risk' ? 8 : euRisk === 'Limited Risk' ? 5 : 3
+  const risks: RisikoEntry[] = []
+  let idx = 0
+  const add = (r: Omit<RisikoEntry, 'id' | 'auto'>) => risks.push({ ...r, id: `auto-${uc.id}-${idx++}`, auto: true })
+
+  add({ beschreibung: `KI-Risikoeinstufung "${euRisk ?? 'Minimal Risk'}" nach EU AI Act`, art: 'Ethisches Risiko', b: bBase, a: bBase >= 8 ? 6 : 4, e: bBase >= 8 ? 7 : 4 })
+  if (bBase >= 7) {
+    add({ beschreibung: 'Automation Bias – Nutzer verlassen sich blind auf KI-Ausgaben', art: 'Ethisches Risiko', b: bBase, a: 6, e: 8 })
+    add({ beschreibung: 'Modell-Drift – Leistungsverlust durch veränderte Datenverteilung bleibt unbemerkt', art: 'Technischer Fehler', b: bBase - 1, a: 5, e: 7 })
+  }
+  if (!uc.complianceLegal)        add({ beschreibung: 'Keine Rechtsgrundlage dokumentiert – Einsatz ohne DSGVO/KI-VO-Grundlage', art: 'Ethisches Risiko', b: 7, a: 6, e: 4 })
+  if (!uc.compliancePersonalData) add({ beschreibung: 'Personendaten nicht dokumentiert – fehlende DSGVO Art. 30 Pflicht', art: 'Bias', b: 6, a: 5, e: 5 })
+  if (!uc.complianceDataMin)      add({ beschreibung: 'Datensparsamkeit nicht sichergestellt (DSGVO Art. 5)', art: 'Bias', b: 5, a: 6, e: 5 })
+  if (!uc.complianceDocumentation)add({ beschreibung: 'Dokumentationspflichten unerfüllt – kein Nachweis für Audit', art: 'Ethisches Risiko', b: 6, a: 7, e: 3 })
+  if (!uc.complianceLiability)    add({ beschreibung: 'Verantwortlichkeit nicht definiert – bei Schaden unklar wer haftet', art: 'Sicherheitsrisiko', b: 7, a: 5, e: 4 })
+  add({ beschreibung: 'Vendor Lock-in – Ausfall des KI-Anbieters legt Betrieb still', art: 'Sicherheitsrisiko', b: 7, a: 3, e: 4 })
+  return risks
+}
+
+function RpzBadge({ rpz }: { rpz: number }) {
+  const s = RPZ_STATUS(rpz)
+  const cls = s === 'high' ? 'bg-red-100 text-red-700 border-red-300' : s === 'medium' ? 'bg-amber-100 text-amber-700 border-amber-300' : 'bg-green-100 text-green-700 border-green-300'
+  return <span className={`text-xs px-2 py-0.5 rounded border font-bold ${cls}`}>RPZ {rpz}</span>
+}
+
+function BaeTab({ useCases, isDemo }: { useCases: AIUseCase[]; isDemo: boolean }) {
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [customRisiken, setCustomRisiken] = useState<Record<string, RisikoEntry[]>>({})
+  const [addingFor, setAddingFor] = useState<string | null>(null)
+  const [form, setForm] = useState<Omit<RisikoEntry, 'id' | 'auto'>>(EMPTY_RISIKO)
+
+  const addCustom = (ucId: string) => {
+    if (!form.beschreibung.trim()) return
+    setCustomRisiken((p) => ({ ...p, [ucId]: [...(p[ucId] ?? []), { ...form, id: `m-${ucId}-${Date.now()}`, auto: false }] }))
+    setForm(EMPTY_RISIKO)
+    setAddingFor(null)
+  }
+  const removeCustom = (ucId: string, id: string) =>
+    setCustomRisiken((p) => ({ ...p, [ucId]: (p[ucId] ?? []).filter((r) => r.id !== id) }))
+
+  const ucRisiken = useCases.map((uc) => {
+    const derived = deriveRisiken(uc)
+    const custom = customRisiken[uc.id] ?? []
+    const all = [...derived, ...custom]
+    const maxRpz = all.length ? Math.max(...all.map((r) => r.b * r.a * r.e)) : 0
+    const highCount = all.filter((r) => RPZ_STATUS(r.b * r.a * r.e) === 'high').length
+    return { uc, risks: all, maxRpz, highCount }
+  }).sort((a, b) => b.maxRpz - a.maxRpz)
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-md p-5">
+        <h2 className="text-base font-bold text-slate-800 mb-1">B×A×E Risikoanalyse · alle Use Cases</h2>
+        <p className="text-xs text-slate-400 mb-3">Automatisch abgeleitet aus EU AI Act Einstufung + Compliance-Lücken · Methodik: FMEA nach KI-VO Art. 9 / ISO 23894</p>
+        <div className="flex flex-wrap gap-3 text-xs text-slate-600 mb-3">
+          <span><span className="font-mono font-bold text-slate-800">RPZ = B × A × E</span> = Risiko-Prioritäts-Zahl (1–1000)</span>
+          <span><span className="font-mono font-bold">B</span> = Bedeutung/Schadensschwere</span>
+          <span><span className="font-mono font-bold">A</span> = Auftreten/Wahrscheinlichkeit</span>
+          <span><span className="font-mono font-bold">E</span> = Entdeckung (10 = kaum erkennbar)</span>
+        </div>
+        <div className="flex gap-2 flex-wrap text-xs">
+          <span className="px-2 py-1 rounded bg-green-50 border border-green-200 text-green-700">RPZ &lt; 50 = akzeptabel</span>
+          <span className="px-2 py-1 rounded bg-amber-50 border border-amber-200 text-amber-700">50–125 = prüfen</span>
+          <span className="px-2 py-1 rounded bg-red-50 border border-red-200 text-red-700">&gt; 125 = Maßnahmen erforderlich</span>
+        </div>
+      </div>
+
+      {/* NIST Trias */}
+      <div className="bg-white rounded-xl shadow-md p-5">
+        <p className="text-xs font-mono uppercase tracking-widest text-slate-400 mb-3">NIST AI RMF · Drei Schadenssphären</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {NIST_TRIAS.map((t) => (
+            <div key={t.label} className="rounded-lg border border-slate-200 p-3 bg-slate-50">
+              <p className="text-xs font-bold text-blue-700 mb-1">{t.label}</p>
+              <p className="text-xs text-slate-500 leading-relaxed">{t.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* UC list */}
+      {useCases.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-md p-10 text-center text-slate-400">
+          <p className="text-sm">Keine Use Cases vorhanden.</p>
+          <p className="text-xs mt-1">Lege zuerst Use Cases unter „AI Use Cases" an.</p>
+        </div>
+      ) : ucRisiken.map(({ uc, risks, maxRpz, highCount }) => {
+        const isOpen = expandedId === uc.id
+        const status = RPZ_STATUS(maxRpz)
+        const borderCls = status === 'high' ? 'border-red-400' : status === 'medium' ? 'border-amber-400' : 'border-green-400'
+        const sorted = [...risks].sort((a, b) => (b.b * b.a * b.e) - (a.b * a.a * a.e))
+        return (
+          <div key={uc.id} className={`bg-white rounded-xl shadow-md border-l-4 ${borderCls} overflow-hidden`}>
+            <button className="w-full text-left p-4" onClick={() => setExpandedId(isOpen ? null : uc.id)}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-bold text-slate-800">{uc.title}</span>
+                    <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{uc.department}</span>
+                    {uc.euAiActRisk && <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${EU_AI_ACT_BG[uc.euAiActRisk]}`}>{uc.euAiActRisk}</span>}
+                  </div>
+                </div>
+                <div className="flex gap-2 flex-shrink-0 items-center">
+                  <div className="text-center"><RpzBadge rpz={maxRpz} /><p className="text-xs text-slate-400 mt-0.5">max RPZ</p></div>
+                  <div className={`text-center px-2 py-1 rounded-lg ${highCount > 0 ? 'bg-red-50 border border-red-200' : 'bg-slate-50 border border-slate-200'}`}>
+                    <p className={`text-base font-bold ${highCount > 0 ? 'text-red-700' : 'text-slate-400'}`}>{highCount}</p>
+                    <p className="text-xs text-slate-400">kritisch</p>
+                  </div>
+                  <span className="text-slate-400 text-xs">{isOpen ? '▲' : '▼'}</span>
+                </div>
+              </div>
+            </button>
+            {isOpen && (
+              <div className="border-t border-slate-100">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-100">
+                        <th className="text-left px-4 py-2 font-mono text-slate-400 uppercase tracking-wider text-[10px]">Risiko</th>
+                        <th className="text-left px-3 py-2 font-mono text-slate-400 uppercase tracking-wider text-[10px]">Art</th>
+                        <th className="text-center px-2 py-2 font-mono text-slate-400 text-[10px]">B</th>
+                        <th className="text-center px-2 py-2 font-mono text-slate-400 text-[10px]">A</th>
+                        <th className="text-center px-2 py-2 font-mono text-slate-400 text-[10px]">E</th>
+                        <th className="text-center px-3 py-2 font-mono text-slate-400 text-[10px]">RPZ</th>
+                        {!isDemo && <th className="px-2 py-2 text-[10px]"></th>}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {sorted.map((r) => {
+                        const rpz = r.b * r.a * r.e
+                        const s = RPZ_STATUS(rpz)
+                        const rpzCls = s === 'high' ? 'text-red-700 font-bold' : s === 'medium' ? 'text-amber-700 font-semibold' : 'text-green-700'
+                        return (
+                          <tr key={r.id} className="hover:bg-slate-50">
+                            <td className="px-4 py-2.5 text-slate-700 leading-snug max-w-xs">
+                              {r.beschreibung}
+                              {r.auto && <span className="ml-1.5 text-[10px] text-slate-400 border border-slate-200 rounded px-1">auto</span>}
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <span className={`px-1.5 py-0.5 rounded border text-[10px] font-medium ${RISIKOART_CFG[r.art].cls}`}>{r.art}</span>
+                            </td>
+                            <td className="px-2 py-2.5 text-center font-mono text-slate-600">{r.b}</td>
+                            <td className="px-2 py-2.5 text-center font-mono text-slate-600">{r.a}</td>
+                            <td className="px-2 py-2.5 text-center font-mono text-slate-600">{r.e}</td>
+                            <td className={`px-3 py-2.5 text-center font-mono ${rpzCls}`}>{r.b}×{r.a}×{r.e}={rpz}</td>
+                            {!isDemo && (
+                              <td className="px-2 py-2.5 text-center">
+                                {!r.auto && <button onClick={() => removeCustom(uc.id, r.id)} className="text-slate-300 hover:text-red-400 text-xs">✕</button>}
+                              </td>
+                            )}
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                {!isDemo && (
+                  <div className="px-4 py-3 border-t border-slate-100 bg-slate-50">
+                    {addingFor === uc.id ? (
+                      <div className="space-y-3">
+                        <textarea rows={2} value={form.beschreibung} onChange={(e) => setForm((p) => ({ ...p, beschreibung: e.target.value }))}
+                          placeholder="Risikobeschreibung…"
+                          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        <div className="flex gap-2 flex-wrap items-center">
+                          <select value={form.art} onChange={(e) => setForm((p) => ({ ...p, art: e.target.value as RisikoArt }))}
+                            className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 bg-white">
+                            {(['Bias', 'Technischer Fehler', 'Ethisches Risiko', 'Sicherheitsrisiko'] as RisikoArt[]).map((a) => <option key={a} value={a}>{a}</option>)}
+                          </select>
+                          {(['b', 'a', 'e'] as const).map((dim) => (
+                            <label key={dim} className="flex items-center gap-1 text-xs text-slate-500">
+                              <span className="font-mono font-bold uppercase">{dim}</span>
+                              <input type="number" min={1} max={10} value={form[dim]}
+                                onChange={(e) => setForm((p) => ({ ...p, [dim]: Number(e.target.value) }))}
+                                className="w-12 border border-slate-200 rounded px-1.5 py-1 text-xs text-center bg-white" />
+                            </label>
+                          ))}
+                          <span className="text-xs font-mono"><RpzBadge rpz={form.b * form.a * form.e} /></span>
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => { setAddingFor(null); setForm(EMPTY_RISIKO) }} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500">Abbrechen</button>
+                          <button onClick={() => addCustom(uc.id)} disabled={!form.beschreibung.trim()} className="text-xs px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-medium">Speichern</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button onClick={() => { setAddingFor(uc.id); setForm(EMPTY_RISIKO) }} className="text-xs text-blue-600 hover:underline">+ Risiko manuell hinzufügen</button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-slate-50'
 const labelCls = 'block text-xs font-semibold text-slate-600 mb-1'
 
-function riskScore(l: number, i: number) { return l * i }
+function rpz(b: number, a: number, e: number) { return (b || 5) * (a || 5) * (e || 5) }
 
-function scoreBadge(score: number) {
-  if (score >= 15) return 'bg-red-100 text-red-700'
-  if (score >= 10) return 'bg-orange-100 text-orange-700'
-  if (score >= 5)  return 'bg-amber-100 text-amber-700'
+function scoreBadge(rpzVal: number) {
+  if (rpzVal >= 400) return 'bg-red-100 text-red-700'
+  if (rpzVal >= 125) return 'bg-orange-100 text-orange-700'
+  if (rpzVal >= 50)  return 'bg-amber-100 text-amber-700'
   return 'bg-green-100 text-green-700'
 }
 
-function scoreLabel(score: number) {
-  if (score >= 15) return 'Critical'
-  if (score >= 10) return 'High'
-  if (score >= 5)  return 'Medium'
+function scoreLabel(rpzVal: number) {
+  if (rpzVal >= 400) return 'Critical'
+  if (rpzVal >= 125) return 'High'
+  if (rpzVal >= 50)  return 'Medium'
   return 'Low'
 }
 
-function cellColor(score: number) {
-  if (score >= 15) return 'bg-red-400 text-white'
-  if (score >= 10) return 'bg-orange-300 text-slate-800'
-  if (score >= 5)  return 'bg-amber-200 text-slate-800'
+function cellColor(rpzVal: number) {
+  if (rpzVal >= 400) return 'bg-red-400 text-white'
+  if (rpzVal >= 125) return 'bg-orange-300 text-slate-800'
+  if (rpzVal >= 50)  return 'bg-amber-200 text-slate-800'
   return 'bg-green-100 text-slate-600'
 }
 
@@ -54,13 +277,11 @@ const BLANK_RISK: Omit<AIRisk, 'id'> = {
   category: 'Operational',
   title: '',
   description: '',
-  likelihood: 3,
-  impact: 3,
+  b: 5, a: 5, e: 5,
   mitigation: '',
   mitigationStatus: 'None',
   owner: '',
-  residualLikelihood: 2,
-  residualImpact: 2,
+  residualB: 3, residualA: 3, residualE: 3,
 }
 
 export default function RiskPage() {
@@ -68,13 +289,14 @@ export default function RiskPage() {
   useEffect(() => { init() }, [init])
   const { useCases } = useUseCasesStore()
   const user = useAuthStore((s) => s.user)
+  const demoMode = useDemoStore((s) => s.demoMode)
   const [tab, setTab] = useState<Tab>('register')
   const [showForm, setShowForm] = useState(false)
 
-  const criticalCount    = risks.filter((r) => riskScore(r.likelihood, r.impact) >= 15).length
+  const criticalCount    = risks.filter((r) => rpz(r.b, r.a, r.e) >= 400).length
   const noMitigCount     = risks.filter((r) => r.mitigationStatus === 'None').length
   const implementedCount = risks.filter((r) => r.mitigationStatus === 'Implemented').length
-  const residualHigh     = risks.filter((r) => riskScore(r.residualLikelihood, r.residualImpact) >= 10).length
+  const residualHigh     = risks.filter((r) => rpz(r.residualB, r.residualA, r.residualE) >= 125).length
 
   return (
     <div className="p-6 space-y-6">
@@ -104,7 +326,7 @@ export default function RiskPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
-        {([['register', 'Risk Register'], ['heatmap', 'Heat Map']] as [Tab, string][]).map(([id, label]) => (
+        {([['register', 'Risk Register'], ['heatmap', 'Heat Map'], ['bae', 'B×A×E Analyse']] as [Tab, string][]).map(([id, label]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
@@ -128,6 +350,7 @@ export default function RiskPage() {
 
       {tab === 'register' && <RegisterTab risks={risks} useCases={useCases} user={!!user} onUpdate={update} onDelete={remove} />}
       {tab === 'heatmap'  && <HeatMapTab  risks={risks} />}
+      {tab === 'bae'      && <BaeTab useCases={useCases} isDemo={demoMode} />}
     </div>
   )
 }
@@ -165,14 +388,14 @@ function RegisterTab({ risks, useCases, user, onUpdate, onDelete }: {
     if (ucFilter  && r.useCaseTitle !== ucFilter) return false
     if (catFilter && r.category !== catFilter)    return false
     if (sevFilter) {
-      const s = riskScore(r.likelihood, r.impact)
-      if (sevFilter === 'Critical' && s < 15)  return false
-      if (sevFilter === 'High'     && (s < 10 || s >= 15)) return false
-      if (sevFilter === 'Medium'   && (s < 5  || s >= 10)) return false
-      if (sevFilter === 'Low'      && s >= 5)  return false
+      const s = rpz(r.b, r.a, r.e)
+      if (sevFilter === 'Critical' && s < 400)         return false
+      if (sevFilter === 'High'     && (s < 125 || s >= 400)) return false
+      if (sevFilter === 'Medium'   && (s < 50  || s >= 125)) return false
+      if (sevFilter === 'Low'      && s >= 50)         return false
     }
     return true
-  }).sort((a, b) => riskScore(b.likelihood, b.impact) - riskScore(a.likelihood, a.impact)), [risks, ucFilter, catFilter, sevFilter])
+  }).sort((a, b) => rpz(b.b, b.a, b.e) - rpz(a.b, a.a, a.e)), [risks, ucFilter, catFilter, sevFilter])
 
   return (
     <div className="space-y-3">
@@ -215,8 +438,8 @@ function RegisterTab({ risks, useCases, user, onUpdate, onDelete }: {
           </thead>
           <tbody className="divide-y divide-slate-50">
             {filtered.map((r) => {
-              const score = riskScore(r.likelihood, r.impact)
-              const residual = riskScore(r.residualLikelihood, r.residualImpact)
+              const score = rpz(r.b, r.a, r.e)
+              const residual = rpz(r.residualB, r.residualA, r.residualE)
               const isOpen = expanded === r.id
               return (
                 <>
@@ -325,12 +548,16 @@ function ExpandedRow({ risk, user, onUpdate, onDelete }: {
             <input value={local.owner} onChange={(e) => upd({ owner: e.target.value })} className={inputCls} placeholder="Name or role" />
           </div>
           <div>
-            <label className={labelCls}>Residual Likelihood (1–5)</label>
-            <input type="number" min={1} max={5} value={local.residualLikelihood} onChange={(e) => upd({ residualLikelihood: Number(e.target.value) })} className={inputCls} />
+            <label className={labelCls}>Residual B – Bedeutung nach Maßnahme (1–10)</label>
+            <input type="number" min={1} max={10} value={local.residualB} onChange={(e) => upd({ residualB: Number(e.target.value) })} className={inputCls} />
           </div>
           <div>
-            <label className={labelCls}>Residual Impact (1–5)</label>
-            <input type="number" min={1} max={5} value={local.residualImpact} onChange={(e) => upd({ residualImpact: Number(e.target.value) })} className={inputCls} />
+            <label className={labelCls}>Residual A – Auftreten nach Maßnahme (1–10)</label>
+            <input type="number" min={1} max={10} value={local.residualA} onChange={(e) => upd({ residualA: Number(e.target.value) })} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Residual E – Entdeckung nach Maßnahme (1–10)</label>
+            <input type="number" min={1} max={10} value={local.residualE} onChange={(e) => upd({ residualE: Number(e.target.value) })} className={inputCls} />
           </div>
         </div>
       )}
@@ -406,12 +633,20 @@ function AddRiskForm({ useCases, onSave, onCancel }: {
           <textarea rows={2} value={form.description} onChange={(e) => upd({ description: e.target.value })} placeholder="What could go wrong and why does it matter?" className={`${inputCls} resize-none`} />
         </div>
         <div>
-          <label className={labelCls}>Likelihood (1–5)</label>
-          <input type="number" min={1} max={5} value={form.likelihood} onChange={(e) => upd({ likelihood: Number(e.target.value) })} className={inputCls} />
+          <label className={labelCls}>B – Bedeutung / Severity (1–10)</label>
+          <input type="number" min={1} max={10} value={form.b} onChange={(e) => upd({ b: Number(e.target.value) })} className={inputCls} />
         </div>
         <div>
-          <label className={labelCls}>Impact (1–5)</label>
-          <input type="number" min={1} max={5} value={form.impact} onChange={(e) => upd({ impact: Number(e.target.value) })} className={inputCls} />
+          <label className={labelCls}>A – Auftreten / Occurrence (1–10)</label>
+          <input type="number" min={1} max={10} value={form.a} onChange={(e) => upd({ a: Number(e.target.value) })} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>E – Entdeckung / Detection (1–10)</label>
+          <input type="number" min={1} max={10} value={form.e} onChange={(e) => upd({ e: Number(e.target.value) })} className={inputCls} />
+        </div>
+        <div className="col-span-2 p-3 bg-slate-50 rounded-lg text-sm text-slate-600">
+          RPZ = B × A × E = <strong>{form.b} × {form.a} × {form.e} = {form.b * form.a * form.e}</strong>
+          {' '}— <span className={`font-semibold ${form.b * form.a * form.e >= 400 ? 'text-red-600' : form.b * form.a * form.e >= 125 ? 'text-orange-600' : form.b * form.a * form.e >= 50 ? 'text-amber-600' : 'text-green-600'}`}>{scoreLabel(form.b * form.a * form.e)}</span>
         </div>
         <div className="col-span-2">
           <label className={labelCls}>Mitigation Plan</label>
@@ -444,27 +679,38 @@ function AddRiskForm({ useCases, onSave, onCancel }: {
   )
 }
 
-// ─── Heat Map tab ─────────────────────────────────────────────────────────────
+// ─── Heat Map tab (RPZ buckets) ───────────────────────────────────────────────
+const RPZ_BUCKETS = [
+  { label: 'Critical',  min: 400, max: 1000, cls: 'bg-red-400 text-white',          border: 'border-red-500'    },
+  { label: 'High',      min: 125, max: 399,  cls: 'bg-orange-300 text-slate-800',   border: 'border-orange-400' },
+  { label: 'Medium',    min: 50,  max: 124,  cls: 'bg-amber-200 text-slate-800',    border: 'border-amber-300'  },
+  { label: 'Low',       min: 1,   max: 49,   cls: 'bg-green-100 text-slate-600',    border: 'border-green-300'  },
+]
+
 function HeatMapTab({ risks }: { risks: AIRisk[] }) {
   const [showResidual, setShowResidual] = useState(false)
-  const [selected, setSelected] = useState<{ l: number; i: number } | null>(null)
+  const [selected, setSelected] = useState<string | null>(null)
 
-  const risksInCell = (l: number, i: number) =>
-    risks.filter((r) => {
-      const rl = showResidual ? r.residualLikelihood : r.likelihood
-      const ri = showResidual ? r.residualImpact : r.impact
-      return rl === l && ri === i
-    })
+  const getScore = (r: AIRisk) => showResidual
+    ? rpz(r.residualB, r.residualA, r.residualE)
+    : rpz(r.b, r.a, r.e)
 
-  const selectedRisks = selected ? risksInCell(selected.l, selected.i) : []
+  const bucket = (r: AIRisk) => {
+    const s = getScore(r)
+    return RPZ_BUCKETS.find((b) => s >= b.min && s <= b.max) ?? RPZ_BUCKETS[3]
+  }
+
+  const selectedRisks = selected
+    ? risks.filter((r) => bucket(r).label === selected)
+    : []
 
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-xl shadow-md p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Risk Heat Map</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Likelihood × Impact — click any cell to see the risks inside.</p>
+            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">RPZ Übersicht</h3>
+            <p className="text-xs text-slate-400 mt-0.5">B × A × E = RPZ — klicken Sie auf eine Kategorie für Details.</p>
           </div>
           <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
             <button onClick={() => setShowResidual(false)} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${!showResidual ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'}`}>Initial</button>
@@ -472,81 +718,40 @@ function HeatMapTab({ risks }: { risks: AIRisk[] }) {
           </div>
         </div>
 
-        <div className="flex gap-4 items-start">
-          {/* Y-axis label */}
-          <div className="flex flex-col items-center justify-center h-[300px] w-6 flex-shrink-0">
-            <span className="text-[10px] text-slate-400 font-semibold tracking-widest uppercase" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
-              Likelihood
-            </span>
-          </div>
-
-          <div className="flex-1">
-            {/* Grid */}
-            {[5, 4, 3, 2, 1].map((l) => (
-              <div key={l} className="flex items-center gap-1 mb-1">
-                <span className="w-4 text-[10px] text-slate-400 text-right flex-shrink-0">{l}</span>
-                {[1, 2, 3, 4, 5].map((i) => {
-                  const count = risksInCell(l, i).length
-                  const score = l * i
-                  const isSelected = selected?.l === l && selected?.i === i
-                  return (
-                    <div
-                      key={i}
-                      onClick={() => setSelected(isSelected ? null : { l, i })}
-                      className={`flex-1 h-14 flex flex-col items-center justify-center rounded-lg cursor-pointer transition-all border-2 ${
-                        cellColor(score)
-                      } ${isSelected ? 'border-blue-600 shadow-md scale-105' : 'border-transparent hover:border-slate-300'}`}
-                    >
-                      {count > 0 && (
-                        <>
-                          <span className="text-xl font-bold leading-none">{count}</span>
-                          <span className="text-[9px] font-medium opacity-70 mt-0.5">{scoreLabel(score)}</span>
-                        </>
-                      )}
-                    </div>
-                  )
-                })}
+        <div className="grid grid-cols-4 gap-4">
+          {RPZ_BUCKETS.map((b) => {
+            const count = risks.filter((r) => bucket(r).label === b.label).length
+            const isSelected = selected === b.label
+            return (
+              <div
+                key={b.label}
+                onClick={() => setSelected(isSelected ? null : b.label)}
+                className={`rounded-xl p-5 cursor-pointer border-2 transition-all ${b.cls} ${isSelected ? `${b.border} shadow-lg scale-105` : 'border-transparent hover:shadow-md'}`}
+              >
+                <div className="text-3xl font-bold">{count}</div>
+                <div className="text-xs font-semibold mt-1 uppercase tracking-wide opacity-80">{b.label}</div>
+                <div className="text-[10px] opacity-60 mt-0.5">RPZ {b.min}{b.max < 1000 ? `–${b.max}` : '+'}</div>
               </div>
-            ))}
-
-            {/* X-axis labels */}
-            <div className="flex items-center gap-1 mt-1">
-              <span className="w-4 flex-shrink-0" />
-              {[1, 2, 3, 4, 5].map((i) => (
-                <span key={i} className="flex-1 text-center text-[10px] text-slate-400">{i}</span>
-              ))}
-            </div>
-            <p className="text-center text-[10px] text-slate-400 font-semibold uppercase tracking-widest mt-1">Impact</p>
-          </div>
+            )
+          })}
         </div>
 
-        {/* Legend */}
-        <div className="flex gap-3 mt-5 pt-4 border-t border-slate-100">
-          {[
-            { label: 'Low (1–4)',     cls: 'bg-green-100 text-slate-600'  },
-            { label: 'Medium (5–9)', cls: 'bg-amber-200 text-slate-800'  },
-            { label: 'High (10–14)', cls: 'bg-orange-300 text-slate-800' },
-            { label: 'Critical (15–25)', cls: 'bg-red-400 text-white'    },
-          ].map((l) => (
-            <div key={l.label} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${l.cls}`}>
-              {l.label}
-            </div>
-          ))}
+        <div className="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-400">
+          RPZ-Schwellen: &lt;50 akzeptabel · 50–125 prüfen · &gt;125 Maßnahmen erforderlich · ≥400 kritisch
         </div>
       </div>
 
-      {/* Selected cell risks */}
       {selected && selectedRisks.length > 0 && (
         <div className="bg-white rounded-xl shadow-md p-5">
           <h4 className="text-sm font-bold text-slate-700 mb-3">
-            Risks at L{selected.l} × I{selected.i} (score {selected.l * selected.i})
+            {selected} — {selectedRisks.length} Risiken
           </h4>
           <div className="space-y-2">
             {selectedRisks.map((r) => (
               <div key={r.id} className="flex items-start justify-between gap-4 p-3 bg-slate-50 rounded-lg">
                 <div>
                   <p className="text-sm font-semibold text-slate-800">{r.title}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{r.useCaseTitle} · {r.category}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{r.useCaseTitle} · {r.category} · RPZ {getScore(r)}</p>
                 </div>
                 <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${MITIGATION_BG[r.mitigationStatus]}`}>
                   {r.mitigationStatus}

@@ -10,7 +10,9 @@ const DUMMY_IDS = new Set(dummyData.map((d) => d.id))
 interface UseCasesStore {
   useCases: AIUseCase[]
   loading: boolean
+  initializedFor: 'demo' | 'workspace' | null
   init: () => Promise<void>
+  resetStore: () => void
   addUseCase: (uc: AIUseCase) => void
   updateUseCase: (uc: AIUseCase) => void
   deleteUseCase: (id: string) => void
@@ -21,29 +23,35 @@ interface UseCasesStore {
 export const useUseCasesStore = create<UseCasesStore>()((set, get) => ({
   useCases: [],
   loading: true,
+  initializedFor: null,
 
   init: async () => {
-    // Demo mode — serve seed data in-memory, skip all network calls
-    if (getDemoMode()) {
-      set({ useCases: dummyData, loading: false })
+    const mode = getDemoMode() ? 'demo' : 'workspace'
+
+    // Skip if already initialized for this mode — prevents wiping in-memory cases
+    if (get().initializedFor === mode) return
+
+    if (mode === 'demo') {
+      set({ useCases: dummyData, loading: false, initializedFor: 'demo' })
       return
     }
 
     // Real workspace — load from Supabase, exclude dummy-seeded records
-    let { data, error } = await supabase
+    const { data, error } = await supabase
       .from('ai_use_cases')
       .select('*')
       .order('created_at', { ascending: false })
 
     if (error || !data) {
-      set({ useCases: [], loading: false })
+      set({ useCases: [], loading: false, initializedFor: 'workspace' })
       return
     }
 
-    // Filter out the pre-seeded dummy records so the real workspace starts clean
     const userRows = data.filter((row) => !DUMMY_IDS.has(row.id as string))
-    set({ useCases: userRows.map(rowToUseCase), loading: false })
+    set({ useCases: userRows.map(rowToUseCase), loading: false, initializedFor: 'workspace' })
   },
+
+  resetStore: () => set({ useCases: [], loading: true, initializedFor: null }),
 
   addUseCase: (uc) => {
     set((state) => ({ useCases: [...state.useCases, uc] }))

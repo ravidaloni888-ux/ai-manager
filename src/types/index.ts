@@ -95,13 +95,15 @@ export interface AIRisk {
   category: RiskCategory
   title: string
   description: string
-  likelihood: number
-  impact: number
+  b: number  // Bedeutung / Severity 1-10
+  a: number  // Auftreten / Occurrence 1-10
+  e: number  // Entdeckung / Detection 1-10
   mitigation: string
   mitigationStatus: MitigationStatus
   owner: string
-  residualLikelihood: number
-  residualImpact: number
+  residualB: number
+  residualA: number
+  residualE: number
 }
 
 export type Motivation =
