@@ -10,6 +10,8 @@ import {
 } from '../../types'
 import { computePriorityScore, computeROI, scoreColor } from '../../lib/scoring'
 import { useUseCasesStore } from '../../store/useCasesStore'
+import { useRiskStore } from '../../store/riskStore'
+import { deriveAIRisks } from '../../lib/deriveRisks'
 
 interface Props {
   existing?: AIUseCase
@@ -162,6 +164,7 @@ function SliderField({
 export default function CanvasForm({ existing }: Props) {
   const navigate = useNavigate()
   const { addUseCase, updateUseCase, deleteUseCase } = useUseCasesStore()
+  const { add: addRisk } = useRiskStore()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
 
@@ -246,6 +249,7 @@ export default function CanvasForm({ existing }: Props) {
       navigate('/use-cases')
     } else {
       addUseCase(uc)
+      deriveAIRisks(uc).forEach((r) => addRisk(r))
       setSavedId(uc.id)
     }
   }

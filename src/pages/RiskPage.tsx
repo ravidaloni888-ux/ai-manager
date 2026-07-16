@@ -9,6 +9,7 @@ import {
 } from '../types'
 import { nanoid } from 'nanoid'
 import { getDemoMode, useDemoStore } from '../store/demoStore'
+import { deriveRisikoEntries, deriveAIRisks } from '../lib/deriveRisks'
 
 type Tab = 'register' | 'heatmap' | 'bae'
 
@@ -34,26 +35,7 @@ const NIST_TRIAS = [
   { label: 'Harm to Ecosystem',    desc: 'Globales Finanzsystem, Lieferketten, vernetzte Systeme, natürliche Ressourcen, Umwelt.' },
 ]
 
-function deriveRisiken(uc: AIUseCase): RisikoEntry[] {
-  const euRisk = uc.euAiActRisk
-  const bBase = euRisk === 'Unacceptable Risk' ? 10 : euRisk === 'High Risk' ? 8 : euRisk === 'Limited Risk' ? 5 : 3
-  const risks: RisikoEntry[] = []
-  let idx = 0
-  const add = (r: Omit<RisikoEntry, 'id' | 'auto'>) => risks.push({ ...r, id: `auto-${uc.id}-${idx++}`, auto: true })
-
-  add({ beschreibung: `KI-Risikoeinstufung "${euRisk ?? 'Minimal Risk'}" nach EU AI Act`, art: 'Ethisches Risiko', b: bBase, a: bBase >= 8 ? 6 : 4, e: bBase >= 8 ? 7 : 4 })
-  if (bBase >= 7) {
-    add({ beschreibung: 'Automation Bias – Nutzer verlassen sich blind auf KI-Ausgaben', art: 'Ethisches Risiko', b: bBase, a: 6, e: 8 })
-    add({ beschreibung: 'Modell-Drift – Leistungsverlust durch veränderte Datenverteilung bleibt unbemerkt', art: 'Technischer Fehler', b: bBase - 1, a: 5, e: 7 })
-  }
-  if (!uc.complianceLegal)        add({ beschreibung: 'Keine Rechtsgrundlage dokumentiert – Einsatz ohne DSGVO/KI-VO-Grundlage', art: 'Ethisches Risiko', b: 7, a: 6, e: 4 })
-  if (!uc.compliancePersonalData) add({ beschreibung: 'Personendaten nicht dokumentiert – fehlende DSGVO Art. 30 Pflicht', art: 'Bias', b: 6, a: 5, e: 5 })
-  if (!uc.complianceDataMin)      add({ beschreibung: 'Datensparsamkeit nicht sichergestellt (DSGVO Art. 5)', art: 'Bias', b: 5, a: 6, e: 5 })
-  if (!uc.complianceDocumentation)add({ beschreibung: 'Dokumentationspflichten unerfüllt – kein Nachweis für Audit', art: 'Ethisches Risiko', b: 6, a: 7, e: 3 })
-  if (!uc.complianceLiability)    add({ beschreibung: 'Verantwortlichkeit nicht definiert – bei Schaden unklar wer haftet', art: 'Sicherheitsrisiko', b: 7, a: 5, e: 4 })
-  add({ beschreibung: 'Vendor Lock-in – Ausfall des KI-Anbieters legt Betrieb still', art: 'Sicherheitsrisiko', b: 7, a: 3, e: 4 })
-  return risks
-}
+const deriveRisiken = (uc: AIUseCase) => deriveRisikoEntries(uc)
 
 function RpzBadge({ rpz }: { rpz: number }) {
   const s = RPZ_STATUS(rpz)
