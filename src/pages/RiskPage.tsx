@@ -287,9 +287,10 @@ const BLANK_RISK: Omit<AIRisk, 'id'> = {
 export default function RiskPage() {
   const { risks, init, add, update, remove } = useRiskStore()
   useEffect(() => { init() }, [init])
-  const { useCases } = useUseCasesStore()
+  const { useCases, init: initUseCases } = useUseCasesStore()
   const user = useAuthStore((s) => s.user)
   const demoMode = useDemoStore((s) => s.demoMode)
+  useEffect(() => { initUseCases() }, [initUseCases, demoMode])
   const [tab, setTab] = useState<Tab>('register')
   const [showForm, setShowForm] = useState(false)
 
