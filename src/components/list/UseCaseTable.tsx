@@ -332,7 +332,7 @@ export default function UseCaseTable() {
           value={healthFilter}
           onChange={(v) => setFilter('projectHealth', v)}
           options={PROJECT_HEALTH_OPTIONS.map((h) => h.value)}
-          placeholder="Alle Status
+          placeholder="Alle Status"
         />
 
         {/* Group by */}

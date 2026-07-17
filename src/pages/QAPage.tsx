@@ -326,4 +326,11 @@ const FAILURES = [
     desc: 'Response times exceed SLA thresholds or the API returns errors under load, degrading user experience.',
     mitigation: 'Load test before go-live, set timeout budgets, implement fallback responses and retry logic.',
   },
+  {
+    icon: '🤖',
+    title: 'Automation Bias',
+    severity: 'High',
+    desc: 'Die Aufsichtsperson stimmt Agent-Vorschlägen zu, ohne sie ernsthaft zu prüfen (Rubber-Stamping). „Wir haben einen Menschen in der Schleife" ist keine ausreichende Aussage — Human-in-the-Loop muss quantifiziert werden. Das IMDA-Framework benennt zwei messbare KPIs:\n\n• Human Override Rate — Wie oft lehnt die Aufsichtsperson den Agenten-Vorschlag ab? Eine dauerhaft niedrige Rate ist kein Qualitätsbeweis: Sie kann signalisieren, dass der Mensch nicht wirklich prüft. Eine gesunde Override Rate liegt über einem definierten Mindestschwellenwert.\n\n• Human Response Time — Wie lange braucht die Aufsichtsperson für ihre Entscheidung? Sehr kurze Reaktionszeiten ohne erkennbare Prüfphase sind ein starkes Signal für Automation Bias — der Mensch hat die Agent-Aktion nicht kontrolliert, sondern nur bestätigt.',
+    mitigation: 'Override Rate und Response Time als KPIs im Monitoring erfassen. Mindestschwellenwerte für beide Kennzahlen definieren und bei Unterschreitung eskalieren. Regelmäßige Kalibrierungssessions durchführen, in denen Aufsichtspersonen absichtlich fehlerhafte Agent-Outputs bewerten — um Wachsamkeit zu trainieren und Bias zu messen.',
+  },
 ]
