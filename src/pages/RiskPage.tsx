@@ -362,7 +362,7 @@ export default function RiskPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
-        {([['register', 'Risk Register'], ['heatmap', 'Heat Map'], ['bae', 'B×A×E Analyse'], ['matrix', 'Risikomatrix']] as [Tab, string][]).map(([id, label]) => (
+        {([['register', 'Risk Register'], ['heatmap', 'Heat Map'], ['bae', 'B×A×E Analyse'], ['matrix', 'Über Risiken']] as [Tab, string][]).map(([id, label]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
@@ -387,7 +387,7 @@ export default function RiskPage() {
       {tab === 'register' && <RegisterTab risks={risks} useCases={useCases} user={!!user} onUpdate={update} onDelete={remove} />}
       {tab === 'heatmap'  && <HeatMapTab  risks={risks} />}
       {tab === 'bae'      && <BaeTab useCases={useCases} isDemo={demoMode} onAddToRegister={(r) => { add(r); setTab('register') }} />}
-      {tab === 'matrix'   && <RisikomatrixTab risks={risks} useCases={useCases} />}
+      {tab === 'matrix'   && <RisikomatrixTab useCases={useCases} />}
     </div>
   )
 }
@@ -840,15 +840,7 @@ const GEGENPRINZIPIEN = [
   { label: 'Human-in-the-Loop', icon: '👤', desc: 'Bei kritischen Aktionen verpflichtende Bestätigung durch Mensch (KI-VO Art. 14).' },
 ]
 
-function RisikomatrixTab({ risks, useCases }: { risks: AIRisk[]; useCases: AIUseCase[] }) {
-  const [selectedZone, setSelectedZone] = useState<string | null>(null)
-
-  const getZone = (r: AIRisk) => {
-    const score = rpz(r.b, r.a, r.e)
-    return ZONEN.find((z) => score >= z.min && score <= z.max) ?? ZONEN[2]
-  }
-  const zoneRisks = (label: string) => risks.filter((r) => getZone(r).label === label)
-
+function RisikomatrixTab({ useCases }: { useCases: AIUseCase[] }) {
   const hasAgenten = useCases.some((uc) => uc.aiApproach === 'Generative AI')
 
   const colorMap: Record<string, string> = { blue: 'border-blue-400 bg-blue-50', amber: 'border-amber-400 bg-amber-50', red: 'border-red-400 bg-red-50' }
@@ -857,46 +849,6 @@ function RisikomatrixTab({ risks, useCases }: { risks: AIRisk[]; useCases: AIUse
 
   return (
     <div className="space-y-6">
-
-      {/* ── Risikomatrix Zonen ── */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">Risikomatrix — 3 Zonen</h3>
-        <p className="text-xs text-slate-400 mb-4">B × A × E = RPZ · Eingriffsschwellen nach Tag 10 · Bei B = 9–10 immer handeln — unabhängig von A</p>
-        <div className="grid grid-cols-3 gap-4">
-          {ZONEN.map((z) => {
-            const count = zoneRisks(z.label).length
-            const isSelected = selectedZone === z.label
-            return (
-              <div
-                key={z.label}
-                onClick={() => setSelectedZone(isSelected ? null : z.label)}
-                className={`rounded-xl border-2 p-4 cursor-pointer transition-all ${z.bg} ${isSelected ? z.border + ' shadow-lg scale-[1.02]' : 'border-transparent hover:shadow-md'}`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`w-3 h-3 rounded-full ${z.dot}`} />
-                  <span className={`text-sm font-bold ${z.text}`}>{z.label}</span>
-                  <span className="ml-auto text-2xl font-bold text-slate-700">{count}</span>
-                </div>
-                <p className="text-[10px] font-mono text-slate-500 mb-1">RPZ {z.min}{z.max < 1000 ? `–${z.max}` : '+'}</p>
-                <p className="text-xs text-slate-600 leading-snug">{z.action}</p>
-              </div>
-            )
-          })}
-        </div>
-        {selectedZone && zoneRisks(selectedZone).length > 0 && (
-          <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
-            {zoneRisks(selectedZone).map((r) => (
-              <div key={r.id} className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-lg text-sm">
-                <span className="font-medium text-slate-800">{r.title}</span>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-xs font-mono text-slate-500">RPZ {rpz(r.b, r.a, r.e)}</span>
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${MITIGATION_BG[r.mitigationStatus]}`}>{r.mitigationStatus}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
 
       {/* ── Drei Kontroll-Typen ── */}
       <div className="bg-white rounded-xl shadow-md p-6">
