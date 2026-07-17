@@ -43,43 +43,43 @@ export default function DashboardPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-          <p className="text-sm text-slate-500 mt-0.5">AI Use Case Portfolio Overview</p>
+          <p className="text-sm text-slate-500 mt-0.5">KI-Anwendungsfall-Portfolio-Übersicht</p>
         </div>
       </div>
 
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
         <KpiCard
-          label="Total Use Cases"
+          label="Anwendungsfälle gesamt"
           value={stats.total}
           icon={<IconClipboard />}
           color="bg-blue-50 text-blue-600"
         />
         <KpiCard
-          label="In Production"
+          label="In Produktion"
           value={stats.inProduction}
-          sub={`${Math.round((stats.inProduction / stats.total) * 100)}% of portfolio`}
+          sub={`${Math.round((stats.inProduction / stats.total) * 100)}% des Portfolios`}
           icon={<IconRocket />}
           color="bg-green-50 text-green-600"
         />
         <KpiCard
-          label="Avg Priority Score"
+          label="Ø Prioritätsscore"
           value={stats.avgScore}
-          sub="out of 10.0"
+          sub="von 10,0"
           icon={<IconStar />}
           color="bg-amber-50 text-amber-600"
         />
         <KpiCard
-          label="Total Annual Benefit"
+          label="Jährlicher Gesamtnutzen"
           value={`€${stats.totalBenefit.toLocaleString()}k`}
-          sub="expected per year"
+          sub="erwartet pro Jahr"
           icon={<IconMoneybag />}
           color="bg-emerald-50 text-emerald-600"
         />
         <KpiCard
-          label="3-Y Portfolio ROI"
+          label="3-J. Portfolio-ROI"
           value={`${stats.portfolioROI}%`}
-          sub={`€${stats.totalCost.toLocaleString()}k invested`}
+          sub={`€${stats.totalCost.toLocaleString()}k investiert`}
           icon={<IconTrendingUp />}
           color="bg-violet-50 text-violet-600"
         />
@@ -99,16 +99,16 @@ export default function DashboardPage() {
 
       {/* Top 5 */}
       <div className="bg-white rounded-xl shadow-md p-5">
-        <h3 className="text-sm font-semibold text-slate-700 mb-4">Top 5 Use Cases by Priority Score</h3>
+        <h3 className="text-sm font-semibold text-slate-700 mb-4">Top 5 Anwendungsfälle nach Prioritätsscore</h3>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-100 text-xs text-slate-500 uppercase tracking-wide">
               <th className="text-left py-2 font-semibold">#</th>
-              <th className="text-left py-2 font-semibold">Title</th>
-              <th className="text-left py-2 font-semibold">Department</th>
+              <th className="text-left py-2 font-semibold">Titel</th>
+              <th className="text-left py-2 font-semibold">Abteilung</th>
               <th className="text-left py-2 font-semibold">Phase</th>
               <th className="text-right py-2 font-semibold">Score</th>
-              <th className="text-right py-2 font-semibold">3-Y ROI</th>
+              <th className="text-right py-2 font-semibold">3-J. ROI</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">

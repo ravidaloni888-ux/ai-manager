@@ -337,7 +337,7 @@ export default function RolesPage() {
             disabled={saving}
             className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-60"
           >
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? 'Speichern…' : 'Speichern'}
           </button>
         )}
       </div>
@@ -403,7 +403,7 @@ export default function RolesPage() {
                       type="text"
                       value={person}
                       onChange={(e) => setAssignments((prev) => ({ ...prev, [role.id]: e.target.value }))}
-                      placeholder="Assign person…"
+                      placeholder="Person zuweisen…"
                       className="flex-1 text-sm text-slate-700 bg-transparent focus:outline-none placeholder:text-slate-300"
                     />
                   ) : (

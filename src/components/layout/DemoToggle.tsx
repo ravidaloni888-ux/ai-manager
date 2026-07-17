@@ -47,7 +47,7 @@ export default function DemoToggle() {
             : 'text-white/50 hover:text-white/80'
         }`}
       >
-        My Workspace
+        Mein Bereich
       </button>
     </div>
   )

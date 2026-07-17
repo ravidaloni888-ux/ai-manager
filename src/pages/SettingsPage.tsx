@@ -101,12 +101,12 @@ export default function SettingsPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Settings</h1>
-        <p className="text-sm text-slate-500 mt-0.5">Project links & configuration</p>
+        <h1 className="text-2xl font-bold text-slate-800">Einstellungen</h1>
+        <p className="text-sm text-slate-500 mt-0.5">Projektlinks & Konfiguration</p>
       </div>
 
       <section className="space-y-3">
-        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Project Links</h2>
+        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Projektlinks</h2>
 
         <LinkCard
           icon={<IconGlobe />}
@@ -150,7 +150,7 @@ export default function SettingsPage() {
 
         <LinkCard
           icon={<IconFolder />}
-          label="Local Folder"
+          label="Lokaler Ordner"
           value={LOCAL_PATH}
           iconBg="bg-amber-50 text-amber-600"
         />

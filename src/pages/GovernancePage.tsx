@@ -222,7 +222,7 @@ export default function GovernancePage() {
             disabled={saving || tab === 'checklist' || tab === 'compliance'}
             className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors min-w-[90px]"
           >
-            {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save'}
+            {saving ? 'Speichern…' : saved ? '✓ Gespeichert' : 'Speichern'}
           </button>
         )}
       </div>
@@ -369,7 +369,7 @@ function StepsTab({ steps, onChange, readonly }: {
                   <button
                     onClick={() => toggle(s.key)}
                     className="flex-shrink-0 p-1 rounded hover:bg-slate-200/60 transition-colors"
-                    title={isExpanded ? 'Hide details' : 'Show details'}
+                    title={isExpanded ? 'Details ausblenden' : 'Details anzeigen'}
                   >
                     <svg
                       className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
@@ -436,7 +436,7 @@ function RichtlinieTab({ richtlinie, onChange, readonly }: {
             disabled={readonly}
             value={richtlinie[f.key]}
             onChange={(e) => onChange({ ...richtlinie, [f.key]: e.target.value })}
-            placeholder={readonly ? '—' : 'Enter your answer…'}
+            placeholder={readonly ? '—' : 'Antwort eingeben…'}
             className={textareaCls}
           />
         </div>
@@ -469,7 +469,7 @@ function RolesTab({ roles, onChange, readonly }: {
               disabled={readonly}
               value={roles[r.key]}
               onChange={(e) => onChange({ ...roles, [r.key]: e.target.value })}
-              placeholder={readonly ? 'Not assigned' : 'Enter name…'}
+              placeholder={readonly ? 'Nicht zugewiesen' : 'Name eingeben…'}
               className={inputCls}
             />
           </div>

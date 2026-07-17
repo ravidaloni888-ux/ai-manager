@@ -40,38 +40,38 @@ export default function AppShell({ children }: AppShellProps) {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-          <NavItem to="/start" icon={<IconRocket />} label="Getting Started" />
+          <NavItem to="/start" icon={<IconRocket />} label="Einstieg" />
           <NavItem to="/dashboard" icon={<IconDashboard />} label="Dashboard" />
 
           <div className="pt-4" />
 
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
-            AI Programme
+            KI-Programm
           </p>
-          <NavItem to="/strategy" icon={<IconMap />} label="Strategy Wizard" />
-          <NavItem to="/maturity" icon={<IconChartBar />} label="Maturity Assessment" />
-          <NavItem to="/governance" icon={<IconBuilding />} label="AI Governance" />
-          <NavItem to="/use-cases" icon={<IconList />} label="AI Use Cases" />
-          <NavItem to="/risk" icon={<IconAlert />} label="Risk Manager" />
-          <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap Generator" />
-          <NavItem to="/roi" icon={<IconCurrency />} label="ROI Calculator" />
-          <NavItem to="/enablement" icon={<IconAcademic />} label="Enablement & Coaching" />
-          <NavItem to="/meetings" icon={<IconCalendar />} label="Regular Meetings" />
+          <NavItem to="/strategy" icon={<IconMap />} label="Strategie-Assistent" />
+          <NavItem to="/maturity" icon={<IconChartBar />} label="Reifegradcheck" />
+          <NavItem to="/governance" icon={<IconBuilding />} label="KI-Governance" />
+          <NavItem to="/use-cases" icon={<IconList />} label="KI-Anwendungsfälle" />
+          <NavItem to="/risk" icon={<IconAlert />} label="Risikomanager" />
+          <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap-Generator" />
+          <NavItem to="/roi" icon={<IconCurrency />} label="ROI-Rechner" />
+          <NavItem to="/enablement" icon={<IconAcademic />} label="Schulung & Coaching" />
+          <NavItem to="/meetings" icon={<IconCalendar />} label="Regelmäßige Meetings" />
 
           <div className="pt-4" />
 
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
-            More
+            Mehr
           </p>
-          <NavItem to="/roles" icon={<IconUsers />} label="Team & Roles" />
-          <NavItem to="/vendors" icon={<IconSearch />} label="Vendor Comparison" />
-          <NavItem to="/qa" icon={<IconClipboard />} label="AI Quality Assurance" />
-          <NavItem to="/glossary" icon={<IconSearch />} label="AI Glossary" />
+          <NavItem to="/roles" icon={<IconUsers />} label="Team & Rollen" />
+          <NavItem to="/vendors" icon={<IconSearch />} label="Anbietervergleich" />
+          <NavItem to="/qa" icon={<IconClipboard />} label="KI-Qualitätssicherung" />
+          <NavItem to="/glossary" icon={<IconSearch />} label="KI-Glossar" />
           <NavItem to="/prompts" icon={<IconStar />} label="Prompt-Bibliothek" />
           <NavItem to="/eu-ai-act" icon={<IconFlag />} label="EU AI Act" />
           <NavItem to="/dsgvo" icon={<IconShield />} label="DSGVO & Datenschutz" />
-          <NavItem to="/settings" icon={<IconSettings />} label="Settings" />
-          <NavItem to="/about" icon={<IconInfo />} label="About" />
+          <NavItem to="/settings" icon={<IconSettings />} label="Einstellungen" />
+          <NavItem to="/about" icon={<IconInfo />} label="Über uns" />
         </nav>
 
         {/* Sidebar footer — user info when logged in */}
@@ -80,7 +80,7 @@ export default function AppShell({ children }: AppShellProps) {
             <div className="flex items-center justify-between px-1">
               <span className="text-xs text-slate-400 truncate max-w-[130px]">{user.email}</span>
               <button onClick={() => signOut()} className="text-xs text-slate-400 hover:text-white transition-colors">
-                Sign out
+                Abmelden
               </button>
             </div>
           </div>
@@ -97,7 +97,7 @@ export default function AppShell({ children }: AppShellProps) {
               onClick={() => navigate('/canvas/new')}
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              <IconPlus /> New Use Case
+              <IconPlus /> Neuer Anwendungsfall
             </button>
           ) : (
             <>
@@ -105,13 +105,13 @@ export default function AppShell({ children }: AppShellProps) {
                 onClick={() => setShowBeta(true)}
                 className="text-sm text-white/60 hover:text-white border border-white/20 hover:border-white/40 px-4 py-2 rounded-lg transition-colors"
               >
-                Request access
+                Zugang anfragen
               </button>
               <button
                 onClick={() => navigate('/login')}
                 className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg transition-colors"
               >
-                Login
+                Anmelden
               </button>
             </>
           )}

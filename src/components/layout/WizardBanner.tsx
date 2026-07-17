@@ -44,7 +44,7 @@ export default function WizardBanner() {
 
       {/* Progress */}
       <p className="text-xs text-blue-100 flex-shrink-0 hidden sm:block">
-        Step {currentStep.num} of {STEPS.length}
+        Schritt {currentStep.num} von {STEPS.length}
       </p>
 
       {/* Spacer */}
@@ -57,21 +57,21 @@ export default function WizardBanner() {
             onClick={markAndNext}
             className="flex items-center gap-1.5 bg-white text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
           >
-            {isComplete ? '' : '✓ Done — '}Next: {nextStep.title} →
+            {isComplete ? '' : '✓ Fertig — '}Weiter: {nextStep.title} →
           </button>
         ) : (
           <button
             onClick={() => { if (!isComplete) toggle(currentStep.id); navigate('/start') }}
             className="flex items-center gap-1.5 bg-white text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
           >
-            ✓ Finish wizard
+            ✓ Assistent abschließen
           </button>
         )}
         <button
           onClick={() => navigate('/start')}
           className="text-xs text-blue-200 hover:text-white transition-colors px-2 py-1.5"
         >
-          Back to wizard
+          Zurück zum Assistenten
         </button>
         <button
           onClick={() => setDismissed(true)}

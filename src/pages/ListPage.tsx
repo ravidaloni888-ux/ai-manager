@@ -192,46 +192,46 @@ function PilotWizard({ useCases }: { useCases: AIUseCase[] }) {
 const ISO_REGISTER_REQUIREMENTS = [
   {
     clause: '§6.1.2',
-    title: 'AI Risk Assessment',
-    description: 'The organisation must identify, analyse and evaluate AI risks for each system. Every use case in the register must have a documented risk level before deployment.',
+    title: 'KI-Risikobewertung',
+    description: 'Die Organisation muss KI-Risiken für jedes System identifizieren, analysieren und bewerten. Jeder Anwendungsfall im Register muss vor dem Einsatz ein dokumentiertes Risikoniveau haben.',
     check: (cases: AIUseCase[]) => cases.length > 0 && cases.every((c) => c.euAiActRisk),
     gap: (cases: AIUseCase[]) => {
       const missing = cases.filter((c) => !c.euAiActRisk).length
-      return missing > 0 ? `${missing} use case${missing > 1 ? 's' : ''} without EU AI Act risk level` : null
+      return missing > 0 ? `${missing} Anwendungsfall${missing > 1 ? '‍fälle' : ''} ohne EU AI Act-Risikoniveau` : null
     },
   },
   {
     clause: '§8.2',
-    title: 'AI Risk Assessment Process',
-    description: 'A repeatable process must exist for assessing AI risks — not ad hoc. Each use case should document likelihood, impact and mitigation, not just a risk label.',
+    title: 'KI-Risikobewertungsprozess',
+    description: 'Es muss ein wiederholbarer Prozess zur Bewertung von KI-Risiken existieren — nicht ad hoc. Jeder Anwendungsfall sollte B×A×E und Maßnahmen dokumentieren, nicht nur ein Risiko-Label.',
     check: (cases: AIUseCase[]) => cases.length > 0,
     gap: (_cases: AIUseCase[]) => null,
   },
   {
     clause: '§8.4',
-    title: 'AI System Impact Assessment',
-    description: 'Before deploying or significantly changing an AI system, the potential impacts on individuals, groups and society must be assessed and documented.',
+    title: 'KI-System-Folgenabschätzung',
+    description: 'Vor dem Einsatz oder wesentlichen Änderungen eines KI-Systems müssen die potenziellen Auswirkungen auf Einzelpersonen, Gruppen und die Gesellschaft bewertet und dokumentiert werden.',
     check: (cases: AIUseCase[]) => cases.filter((c) => c.euAiActRisk === 'High Risk').every((c) => c.compliancePersonalData !== undefined && c.complianceDocumentation !== undefined),
     gap: (cases: AIUseCase[]) => {
       const highRisk = cases.filter((c) => c.euAiActRisk === 'High Risk')
       const missing = highRisk.filter((c) => c.compliancePersonalData === undefined).length
-      return missing > 0 ? `${missing} high-risk use case${missing > 1 ? 's' : ''} missing compliance checklist` : null
+      return missing > 0 ? `${missing} Hochrisiko-Anwendungsfall${missing > 1 ? 'fälle' : ''} ohne Compliance-Checkliste` : null
     },
   },
   {
     clause: 'A.6.1',
-    title: 'AI System Documentation (Annex A)',
-    description: 'Each AI system must be documented with its purpose, intended use, data sources, model type, owner, and known limitations — the AI Canvas fulfils this requirement.',
+    title: 'KI-System-Dokumentation (Anhang A)',
+    description: 'Jedes KI-System muss mit Zweck, Verwendungszweck, Datenquellen, Modelltyp, Eigentümer und bekannten Einschränkungen dokumentiert werden — das KI-Canvas erfüllt diese Anforderung.',
     check: (cases: AIUseCase[]) => cases.length > 0 && cases.every((c) => c.businessProblem && c.department),
     gap: (cases: AIUseCase[]) => {
       const incomplete = cases.filter((c) => !c.businessProblem || !c.department).length
-      return incomplete > 0 ? `${incomplete} use case${incomplete > 1 ? 's' : ''} with incomplete documentation` : null
+      return incomplete > 0 ? `${incomplete} Anwendungsfall${incomplete > 1 ? 'fälle' : ''} mit unvollständiger Dokumentation` : null
     },
   },
   {
     clause: 'A.7.1',
-    title: 'AI System Lifecycle Management (Annex A)',
-    description: 'The register must reflect the current lifecycle status of each AI system — from idea through production and retirement — to ensure governance applies at every phase.',
+    title: 'KI-System-Lebenszyklusmanagement (Anhang A)',
+    description: 'Das Register muss den aktuellen Lebenszyklusstatus jedes KI-Systems widerspiegeln — von der Idee über die Produktion bis zur Außerbetriebnahme — um Governance in jeder Phase sicherzustellen.',
     check: (cases: AIUseCase[]) => cases.length > 0 && cases.every((c) => !!c.status),
     gap: (_cases: AIUseCase[]) => null,
   },
@@ -254,15 +254,15 @@ function Iso42001RegisterPanel({ useCases }: { useCases: AIUseCase[] }) {
             </svg>
           </span>
           <div className="text-left">
-            <p className="text-sm font-semibold text-slate-800">ISO 42001 · Use Case Register Requirements</p>
-            <p className="text-xs text-slate-500 mt-0.5">§6.1.2 · §8.2 · §8.4 · Annex A.6 & A.7 — documentation and risk assessment obligations</p>
+            <p className="text-sm font-semibold text-slate-800">ISO 42001 · Anforderungen an das Anwendungsfall-Register</p>
+            <p className="text-xs text-slate-500 mt-0.5">§6.1.2 · §8.2 · §8.4 · Anhang A.6 & A.7 — Dokumentations- und Risikobewertungspflichten</p>
           </div>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
             passed === ISO_REGISTER_REQUIREMENTS.length ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
           }`}>
-            {passed}/{ISO_REGISTER_REQUIREMENTS.length} met
+            {passed}/{ISO_REGISTER_REQUIREMENTS.length} erfüllt
           </span>
           <svg className={`w-4 h-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -274,7 +274,7 @@ function Iso42001RegisterPanel({ useCases }: { useCases: AIUseCase[] }) {
         <div className="border-t border-slate-100 divide-y divide-slate-50">
           <div className="px-5 py-3 bg-indigo-50">
             <p className="text-xs text-indigo-700 leading-relaxed">
-              <span className="font-semibold">ISO 42001:2023</span> requires organisations to maintain a register of AI systems with documented risk assessments, impact evaluations, and lifecycle status. The checks below are derived from the standard and evaluated live against your current use case portfolio.
+              <span className="font-semibold">ISO 42001:2023</span> verpflichtet Organisationen, ein Register von KI-Systemen mit dokumentierten Risikobewertungen, Folgenabschätzungen und Lebenszyklusstatus zu führen. Die Prüfungen unten leiten sich aus dem Standard ab und werden live gegen Ihr aktuelles Portfolio ausgewertet.
             </p>
           </div>
 
@@ -308,7 +308,7 @@ function Iso42001RegisterPanel({ useCases }: { useCases: AIUseCase[] }) {
                     <p className="text-[10px] text-amber-600 font-medium">⚠ {gap}</p>
                   )}
                   {ok && !gap && (
-                    <p className="text-[10px] text-green-600 font-medium">✓ Requirement met based on current portfolio</p>
+                    <p className="text-[10px] text-green-600 font-medium">✓ Anforderung erfüllt auf Basis des aktuellen Portfolios</p>
                   )}
                 </div>
               </div>
@@ -331,9 +331,9 @@ export default function ListPage() {
     <div className="p-6 space-y-4">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">AI Use Cases</h1>
+          <h1 className="text-2xl font-bold text-slate-800">KI-Anwendungsfälle</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Sort, filter, group and manage your AI portfolio.
+            Sortieren, filtern, gruppieren und verwalten Sie Ihr KI-Portfolio.
           </p>
         </div>
 
@@ -347,7 +347,7 @@ export default function ListPage() {
                 : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <IconTable /> Table
+            <IconTable /> Tabelle
           </button>
           <button
             onClick={() => setView('pipeline')}

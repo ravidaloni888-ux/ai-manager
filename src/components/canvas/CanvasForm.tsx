@@ -370,7 +370,7 @@ export default function CanvasForm({ existing }: Props) {
           <div className="grid grid-cols-3 gap-4">
             {/* Row 1: Title + Department */}
             <div className="col-span-2">
-              <label className={labelCls}>Title *</label>
+              <label className={labelCls}>Titel *</label>
               <input
                 {...register('title', { required: 'Titel ist erforderlich' })}
                 className={inputCls}
@@ -379,7 +379,7 @@ export default function CanvasForm({ existing }: Props) {
               {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
             </div>
             <div>
-              <label className={labelCls}>Department</label>
+              <label className={labelCls}>Abteilung</label>
               <select {...register('department')} className={inputCls}>
                 {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
               </select>
@@ -387,7 +387,7 @@ export default function CanvasForm({ existing }: Props) {
 
             {/* Row 2: Motivation */}
             <div className="col-span-2">
-              <label className={labelCls}>Trigger / Motivation</label>
+              <label className={labelCls}>Auslöser / Motivation</label>
               <MotivationSelect
                 value={watched.motivation ?? ''}
                 onChange={(v) => setValue('motivation', v)}
@@ -397,7 +397,7 @@ export default function CanvasForm({ existing }: Props) {
 
             {/* Row 3: Stage + Health */}
             <div className="col-span-2">
-              <label className={labelCls}>Project Phase</label>
+              <label className={labelCls}>Projektphase</label>
               <div className="flex items-center gap-2">
                 <select {...register('status')} className={inputCls}>
                   {STATUSES.map((s) => <option key={s}>{s}</option>)}
@@ -408,7 +408,7 @@ export default function CanvasForm({ existing }: Props) {
               </div>
             </div>
             <div>
-              <label className={labelCls}>Project Status</label>
+              <label className={labelCls}>Projektstatus</label>
               <input type="hidden" {...register('projectHealth')} />
               <div className="flex gap-1.5 h-[38px]">
                 {PROJECT_HEALTH_OPTIONS.map((h) => (
@@ -431,12 +431,12 @@ export default function CanvasForm({ existing }: Props) {
             {/* Cancellation reason — only shown when status is Cancelled */}
             {watched.status === 'Cancelled' && (
               <div className="col-span-3">
-                <label className={labelCls}>Reason for Cancellation</label>
+                <label className={labelCls}>Grund für Stornierung</label>
                 <textarea
                   {...register('cancellationReason')}
                   rows={2}
                   className={`${textareaCls} border-red-200 focus:ring-red-400`}
-                  placeholder="Why was this use case cancelled? (e.g. budget cut, strategic pivot, technical blocker…)"
+                  placeholder="Warum wurde dieser Anwendungsfall gestoppt? (z.B. Budget, strategischer Schwenk, technische Hürde…)"
                 />
               </div>
             )}
@@ -446,12 +446,12 @@ export default function CanvasForm({ existing }: Props) {
         {/* Section 2: AI Use Case Canvas */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-            AI Use Case Canvas <span className="text-slate-400 font-normal normal-case">(9 elements)</span>
+            KI-Anwendungsfall-Canvas <span className="text-slate-400 font-normal normal-case">(9 Elemente)</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className={labelCls}>1 · Business Problem *</label>
+              <label className={labelCls}>1 · Geschäftsproblem *</label>
               <textarea
                 {...register('businessProblem', { required: true })}
                 rows={3}
@@ -461,7 +461,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>2 · Success Metrics (KPIs)</label>
+              <label className={labelCls}>2 · Erfolgskennzahlen (KPIs)</label>
               <textarea
                 {...register('successMetrics')}
                 rows={3}
@@ -471,7 +471,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>3 · Data Requirements</label>
+              <label className={labelCls}>3 · Datenanforderungen</label>
               <textarea
                 {...register('dataRequirements')}
                 rows={3}
@@ -481,7 +481,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>4 · AI Approach</label>
+              <label className={labelCls}>4 · KI-Ansatz</label>
               <div className="flex items-center gap-2">
                 <select {...register('aiApproach')} className={inputCls}>
                   {AI_APPROACHES.map((a) => <option key={a}>{a}</option>)}
@@ -493,7 +493,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>5 · Technical Feasibility</label>
+              <label className={labelCls}>5 · Technische Machbarkeit</label>
               <div className="flex items-center gap-2">
                 <select {...register('technicalFeasibility')} className={inputCls}>
                   {FEASIBILITIES.map((f) => <option key={f}>{f}</option>)}
@@ -505,7 +505,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div className="md:col-span-2">
-              <label className={labelCls}>6 · Required Team Competencies</label>
+              <label className={labelCls}>6 · Benötigte Teamkompetenzen</label>
               <CompetencySelect
                 value={watched.teamCompetencies ?? ''}
                 onChange={(v) => setValue('teamCompetencies', v)}
@@ -513,7 +513,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>7 · Timeline</label>
+              <label className={labelCls}>7 · Zeitplan</label>
               <input
                 {...register('timeline')}
                 className={inputCls}
@@ -527,7 +527,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>Start Date</label>
+              <label className={labelCls}>Startdatum</label>
               <input
                 type="date"
                 {...register('startDate')}
@@ -536,7 +536,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>8 · Estimated Cost (€k)</label>
+              <label className={labelCls}>8 · Geschätzte Kosten (€k)</label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-sm text-slate-400">€</span>
                 <input
@@ -544,14 +544,14 @@ export default function CanvasForm({ existing }: Props) {
                   min={0}
                   {...register('estimatedCostK', { valueAsNumber: true })}
                   className={`${inputCls} pl-7`}
-                  placeholder="e.g. 180"
+                  placeholder="z.B. 180"
                 />
                 <span className="absolute right-3 top-2 text-xs text-slate-400">k</span>
               </div>
             </div>
 
             <div>
-              <label className={labelCls}>9 · Expected Annual Benefit (€k/yr)</label>
+              <label className={labelCls}>9 · Erwarteter Jahresnutzen (€k/J.)</label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-sm text-slate-400">€</span>
                 <input
@@ -559,9 +559,9 @@ export default function CanvasForm({ existing }: Props) {
                   min={0}
                   {...register('expectedBenefitK', { valueAsNumber: true })}
                   className={`${inputCls} pl-7`}
-                  placeholder="e.g. 450"
+                  placeholder="z.B. 450"
                 />
-                <span className="absolute right-3 top-2 text-xs text-slate-400">k/yr</span>
+                <span className="absolute right-3 top-2 text-xs text-slate-400">k/J.</span>
               </div>
             </div>
           </div>
@@ -570,33 +570,33 @@ export default function CanvasForm({ existing }: Props) {
         {/* Section 3: Portfolio Scoring */}
         <section className="bg-white rounded-xl shadow-md p-5">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">
-            Portfolio Scoring
+            Portfolio-Bewertung
           </h2>
           <p className="text-xs text-slate-400 mb-5">
-            Weighted model (Chapter 2.5): Impact 40% · Feasibility 30% · Strategic Fit 20% · Urgency 10%
+            Gewichtetes Modell (Kap. 2.5): Nutzen 40% · Machbarkeit 30% · Strategische Passung 20% · Dringlichkeit 10%
           </p>
           <div className="space-y-3">
-            <SliderField label="Business Impact" name="businessImpact" weight="40%" register={register} value={Number(watched.businessImpact ?? 7)} />
-            <SliderField label="Feasibility"     name="feasibility"    weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
-            <SliderField label="Strategic Fit"   name="strategicFit"   weight="20%" register={register} value={Number(watched.strategicFit ?? 7)} />
-            <SliderField label="Urgency"          name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
+            <SliderField label="Geschäftsnutzen"      name="businessImpact" weight="40%" register={register} value={Number(watched.businessImpact ?? 7)} />
+            <SliderField label="Machbarkeit"           name="feasibility"    weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
+            <SliderField label="Strategische Passung"  name="strategicFit"   weight="20%" register={register} value={Number(watched.strategicFit ?? 7)} />
+            <SliderField label="Dringlichkeit"         name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
           </div>
         </section>
 
         {/* Section 5: Privacy & Compliance Checklist */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <div className="flex items-center gap-3">
-            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Privacy &amp; Compliance Checklist</h2>
+            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Datenschutz &amp; Compliance-Checkliste</h2>
             <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Governance</span>
           </div>
-          <p className="text-xs text-slate-400 -mt-2">Check each item once verified. Results appear in Governance → Privacy Checklist.</p>
+          <p className="text-xs text-slate-400 -mt-2">Haken setzen, sobald geprüft. Ergebnisse erscheinen unter Governance → Datenschutz-Checkliste.</p>
           <div className="space-y-3">
             {([
-              { key: 'complianceLegal',         label: 'Legal basis confirmed', desc: 'GDPR legal basis (Art. 6 / Art. 9) and EU AI Act classification documented' },
-              { key: 'compliancePersonalData',  label: 'Personal data & legal basis documented', desc: 'All personal data flows identified, DPIA completed if required' },
-              { key: 'complianceDataMin',       label: 'Data minimisation & purpose limitation ensured', desc: 'Only data strictly necessary for the stated purpose is processed' },
-              { key: 'complianceDocumentation', label: 'Documentation & proof obligations fulfilled', desc: 'Technical documentation, audit trail and record of processing activities in place' },
-              { key: 'complianceLiability',     label: 'Liability & responsibility defined', desc: 'Roles for AI Owner, DPO and business sponsor documented and signed off' },
+              { key: 'complianceLegal',         label: 'Rechtsgrundlage bestätigt', desc: 'DSGVO-Rechtsgrundlage (Art. 6 / Art. 9) und EU AI Act-Klassifizierung dokumentiert' },
+              { key: 'compliancePersonalData',  label: 'Personendaten & Rechtsgrundlage dokumentiert', desc: 'Alle Personendatenflüsse identifiziert, DSFA durchgeführt wenn erforderlich' },
+              { key: 'complianceDataMin',       label: 'Datensparsamkeit & Zweckbindung sichergestellt', desc: 'Nur für den angegebenen Zweck unbedingt notwendige Daten werden verarbeitet' },
+              { key: 'complianceDocumentation', label: 'Dokumentations- & Nachweispflichten erfüllt', desc: 'Technische Dokumentation, Audit-Trail und Verarbeitungsverzeichnis vorhanden' },
+              { key: 'complianceLiability',     label: 'Haftung & Verantwortung definiert', desc: 'Rollen für KI-Owner, DSB und Business-Sponsor dokumentiert und abgezeichnet' },
             ] as { key: string; label: string; desc: string }[]).map(({ key, label, desc }) => {
               const checked = !!(watched[key as keyof typeof watched])
               return (
@@ -619,52 +619,52 @@ export default function CanvasForm({ existing }: Props) {
         {/* Section 6: Documentation (Step 9) */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <div className="flex items-center gap-3">
-            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Documentation</h2>
-            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Step 9 · 9-Step Framework</span>
+            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Dokumentation</h2>
+            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Schritt 9 · 9-Schritte-Framework</span>
           </div>
-          <p className="text-xs text-slate-400 -mt-2">Formal compliance and audit documentation. All fields optional.</p>
+          <p className="text-xs text-slate-400 -mt-2">Formelle Compliance- und Audit-Dokumentation. Alle Felder optional.</p>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className={labelCls}>1 · Goal & Scope</label>
-              <p className="text-xs text-slate-400 mb-1.5">What is this AI system used for? Which models, data sources and technologies are involved?</p>
-              <textarea {...register('docGoal')} rows={3} className={textareaCls} placeholder="Description of the AI system, supported processes and decisions…" />
+              <label className={labelCls}>1 · Ziel & Umfang</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wofür wird dieses KI-System eingesetzt? Welche Modelle, Datenquellen und Technologien sind beteiligt?</p>
+              <textarea {...register('docGoal')} rows={3} className={textareaCls} placeholder="Beschreibung des KI-Systems, unterstützte Prozesse und Entscheidungen…" />
             </div>
 
             <div>
-              <label className={labelCls}>2 · Data Basis & Data Flows</label>
-              <p className="text-xs text-slate-400 mb-1.5">What data is used, where does it come from and how is it processed?</p>
-              <textarea {...register('docDataBasis')} rows={3} className={textareaCls} placeholder="Data sources, processing steps, quality assurance…" />
+              <label className={labelCls}>2 · Datenbasis & Datenflüsse</label>
+              <p className="text-xs text-slate-400 mb-1.5">Welche Daten werden verwendet, woher stammen sie und wie werden sie verarbeitet?</p>
+              <textarea {...register('docDataBasis')} rows={3} className={textareaCls} placeholder="Datenquellen, Verarbeitungsschritte, Qualitätssicherung…" />
             </div>
 
             <div>
-              <label className={labelCls}>3 · Risk Assessment & Mitigations</label>
-              <p className="text-xs text-slate-400 mb-1.5">Which risks were identified and how are they reduced or controlled?</p>
-              <textarea {...register('docRiskMitigation')} rows={3} className={textareaCls} placeholder="Identified risks, countermeasures, residual risk…" />
+              <label className={labelCls}>3 · Risikobewertung & Maßnahmen</label>
+              <p className="text-xs text-slate-400 mb-1.5">Welche Risiken wurden identifiziert und wie werden sie reduziert oder kontrolliert?</p>
+              <textarea {...register('docRiskMitigation')} rows={3} className={textareaCls} placeholder="Identifizierte Risiken, Gegenmaßnahmen, Restrisiko…" />
             </div>
 
             <div>
-              <label className={labelCls}>4 · Explainability & Decision Logic</label>
-              <p className="text-xs text-slate-400 mb-1.5">How can AI results be understood and interpreted by end users?</p>
-              <textarea {...register('docExplainability')} rows={3} className={textareaCls} placeholder="Explainability approach, interpretability for end users…" />
+              <label className={labelCls}>4 · Erklärbarkeit & Entscheidungslogik</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wie können KI-Ergebnisse von Endnutzenden verstanden und interpretiert werden?</p>
+              <textarea {...register('docExplainability')} rows={3} className={textareaCls} placeholder="Erklärbarkeitsstrategie, Interpretierbarkeit für Nutzende…" />
             </div>
 
             <div>
-              <label className={labelCls}>5 · Operations & Monitoring</label>
-              <p className="text-xs text-slate-400 mb-1.5">How is the AI monitored, maintained and improved in production?</p>
-              <textarea {...register('docOperations')} rows={3} className={textareaCls} placeholder="Monitoring, maintenance intervals, improvement cycle…" />
+              <label className={labelCls}>5 · Betrieb & Monitoring</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wie wird die KI im Betrieb überwacht, gewartet und verbessert?</p>
+              <textarea {...register('docOperations')} rows={3} className={textareaCls} placeholder="Monitoring, Wartungsintervalle, Verbesserungszyklus…" />
             </div>
 
             <div>
-              <label className={labelCls}>6 · Compliance & Regulatory Evidence</label>
-              <p className="text-xs text-slate-400 mb-1.5">How is compliance with laws and internal policies documented?</p>
-              <textarea {...register('docRegulatory')} rows={3} className={textareaCls} placeholder="Audit trail, evidence records, responsible party…" />
+              <label className={labelCls}>6 · Compliance & Regulatorischer Nachweis</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wie wird die Einhaltung von Gesetzen und internen Richtlinien dokumentiert?</p>
+              <textarea {...register('docRegulatory')} rows={3} className={textareaCls} placeholder="Audit-Trail, Nachweisdokumente, verantwortliche Person…" />
             </div>
 
             <div>
-              <label className={labelCls}>7 · Change & Version Management</label>
-              <p className="text-xs text-slate-400 mb-1.5">How are changes to the model or data recorded in a traceable way?</p>
-              <textarea {...register('docVersioning')} rows={3} className={textareaCls} placeholder="Versioning, change log, release process…" />
+              <label className={labelCls}>7 · Änderungs- & Versionsmanagement</label>
+              <p className="text-xs text-slate-400 mb-1.5">Wie werden Änderungen am Modell oder an Daten nachvollziehbar erfasst?</p>
+              <textarea {...register('docVersioning')} rows={3} className={textareaCls} placeholder="Versionierung, Änderungsprotokoll, Release-Prozess…" />
             </div>
           </div>
         </section>
@@ -672,7 +672,7 @@ export default function CanvasForm({ existing }: Props) {
         {/* Priority Score — below portfolio scoring */}
         <div className="bg-[#1a2538] rounded-xl p-5 flex items-center gap-6 text-white">
           <div className="text-center min-w-[80px]">
-            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Priority Score</p>
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Prioritätsscore</p>
             <p className={`text-4xl font-bold ${scoreColor(liveScore)}`}>{liveScore}</p>
             <p className="text-[10px] text-slate-500 mt-0.5">/ 10</p>
           </div>
@@ -687,11 +687,11 @@ export default function CanvasForm({ existing }: Props) {
               />
             </div>
             <p className="text-[10px] text-slate-500">
-              Impact×40% + Feasibility×30% + Strategic Fit×20% + Dringlichkeit×10%
+              Nutzen×40% + Machbarkeit×30% + Strateg. Passung×20% + Dringlichkeit×10%
             </p>
           </div>
           <div className="text-center min-w-[80px]">
-            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">3-Y ROI</p>
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1">3-J. ROI</p>
             <p className={`text-3xl font-bold ${liveROI > 200 ? 'text-green-400' : liveROI > 0 ? 'text-amber-400' : 'text-red-400'}`}>
               {liveROI}%
             </p>
@@ -705,13 +705,13 @@ export default function CanvasForm({ existing }: Props) {
             onClick={() => navigate(-1)}
             className="text-sm border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg"
           >
-            Cancel
+            Abbrechen
           </button>
           <button
             type="submit"
             className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2 rounded-lg transition-colors"
           >
-            {existing ? 'Save Changes' : 'Create Use Case'}
+            {existing ? 'Änderungen speichern' : 'Anwendungsfall erstellen'}
           </button>
         </div>
       </form>

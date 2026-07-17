@@ -35,11 +35,11 @@ import { useAuthStore } from '../../store/authStore'
 const ch = createColumnHelper<AIUseCase>()
 
 const GROUP_OPTIONS = [
-  { value: '', label: 'No Grouping' },
-  { value: 'department', label: 'Department' },
+  { value: '', label: 'Keine Gruppierung' },
+  { value: 'department', label: 'Abteilung' },
   { value: 'status', label: 'Phase' },
-  { value: 'projectHealth', label: 'Project Health' },
-  { value: 'aiApproach', label: 'AI Approach' },
+  { value: 'projectHealth', label: 'Projektstatus' },
+  { value: 'aiApproach', label: 'KI-Ansatz' },
 ]
 
 export default function UseCaseTable() {
@@ -96,7 +96,7 @@ export default function UseCaseTable() {
 
   const columns = useMemo(() => [
     ch.accessor('title', {
-      header: 'Title',
+      header: 'Titel',
       cell: (i) => user ? (
         <button
           onClick={() => navigate(`/canvas/${i.row.original.id}`)}
@@ -109,11 +109,11 @@ export default function UseCaseTable() {
       ),
     }),
     ch.accessor('department', {
-      header: 'Department',
+      header: 'Abteilung',
       filterFn: 'equals',
     }),
     ch.accessor('status', {
-      header: 'Phase/Status',
+      header: 'Phase / Status',
       filterFn: 'equals',
       cell: (i) => (
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_BG[i.getValue() as Status]}`}>
@@ -122,7 +122,7 @@ export default function UseCaseTable() {
       ),
     }),
     ch.accessor('motivation', {
-      header: 'Motivation / Trigger',
+      header: 'Motivation / Auslöser',
       filterFn: motivationFilterFn,
       cell: (i) => {
         const v = (i.getValue() as string) ?? ''
@@ -139,7 +139,7 @@ export default function UseCaseTable() {
       },
     }),
     ch.accessor('projectHealth', {
-      header: 'Project Health',
+      header: 'Projektstatus',
       filterFn: 'equals',
       cell: (i) => {
         const v = (i.getValue() ?? 'On Track') as ProjectHealth
@@ -151,7 +151,7 @@ export default function UseCaseTable() {
       },
     }),
     ch.accessor('aiApproach', {
-      header: 'AI Approach',
+      header: 'KI-Ansatz',
       filterFn: 'equals',
       cell: (i) => (
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${APPROACH_BG[i.getValue() as AIApproach]}`}>
@@ -160,19 +160,19 @@ export default function UseCaseTable() {
       ),
     }),
     ch.accessor('technicalFeasibility', {
-      header: 'Feasibility',
+      header: 'Machbarkeit',
       cell: (i) => (
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${FEASIBILITY_BG[i.getValue()]}`}>
           {i.getValue()}
         </span>
       ),
     }),
-    ch.accessor('businessImpact', { header: 'Business Impact', cell: (i) => <ScoreCell v={i.getValue()} /> }),
-    ch.accessor('feasibility', { header: 'Feasibility', cell: (i) => <ScoreCell v={i.getValue()} /> }),
-    ch.accessor('strategicFit', { header: 'Strategic Fit', cell: (i) => <ScoreCell v={i.getValue()} /> }),
-    ch.accessor('urgency', { header: 'Urgency', cell: (i) => <ScoreCell v={i.getValue()} /> }),
+    ch.accessor('businessImpact', { header: 'Geschäftsnutzen', cell: (i) => <ScoreCell v={i.getValue()} /> }),
+    ch.accessor('feasibility', { header: 'Machbarkeit', cell: (i) => <ScoreCell v={i.getValue()} /> }),
+    ch.accessor('strategicFit', { header: 'Strategische Passung', cell: (i) => <ScoreCell v={i.getValue()} /> }),
+    ch.accessor('urgency', { header: 'Dringlichkeit', cell: (i) => <ScoreCell v={i.getValue()} /> }),
     ch.accessor('priorityScore', {
-      header: 'Priority Score',
+      header: 'Prioritätsscore',
       cell: (i) => {
         const v = i.getValue()
         return (
@@ -186,16 +186,16 @@ export default function UseCaseTable() {
       },
     }),
     ch.accessor('estimatedCostK', {
-      header: 'Cost (€k)',
+      header: 'Kosten (€k)',
       cell: (i) => <span className="text-slate-600">€{i.getValue()}k</span>,
     }),
     ch.accessor('expectedBenefitK', {
-      header: 'Benefit (€k/yr)',
+      header: 'Nutzen (€k/J.)',
       cell: (i) => <span className="text-green-600 font-medium">€{i.getValue()}k</span>,
     }),
     ch.display({
       id: 'roi',
-      header: '3-Y ROI',
+      header: '3-J. ROI',
       cell: (i) => {
         const roi = computeROI(i.row.original.estimatedCostK, i.row.original.expectedBenefitK)
         return (
@@ -205,10 +205,10 @@ export default function UseCaseTable() {
         )
       },
     }),
-    ch.accessor('successMetrics', { header: 'Success Metrics' }),
-    ch.accessor('dataRequirements', { header: 'Data Requirements' }),
-    ch.accessor('teamCompetencies', { header: 'Team Competencies' }),
-    ch.accessor('timeline', { header: 'Timeline' }),
+    ch.accessor('successMetrics', { header: 'Erfolgskennzahlen' }),
+    ch.accessor('dataRequirements', { header: 'Datenanforderungen' }),
+    ch.accessor('teamCompetencies', { header: 'Teamkompetenzen' }),
+    ch.accessor('timeline', { header: 'Zeitplan' }),
     ch.accessor('createdAt', {
       header: 'Erstellt am',
       cell: (i) => {
@@ -229,14 +229,14 @@ export default function UseCaseTable() {
       enableHiding: false,
       cell: (i) => user ? (
         <div className="flex items-center gap-1">
-          <ActionBtn label="✏️" title="Edit" onClick={() => navigate(`/canvas/${i.row.original.id}`)} />
-          <ActionBtn label="📋" title="Duplicate" onClick={() => duplicateUseCase(i.row.original.id)} />
+          <ActionBtn label="✏️" title="Bearbeiten" onClick={() => navigate(`/canvas/${i.row.original.id}`)} />
+          <ActionBtn label="📋" title="Duplizieren" onClick={() => duplicateUseCase(i.row.original.id)} />
           <ActionBtn label="📝" title="Projektplan erstellen" onClick={() => navigate(`/project-plan?ucid=${i.row.original.id}`)} />
           <ActionBtn
             label="🗑️"
-            title="Delete"
+            title="Löschen"
             onClick={() => {
-              if (confirm(`Delete "${i.row.original.title}"?`)) deleteUseCase(i.row.original.id)
+              if (confirm(`"${i.row.original.title}" wirklich löschen?`)) deleteUseCase(i.row.original.id)
             }}
           />
         </div>
@@ -304,7 +304,7 @@ export default function UseCaseTable() {
           <input
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Search all columns…"
+            placeholder="Alle Spalten durchsuchen…"
             className="bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
           />
         </div>
@@ -314,25 +314,25 @@ export default function UseCaseTable() {
           value={statusFilter}
           onChange={(v) => setFilter('status', v)}
           options={STATUSES}
-          placeholder="All Phases"
+          placeholder="Alle Phasen"
         />
         <FilterSelect
           value={deptFilter}
           onChange={(v) => setFilter('department', v)}
           options={DEPARTMENTS}
-          placeholder="All Departments"
+          placeholder="Alle Abteilungen"
         />
         <FilterSelect
           value={motivationFilter}
           onChange={(v) => setFilter('motivation', v)}
           options={MOTIVATIONS}
-          placeholder="All Motivations"
+          placeholder="Alle Motivationen"
         />
         <FilterSelect
           value={healthFilter}
           onChange={(v) => setFilter('projectHealth', v)}
           options={PROJECT_HEALTH_OPTIONS.map((h) => h.value)}
-          placeholder="All Health"
+          placeholder="Alle Status
         />
 
         {/* Group by */}
@@ -352,7 +352,7 @@ export default function UseCaseTable() {
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-            Reset filters
+            Filter zurücksetzen
           </button>
         )}
 
@@ -364,7 +364,7 @@ export default function UseCaseTable() {
             onClick={() => setShowColMenu((v) => !v)}
             className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 shadow-sm"
           >
-            Columns ▾
+            Spalten ▾
           </button>
           {showColMenu && (
             <div className="absolute right-0 top-9 z-20 bg-white rounded-xl shadow-xl p-3 w-52 space-y-1">
@@ -389,7 +389,7 @@ export default function UseCaseTable() {
           className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-1.5 shadow-sm"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
-          Export CSV
+          CSV-Export
         </button>
 
         {/* Count */}
@@ -401,7 +401,7 @@ export default function UseCaseTable() {
       {/* Hint */}
       {user && (
         <p className="text-xs text-slate-400">
-          Double-click a row to edit · Right-click for more options · Scroll right for all fields
+          Doppelklick zum Bearbeiten · Rechtsklick für weitere Optionen · Nach rechts scrollen für alle Felder
         </p>
       )}
 
@@ -464,7 +464,7 @@ export default function UseCaseTable() {
             {table.getRowModel().rows.length === 0 && (
               <tr>
                 <td colSpan={columns.length} className="text-center py-12 text-slate-400">
-                  No use cases found.
+                  Keine Anwendungsfälle gefunden.
                 </td>
               </tr>
             )}
@@ -482,7 +482,7 @@ export default function UseCaseTable() {
                       >
                         <span>{row.getIsExpanded() ? '▼' : '▶'}</span>
                         <span>{String(row.groupingValue)}</span>
-                        <span className="font-normal text-slate-400">({row.subRows.length} entries)</span>
+                        <span className="font-normal text-slate-400">({row.subRows.length} Einträge)</span>
                       </button>
                     </td>
                   </tr>
@@ -546,13 +546,13 @@ export default function UseCaseTable() {
             className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
             onClick={() => { navigate(`/canvas/${contextMenu.row.id}`); setContextMenu(null) }}
           >
-            <span className="text-base">✏️</span> Edit
+            <span className="text-base">✏️</span> Bearbeiten
           </button>
           <button
             className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
             onClick={() => { duplicateUseCase(contextMenu.row.id); setContextMenu(null) }}
           >
-            <span className="text-base">📋</span> Duplicate
+            <span className="text-base">📋</span> Duplizieren
           </button>
           <button
             className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
@@ -564,11 +564,11 @@ export default function UseCaseTable() {
           <button
             className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
             onClick={() => {
-              if (confirm(`Delete "${contextMenu.row.title}"?`)) deleteUseCase(contextMenu.row.id)
+              if (confirm(`"${contextMenu.row.title}" wirklich löschen?`)) deleteUseCase(contextMenu.row.id)
               setContextMenu(null)
             }}
           >
-            <span className="text-base">🗑️</span> Delete
+            <span className="text-base">🗑️</span> Löschen
           </button>
         </div>
       )}

@@ -19,151 +19,151 @@ export const STEPS: Step[] = [
   // ── Phase 1 ──
   {
     id: 'vision',
-    phase: 'Strategy & Governance',
+    phase: 'Strategie & Governance',
     num: 1,
-    title: 'Define your AI Vision',
-    description: 'Set the strategic direction — your time horizon, 3 key objectives, and the competitive challenge driving AI adoption.',
-    detail: 'A clear vision aligns the organisation and gives every use case decision a "north star." Without it, AI efforts fragment into isolated experiments that never compound.',
-    effort: '~30 min',
+    title: 'KI-Vision definieren',
+    description: 'Legen Sie die strategische Ausrichtung fest — Zeithorizont, 3 Kernziele und die Wettbewerbsherausforderung, die den KI-Einsatz antreibt.',
+    detail: 'Eine klare Vision richtet die Organisation aus und gibt jeder Anwendungsfallentscheidung einen "Nordstern". Ohne sie zerfallen KI-Bemühungen in isolierte Experimente, die sich nie verstärken.',
+    effort: '~30 Min.',
     to: '/strategy',
-    cta: 'Open Strategy Wizard',
+    cta: 'Strategie-Assistent öffnen',
   },
   {
     id: 'maturity',
-    phase: 'Strategy & Governance',
+    phase: 'Strategie & Governance',
     num: 2,
-    title: 'Assess your AI Maturity',
-    description: 'Complete the maturity assessment to understand where your organisation stands across data, talent, tooling, and governance.',
-    detail: 'The maturity score tells you which use cases are realistic today and where you need to invest before scaling. It prevents over-promising to stakeholders.',
-    effort: '~45 min',
+    title: 'KI-Reifegrad einschätzen',
+    description: 'Schließen Sie die Reifegradbeurteilung ab, um zu verstehen, wo Ihre Organisation in Bezug auf Daten, Talente, Tools und Governance steht.',
+    detail: 'Der Reifegradscore zeigt, welche Anwendungsfälle heute realistisch sind und wo Sie investieren müssen, bevor Sie skalieren. Er verhindert Überversprechen gegenüber Stakeholdern.',
+    effort: '~45 Min.',
     to: '/maturity',
-    cta: 'Start Assessment',
+    cta: 'Bewertung starten',
   },
   {
     id: 'governance',
-    phase: 'Strategy & Governance',
+    phase: 'Strategie & Governance',
     num: 3,
-    title: 'Set up your AI Governance Policy',
-    description: 'Document your organisation-wide AI policy across 7 dimensions: purpose, data, transparency, responsibility, risk, ethics, and training.',
-    detail: 'A written AI policy is required under the EU AI Act and expected by enterprise customers and regulators. It also prevents rogue AI initiatives from creating legal or reputational risk.',
-    effort: '~1 hour',
+    title: 'KI-Governance-Richtlinie aufsetzen',
+    description: 'Dokumentieren Sie Ihre organisationsweite KI-Richtlinie in 7 Dimensionen: Zweck, Daten, Transparenz, Verantwortung, Risiko, Ethik und Schulung.',
+    detail: 'Eine schriftliche KI-Richtlinie ist unter dem EU AI Act erforderlich und wird von Unternehmenskunden und Regulatoren erwartet. Sie verhindert auch Schatten-KI-Initiativen, die rechtliche oder Reputationsrisiken erzeugen.',
+    effort: '~1 Std.',
     to: '/governance',
-    cta: 'Open AI Governance',
+    cta: 'KI-Governance öffnen',
   },
   {
     id: 'roles',
-    phase: 'Strategy & Governance',
+    phase: 'Strategie & Governance',
     num: 4,
-    title: 'Assign Roles & Responsibilities',
-    description: 'Name the AI Owner, Data Protection Officer, Ethics Reviewer, and other key roles. Document who is accountable for what.',
-    detail: 'The EU AI Act requires named accountability. Without assigned roles, decisions stall and incidents have no clear owner.',
-    effort: '~20 min',
+    title: 'Rollen & Verantwortlichkeiten zuweisen',
+    description: 'Benennen Sie KI-Verantwortlichen, Datenschutzbeauftragten, Ethik-Prüfer und andere Schlüsselrollen. Dokumentieren Sie, wer wofür verantwortlich ist.',
+    detail: 'Der EU AI Act erfordert benannte Verantwortlichkeit. Ohne zugewiesene Rollen stocken Entscheidungen und Vorfälle haben keinen klaren Eigentümer.',
+    effort: '~20 Min.',
     to: '/governance',
-    cta: 'Assign Roles',
+    cta: 'Rollen zuweisen',
   },
 
   // ── Phase 2 ──
   {
     id: 'usecases',
-    phase: 'Portfolio Management',
+    phase: 'Portfolio-Management',
     num: 5,
-    title: 'Inventory your AI Use Cases',
-    description: 'Add every AI initiative — live, in evaluation, or just an idea — to the portfolio. Include department, status, and a brief problem statement.',
-    detail: 'You can only manage what you can see. Many organisations discover shadow AI projects at this stage — initiatives running without governance or risk review.',
-    effort: '~1–2 hours',
+    title: 'KI-Anwendungsfälle inventarisieren',
+    description: 'Fügen Sie jede KI-Initiative — in Betrieb, in Evaluierung oder nur eine Idee — zum Portfolio hinzu. Inkl. Abteilung, Status und kurzer Problembeschreibung.',
+    detail: 'Man kann nur managen, was man sieht. Viele Organisationen entdecken in dieser Phase Schatten-KI-Projekte — Initiativen, die ohne Governance oder Risikoprüfung laufen.',
+    effort: '~1–2 Std.',
     to: '/use-cases',
-    cta: 'Open Use Cases',
+    cta: 'Anwendungsfälle öffnen',
   },
   {
     id: 'score',
-    phase: 'Portfolio Management',
+    phase: 'Portfolio-Management',
     num: 6,
-    title: 'Score & Prioritise the Portfolio',
-    description: 'Complete the AI Canvas for each case — fill in business impact, feasibility, strategic fit, and urgency scores to compute a priority ranking.',
-    detail: 'Prioritisation removes the "loudest stakeholder wins" problem. The weighted score model gives leadership an objective basis for investment decisions.',
-    effort: '~30 min per case',
+    title: 'Portfolio bewerten & priorisieren',
+    description: 'Füllen Sie das KI-Canvas für jeden Fall aus — Geschäftsnutzen, Machbarkeit, strategische Passung und Dringlichkeit — um ein Prioritätsranking zu errechnen.',
+    detail: 'Priorisierung löst das Problem "der Lauteste gewinnt". Das gewichtete Scoremodell gibt der Führungsebene eine objektive Grundlage für Investitionsentscheidungen.',
+    effort: '~30 Min. pro Fall',
     to: '/use-cases',
-    cta: 'Score Use Cases',
+    cta: 'Anwendungsfälle bewerten',
   },
   {
     id: 'eu-act',
-    phase: 'Portfolio Management',
+    phase: 'Portfolio-Management',
     num: 7,
-    title: 'Classify EU AI Act Risk per Case',
-    description: 'Set the EU AI Act risk level (Minimal / Limited / High / Unacceptable) for each use case and complete the privacy checklist for high-risk cases.',
-    detail: 'High-risk AI systems require a DPIA and additional documentation under the EU AI Act. Identifying them early avoids costly remediation later.',
-    effort: '~15 min per case',
+    title: 'EU AI Act-Risiko je Fall klassifizieren',
+    description: 'Legen Sie das EU AI Act-Risikoniveau (Minimal / Limited / High / Unacceptable) für jeden Anwendungsfall fest und füllen Sie die Datenschutz-Checkliste für Hochrisikofälle aus.',
+    detail: 'Hochrisiko-KI-Systeme erfordern eine DSFA und zusätzliche Dokumentation unter dem EU AI Act. Frühzeitige Identifikation vermeidet kostspielige Nachbesserungen.',
+    effort: '~15 Min. pro Fall',
     to: '/use-cases',
-    cta: 'Review Risk Levels',
+    cta: 'Risikoniveaus prüfen',
   },
 
   // ── Phase 3 ──
   {
     id: 'risks',
-    phase: 'Risk & Investment',
+    phase: 'Risiko & Investition',
     num: 8,
-    title: 'Register & Assess AI Risks',
-    description: 'Log technical, ethical, and operational risks for your portfolio. Score likelihood and impact, assign owners, and track mitigation status.',
-    detail: 'AI risks (bias, model drift, vendor lock-in) are often invisible until they cause an incident. A risk register makes them visible and manageable before they escalate.',
-    effort: '~1 hour',
+    title: 'KI-Risiken erfassen & bewerten',
+    description: 'Erfassen Sie technische, ethische und operative Risiken Ihres Portfolios. Bewerten Sie B×A×E, weisen Sie Verantwortliche zu und verfolgen Sie den Maßnahmenstatus.',
+    detail: 'KI-Risiken (Bias, Modell-Drift, Vendor Lock-in) sind oft unsichtbar, bis sie einen Vorfall verursachen. Ein Risikoregister macht sie sichtbar und handhabbar, bevor sie eskalieren.',
+    effort: '~1 Std.',
     to: '/risk',
-    cta: 'Open Risk Manager',
+    cta: 'Risikomanager öffnen',
   },
   {
     id: 'roadmap',
-    phase: 'Risk & Investment',
+    phase: 'Risiko & Investition',
     num: 9,
-    title: 'Generate a Delivery Roadmap',
-    description: 'Auto-sequence use cases into quarters based on priority score and budget cap. Adjust by dragging cards between quarters.',
-    detail: 'A roadmap converts the priority ranking into a delivery commitment. It answers the question stakeholders always ask: "When will we see results?"',
-    effort: '~30 min',
+    title: 'Roadmap generieren',
+    description: 'Sequenzieren Sie Anwendungsfälle automatisch in Quartale basierend auf Prioritätsscore und Budgetobergrenze. Passen Sie durch Drag & Drop zwischen Quartalen an.',
+    detail: 'Eine Roadmap wandelt das Prioritätsranking in eine Lieferverpflichtung um. Sie beantwortet die Frage, die Stakeholder immer stellen: "Wann sehen wir Ergebnisse?"',
+    effort: '~30 Min.',
     to: '/roadmap',
-    cta: 'Open Roadmap Generator',
+    cta: 'Roadmap-Generator öffnen',
   },
   {
     id: 'roi',
-    phase: 'Risk & Investment',
+    phase: 'Risiko & Investition',
     num: 10,
-    title: 'Calculate ROI for Key Cases',
-    description: 'For your highest-priority use cases, model the investment cost, annual benefit, payback period, and break-even point.',
-    detail: 'Finance and leadership will ask for ROI numbers before approving budgets. Having these ready — even as estimates — dramatically accelerates sign-off.',
-    effort: '~15 min per case',
+    title: 'ROI für Schlüsselfälle berechnen',
+    description: 'Modellieren Sie für Ihre Hochprioritätsfälle Investitionskosten, Jahresnutzen, Amortisationszeit und Break-even-Punkt.',
+    detail: 'Finanzen und Führungsebene werden ROI-Zahlen vor der Budgetfreigabe verlangen. Diese bereit zu haben — auch als Schätzungen — beschleunigt die Genehmigung erheblich.',
+    effort: '~15 Min. pro Fall',
     to: '/roi',
-    cta: 'Open ROI Calculator',
+    cta: 'ROI-Rechner öffnen',
   },
 
   // ── Phase 4 ──
   {
     id: 'enablement',
-    phase: 'Operations & People',
+    phase: 'Betrieb & Personal',
     num: 11,
-    title: 'Plan Team Enablement',
-    description: 'Define your AI training curriculum, identify skill gaps, and schedule coaching sessions for teams working with AI systems.',
-    detail: 'The most common reason AI initiatives stall after launch is that employees don\'t know how to use or trust the new system. Enablement is not optional.',
-    effort: '~45 min',
+    title: 'Team-Schulung planen',
+    description: 'Definieren Sie Ihren KI-Schulungsplan, identifizieren Sie Kompetenzlücken und planen Sie Coaching-Sessions für Teams, die mit KI-Systemen arbeiten.',
+    detail: 'Der häufigste Grund, warum KI-Initiativen nach dem Start ins Stocken geraten, ist, dass Mitarbeitende das neue System nicht nutzen oder ihm nicht vertrauen können. Schulung ist keine Option.',
+    effort: '~45 Min.',
     to: '/enablement',
-    cta: 'Open Enablement',
+    cta: 'Schulung & Coaching öffnen',
   },
   {
     id: 'meetings',
-    phase: 'Operations & People',
+    phase: 'Betrieb & Personal',
     num: 12,
-    title: 'Set Up Governance Meetings',
-    description: 'Establish a recurring AI Steering Committee, monthly portfolio review, and quarterly strategy check-in. Document agenda and attendees.',
-    detail: 'Sustained AI progress requires a governance rhythm. Without scheduled check-ins, the portfolio drifts and accountability fades within 3–6 months.',
-    effort: '~20 min',
+    title: 'Governance-Meetings einrichten',
+    description: 'Etablieren Sie einen regelmäßigen KI-Lenkungsausschuss, monatliches Portfolio-Review und quartalsweises Strategie-Check-in. Dokumentieren Sie Agenda und Teilnehmende.',
+    detail: 'Nachhaltige KI-Fortschritte erfordern einen Governance-Rhythmus. Ohne geplante Check-ins driftet das Portfolio, und Verantwortlichkeit schwindet innerhalb von 3–6 Monaten.',
+    effort: '~20 Min.',
     to: '/meetings',
-    cta: 'Open Meetings',
+    cta: 'Meetings öffnen',
   },
 ]
 
 const PHASES = [...new Set(STEPS.map((s) => s.phase))]
 
 const PHASE_STYLE: Record<string, { bg: string; border: string; text: string; badge: string }> = {
-  'Strategy & Governance': { bg: 'bg-blue-50',   border: 'border-blue-200',  text: 'text-blue-800',  badge: 'bg-blue-100 text-blue-700' },
-  'Portfolio Management':  { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', badge: 'bg-purple-100 text-purple-700' },
-  'Risk & Investment':     { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-800', badge: 'bg-orange-100 text-orange-700' },
-  'Operations & People':   { bg: 'bg-green-50',  border: 'border-green-200',  text: 'text-green-800',  badge: 'bg-green-100 text-green-700' },
+  'Strategie & Governance': { bg: 'bg-blue-50',   border: 'border-blue-200',  text: 'text-blue-800',  badge: 'bg-blue-100 text-blue-700' },
+  'Portfolio-Management':   { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', badge: 'bg-purple-100 text-purple-700' },
+  'Risiko & Investition':   { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-800', badge: 'bg-orange-100 text-orange-700' },
+  'Betrieb & Personal':     { bg: 'bg-green-50',  border: 'border-green-200',  text: 'text-green-800',  badge: 'bg-green-100 text-green-700' },
 }
 
 
@@ -187,9 +187,9 @@ export default function StartPage() {
     <div className="p-6 space-y-6 max-w-3xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Getting Started</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Einstieg</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Your AI Manager Playbook — follow these steps in order to build a solid AI programme.
+          Ihr KI-Manager-Playbook — folgen Sie diesen Schritten, um ein solides KI-Programm aufzubauen.
         </p>
       </div>
 
@@ -198,8 +198,8 @@ export default function StartPage() {
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-semibold text-slate-700">
             {completedCount === totalCount
-              ? '🎉 All steps complete!'
-              : `${completedCount} of ${totalCount} steps complete`}
+              ? '🎉 Alle Schritte abgeschlossen!'
+              : `${completedCount} von ${totalCount} Schritten abgeschlossen`}
           </p>
           <span className="text-sm font-bold text-blue-600">{pct}%</span>
         </div>
@@ -211,7 +211,7 @@ export default function StartPage() {
         </div>
         {nextStep && (
           <p className="text-xs text-slate-400 mt-2">
-            Next up: <span className="font-semibold text-slate-600">Step {nextStep.num} — {nextStep.title}</span>
+            Als nächstes: <span className="font-semibold text-slate-600">Schritt {nextStep.num} — {nextStep.title}</span>
           </p>
         )}
       </div>
@@ -261,7 +261,7 @@ export default function StartPage() {
                             ? 'border-blue-500 text-blue-500 hover:bg-blue-50'
                             : 'border-slate-300 text-slate-300 hover:border-slate-400'
                         }`}
-                        title={isComplete ? 'Mark incomplete' : 'Mark complete'}
+                        title={isComplete ? 'Als unvollständig markieren' : 'Als abgeschlossen markieren'}
                       >
                         {isComplete ? (
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
@@ -281,7 +281,7 @@ export default function StartPage() {
                                 {step.title}
                               </p>
                               {isNext && (
-                                <span className="text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded-full">Next</span>
+                                <span className="text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded-full">Weiter</span>
                               )}
                             </div>
                             <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{step.description}</p>
@@ -296,7 +296,7 @@ export default function StartPage() {
                         {/* Expanded detail */}
                         {isExpanded && (
                           <div className={`mt-3 p-3 rounded-lg text-xs text-slate-600 leading-relaxed border ${style.bg} ${style.border}`}>
-                            <p className={`font-semibold mb-1 ${style.text}`}>Why this step matters</p>
+                            <p className={`font-semibold mb-1 ${style.text}`}>Warum dieser Schritt wichtig ist</p>
                             {step.detail}
                           </div>
                         )}
@@ -317,7 +317,7 @@ export default function StartPage() {
                             onClick={() => setExpanded(isExpanded ? null : step.id)}
                             className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
                           >
-                            {isExpanded ? 'Hide detail' : 'Why this?'}
+                            {isExpanded ? 'Detail ausblenden' : 'Warum?'}
                           </button>
                         </div>
                       </div>
@@ -332,8 +332,8 @@ export default function StartPage() {
 
       {/* Footer note */}
       <p className="text-xs text-slate-400 pb-2">
-        Steps can be completed in any order — the sequence above reflects the recommended approach for new AI Managers.
-        Progress is saved automatically in your browser.
+        Schritte können in beliebiger Reihenfolge abgeschlossen werden — die obige Sequenz spiegelt den empfohlenen Ansatz für neue KI-Manager wider.
+        Fortschritt wird automatisch im Browser gespeichert.
       </p>
     </div>
   )

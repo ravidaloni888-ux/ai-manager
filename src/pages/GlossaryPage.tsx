@@ -356,7 +356,7 @@ export default function GlossaryPage() {
       <div className="space-y-3">
         <input
           type="text"
-          placeholder="Search terms or definitions…"
+          placeholder="Begriffe oder Definitionen suchen…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -389,7 +389,7 @@ export default function GlossaryPage() {
       <div className="space-y-2">
         {filtered.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-            <p className="text-slate-400 text-sm">No terms found.</p>
+            <p className="text-slate-400 text-sm">Keine Begriffe gefunden.</p>
           </div>
         ) : (
           filtered.map((t) => (

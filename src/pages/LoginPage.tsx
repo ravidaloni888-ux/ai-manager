@@ -71,7 +71,7 @@ export default function LoginPage() {
           <div>
             <p className="font-semibold text-slate-800">AI Manager</p>
             <p className="text-xs text-slate-400">
-              {forgotMode ? 'Reset Password' : 'Sign in to manage your use cases'}
+              {forgotMode ? 'Passwort zurücksetzen' : 'Anmelden zur Verwaltung Ihrer Anwendungsfälle'}
             </p>
           </div>
         </div>
@@ -79,13 +79,13 @@ export default function LoginPage() {
         {resetSent ? (
           <div className="space-y-4">
             <p className="text-sm text-green-600">
-              Reset link sent to <strong>{email}</strong>. Please check your inbox.
+              Reset-Link gesendet an <strong>{email}</strong>. Bitte prüfen Sie Ihren Posteingang.
             </p>
             <button
               onClick={() => { setForgotMode(false); setResetSent(false) }}
               className="text-sm text-blue-600 hover:underline"
             >
-              Back to login
+              Zurück zum Login
             </button>
           </div>
         ) : forgotMode ? (
@@ -109,14 +109,14 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2.5 rounded-lg transition-colors disabled:opacity-60"
             >
-              {loading ? 'Sending…' : 'Send reset link'}
+              {loading ? 'Wird gesendet…' : 'Reset-Link senden'}
             </button>
             <button
               type="button"
               onClick={() => { setForgotMode(false); setError('') }}
               className="w-full text-sm text-slate-500 hover:text-slate-700"
             >
-              Back to login
+              Zurück zum Login
             </button>
           </form>
         ) : (
@@ -136,13 +136,13 @@ export default function LoginPage() {
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-medium text-slate-600">Password</label>
+                <label className="block text-xs font-medium text-slate-600">Passwort</label>
                 <button
                   type="button"
                   onClick={() => { setForgotMode(true); setError('') }}
                   className="text-xs text-blue-600 hover:underline"
                 >
-                  Forgot password?
+                  Passwort vergessen?
                 </button>
               </div>
               <input
@@ -161,7 +161,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2.5 rounded-lg transition-colors disabled:opacity-60"
             >
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? 'Anmelden…' : 'Anmelden'}
             </button>
           </form>
         )}

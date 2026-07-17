@@ -364,7 +364,7 @@ export default function VendorPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search vendors or tags…"
+              placeholder="Anbieter oder Tags suchen…"
               className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-56 bg-white"
             />
             <div className="flex gap-1.5 flex-wrap">
@@ -409,7 +409,7 @@ export default function VendorPage() {
                       </div>
                       <button
                         onClick={() => toggleSelect(v.id)}
-                        title={isSelected ? 'Remove from comparison' : selected.size >= 4 ? 'Max 4 vendors' : 'Add to comparison'}
+                        title={isSelected ? 'Aus Vergleich entfernen' : selected.size >= 4 ? 'Max. 4 Anbieter' : 'Zum Vergleich hinzufügen'}
                         className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center text-xs font-bold transition-colors ${
                           isSelected
                             ? 'bg-blue-600 border-blue-600 text-white'
@@ -666,7 +666,7 @@ export default function VendorPage() {
                     : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-500'
                 }`}
               >
-                {selected.has(detail.id) ? 'Remove from compare' : 'Add to compare'}
+                {selected.has(detail.id) ? 'Aus Vergleich entfernen' : 'Zum Vergleich hinzufügen'}
               </button>
               <a
                 href={detail.website}

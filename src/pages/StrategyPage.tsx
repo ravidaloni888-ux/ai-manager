@@ -13,10 +13,10 @@ import { scoreColor } from '../lib/scoring'
 type Tab = 'vision' | 'focus' | 'roadmap' | 'investment'
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'vision',     label: 'AI Vision'     },
-  { id: 'focus',      label: 'Focus Areas'   },
-  { id: 'roadmap',    label: 'Timeline'      },
-  { id: 'investment', label: 'Investment'    },
+  { id: 'vision',     label: 'KI-Vision'      },
+  { id: 'focus',      label: 'Schwerpunkte'   },
+  { id: 'roadmap',    label: 'Timeline'       },
+  { id: 'investment', label: 'Investitionen'  },
 ]
 
 const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-slate-50 disabled:text-slate-400'
@@ -102,8 +102,8 @@ export default function StrategyPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">AI Strategy</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Vision · Focus Areas · Roadmap · Investment — K7.0069</p>
+          <h1 className="text-2xl font-bold text-slate-800">KI-Strategie</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Vision · Schwerpunkte · Roadmap · Investitionen — K7.0069</p>
         </div>
         {tab !== 'roadmap' && user && (
           <button
@@ -111,17 +111,17 @@ export default function StrategyPage() {
             disabled={saving}
             className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors min-w-[90px]"
           >
-            {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save'}
+            {saving ? 'Speichern…' : saved ? '✓ Gespeichert' : 'Speichern'}
           </button>
         )}
       </div>
 
       {/* KPI strip */}
       <div className="grid grid-cols-4 gap-4">
-        <KpiCard icon="🎯" label="Vision"        value={visionFilled ? '✓ Set' : '— Empty'} ok={visionFilled} />
-        <KpiCard icon="🎚️" label="Focus Areas"   value={`${focusSet} / 8`}                  ok={focusSet >= 4} />
-        <KpiCard icon="💶" label="Budget"         value={budgetSet ? `€${local.budgetTotalK.toLocaleString()}k` : '— Not set'} ok={budgetSet} />
-        <KpiCard icon="📌" label="KPIs Tracked"  value={`${kpiCount}`}                       ok={kpiCount > 0} />
+        <KpiCard icon="🎯" label="Vision"          value={visionFilled ? '✓ Gesetzt' : '— Leer'} ok={visionFilled} />
+        <KpiCard icon="🎚️" label="Schwerpunkte"  value={`${focusSet} / 8`}                    ok={focusSet >= 4} />
+        <KpiCard icon="💶" label="Budget"          value={budgetSet ? `€${local.budgetTotalK.toLocaleString()}k` : '— Nicht gesetzt'} ok={budgetSet} />
+        <KpiCard icon="📌" label="KPIs verfolgt"  value={`${kpiCount}`}                        ok={kpiCount > 0} />
       </div>
 
       {/* Tabs */}
@@ -169,21 +169,21 @@ function VisionTab({ local, setLocal, readonly }: { local: StrategyData; setLoca
     <div className="space-y-4">
       {/* Vision statement */}
       <div className="bg-white rounded-xl shadow-md p-5 space-y-2">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">AI Vision Statement</h3>
-        <p className="text-xs text-slate-400">Where do you want AI to take your organisation? Write a one-paragraph vision for {local.horizon} years from now.</p>
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">KI-Vision Statement</h3>
+        <p className="text-xs text-slate-400">Wohin soll KI Ihre Organisation führen? Beschreiben Sie eine Vision für {local.horizon} Jahre ab heute.</p>
         <textarea
           rows={4}
           disabled={readonly}
           value={local.vision}
           onChange={(e) => upd({ vision: e.target.value })}
-          placeholder="In 3 years, AI will enable us to…"
+          placeholder="In 3 Jahren wird KI es uns ermöglichen, …"
           className={textareaCls}
         />
       </div>
 
       {/* Horizon */}
       <div className="bg-white rounded-xl shadow-md p-5 space-y-3">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Strategic Horizon</h3>
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Strategischer Horizont</h3>
         <div className="flex gap-2">
           {(['1', '2', '3', '5'] as const).map((y) => (
             <button
@@ -196,7 +196,7 @@ function VisionTab({ local, setLocal, readonly }: { local: StrategyData; setLoca
                   : 'bg-white text-slate-600 border-slate-200 hover:border-blue-400'
               }`}
             >
-              {y} yr
+              {y} J.
             </button>
           ))}
         </div>
@@ -204,8 +204,8 @@ function VisionTab({ local, setLocal, readonly }: { local: StrategyData; setLoca
 
       {/* 3 Objectives */}
       <div className="bg-white rounded-xl shadow-md p-5 space-y-3">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Top 3 Strategic Objectives</h3>
-        <p className="text-xs text-slate-400">Concrete, measurable goals AI must achieve within the horizon.</p>
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Top 3 Strategische Ziele</h3>
+        <p className="text-xs text-slate-400">Konkrete, messbare Ziele, die KI innerhalb des Horizonts erreichen soll.</p>
         <div className="space-y-2">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex items-center gap-3">
@@ -222,9 +222,9 @@ function VisionTab({ local, setLocal, readonly }: { local: StrategyData; setLoca
                   upd({ objectives: next })
                 }}
                 placeholder={[
-                  'e.g. Automate 30% of operational processes by end of year',
-                  'e.g. Deploy AI in 3 customer-facing touchpoints',
-                  'e.g. Achieve €2M annual savings from AI-driven efficiency',
+                  'z.B. 30% der operativen Prozesse bis Jahresende automatisieren',
+                  'z.B. KI in 3 kundenseitigen Touchpoints einsetzen',
+                  'z.B. €2M jährliche Einsparungen durch KI-Effizienz erzielen',
                 ][i]}
                 className={inputCls}
               />
@@ -235,14 +235,14 @@ function VisionTab({ local, setLocal, readonly }: { local: StrategyData; setLoca
 
       {/* Challenge */}
       <div className="bg-white rounded-xl shadow-md p-5 space-y-2">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Key Challenge / Burning Platform</h3>
-        <p className="text-xs text-slate-400">What business pressure or competitive threat makes AI adoption urgent?</p>
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Zentrale Herausforderung / Handlungsdruck</h3>
+        <p className="text-xs text-slate-400">Welcher Geschäftsdruck oder Wettbewerbsdruck macht die KI-Einführung dringend?</p>
         <textarea
           rows={3}
           disabled={readonly}
           value={local.challenge}
           onChange={(e) => upd({ challenge: e.target.value })}
-          placeholder="e.g. Competitor launched AI-powered service in Q1, reducing our market share by 8%…"
+          placeholder="z.B. Wettbewerber hat in Q1 einen KI-Service eingeführt und unseren Marktanteil um 8% reduziert…"
           className={textareaCls}
         />
       </div>
@@ -265,8 +265,8 @@ function FocusTab({ local, setLocal, readonly }: { local: StrategyData; setLocal
       <div className="bg-white rounded-xl shadow-md p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Strategic Focus Areas</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Rate each theme by how central it is to your AI strategy.</p>
+            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Strategische Schwerpunkte</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Bewerten Sie jedes Thema danach, wie zentral es für Ihre KI-Strategie ist.</p>
           </div>
           <div className="flex gap-2 text-xs">
             <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full font-semibold">{highCount} High</span>
@@ -303,7 +303,7 @@ function FocusTab({ local, setLocal, readonly }: { local: StrategyData; setLocal
                 disabled={readonly}
                 value={area.note}
                 onChange={(e) => updArea(i, { note: e.target.value })}
-                placeholder="Add a note…"
+                placeholder="Notiz hinzufügen…"
                 className="flex-1 text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white disabled:bg-transparent disabled:border-transparent"
               />
             </div>
@@ -328,10 +328,10 @@ function RoadmapTab({ useCases }: { useCases: AIUseCase[] }) {
       <div className="bg-white rounded-xl shadow-md p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Portfolio Roadmap</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Use cases plotted by expected production quarter based on current phase.</p>
+            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Portfolio-Roadmap</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Anwendungsfälle nach erwartetem Produktionsquartal basierend auf der aktuellen Phase.</p>
           </div>
-          <span className="text-xs text-slate-400 italic">Click any card to open</span>
+          <span className="text-xs text-slate-400 italic">Karte anklicken zum Öffnen</span>
         </div>
 
         <div className="overflow-x-auto">
@@ -346,7 +346,7 @@ function RoadmapTab({ useCases }: { useCases: AIUseCase[] }) {
                     isCurrent ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
                   }`}>
                     <span className="text-xs font-bold">{q}</span>
-                    {isCurrent && <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-semibold">NOW</span>}
+                    {isCurrent && <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-semibold">JETZT</span>}
                     {!isCurrent && <span className="text-[10px] font-semibold">{cases.length}</span>}
                     {isCurrent && <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-semibold">{cases.length}</span>}
                   </div>
@@ -430,38 +430,38 @@ function InvestmentTab({ local, setLocal, readonly, useCases }: {
     <div className="space-y-4">
       {/* Budget inputs */}
       <div className="bg-white rounded-xl shadow-md p-5 space-y-4">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Budget & ROI Targets</h3>
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Budget & ROI-Ziele</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className={labelCls}>Total AI Investment Budget (€k)</label>
+            <label className={labelCls}>Gesamtes KI-Investitionsbudget (€k)</label>
             <input
               type="number"
               disabled={readonly}
               value={local.budgetTotalK || ''}
               onChange={(e) => upd({ budgetTotalK: Number(e.target.value) })}
-              placeholder="e.g. 2000"
+              placeholder="z.B. 2000"
               className={inputCls}
             />
             {local.budgetTotalK > 0 && totalPortfolioCost > 0 && (
               <p className="text-xs text-slate-400 mt-1">
-                Portfolio committed: €{totalPortfolioCost.toLocaleString()}k
-                ({Math.round((totalPortfolioCost / local.budgetTotalK) * 100)}% of budget)
+                Portfolio gebunden: €{totalPortfolioCost.toLocaleString()}k
+                ({Math.round((totalPortfolioCost / local.budgetTotalK) * 100)}% des Budgets)
               </p>
             )}
           </div>
           <div>
-            <label className={labelCls}>Target Portfolio ROI (%)</label>
+            <label className={labelCls}>Ziel-Portfolio-ROI (%)</label>
             <input
               type="number"
               disabled={readonly}
               value={local.targetRoiPct || ''}
               onChange={(e) => upd({ targetRoiPct: Number(e.target.value) })}
-              placeholder="e.g. 250"
+              placeholder="z.B. 250"
               className={inputCls}
             />
             {totalPortfolioCost > 0 && (
               <p className="text-xs text-slate-400 mt-1">
-                Portfolio actual: {Math.round(((totalPortfolioBenefit * 3 - totalPortfolioCost) / totalPortfolioCost) * 100)}% 3-yr ROI
+                Portfolio aktuell: {Math.round(((totalPortfolioBenefit * 3 - totalPortfolioCost) / totalPortfolioCost) * 100)}% 3-J. ROI
               </p>
             )}
           </div>
@@ -470,8 +470,8 @@ function InvestmentTab({ local, setLocal, readonly, useCases }: {
 
       {/* Cost by department */}
       <div className="bg-white rounded-xl shadow-md p-5 space-y-3">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Portfolio Cost by Department</h3>
-        <p className="text-xs text-slate-400">Derived from estimated costs across all use cases.</p>
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Portfolio-Kosten nach Abteilung</h3>
+        <p className="text-xs text-slate-400">Abgeleitet aus den geschätzten Kosten aller Anwendungsfälle.</p>
         <div className="space-y-2">
           {DEPARTMENTS.filter((d) => costByDept[d] > 0)
             .sort((a, b) => costByDept[b] - costByDept[a])
@@ -496,31 +496,31 @@ function InvestmentTab({ local, setLocal, readonly, useCases }: {
       <div className="bg-white rounded-xl shadow-md p-5 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Strategic KPIs</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Define the metrics that will show AI strategy is succeeding.</p>
+            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Strategische KPIs</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Definieren Sie Kennzahlen, die den Erfolg der KI-Strategie messen.</p>
           </div>
           {!readonly && (
             <button
               onClick={addKpi}
               className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
             >
-              + Add KPI
+              + KPI hinzufügen
             </button>
           )}
         </div>
 
         {local.kpis.length === 0 ? (
           <div className="text-center py-8 text-slate-400 text-sm">
-            {readonly ? 'No KPIs defined yet.' : 'Add your first KPI to start tracking strategic progress.'}
+            {readonly ? 'Noch keine KPIs definiert.' : 'Ersten KPI hinzufügen, um den strategischen Fortschritt zu verfolgen.'}
           </div>
         ) : (
           <div className="space-y-2">
             {/* Header */}
             <div className="grid grid-cols-[1fr_120px_120px_120px_32px] gap-2 px-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
-              <span>Metric</span>
-              <span>Current</span>
-              <span>Target</span>
-              <span>Deadline</span>
+              <span>Kennzahl</span>
+              <span>Aktuell</span>
+              <span>Ziel</span>
+              <span>Frist</span>
               <span />
             </div>
             {local.kpis.map((kpi) => (
@@ -529,7 +529,7 @@ function InvestmentTab({ local, setLocal, readonly, useCases }: {
                   disabled={readonly}
                   value={kpi.metric}
                   onChange={(e) => updateKpi(kpi.id, { metric: e.target.value })}
-                  placeholder="e.g. Use cases in production"
+                  placeholder="z.B. Anwendungsfälle in Produktion"
                   className="text-xs border-0 bg-transparent focus:outline-none text-slate-800 placeholder:text-slate-300 w-full"
                 />
                 <input

@@ -23,7 +23,7 @@ export default function BetaRequestModal({ onClose }: Props) {
       email,
     })
     setLoading(false)
-    if (error) setError('Something went wrong. Please try again.')
+    if (error) setError('Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.')
     else setSuccess(true)
   }
 
@@ -32,24 +32,24 @@ export default function BetaRequestModal({ onClose }: Props) {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-5">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-800">Request Beta Access</h2>
-            <p className="text-xs text-slate-400 mt-0.5">We'll get back to you shortly.</p>
+            <h2 className="text-base font-semibold text-slate-800">Beta-Zugang anfragen</h2>
+            <p className="text-xs text-slate-400 mt-0.5">Wir melden uns bald bei Ihnen.</p>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-lg leading-none">×</button>
         </div>
 
         {success ? (
           <div className="space-y-4">
-            <p className="text-sm text-green-600">Thanks! Your request has been submitted. We'll be in touch.</p>
+            <p className="text-sm text-green-600">Danke! Ihre Anfrage wurde eingereicht. Wir melden uns.</p>
             <button onClick={onClose} className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium py-2.5 rounded-lg transition-colors">
-              Close
+              Schließen
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="flex gap-3">
               <div className="flex-1">
-                <label className="block text-xs font-medium text-slate-600 mb-1">First name</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Vorname</label>
                 <input
                   type="text"
                   value={firstName}
@@ -60,7 +60,7 @@ export default function BetaRequestModal({ onClose }: Props) {
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-xs font-medium text-slate-600 mb-1">Last name</label>
+                <label className="block text-xs font-medium text-slate-600 mb-1">Nachname</label>
                 <input
                   type="text"
                   value={lastName}
@@ -86,7 +86,7 @@ export default function BetaRequestModal({ onClose }: Props) {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2.5 rounded-lg transition-colors disabled:opacity-60"
             >
-              {loading ? 'Sending…' : 'Request Access'}
+              {loading ? 'Wird gesendet…' : 'Zugang anfragen'}
             </button>
           </form>
         )}

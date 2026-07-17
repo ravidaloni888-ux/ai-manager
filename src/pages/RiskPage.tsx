@@ -339,30 +339,30 @@ export default function RiskPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">AI Risk Manager</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Risk register · Heat map · Mitigation tracking</p>
+          <h1 className="text-2xl font-bold text-slate-800">KI-Risikomanager</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Risikoregister · Heat Map · Maßnahmenverfolgung</p>
         </div>
         {user && tab === 'register' && (
           <button
             onClick={() => setShowForm((v) => !v)}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
-            {showForm ? '✕ Cancel' : '+ Add Risk'}
+            {showForm ? '✕ Abbrechen' : '+ Risiko hinzufügen'}
           </button>
         )}
       </div>
 
       {/* KPI strip */}
       <div className="grid grid-cols-4 gap-4">
-        <KpiCard label="Total Risks"      value={String(risks.length)}       sub="identified"          color="text-slate-700" />
-        <KpiCard label="Critical"         value={String(criticalCount)}       sub="score ≥ 15"          color="text-red-600"   />
-        <KpiCard label="No Mitigation"    value={String(noMitigCount)}        sub="action needed"       color="text-amber-600" />
-        <KpiCard label="Residual High"    value={String(residualHigh)}        sub="after controls"      color="text-orange-600"/>
+        <KpiCard label="Risiken gesamt"    value={String(risks.length)}       sub="identifiziert"       color="text-slate-700" />
+        <KpiCard label="Kritisch"         value={String(criticalCount)}       sub="RPZ ≥ 400"           color="text-red-600"   />
+        <KpiCard label="Ohne Maßnahme"    value={String(noMitigCount)}        sub="Handlungsbedarf"     color="text-amber-600" />
+        <KpiCard label="Restrisiko hoch"  value={String(residualHigh)}        sub="nach Kontrollen"     color="text-orange-600"/>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
-        {([['register', 'Risk Register'], ['heatmap', 'Heat Map'], ['bae', 'B×A×E Analyse'], ['matrix', 'Über Risiken']] as [Tab, string][]).map(([id, label]) => (
+        {([['register', 'Risikoregister'], ['heatmap', 'Heat Map'], ['bae', 'B×A×E Analyse'], ['matrix', 'Über Risiken']] as [Tab, string][]).map(([id, label]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
@@ -439,23 +439,23 @@ function RegisterTab({ risks, useCases, user, onUpdate, onDelete }: {
       {/* Filters */}
       <div className="flex gap-2 flex-wrap">
         <select value={ucFilter}  onChange={(e) => setUcFilter(e.target.value)}  className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">All use cases</option>
+          <option value="">Alle Anwendungsfälle</option>
           {ucTitles.map((t) => <option key={t}>{t}</option>)}
         </select>
         <select value={catFilter} onChange={(e) => setCatFilter(e.target.value)} className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">All categories</option>
+          <option value="">Alle Kategorien</option>
           {RISK_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
         </select>
         <select value={sevFilter} onChange={(e) => setSevFilter(e.target.value)} className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">All severities</option>
+          <option value="">Alle Schweregrade</option>
           {['Critical', 'High', 'Medium', 'Low'].map((s) => <option key={s}>{s}</option>)}
         </select>
         {(ucFilter || catFilter || sevFilter) && (
           <button onClick={() => { setUcFilter(''); setCatFilter(''); setSevFilter('') }} className="text-xs text-slate-400 hover:text-slate-600 px-2">
-            Clear filters
+            Filter löschen
           </button>
         )}
-        <span className="text-xs text-slate-400 self-center ml-auto">{filtered.length} of {risks.length} risks</span>
+        <span className="text-xs text-slate-400 self-center ml-auto">{filtered.length} von {risks.length} Risiken</span>
       </div>
 
       {/* Table */}
@@ -463,13 +463,13 @@ function RegisterTab({ risks, useCases, user, onUpdate, onDelete }: {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-100 text-[10px] text-slate-400 uppercase tracking-wide">
-              <th className="text-left px-4 py-3 font-semibold">Risk</th>
-              <th className="text-left px-4 py-3 font-semibold">Use Case</th>
-              <th className="text-left px-4 py-3 font-semibold">Category</th>
+              <th className="text-left px-4 py-3 font-semibold">Risiko</th>
+              <th className="text-left px-4 py-3 font-semibold">Anwendungsfall</th>
+              <th className="text-left px-4 py-3 font-semibold">Kategorie</th>
               <th className="text-center px-4 py-3 font-semibold">Score</th>
-              <th className="text-center px-4 py-3 font-semibold">Residual</th>
-              <th className="text-left px-4 py-3 font-semibold">Mitigation</th>
-              <th className="text-left px-4 py-3 font-semibold">Owner</th>
+              <th className="text-center px-4 py-3 font-semibold">Restrisiko</th>
+              <th className="text-left px-4 py-3 font-semibold">Maßnahme</th>
+              <th className="text-left px-4 py-3 font-semibold">Verantwortlich</th>
               <th className="px-2 py-3" />
             </tr>
           </thead>
@@ -532,7 +532,7 @@ function RegisterTab({ risks, useCases, user, onUpdate, onDelete }: {
           </tbody>
         </table>
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-slate-400 text-sm">No risks match the current filters.</div>
+          <div className="text-center py-12 text-slate-400 text-sm">Keine Risiken entsprechen den aktuellen Filtern.</div>
         )}
       </div>
     </div>
@@ -554,11 +554,11 @@ function ExpandedRow({ risk, user, onUpdate, onDelete }: {
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Description</p>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Beschreibung</p>
           <p className="text-sm text-slate-700 leading-relaxed">{risk.description}</p>
         </div>
         <div>
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Mitigation Plan</p>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Maßnahmenplan</p>
           {editing ? (
             <textarea
               rows={3}
@@ -575,14 +575,14 @@ function ExpandedRow({ risk, user, onUpdate, onDelete }: {
       {editing && (
         <div className="grid grid-cols-4 gap-3">
           <div>
-            <label className={labelCls}>Mitigation Status</label>
+            <label className={labelCls}>Maßnahmenstatus</label>
             <select value={local.mitigationStatus} onChange={(e) => upd({ mitigationStatus: e.target.value as MitigationStatus })} className={inputCls}>
               {MITIGATION_STATUSES.map((s) => <option key={s}>{s}</option>)}
             </select>
           </div>
           <div>
-            <label className={labelCls}>Owner</label>
-            <input value={local.owner} onChange={(e) => upd({ owner: e.target.value })} className={inputCls} placeholder="Name or role" />
+            <label className={labelCls}>Verantwortlich</label>
+            <input value={local.owner} onChange={(e) => upd({ owner: e.target.value })} className={inputCls} placeholder="Name oder Rolle" />
           </div>
           <div>
             <label className={labelCls}>Residual B – Bedeutung nach Maßnahme (1–10)</label>
@@ -607,19 +607,19 @@ function ExpandedRow({ risk, user, onUpdate, onDelete }: {
                 onClick={() => { onUpdate(local); setEditing(false) }}
                 className="text-xs bg-blue-600 hover:bg-blue-500 text-white font-semibold px-3 py-1.5 rounded-lg transition-colors"
               >
-                Save changes
+                Speichern
               </button>
               <button onClick={() => { setLocal(risk); setEditing(false) }} className="text-xs text-slate-500 hover:text-slate-700 px-2">
-                Cancel
+                Abbrechen
               </button>
             </>
           ) : (
             <>
               <button onClick={() => setEditing(true)} className="text-xs text-blue-600 hover:text-blue-800 font-semibold px-3 py-1.5 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
-                Edit
+                Bearbeiten
               </button>
-              <button onClick={() => { if (confirm('Delete this risk?')) onDelete(risk.id) }} className="text-xs text-red-500 hover:text-red-700 font-semibold px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors">
-                Delete
+              <button onClick={() => { if (confirm('Dieses Risiko wirklich löschen?')) onDelete(risk.id) }} className="text-xs text-red-500 hover:text-red-700 font-semibold px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors">
+                Löschen
               </button>
             </>
           )}
@@ -645,29 +645,29 @@ function AddRiskForm({ useCases, onSave, onCancel }: {
 
   return (
     <div className="bg-white rounded-xl shadow-md p-5 space-y-4 border-2 border-blue-200">
-      <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">New Risk</h3>
+      <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Neues Risiko</h3>
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">
-          <label className={labelCls}>Risk Title</label>
-          <input value={form.title} onChange={(e) => upd({ title: e.target.value })} placeholder="Short descriptive title" className={inputCls} />
+          <label className={labelCls}>Risikotitel</label>
+          <input value={form.title} onChange={(e) => upd({ title: e.target.value })} placeholder="Kurzer beschreibender Titel" className={inputCls} />
         </div>
         <div>
-          <label className={labelCls}>Use Case</label>
+          <label className={labelCls}>Anwendungsfall</label>
           <select value={form.useCaseId} onChange={(e) => handleUc(e.target.value)} className={inputCls}>
-            <option value="">— Select or Portfolio-wide —</option>
-            <option value="portfolio">Portfolio-wide</option>
+            <option value="">— Auswählen oder Portfolio-weit —</option>
+            <option value="portfolio">Portfolio-weit</option>
             {useCases.map((uc) => <option key={uc.id} value={uc.id}>{uc.title}</option>)}
           </select>
         </div>
         <div>
-          <label className={labelCls}>Category</label>
+          <label className={labelCls}>Kategorie</label>
           <select value={form.category} onChange={(e) => upd({ category: e.target.value as RiskCategory })} className={inputCls}>
             {RISK_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
           </select>
         </div>
         <div className="col-span-2">
-          <label className={labelCls}>Description</label>
-          <textarea rows={2} value={form.description} onChange={(e) => upd({ description: e.target.value })} placeholder="What could go wrong and why does it matter?" className={`${inputCls} resize-none`} />
+          <label className={labelCls}>Beschreibung</label>
+          <textarea rows={2} value={form.description} onChange={(e) => upd({ description: e.target.value })} placeholder="Was könnte schiefgehen und warum ist das relevant?" className={`${inputCls} resize-none`} />
         </div>
         <div>
           <label className={labelCls}>B – Bedeutung / Severity (1–10)</label>
@@ -686,18 +686,18 @@ function AddRiskForm({ useCases, onSave, onCancel }: {
           {' '}— <span className={`font-semibold ${form.b * form.a * form.e >= 400 ? 'text-red-600' : form.b * form.a * form.e >= 125 ? 'text-orange-600' : form.b * form.a * form.e >= 50 ? 'text-amber-600' : 'text-green-600'}`}>{scoreLabel(form.b * form.a * form.e)}</span>
         </div>
         <div className="col-span-2">
-          <label className={labelCls}>Mitigation Plan</label>
-          <textarea rows={2} value={form.mitigation} onChange={(e) => upd({ mitigation: e.target.value })} placeholder="What controls or actions reduce this risk?" className={`${inputCls} resize-none`} />
+          <label className={labelCls}>Maßnahmenplan</label>
+          <textarea rows={2} value={form.mitigation} onChange={(e) => upd({ mitigation: e.target.value })} placeholder="Welche Kontrollen oder Maßnahmen reduzieren dieses Risiko?" className={`${inputCls} resize-none`} />
         </div>
         <div>
-          <label className={labelCls}>Mitigation Status</label>
+          <label className={labelCls}>Maßnahmenstatus</label>
           <select value={form.mitigationStatus} onChange={(e) => upd({ mitigationStatus: e.target.value as MitigationStatus })} className={inputCls}>
             {MITIGATION_STATUSES.map((s) => <option key={s}>{s}</option>)}
           </select>
         </div>
         <div>
-          <label className={labelCls}>Owner</label>
-          <input value={form.owner} onChange={(e) => upd({ owner: e.target.value })} placeholder="Name or role" className={inputCls} />
+          <label className={labelCls}>Verantwortlich</label>
+          <input value={form.owner} onChange={(e) => upd({ owner: e.target.value })} placeholder="Name oder Rolle" className={inputCls} />
         </div>
       </div>
       <div className="flex gap-2">
@@ -706,10 +706,10 @@ function AddRiskForm({ useCases, onSave, onCancel }: {
           disabled={!form.title}
           className="text-sm bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
         >
-          Add Risk
+          Risiko hinzufügen
         </button>
         <button onClick={onCancel} className="text-sm text-slate-500 hover:text-slate-700 px-4 py-2">
-          Cancel
+          Abbrechen
         </button>
       </div>
     </div>
@@ -751,7 +751,7 @@ function HeatMapTab({ risks }: { risks: AIRisk[] }) {
           </div>
           <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
             <button onClick={() => setShowResidual(false)} className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${!showResidual ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'}`}>Initial</button>
-            <button onClick={() => setShowResidual(true)}  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${showResidual  ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'}`}>Residual</button>
+            <button onClick={() => setShowResidual(true)}  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${showResidual  ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500'}`}>Restrisiko</button>
           </div>
         </div>
 
