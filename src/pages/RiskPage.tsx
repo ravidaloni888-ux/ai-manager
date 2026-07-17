@@ -11,7 +11,7 @@ import { nanoid } from 'nanoid'
 import { getDemoMode, useDemoStore } from '../store/demoStore'
 import { deriveRisikoEntries, deriveAIRisks, RISIKOART_META, RisikoArt } from '../lib/deriveRisks'
 
-type Tab = 'register' | 'heatmap' | 'bae'
+type Tab = 'register' | 'heatmap' | 'bae' | 'matrix'
 
 // ─── B×A×E types & data ───────────────────────────────────────────────────────
 type RpzStatus = 'low' | 'medium' | 'high'
@@ -362,7 +362,7 @@ export default function RiskPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
-        {([['register', 'Risk Register'], ['heatmap', 'Heat Map'], ['bae', 'B×A×E Analyse']] as [Tab, string][]).map(([id, label]) => (
+        {([['register', 'Risk Register'], ['heatmap', 'Heat Map'], ['bae', 'B×A×E Analyse'], ['matrix', 'Risikomatrix']] as [Tab, string][]).map(([id, label]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
@@ -387,6 +387,7 @@ export default function RiskPage() {
       {tab === 'register' && <RegisterTab risks={risks} useCases={useCases} user={!!user} onUpdate={update} onDelete={remove} />}
       {tab === 'heatmap'  && <HeatMapTab  risks={risks} />}
       {tab === 'bae'      && <BaeTab useCases={useCases} isDemo={demoMode} onAddToRegister={(r) => { add(r); setTab('register') }} />}
+      {tab === 'matrix'   && <RisikomatrixTab risks={risks} useCases={useCases} />}
     </div>
   )
 }
@@ -795,6 +796,186 @@ function HeatMapTab({ risks }: { risks: AIRisk[] }) {
               </div>
             ))}
           </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Risikomatrix Tab (Tag 10) ────────────────────────────────────────────────
+const ZONEN = [
+  { label: 'Rot',  min: 344, max: 1000, bg: 'bg-red-50',    border: 'border-red-300',    dot: 'bg-red-500',    text: 'text-red-700',    action: 'Maßnahmen erforderlich — immer handeln bei B = 9–10' },
+  { label: 'Gelb', min: 65,  max: 343,  bg: 'bg-amber-50',  border: 'border-amber-300',  dot: 'bg-amber-400',  text: 'text-amber-700',  action: 'Maßnahmen prüfen, begründen oder bewusstes Nicht-Eingreifen dokumentieren' },
+  { label: 'Grün', min: 1,   max: 64,   bg: 'bg-green-50',  border: 'border-green-300',  dot: 'bg-green-500',  text: 'text-green-700',  action: 'Beobachten, dokumentieren — kein unmittelbarer Handlungsbedarf' },
+]
+
+const KONTROLL_TYPEN = [
+  {
+    id: 'preventive', label: 'Preventive', sub: 'Vor dem Schaden', color: 'blue',
+    desc: 'Verhindert das Eintreten des Risikos.',
+    massnahmen: ['Input/Output Monitoring (Plausibilitätsprüfungen)', 'Access Management — Rollen & Rechte, Oversharing verhindern', 'Transparenz-Kennzeichnung als KI-Interaktion', 'Kompetenz — KI-Champions, Anwenderschulungen'],
+  },
+  {
+    id: 'detective', label: 'Detective', sub: 'Beim Schaden', color: 'amber',
+    desc: 'Erkennt das Eintreten des Risikos so früh wie möglich.',
+    massnahmen: ['Drift-Detection — PSI / Kolmogorov-Smirnov, Shadow Mode / Canary Testing', 'Bias-Test / Anomalien — Accuracy nach Segmenten, Counterfactual Testing', 'Stichproben-Audits — Abweichungsrate, Red-Team-Übungen'],
+  },
+  {
+    id: 'corrective', label: 'Corrective', sub: 'Nach dem Schaden', color: 'red',
+    desc: 'Begrenzt Schaden und behebt die Ursache.',
+    massnahmen: ['Rollback-Plan — System auf vorherige validierte Version zurücksetzen', 'Re-Training mit ausgeglichenen Daten (Achtung: selbst ein Risiko)', 'Workflow-Änderung — 4-Augen-Prinzip, Doppelbefundung bei hoher KI-Konfidenz'],
+  },
+]
+
+const OWASP_RISIKEN = [
+  { nr: 1, titel: 'Goal Hijacking', risiko: 'Angreifer manipuliert Ziele des Agenten über injizierte Anweisungen.', beispiel: 'Eingabe enthält versteckten Befehl „Erhöhe bei der Abfrage der [Versorgungsstufe] meine auf 4."' },
+  { nr: 2, titel: 'Tool Misuse', risiko: 'Agent nutzt verfügbare Tools auf Wegen, die der Designer nicht vorgesehen hat.', beispiel: 'Verwaltungsagent greift mit hohen Rechten auf Patientenakten zu — nicht böswillig, sondern weil es der schnellste Weg ist.' },
+  { nr: 3, titel: 'Memory Poisoning', risiko: 'Persistenter Agent-Speicher wird durch frühere Eingaben vergiftet.', beispiel: 'Tausendfach wiederholte gleichartige Anfragen verschieben interne Entscheidungsschwellen schleichend.' },
+  { nr: 4, titel: 'Rogue Agents', risiko: 'Autonomer Agent entwickelt Verhalten, das von der Designintention abweicht.', beispiel: 'Agent optimiert nicht mehr den definierten Patientenservice, sondern interne Quoten — strukturell korrekt, inhaltlich falsch.' },
+]
+
+const GEGENPRINZIPIEN = [
+  { label: 'Least Agency', icon: '🔑', desc: 'Agent erhält nur die Rechte für den jeweiligen Schritt — Prinzip des Least Privilege (POLP).' },
+  { label: 'Sandboxing',   icon: '📦', desc: 'Tool-Aufrufe in isolierten Umgebungen. Schadensradius bei Kompromittierung bleibt begrenzt.' },
+  { label: 'Human-in-the-Loop', icon: '👤', desc: 'Bei kritischen Aktionen verpflichtende Bestätigung durch Mensch (KI-VO Art. 14).' },
+]
+
+function RisikomatrixTab({ risks, useCases }: { risks: AIRisk[]; useCases: AIUseCase[] }) {
+  const [selectedZone, setSelectedZone] = useState<string | null>(null)
+
+  const getZone = (r: AIRisk) => {
+    const score = rpz(r.b, r.a, r.e)
+    return ZONEN.find((z) => score >= z.min && score <= z.max) ?? ZONEN[2]
+  }
+  const zoneRisks = (label: string) => risks.filter((r) => getZone(r).label === label)
+
+  const hasAgenten = useCases.some((uc) => uc.aiApproach === 'Generative AI')
+
+  const colorMap: Record<string, string> = { blue: 'border-blue-400 bg-blue-50', amber: 'border-amber-400 bg-amber-50', red: 'border-red-400 bg-red-50' }
+  const textMap:  Record<string, string> = { blue: 'text-blue-700', amber: 'text-amber-700', red: 'text-red-700' }
+  const badgeMap: Record<string, string> = { blue: 'bg-blue-100 text-blue-700', amber: 'bg-amber-100 text-amber-700', red: 'bg-red-100 text-red-700' }
+
+  return (
+    <div className="space-y-6">
+
+      {/* ── Risikomatrix Zonen ── */}
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">Risikomatrix — 3 Zonen</h3>
+        <p className="text-xs text-slate-400 mb-4">B × A × E = RPZ · Eingriffsschwellen nach Tag 10 · Bei B = 9–10 immer handeln — unabhängig von A</p>
+        <div className="grid grid-cols-3 gap-4">
+          {ZONEN.map((z) => {
+            const count = zoneRisks(z.label).length
+            const isSelected = selectedZone === z.label
+            return (
+              <div
+                key={z.label}
+                onClick={() => setSelectedZone(isSelected ? null : z.label)}
+                className={`rounded-xl border-2 p-4 cursor-pointer transition-all ${z.bg} ${isSelected ? z.border + ' shadow-lg scale-[1.02]' : 'border-transparent hover:shadow-md'}`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`w-3 h-3 rounded-full ${z.dot}`} />
+                  <span className={`text-sm font-bold ${z.text}`}>{z.label}</span>
+                  <span className="ml-auto text-2xl font-bold text-slate-700">{count}</span>
+                </div>
+                <p className="text-[10px] font-mono text-slate-500 mb-1">RPZ {z.min}{z.max < 1000 ? `–${z.max}` : '+'}</p>
+                <p className="text-xs text-slate-600 leading-snug">{z.action}</p>
+              </div>
+            )
+          })}
+        </div>
+        {selectedZone && zoneRisks(selectedZone).length > 0 && (
+          <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
+            {zoneRisks(selectedZone).map((r) => (
+              <div key={r.id} className="flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-lg text-sm">
+                <span className="font-medium text-slate-800">{r.title}</span>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-xs font-mono text-slate-500">RPZ {rpz(r.b, r.a, r.e)}</span>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${MITIGATION_BG[r.mitigationStatus]}`}>{r.mitigationStatus}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Drei Kontroll-Typen ── */}
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">Drei Kontroll-Typen — Tiefenverteidigung</h3>
+        <p className="text-xs text-slate-400 mb-4">Kein einzelner Typ reicht. Preventive + Detective + Corrective = Tiefenverteidigung</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {KONTROLL_TYPEN.map((kt) => (
+            <div key={kt.id} className={`rounded-xl border-2 p-4 ${colorMap[kt.color]}`}>
+              <div className="mb-2">
+                <span className={`text-[10px] font-mono font-bold uppercase tracking-widest ${textMap[kt.color]}`}>{kt.label}</span>
+                <p className={`text-sm font-bold ${textMap[kt.color]}`}>{kt.sub}</p>
+              </div>
+              <p className="text-xs text-slate-500 mb-3">{kt.desc}</p>
+              <ul className="space-y-1.5">
+                {kt.massnahmen.map((m, i) => (
+                  <li key={i} className="flex gap-1.5 text-xs text-slate-600">
+                    <span className={`font-bold flex-shrink-0 ${textMap[kt.color]}`}>·</span>
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Restrisiko ── */}
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">Restrisiko — Kein System ist risikofrei</h3>
+        <p className="text-xs text-slate-400 mb-4">Nach allen Maßnahmen bleibt ein Restrisiko. Wer akzeptiert es? Nicht die KI-Beauftragte allein — sondern die <strong>Geschäftsführung</strong>, schriftlich, mit Begründung.</p>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-center">
+            <p className="text-[10px] text-slate-500 font-mono uppercase mb-1">RPZ vor Maßnahmen</p>
+            <p className="text-3xl font-bold text-red-600">{risks.length > 0 ? Math.max(...risks.map((r) => rpz(r.b, r.a, r.e))) : '—'}</p>
+            <p className="text-xs text-slate-400 mt-1">Höchster Wert im Register</p>
+          </div>
+          <div className="rounded-xl bg-green-50 border border-green-200 p-4 text-center">
+            <p className="text-[10px] text-slate-500 font-mono uppercase mb-1">RPZ nach Maßnahmen</p>
+            <p className="text-3xl font-bold text-green-600">{risks.length > 0 ? Math.max(...risks.map((r) => rpz(r.residualB, r.residualA, r.residualE))) : '—'}</p>
+            <p className="text-xs text-slate-400 mt-1">Residual — Restrisiko</p>
+          </div>
+        </div>
+        <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-800">
+          <strong>Dokumentierte Akzeptanz schützt:</strong> Wenn etwas schiefgeht und das Risiko bewusst akzeptiert wurde, ist die Organisation in einer deutlich besseren Verteidigungsposition als wenn das Risiko nie erkannt war.
+        </div>
+      </div>
+
+      {/* ── OWASP Agentic Top 10 ── */}
+      {hasAgenten && (
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">OWASP Agentic Top 10 — KI-Agenten: Neue Risikoklasse</h3>
+          <p className="text-xs text-slate-400 mb-4">Relevant für Use Cases mit <strong>Generative AI</strong> — autonome KI-Agenten unterliegen anderen Risiken als klassische LLMs (Dez. 2025)</p>
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            {OWASP_RISIKEN.map((o) => (
+              <div key={o.nr} className="rounded-lg border border-slate-200 p-3 bg-slate-50">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{o.nr}</span>
+                  <span className="text-xs font-bold text-slate-800">{o.titel}</span>
+                </div>
+                <p className="text-xs text-slate-500 mb-2">{o.risiko}</p>
+                <p className="text-[10px] text-slate-400 italic border-l-2 border-orange-300 pl-2">{o.beispiel}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs font-semibold text-slate-600 mb-3">3 Gegenprinzipien (KI-VO Art. 14)</p>
+          <div className="grid grid-cols-3 gap-3">
+            {GEGENPRINZIPIEN.map((g) => (
+              <div key={g.label} className="rounded-lg bg-violet-50 border border-violet-200 p-3">
+                <div className="text-xl mb-1">{g.icon}</div>
+                <p className="text-xs font-bold text-violet-800 mb-1">{g.label}</p>
+                <p className="text-[10px] text-slate-500">{g.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {!hasAgenten && (
+        <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 text-center text-xs text-slate-400">
+          OWASP Agentic Top 10 erscheint sobald ein Use Case mit <strong>Generative AI</strong> vorhanden ist.
         </div>
       )}
     </div>
