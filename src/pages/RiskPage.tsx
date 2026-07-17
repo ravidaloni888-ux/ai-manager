@@ -923,27 +923,6 @@ function RisikomatrixTab({ risks, useCases }: { risks: AIRisk[]; useCases: AIUse
         </div>
       </div>
 
-      {/* ── Restrisiko ── */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">Restrisiko — Kein System ist risikofrei</h3>
-        <p className="text-xs text-slate-400 mb-4">Nach allen Maßnahmen bleibt ein Restrisiko. Wer akzeptiert es? Nicht die KI-Beauftragte allein — sondern die <strong>Geschäftsführung</strong>, schriftlich, mit Begründung.</p>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-center">
-            <p className="text-[10px] text-slate-500 font-mono uppercase mb-1">RPZ vor Maßnahmen</p>
-            <p className="text-3xl font-bold text-red-600">{risks.length > 0 ? Math.max(...risks.map((r) => rpz(r.b, r.a, r.e))) : '—'}</p>
-            <p className="text-xs text-slate-400 mt-1">Höchster Wert im Register</p>
-          </div>
-          <div className="rounded-xl bg-green-50 border border-green-200 p-4 text-center">
-            <p className="text-[10px] text-slate-500 font-mono uppercase mb-1">RPZ nach Maßnahmen</p>
-            <p className="text-3xl font-bold text-green-600">{risks.length > 0 ? Math.max(...risks.map((r) => rpz(r.residualB, r.residualA, r.residualE))) : '—'}</p>
-            <p className="text-xs text-slate-400 mt-1">Residual — Restrisiko</p>
-          </div>
-        </div>
-        <div className="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-800">
-          <strong>Dokumentierte Akzeptanz schützt:</strong> Wenn etwas schiefgeht und das Risiko bewusst akzeptiert wurde, ist die Organisation in einer deutlich besseren Verteidigungsposition als wenn das Risiko nie erkannt war.
-        </div>
-      </div>
-
       {/* ── OWASP Agentic Top 10 ── */}
       {hasAgenten && (
         <div className="bg-white rounded-xl shadow-md p-6">
