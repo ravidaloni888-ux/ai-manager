@@ -21,6 +21,7 @@ import QAPage from './pages/QAPage'
 import GlossaryPage from './pages/GlossaryPage'
 import PromptLibraryPage from './pages/PromptLibraryPage'
 import DsgvoPage from './pages/DsgvoPage'
+import EthikPage from './pages/EthikPage'
 import EuAiActPage from './pages/EuAiActPage'
 import ProjectPlanPage from './pages/ProjectPlanPage'
 import LoginPage from './pages/LoginPage'
@@ -91,6 +92,7 @@ function AppRoutes() {
               <Route path="/glossary" element={<GlossaryPage />} />
               <Route path="/prompts" element={<PromptLibraryPage />} />
               <Route path="/dsgvo" element={<DsgvoPage />} />
+              <Route path="/ethik" element={<EthikPage />} />
               <Route path="/eu-ai-act" element={<EuAiActPage />} />
               <Route path="/project-plan" element={<ProjectPlanPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />

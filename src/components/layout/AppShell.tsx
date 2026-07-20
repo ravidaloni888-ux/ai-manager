@@ -70,6 +70,7 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/prompts" icon={<IconStar />} label="Prompt-Bibliothek" />
           <NavItem to="/eu-ai-act" icon={<IconFlag />} label="EU AI Act" />
           <NavItem to="/dsgvo" icon={<IconShield />} label="DSGVO & Datenschutz" />
+          <NavItem to="/ethik" icon={<IconFlag />} label="KI-Ethik" />
           <NavItem to="/settings" icon={<IconSettings />} label="Einstellungen" />
           <NavItem to="/about" icon={<IconInfo />} label="Über uns" />
         </nav>
