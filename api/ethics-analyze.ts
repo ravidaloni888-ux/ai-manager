@@ -7,7 +7,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!caseText?.trim()) return res.status(400).json({ error: 'caseText is required' })
 
   const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' })
+  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured', keys: Object.keys(process.env).filter(k => k.includes('ANTHROPIC') || k.includes('ANTH')) })
 
   const systemPrompt = `Du bist ein KI-Ethikexperte und KI-Beauftragter. Du bewertest KI-Fälle nach dem FAST-Framework des Alan Turing Institute und nach dem Drei-Zonen-Modell (Legal/Ethical/Optimal).
 
