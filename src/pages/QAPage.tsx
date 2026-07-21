@@ -30,11 +30,11 @@ function AnforderungsGenerator() {
     finally { setLoading(false) }
   }
 
-  const allGroups: { label: string; color: string; dot: string; reqs: Requirement[] }[] = result ? [
-    { label: 'Funktionale Anforderungen', color: 'border-blue-200 bg-blue-50', dot: 'bg-blue-500', reqs: result.functional },
-    { label: 'Nicht-funktionale Anforderungen', color: 'border-amber-200 bg-amber-50', dot: 'bg-amber-500', reqs: result.nonFunctional },
-    { label: 'Qualitative Anforderungen', color: 'border-teal-200 bg-teal-50', dot: 'bg-teal-500', reqs: result.qualitative },
-    { label: 'Compliance (Bonus)', color: 'border-slate-200 bg-slate-50', dot: 'bg-slate-500', reqs: result.compliance },
+  const allGroups: { label: string; subtitle: string; color: string; dot: string; reqs: Requirement[] }[] = result ? [
+    { label: 'Funktionale Anforderungen', subtitle: 'Was das System tun muss. Prüfbar als Ja/Nein pro Antwort — entweder die Funktion ist da oder nicht.', color: 'border-blue-200 bg-blue-50', dot: 'bg-blue-500', reqs: result.functional },
+    { label: 'Nicht-funktionale Anforderungen', subtitle: 'Wie das System arbeiten muss: Zeit, Verfügbarkeit, Aktualität. Prüfbar über Messreihen, nicht über Einzelfälle.', color: 'border-amber-200 bg-amber-50', dot: 'bg-amber-500', reqs: result.nonFunctional },
+    { label: 'Qualitative Anforderungen', subtitle: 'Wie gut die Ausgabe ist. Diese drei sind die eigentliche KI-QS, weil sie sich nicht durch Unit-Tests erschlagen lassen und im Betrieb schwanken.', color: 'border-teal-200 bg-teal-50', dot: 'bg-teal-500', reqs: result.qualitative },
+    { label: 'Compliance (Bonus)', subtitle: 'Was rechtlich gelten muss: DSGVO, KI-VO, Branchenrecht. Nulltoleranz — keine Abwägung möglich.', color: 'border-slate-200 bg-slate-50', dot: 'bg-slate-500', reqs: result.compliance },
   ] : []
 
   return (
@@ -63,9 +63,12 @@ function AnforderungsGenerator() {
       {/* Result tables */}
       {result && allGroups.map(g => g.reqs?.length > 0 && (
         <div key={g.label} className={`rounded-xl border overflow-hidden ${g.color}`}>
-          <div className="px-5 py-3 flex items-center gap-2 border-b border-inherit">
-            <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${g.dot}`} />
-            <p className="text-sm font-bold text-slate-800">{g.label}</p>
+          <div className="px-5 py-3 border-b border-inherit">
+            <div className="flex items-center gap-2">
+              <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${g.dot}`} />
+              <p className="text-sm font-bold text-slate-800">{g.label}</p>
+            </div>
+            <p className="text-xs text-slate-500 mt-1 ml-4">{g.subtitle}</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
