@@ -1,7 +1,104 @@
 import { useState } from 'react'
 
+interface Requirement { id: string; anforderung: string; messgroesse: string; warumSchwelle: string; pruefmethode: string }
+interface RequirementsResult {
+  functional: Requirement[]
+  nonFunctional: Requirement[]
+  qualitative: Requirement[]
+  compliance: Requirement[]
+}
+
+function AnforderungsGenerator() {
+  const [text, setText] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState<RequirementsResult | null>(null)
+  const [error, setError] = useState('')
+
+  const generate = async () => {
+    if (!text.trim()) return
+    setLoading(true); setResult(null); setError('')
+    try {
+      const res = await fetch('/api/requirements-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ caseText: text }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`)
+      setResult(data as RequirementsResult)
+    } catch (e) { setError(String(e)) }
+    finally { setLoading(false) }
+  }
+
+  const allGroups: { label: string; color: string; dot: string; reqs: Requirement[] }[] = result ? [
+    { label: 'Funktionale Anforderungen', color: 'border-blue-200 bg-blue-50', dot: 'bg-blue-500', reqs: result.functional },
+    { label: 'Nicht-funktionale Anforderungen', color: 'border-amber-200 bg-amber-50', dot: 'bg-amber-500', reqs: result.nonFunctional },
+    { label: 'Qualitative Anforderungen', color: 'border-teal-200 bg-teal-50', dot: 'bg-teal-500', reqs: result.qualitative },
+    { label: 'Compliance (Bonus)', color: 'border-slate-200 bg-slate-50', dot: 'bg-slate-500', reqs: result.compliance },
+  ] : []
+
+  return (
+    <div className="space-y-5">
+      {/* Intro */}
+      <div className="bg-white border border-slate-200 border-l-4 border-l-slate-800 rounded-r-xl px-5 py-4 text-sm text-slate-700 leading-relaxed">
+        <strong>Leitprinzip:</strong> „Besser werden" ist keine Anforderung — eine Zahl ist eine Anforderung.<br />
+        Beschreibe deinen KI-Anwendungsfall, der Generator erstellt prüfbare Anforderungen in drei Pflicht-Kategorien (Funktional · Nicht-funktional · Qualitativ) plus Compliance als Bonus.
+      </div>
+
+      {/* Input */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 space-y-4">
+        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide">KI-Anwendungsfall beschreiben</label>
+        <textarea
+          value={text} onChange={e => setText(e.target.value)} rows={5}
+          placeholder="Beschreibe das KI-System: Was soll es tun? Wer nutzt es? In welchem Kontext? Welche Daten verarbeitet es?&#10;&#10;Beispiel: Ein RAG-System für Service-Ingenieure an zwei Standorten (Bremen und Busan). Es durchsucht technische Handbücher und gibt Antworten mit Quellenangabe. Die Ingenieure nutzen es bei Maschinenstillstand — Antwortzeit ist kritisch."
+          className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 resize-none placeholder:text-slate-400 leading-relaxed"
+        />
+        <button onClick={generate} disabled={loading || !text.trim()}
+          className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white text-sm font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+          {loading ? (<><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />Generiere Anforderungskatalog…</>) : '📋 Anforderungskatalog generieren'}
+        </button>
+        {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700"><strong>Fehler:</strong> {error}</div>}
+      </div>
+
+      {/* Result tables */}
+      {result && allGroups.map(g => g.reqs?.length > 0 && (
+        <div key={g.label} className={`rounded-xl border overflow-hidden ${g.color}`}>
+          <div className="px-5 py-3 flex items-center gap-2 border-b border-inherit">
+            <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${g.dot}`} />
+            <p className="text-sm font-bold text-slate-800">{g.label}</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-inherit">
+                  <th className="text-left py-2.5 px-4 font-semibold text-slate-500 w-10">ID</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-slate-500 min-w-[220px]">Anforderung (prüfbar formuliert)</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-slate-500 min-w-[160px]">Messgröße &amp; Abnahmeschwelle</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-slate-500 min-w-[160px]">Warum diese Schwelle „gut genug" ist</th>
+                  <th className="text-left py-2.5 px-3 font-semibold text-slate-500 min-w-[180px]">Prüfmethode / Monitoring im Betrieb</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200/60">
+                {g.reqs.map(r => (
+                  <tr key={r.id} className="hover:bg-white/60 transition-colors">
+                    <td className="py-3 px-4 font-mono font-bold text-slate-500 align-top">{r.id}</td>
+                    <td className="py-3 px-3 text-slate-800 leading-relaxed align-top">{r.anforderung}</td>
+                    <td className="py-3 px-3 text-slate-700 font-medium leading-relaxed align-top">{r.messgroesse}</td>
+                    <td className="py-3 px-3 text-slate-600 leading-relaxed align-top">{r.warumSchwelle}</td>
+                    <td className="py-3 px-3 text-slate-600 leading-relaxed align-top">{r.pruefmethode}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function QAPage() {
-  const [tab, setTab] = useState<'tests' | 'ki' | 'abnahme' | 'case'>('tests')
+  const [tab, setTab] = useState<'tests' | 'ki' | 'abnahme' | 'case' | 'generator'>('tests')
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -20,7 +117,8 @@ export default function QAPage() {
           { id: 'tests',  label: 'Test-Typen & Methoden' },
           { id: 'ki',     label: 'KI-Besonderheiten' },
           { id: 'abnahme',label: 'Abnahmestrategien' },
-          { id: 'case',   label: 'Fallstudie: Vibe Citing' },
+          { id: 'case',      label: 'Fallstudie: Vibe Citing' },
+          { id: 'generator', label: '📋 Anforderungs-Generator' },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
@@ -387,6 +485,9 @@ export default function QAPage() {
 
       </div>
       )}
+
+      {/* ── Tab: Anforderungs-Generator ── */}
+      {tab === 'generator' && <AnforderungsGenerator />}
 
     </div>
   )
