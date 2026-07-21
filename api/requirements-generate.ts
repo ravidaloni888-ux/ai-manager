@@ -59,7 +59,7 @@ Antworte AUSSCHLIESSLICH als valides JSON:
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
-        max_tokens: 4096,
+        max_tokens: 8192,
         system: systemPrompt,
         messages: [{ role: 'user', content: `Erstelle den Anforderungskatalog für folgenden KI-Anwendungsfall:\n\n${caseText}` }],
       }),
