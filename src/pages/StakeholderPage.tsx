@@ -122,6 +122,26 @@ function gq(p: number, i: number): QuadKey {
   return p >= 5 && i >= 5 ? 'q1' : p >= 5 && i < 5 ? 'q2' : p < 5 && i >= 5 ? 'q3' : 'q4'
 }
 
+const VALID_ANIMALS = Object.keys(ANIMALS) as AnimalKey[]
+
+function sanitizeGenerated(raw: unknown[]): Omit<Stakeholder, 'id'>[] {
+  return raw.map(item => {
+    const r = item as Record<string, unknown>
+    const rawAnimal = String(r.animal ?? '').toLowerCase().trim()
+    const animal: AnimalKey = VALID_ANIMALS.includes(rawAnimal as AnimalKey)
+      ? (rawAnimal as AnimalKey)
+      : 'hippo'
+    return {
+      name: String(r.name ?? 'Unbekannt').trim(),
+      role: String(r.role ?? '').trim(),
+      power: Math.min(10, Math.max(1, Math.round(Number(r.power) || 5))),
+      interest: Math.min(10, Math.max(1, Math.round(Number(r.interest) || 5))),
+      animal,
+      notes: String(r.notes ?? '').trim(),
+    }
+  })
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function StakeholderPage() {
@@ -455,7 +475,7 @@ export default function StakeholderPage() {
         <AiGenerateModal
           onClose={() => setAiModal(false)}
           onAdd={(generated) => {
-            setSh(prev => [...prev, ...generated.map(g => ({ ...g, id: uid() }))])
+            setSh(prev => [...prev, ...sanitizeGenerated(generated).map(g => ({ ...g, id: uid() }))])
             setAiModal(false)
           }}
         />
@@ -594,7 +614,7 @@ function AiGenerateModal({ onClose, onAdd }: {
       })
       const data = await res.json() as { stakeholders?: Omit<Stakeholder, 'id'>[]; error?: string }
       if (!res.ok || data.error) throw new Error(data.error ?? 'Unbekannter Fehler')
-      setPreview(data.stakeholders ?? [])
+      setPreview(sanitizeGenerated(data.stakeholders ?? []))
     } catch (e) {
       setError(String(e))
     } finally {
