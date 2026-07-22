@@ -474,8 +474,17 @@ export default function StakeholderPage() {
       {aiModal && (
         <AiGenerateModal
           onClose={() => setAiModal(false)}
+          onReplace={(generated) => {
+            const clean = sanitizeGenerated(generated).map(g => ({ ...g, id: uid() }))
+            setSh(clean)
+            setSelId(clean[0]?.id ?? null)
+            setTab('matrix')
+            setAiModal(false)
+          }}
           onAdd={(generated) => {
-            setSh(prev => [...prev, ...sanitizeGenerated(generated).map(g => ({ ...g, id: uid() }))])
+            const clean = sanitizeGenerated(generated).map(g => ({ ...g, id: uid() }))
+            setSh(prev => [...prev, ...clean])
+            setSelId(clean[0]?.id ?? null)
             setTab('matrix')
             setAiModal(false)
           }}
@@ -592,8 +601,9 @@ function DetailPanel({ s, onEdit, onDelete }: { s: Stakeholder; onEdit: () => vo
 
 // ── KI-Generierungs-Modal ─────────────────────────────────────────────────────
 
-function AiGenerateModal({ onClose, onAdd }: {
+function AiGenerateModal({ onClose, onReplace, onAdd }: {
   onClose: () => void
+  onReplace: (stakeholders: Omit<Stakeholder, 'id'>[]) => void
   onAdd: (stakeholders: Omit<Stakeholder, 'id'>[]) => void
 }) {
   const [context, setContext] = useState('Wir führen bei einem Automobilzulieferer (3.000 MA, 5 Werke) ein KI-Programm zur Predictive Maintenance ein. Die IT-Infrastruktur ist veraltet, der Betriebsrat ist skeptisch und der CEO hat das Budget freigegeben ohne die operative Ebene einzubinden.')
@@ -693,9 +703,14 @@ function AiGenerateModal({ onClose, onAdd }: {
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
           <button onClick={onClose} className="px-4 py-2 text-sm border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors">Abbrechen</button>
           {preview ? (
-            <button onClick={() => onAdd(preview)} className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-lg transition-colors">
-              {preview.length} Stakeholder übernehmen
-            </button>
+            <>
+              <button onClick={() => onAdd(preview)} className="px-4 py-2 text-sm border border-violet-300 text-violet-700 hover:bg-violet-50 font-medium rounded-lg transition-colors">
+                + Zu bestehenden hinzufügen
+              </button>
+              <button onClick={() => onReplace(preview)} className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-lg transition-colors">
+                ✓ Liste ersetzen ({preview.length})
+              </button>
+            </>
           ) : (
             <button onClick={generate} disabled={!context.trim() || loading} className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center gap-2">
               {loading ? (
