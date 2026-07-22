@@ -100,12 +100,16 @@ const QUADS: Record<QuadKey, QuadDef> = {
 }
 
 const DEFAULT_SH: Stakeholder[] = [
-  { id: 's1', name: 'Dr. Petra Schreiber', role: 'CTO / KI-Programm-Sponsor', power: 9, interest: 8, animal: 'hippo', notes: 'Enthusiastisch für KI, trifft finale Budgetentscheidungen. Faktische Macht übersteigt formale Rolle.' },
-  { id: 's2', name: 'Alfons Brockmann', role: 'Senior Field Techniker', power: 4, interest: 9, animal: 'zebra', notes: '20 Jahre Erfahrung, Vertrauen der Basis an allen 5 Standorten. Formale Macht gering — faktische Macht enorm.' },
-  { id: 's3', name: 'Heinrich Mäurer', role: 'CEO', power: 10, interest: 2, animal: 'seagull', notes: 'Hat das KI-Programm abgesegnet, kein aktives Interesse am Alltag. Kann jederzeit eingreifen.' },
-  { id: 's4', name: 'Bernd Kruse', role: 'Werkleiter Busan', power: 4, interest: 3, animal: 'rhino', notes: 'Fokussiert auf seinen Standort. Könnte blockieren, wenn lokale Interessen bedroht sind.' },
-  { id: 's5', name: 'Anna Fischer', role: 'Datenschutzbeauftragte', power: 7, interest: 7, animal: 'cobra', notes: 'DSGVO Art. 38 — Pflichteinbindung. Entscheidet über Freigabe der Kundendaten.' },
-  { id: 's6', name: 'Thomas Bauer', role: 'VP Vertrieb', power: 6, interest: 8, animal: 'rhino', notes: 'Sieht KI als Verkaufsargument. Fordert laufend One-off-Features für spezifische Deals.' },
+  { id: 's1',  name: 'Dr. Petra Schreiber',  role: 'CTO / KI-Programm-Sponsor',         power: 9,  interest: 8, animal: 'hippo',   notes: 'Enthusiastisch für KI, trifft finale Budgetentscheidungen. Entscheidet auf Bauchgefühl — Daten helfen, wenn man sie als "Bestätigung ihrer Vision" rahmt.' },
+  { id: 's2',  name: 'Heinrich Mäurer',       role: 'CEO',                                power: 10, interest: 2, animal: 'seagull', notes: 'Hat das KI-Programm abgesegnet, schaltet sich aber ohne Kontext ein. Regelmäßige 1-seitige Executive Summaries verringern spontane Interventionen.' },
+  { id: 's3',  name: 'Anna Fischer',          role: 'Datenschutzbeauftragte',             power: 7,  interest: 7, animal: 'cobra',   notes: 'DSGVO Art. 38 — Pflichteinbindung. Entscheidet über Freigabe der Kundendaten. Cognitive Bias oft unsichtbar: bevorzugt bekannte Risiken gegenüber neuen.' },
+  { id: 's4',  name: 'Alfons Brockmann',      role: 'Senior Field Techniker',             power: 4,  interest: 9, animal: 'zebra',   notes: '20 Jahre Erfahrung, Vertrauen der Basis an allen Standorten. Behauptet auf Basis von Erfahrung — Data-Gegenbeweis allein reicht nicht, braucht Peer-Stimmen.' },
+  { id: 's5',  name: 'Thomas Bauer',          role: 'VP Vertrieb',                        power: 6,  interest: 8, animal: 'rhino',   notes: 'Sieht KI als Verkaufsargument. Fordert laufend One-off-Features für spezifische Deals. "Wenn wir Feature X hätten, würden wir diesen Kunden gewinnen."' },
+  { id: 's6',  name: 'Kai Zimmermann',        role: 'IT-Leiter',                          power: 6,  interest: 5, animal: 'wolf',    notes: 'Reagiert nur auf Brände — jede Woche eine neue Krise. Legacy-Systeme erzeugen permanenten Firefighting-Modus, der KI-Projektzeit auffrisst.' },
+  { id: 's7',  name: 'Lisa Hartmann',         role: 'Head of Product',                    power: 5,  interest: 8, animal: 'puffin',  notes: 'Jede Woche neue Feature-Ideen ohne strategischen Anker. "Können wir das nicht einfach kurz hinzufügen?" Roadmap-Transparenz ist das wichtigste Gegenmittel.' },
+  { id: 's8',  name: 'Markus Brandt',         role: 'Projektleiter Digitalisierung',      power: 4,  interest: 7, animal: 'goose',   notes: '"Fertig bis Freitag." — Jede Woche. Vergisst QA, Onboarding und technische Schulden. History-Reviews helfen, schätzt aber ungern öffentlich nach.' },
+  { id: 's9',  name: 'Sandra Weber',          role: 'Head of HR',                         power: 5,  interest: 6, animal: 'puma',    notes: '"Ein Techniker hat gesagt, das Tool ist zu kompliziert — wir müssen alles überarbeiten." Pounces on einzelne Datenpunkte; Discovery-Sprints helfen.' },
+  { id: 's10', name: 'Dr. Stefan Müller',     role: 'CFO',                                power: 8,  interest: 3, animal: 'yak',     notes: 'Fordert 12 KPIs pro Sprint-Review. Optimiert Metriken, die man einfach messen kann, nicht die, die wichtig sind. ROI-Anbindung jedes KPIs ist Pflicht.' },
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
