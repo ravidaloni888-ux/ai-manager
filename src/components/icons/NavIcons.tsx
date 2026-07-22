@@ -209,6 +209,14 @@ export function IconUsers() {
   )
 }
 
+export function IconSitemap() {
+  return (
+    <svg className={c} fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zM5.25 15.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zM18.75 15.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zM12 8.25v6m0 0L5.25 15.75M12 14.25L18.75 15.75" />
+    </svg>
+  )
+}
+
 export function IconDatabase() {
   return (
     <svg className={c} fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">

@@ -24,6 +24,7 @@ import DsgvoPage from './pages/DsgvoPage'
 import EthikPage from './pages/EthikPage'
 import EuAiActPage from './pages/EuAiActPage'
 import ProjectPlanPage from './pages/ProjectPlanPage'
+import StakeholderPage from './pages/StakeholderPage'
 import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { useUseCasesStore } from './store/useCasesStore'
@@ -95,6 +96,7 @@ function AppRoutes() {
               <Route path="/ethik" element={<EthikPage />} />
               <Route path="/eu-ai-act" element={<EuAiActPage />} />
               <Route path="/project-plan" element={<ProjectPlanPage />} />
+              <Route path="/stakeholders" element={<StakeholderPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
               <Route path="/canvas/:id" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />
             </Routes>
