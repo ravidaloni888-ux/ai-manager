@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useDemoStore } from '../store/demoStore'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -157,22 +157,26 @@ function sanitizeGenerated(raw: unknown[]): Omit<Stakeholder, 'id'>[] {
 
 export default function StakeholderPage() {
   const demoMode = useDemoStore(s => s.demoMode)
+  const demoModeRef = useRef(demoMode)
   const [sh, setSh] = useState<Stakeholder[]>(() => loadSh(demoMode))
   const [selId, setSelId] = useState<string | null>(null)
   const [tab, setTab] = useState<TabKey>('matrix')
   const [modal, setModal] = useState<{ open: boolean; editId: string | null }>({ open: false, editId: null })
   const [aiModal, setAiModal] = useState(false)
 
-  // Persist user's own stakeholders (skip in demo mode)
+  // When demo mode toggles: update ref first, then reload — ref ensures the save
+  // effect below never writes demo data into the user's personal localStorage slot
   useEffect(() => {
-    if (!demoMode) localStorage.setItem(STORAGE_KEY, JSON.stringify(sh))
-  }, [sh, demoMode])
-
-  // When demo mode toggles, reload the right dataset
-  useEffect(() => {
+    demoModeRef.current = demoMode
     setSh(loadSh(demoMode))
     setSelId(null)
   }, [demoMode])
+
+  // Persist only the user's own stakeholders; reads demoMode via ref so this
+  // effect only re-runs when sh actually changes, not when the mode switches
+  useEffect(() => {
+    if (!demoModeRef.current) localStorage.setItem(STORAGE_KEY, JSON.stringify(sh))
+  }, [sh])
 
   const selected = sh.find(s => s.id === selId) ?? null
   const openAdd = () => setModal({ open: true, editId: null })
