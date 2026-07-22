@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { useDemoStore } from '../store/demoStore'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -151,14 +151,6 @@ export default function StakeholderPage() {
   const [tab, setTab] = useState<TabKey>('matrix')
   const [modal, setModal] = useState<{ open: boolean; editId: string | null }>({ open: false, editId: null })
   const [aiModal, setAiModal] = useState(false)
-  const gridRef = useRef<HTMLDivElement>(null)
-  const [gridH, setGridH] = useState(0)
-
-  useEffect(() => {
-    const ro = new ResizeObserver(e => { if (e[0]) setGridH(e[0].contentRect.height) })
-    if (gridRef.current) ro.observe(gridRef.current)
-    return () => ro.disconnect()
-  }, [])
 
   const selected = sh.find(s => s.id === selId) ?? null
   const openAdd = () => setModal({ open: true, editId: null })
@@ -227,15 +219,15 @@ export default function StakeholderPage() {
             <div className="flex-1 flex flex-col p-4 pl-10 gap-2 min-w-0">
               {/* Y label */}
               <div className="flex flex-col items-start gap-1 flex-1 min-h-0">
-                <div className="relative w-full flex-1 min-h-0" ref={gridRef}>
+                <div className="relative w-full flex-1 min-h-0">
                   {/* Rotated Y axis */}
                   <div className="absolute -left-8 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] font-semibold tracking-widest text-slate-400 uppercase whitespace-nowrap select-none">
                     Power ↑
                   </div>
 
-                  {/* The grid */}
+                  {/* The grid (overflow-hidden only for rounded corner clipping of cell backgrounds) */}
                   <div
-                    className="w-full h-full relative grid grid-cols-2 grid-rows-2 border border-slate-200 rounded-xl overflow-hidden shadow-sm"
+                    className="w-full h-full grid grid-cols-2 grid-rows-2 border border-slate-200 rounded-xl overflow-hidden shadow-sm"
                     onClick={(e) => { if (!(e.target as Element).closest('[data-dot]')) setSelId(null) }}
                   >
                     {/* Q2 top-left: Keep Satisfied */}
@@ -287,39 +279,40 @@ export default function StakeholderPage() {
                       </div>
                     </div>
 
-                    {/* Dots layer */}
-                    <div className="absolute inset-0 pointer-events-none" style={{ height: gridH || '100%' }}>
-                      {sh.map(s => {
-                        const a = ANIMALS[s.animal]
-                        const isSelected = s.id === selId
-                        return (
+                  </div>
+
+                  {/* Dots layer — sibling outside overflow-hidden, so dots are never clipped */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    {sh.map(s => {
+                      const a = ANIMALS[s.animal]
+                      const isSelected = s.id === selId
+                      return (
+                        <div
+                          key={s.id}
+                          data-dot="true"
+                          className="absolute pointer-events-auto cursor-pointer transition-transform duration-150"
+                          style={{
+                            left: `${s.interest / 10 * 100}%`,
+                            bottom: `${s.power / 10 * 100}%`,
+                            transform: `translate(-50%, 50%) scale(${isSelected ? 1.2 : 1})`,
+                            zIndex: isSelected ? 10 : 2,
+                          }}
+                          onClick={(e) => { e.stopPropagation(); setSelId(s.id) }}
+                          title={s.name}
+                        >
                           <div
-                            key={s.id}
-                            data-dot="true"
-                            className="absolute pointer-events-auto cursor-pointer transition-transform duration-150"
+                            className="w-9 h-9 rounded-full flex items-center justify-center text-lg shadow-md border-2 transition-all duration-150"
                             style={{
-                              left: `${s.interest / 10 * 100}%`,
-                              bottom: `${s.power / 10 * 100}%`,
-                              transform: `translate(-50%, 50%) scale(${isSelected ? 1.2 : 1})`,
-                              zIndex: isSelected ? 10 : 2,
+                              background: a.bg,
+                              borderColor: isSelected ? '#2563eb' : a.color,
+                              boxShadow: isSelected ? `0 0 0 2px #2563eb, 0 4px 12px rgba(37,99,235,.3)` : undefined,
                             }}
-                            onClick={(e) => { e.stopPropagation(); setSelId(s.id); setTab('matrix') }}
-                            title={s.name}
                           >
-                            <div
-                              className="w-9 h-9 rounded-full flex items-center justify-center text-lg shadow-md border-2 transition-all duration-150"
-                              style={{
-                                background: a.bg,
-                                borderColor: isSelected ? '#2563eb' : a.color,
-                                boxShadow: isSelected ? `0 0 0 2px #2563eb, 0 4px 12px rgba(37,99,235,.3)` : undefined,
-                              }}
-                            >
-                              {a.emoji}
-                            </div>
+                            {a.emoji}
                           </div>
-                        )
-                      })}
-                    </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               </div>
