@@ -110,6 +110,8 @@ const DEFAULT_SH: Stakeholder[] = [
   { id: 's8',  name: 'Markus Brandt',         role: 'Projektleiter Digitalisierung',      power: 4,  interest: 7, animal: 'goose',   notes: '"Fertig bis Freitag." — Jede Woche. Vergisst QA, Onboarding und technische Schulden. History-Reviews helfen, schätzt aber ungern öffentlich nach.' },
   { id: 's9',  name: 'Sandra Weber',          role: 'Head of HR',                         power: 5,  interest: 6, animal: 'puma',    notes: '"Ein Techniker hat gesagt, das Tool ist zu kompliziert — wir müssen alles überarbeiten." Pounces on einzelne Datenpunkte; Discovery-Sprints helfen.' },
   { id: 's10', name: 'Dr. Stefan Müller',     role: 'CFO',                                power: 8,  interest: 3, animal: 'yak',     notes: 'Fordert 12 KPIs pro Sprint-Review. Optimiert Metriken, die man einfach messen kann, nicht die, die wichtig sind. ROI-Anbindung jedes KPIs ist Pflicht.' },
+  { id: 's11', name: 'Bernd Kruse',           role: 'Werkleiter Busan',                   power: 3,  interest: 2, animal: 'rhino',   notes: 'Periphere Rolle — sein Standort ist kaum vom KI-Programm betroffen. Könnte zum RHiNO werden, wenn lokale Interessen ohne Vorwarnung berührt werden. Quartalsweise Newsletter reicht aus.' },
+  { id: 's12', name: 'Julia Kern',            role: 'PR & Unternehmenskommunikation',     power: 2,  interest: 3, animal: 'goose',   notes: 'Kein direkter Einfluss auf das KI-Programm. Wird bei externen Kommunikationsmaßnahmen informiert. Neigt zu optimistischen Ankündigungen — Timing mit ihr abstimmen.' },
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -206,29 +208,53 @@ export default function StakeholderPage() {
                     className="w-full h-full relative grid grid-cols-2 grid-rows-2 border border-slate-200 rounded-xl overflow-hidden shadow-sm"
                     onClick={(e) => { if (!(e.target as Element).closest('[data-dot]')) setSelId(null) }}
                   >
-                    {/* Q2 top-left */}
-                    <div className="bg-blue-50/60 border-b border-r border-slate-200 p-3 flex flex-col gap-0.5">
-                      <span className="text-[9px] font-bold tracking-widest text-blue-400 uppercase">Keep Satisfied</span>
-                      <span className="text-[10px] text-slate-400">Latente Entscheider</span>
-                      <span className="mt-1 self-start text-[9px] font-semibold px-1.5 py-0.5 rounded bg-blue-100 text-blue-600">Informiert halten</span>
+                    {/* Q2 top-left: Keep Satisfied */}
+                    <div className="bg-blue-50/60 border-b border-r border-slate-200 p-3 flex flex-col">
+                      <span className="text-[9px] font-bold tracking-widest text-blue-500 uppercase">Keep Satisfied</span>
+                      <span className="text-[10px] text-slate-500 font-medium mt-0.5">Latente Entscheider</span>
+                      <span className="mt-1.5 self-start text-[9px] font-semibold px-1.5 py-0.5 rounded bg-blue-100 text-blue-600">Hohe Macht · Geringes Interesse</span>
+                      <div className="mt-auto pt-3 space-y-1 border-t border-blue-100 mt-3">
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Kanal:</span> Executive Briefing, E-Mail</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Frequenz:</span> Monatlich</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Inhalt:</span> 1-Pager, Budget-Impact, Milestones</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Ziel:</span> Zufriedenheit erhalten, Eskalation verhindern</div>
+                      </div>
                     </div>
-                    {/* Q1 top-right */}
-                    <div className="bg-red-50/60 border-b border-slate-200 p-3 flex flex-col gap-0.5">
-                      <span className="text-[9px] font-bold tracking-widest text-red-400 uppercase">Manage Closely</span>
-                      <span className="text-[10px] text-slate-400">Schlüssel-Stakeholder</span>
-                      <span className="mt-1 self-start text-[9px] font-semibold px-1.5 py-0.5 rounded bg-red-100 text-red-600">Intensiv einbinden</span>
+                    {/* Q1 top-right: Manage Closely */}
+                    <div className="bg-red-50/60 border-b border-slate-200 p-3 flex flex-col">
+                      <span className="text-[9px] font-bold tracking-widest text-red-500 uppercase">Manage Closely</span>
+                      <span className="text-[10px] text-slate-500 font-medium mt-0.5">Schlüssel-Stakeholder</span>
+                      <span className="mt-1.5 self-start text-[9px] font-semibold px-1.5 py-0.5 rounded bg-red-100 text-red-600">Hohe Macht · Hohes Interesse</span>
+                      <div className="mt-auto pt-3 space-y-1 border-t border-red-100 mt-3">
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Kanal:</span> Persönliches Meeting, Steering Committee</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Frequenz:</span> Wöchentlich</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Inhalt:</span> Status, Risiken, Entscheidungsvorlagen, ROI</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Ziel:</span> Commitment sichern, Blocker lösen</div>
+                      </div>
                     </div>
-                    {/* Q4 bottom-left */}
-                    <div className="bg-slate-50/60 border-r border-slate-200 p-3 flex flex-col gap-0.5">
-                      <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">Monitor</span>
-                      <span className="text-[10px] text-slate-400">Rand-Stakeholder</span>
-                      <span className="mt-1 self-start text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">Beobachten</span>
+                    {/* Q4 bottom-left: Monitor */}
+                    <div className="bg-slate-50/60 border-r border-slate-200 p-3 flex flex-col">
+                      <span className="text-[9px] font-bold tracking-widest text-slate-500 uppercase">Monitor</span>
+                      <span className="text-[10px] text-slate-500 font-medium mt-0.5">Rand-Stakeholder</span>
+                      <span className="mt-1.5 self-start text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">Geringe Macht · Geringes Interesse</span>
+                      <div className="mt-auto pt-3 space-y-1 border-t border-slate-200 mt-3">
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Kanal:</span> Newsletter, allgemeine Ankündigung</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Frequenz:</span> Quartalsweise</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Inhalt:</span> Allgemeiner Fortschrittsstand</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Ziel:</span> Informiert halten ohne Overload</div>
+                      </div>
                     </div>
-                    {/* Q3 bottom-right */}
-                    <div className="bg-amber-50/60 p-3 flex flex-col gap-0.5">
-                      <span className="text-[9px] font-bold tracking-widest text-amber-500 uppercase">Keep Informed</span>
-                      <span className="text-[10px] text-slate-400">Engagierte Unterstützer</span>
-                      <span className="mt-1 self-start text-[9px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-600">Transparent kommunizieren</span>
+                    {/* Q3 bottom-right: Keep Informed */}
+                    <div className="bg-amber-50/60 p-3 flex flex-col">
+                      <span className="text-[9px] font-bold tracking-widest text-amber-600 uppercase">Keep Informed</span>
+                      <span className="text-[10px] text-slate-500 font-medium mt-0.5">Engagierte Unterstützer</span>
+                      <span className="mt-1.5 self-start text-[9px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-600">Geringe Macht · Hohes Interesse</span>
+                      <div className="mt-auto pt-3 space-y-1 border-t border-amber-100 mt-3">
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Kanal:</span> Newsletter, Townhall, Slack</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Frequenz:</span> Bi-wöchentlich</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Inhalt:</span> Sprint-Updates, Lessons Learned, Feedback</div>
+                        <div className="text-[9px] text-slate-400"><span className="font-semibold text-slate-500">Ziel:</span> Einbindung und Motivation erhalten</div>
+                      </div>
                     </div>
 
                     {/* Dots layer */}
