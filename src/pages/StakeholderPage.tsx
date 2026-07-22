@@ -238,13 +238,26 @@ export default function StakeholderPage() {
         {tab === 'matrix' && (
           <div className="flex h-full">
             {/* Matrix area */}
-            <div className="flex-1 flex flex-col p-4 pl-10 gap-2 min-w-0">
-              {/* Y label */}
-              <div className="flex flex-col items-start gap-1 flex-1 min-h-0">
+            <div className="flex-1 flex flex-col p-4 pl-14 gap-0 min-w-0">
+              {/* Y label + grid row */}
+              <div className="flex flex-col items-start flex-1 min-h-0">
                 <div className="relative w-full flex-1 min-h-0">
-                  {/* Rotated Y axis */}
-                  <div className="absolute -left-8 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] font-semibold tracking-widest text-slate-400 uppercase whitespace-nowrap select-none">
-                    Power ↑
+
+                  {/* Y axis — spans full quadrant height */}
+                  <div className="absolute -left-12 inset-y-0 flex flex-col items-center pointer-events-none select-none">
+                    <span className="text-[9px] font-bold text-slate-500 leading-none tabular-nums">10</span>
+                    <div className="relative flex-1 flex items-center justify-center mx-auto" style={{ width: 18 }}>
+                      {/* Axis line */}
+                      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-slate-300" />
+                      {/* Label */}
+                      <span
+                        className="relative text-[10px] font-bold tracking-widest text-slate-500 uppercase bg-white px-0.5 z-10"
+                        style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', letterSpacing: '0.18em' }}
+                      >
+                        Macht
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-bold text-slate-500 leading-none tabular-nums">1</span>
                   </div>
 
                   {/* The grid (overflow-hidden only for rounded corner clipping of cell backgrounds) */}
@@ -340,9 +353,15 @@ export default function StakeholderPage() {
               </div>
 
               {/* X axis */}
-              <div className="flex justify-between text-[10px] font-semibold tracking-widest text-slate-400 uppercase px-1">
-                <span>Low Interest</span>
-                <span>High Interest</span>
+              <div className="flex items-center gap-1 pt-1.5 select-none pointer-events-none">
+                <span className="text-[9px] font-bold text-slate-500 tabular-nums leading-none">1</span>
+                <div className="relative flex-1 flex items-center justify-center">
+                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-slate-300" />
+                  <span className="relative text-[10px] font-bold tracking-widest text-slate-500 uppercase bg-white px-1 z-10" style={{ letterSpacing: '0.18em' }}>
+                    Interesse
+                  </span>
+                </div>
+                <span className="text-[9px] font-bold text-slate-500 tabular-nums leading-none">10</span>
               </div>
             </div>
 
