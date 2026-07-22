@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDemoStore } from '../store/demoStore'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -117,6 +117,17 @@ const DEFAULT_SH: Stakeholder[] = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+const STORAGE_KEY = 'ai_stakeholders_v1'
+
+function loadSh(demo: boolean): Stakeholder[] {
+  if (demo) return DEFAULT_SH
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) return JSON.parse(raw) as Stakeholder[]
+  } catch { /* ignore */ }
+  return []
+}
+
 function uid() { return 's' + Math.random().toString(36).slice(2, 8) }
 function gq(p: number, i: number): QuadKey {
   return p >= 5 && i >= 5 ? 'q1' : p >= 5 && i < 5 ? 'q2' : p < 5 && i >= 5 ? 'q3' : 'q4'
@@ -146,11 +157,22 @@ function sanitizeGenerated(raw: unknown[]): Omit<Stakeholder, 'id'>[] {
 
 export default function StakeholderPage() {
   const demoMode = useDemoStore(s => s.demoMode)
-  const [sh, setSh] = useState<Stakeholder[]>(DEFAULT_SH)
+  const [sh, setSh] = useState<Stakeholder[]>(() => loadSh(demoMode))
   const [selId, setSelId] = useState<string | null>(null)
   const [tab, setTab] = useState<TabKey>('matrix')
   const [modal, setModal] = useState<{ open: boolean; editId: string | null }>({ open: false, editId: null })
   const [aiModal, setAiModal] = useState(false)
+
+  // Persist user's own stakeholders (skip in demo mode)
+  useEffect(() => {
+    if (!demoMode) localStorage.setItem(STORAGE_KEY, JSON.stringify(sh))
+  }, [sh, demoMode])
+
+  // When demo mode toggles, reload the right dataset
+  useEffect(() => {
+    setSh(loadSh(demoMode))
+    setSelId(null)
+  }, [demoMode])
 
   const selected = sh.find(s => s.id === selId) ?? null
   const openAdd = () => setModal({ open: true, editId: null })
