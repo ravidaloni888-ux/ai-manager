@@ -575,7 +575,7 @@ function AiGenerateModal({ onClose, onAdd }: {
   onClose: () => void
   onAdd: (stakeholders: Omit<Stakeholder, 'id'>[]) => void
 }) {
-  const [context, setContext] = useState('')
+  const [context, setContext] = useState('Wir führen bei einem Automobilzulieferer (3.000 MA, 5 Werke) ein KI-Programm zur Predictive Maintenance ein. Die IT-Infrastruktur ist veraltet, der Betriebsrat ist skeptisch und der CEO hat das Budget freigegeben ohne die operative Ebene einzubinden.')
   const [count, setCount] = useState(6)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -620,7 +620,7 @@ function AiGenerateModal({ onClose, onAdd }: {
             value={context}
             onChange={e => setContext(e.target.value)}
             rows={6}
-            placeholder={`Beschreibe dein KI-Projekt und die Organisation:\n\n• Was ist das Ziel des KI-Programms?\n• In welcher Branche / welchem Unternehmen?\n• Welche Abteilungen sind beteiligt?\n• Welche Herausforderungen gibt es?\n\nBeispiel: „Wir führen bei einem Automobilzulieferer (3.000 MA, 5 Werke) ein KI-Programm zur Predictive Maintenance ein. Die IT-Infrastruktur ist veraltet, der Betriebsrat ist skeptisch und der CEO hat das Budget freigegeben ohne die operative Ebene einzubinden."`}
+            placeholder="Beschreibe dein KI-Projekt: Branche, Unternehmensgröße, Ziele, beteiligte Abteilungen, Herausforderungen…"
             className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-violet-500 resize-none leading-relaxed"
           />
         </div>
