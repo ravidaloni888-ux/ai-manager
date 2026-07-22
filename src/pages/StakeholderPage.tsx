@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useDemoStore } from '../store/demoStore'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -124,10 +125,12 @@ function gq(p: number, i: number): QuadKey {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function StakeholderPage() {
+  const demoMode = useDemoStore(s => s.demoMode)
   const [sh, setSh] = useState<Stakeholder[]>(DEFAULT_SH)
   const [selId, setSelId] = useState<string | null>(null)
   const [tab, setTab] = useState<TabKey>('matrix')
   const [modal, setModal] = useState<{ open: boolean; editId: string | null }>({ open: false, editId: null })
+  const [aiModal, setAiModal] = useState(false)
   const gridRef = useRef<HTMLDivElement>(null)
   const [gridH, setGridH] = useState(0)
 
@@ -172,9 +175,16 @@ export default function StakeholderPage() {
           <h1 className="text-lg font-bold text-slate-800">🦁 Stakeholder Zoo</h1>
           <p className="text-xs text-slate-400 mt-0.5">Mendelow-Matrix × Dangerous Animals of Product Management</p>
         </div>
-        <button onClick={openAdd} className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
-          + Stakeholder
-        </button>
+        <div className="flex items-center gap-2">
+          {!demoMode && (
+            <button onClick={() => setAiModal(true)} className="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+              ✦ Mit KI generieren
+            </button>
+          )}
+          <button onClick={openAdd} className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+            + Stakeholder
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -440,7 +450,18 @@ export default function StakeholderPage() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* KI-Generierungs-Modal */}
+      {aiModal && (
+        <AiGenerateModal
+          onClose={() => setAiModal(false)}
+          onAdd={(generated) => {
+            setSh(prev => [...prev, ...generated.map(g => ({ ...g, id: uid() }))])
+            setAiModal(false)
+          }}
+        />
+      )}
+
+      {/* Manuelles Stakeholder-Modal */}
       {modal.open && (
         <StakeholderModal
           editData={modal.editId ? sh.find(s => s.id === modal.editId) : undefined}
@@ -543,6 +564,125 @@ function DetailPanel({ s, onEdit, onDelete }: { s: Stakeholder; onEdit: () => vo
       <div className="flex gap-2 pt-2 border-t border-slate-200">
         <button onClick={onEdit} className="flex-1 text-xs font-medium py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">Bearbeiten</button>
         <button onClick={onDelete} className="text-xs font-medium px-3 py-2 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors">Entfernen</button>
+      </div>
+    </div>
+  )
+}
+
+// ── KI-Generierungs-Modal ─────────────────────────────────────────────────────
+
+function AiGenerateModal({ onClose, onAdd }: {
+  onClose: () => void
+  onAdd: (stakeholders: Omit<Stakeholder, 'id'>[]) => void
+}) {
+  const [context, setContext] = useState('')
+  const [count, setCount] = useState(6)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [preview, setPreview] = useState<Omit<Stakeholder, 'id'>[] | null>(null)
+
+  async function generate() {
+    if (!context.trim()) return
+    setLoading(true)
+    setError(null)
+    setPreview(null)
+    try {
+      const res = await fetch('/api/stakeholders-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context, count }),
+      })
+      const data = await res.json() as { stakeholders?: Omit<Stakeholder, 'id'>[]; error?: string }
+      if (!res.ok || data.error) throw new Error(data.error ?? 'Unbekannter Fehler')
+      setPreview(data.stakeholders ?? [])
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative z-10 bg-white rounded-2xl shadow-2xl w-[600px] max-w-[95vw] max-h-[90vh] overflow-y-auto p-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-bold text-slate-800 flex items-center gap-2">✦ KI-Stakeholder-Generator</h2>
+            <p className="text-xs text-slate-400 mt-0.5">Beschreibe dein Projekt — die KI analysiert und erstellt passende Stakeholder mit Tier-Archetypen.</p>
+          </div>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none">✕</button>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Projektkontext</label>
+          <textarea
+            value={context}
+            onChange={e => setContext(e.target.value)}
+            rows={6}
+            placeholder={`Beschreibe dein KI-Projekt und die Organisation:\n\n• Was ist das Ziel des KI-Programms?\n• In welcher Branche / welchem Unternehmen?\n• Welche Abteilungen sind beteiligt?\n• Welche Herausforderungen gibt es?\n\nBeispiel: „Wir führen bei einem Automobilzulieferer (3.000 MA, 5 Werke) ein KI-Programm zur Predictive Maintenance ein. Die IT-Infrastruktur ist veraltet, der Betriebsrat ist skeptisch und der CEO hat das Budget freigegeben ohne die operative Ebene einzubinden."`}
+            className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-violet-500 resize-none leading-relaxed"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Anzahl Stakeholder — <span className="text-violet-600">{count}</span></label>
+          <input type="range" min={3} max={10} value={count} onChange={e => setCount(+e.target.value)} className="w-full accent-violet-600" />
+          <div className="flex justify-between text-[10px] text-slate-400">
+            <span>3 (kompakt)</span>
+            <span>10 (vollständig)</span>
+          </div>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-600">
+            ⚠ {error}
+          </div>
+        )}
+
+        {preview && (
+          <div className="space-y-2">
+            <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">{preview.length} Stakeholder generiert — Vorschau</div>
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+              {preview.map((s, i) => {
+                const a = ANIMALS[s.animal]
+                const q = gq(s.power, s.interest)
+                const qi = QUADS[q]
+                return (
+                  <div key={i} className="flex items-start gap-3 bg-slate-50 rounded-lg p-3">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-base border flex-shrink-0" style={{ background: a.bg, borderColor: a.color }}>
+                      {a.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-sm text-slate-800">{s.name}</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full border" style={{ borderColor: qi.color, color: qi.color }}>{qi.name}</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full border" style={{ background: a.bg, borderColor: a.color, color: a.color }}>{a.name}</span>
+                      </div>
+                      <div className="text-xs text-slate-400 mt-0.5">{s.role} · Macht {s.power}/10 · Interesse {s.interest}/10</div>
+                      <div className="text-xs text-slate-500 mt-1 leading-relaxed">{s.notes}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
+          <button onClick={onClose} className="px-4 py-2 text-sm border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors">Abbrechen</button>
+          {preview ? (
+            <button onClick={() => onAdd(preview)} className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-lg transition-colors">
+              {preview.length} Stakeholder übernehmen
+            </button>
+          ) : (
+            <button onClick={generate} disabled={!context.trim() || loading} className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center gap-2">
+              {loading ? (
+                <><span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Analysiere…</>
+              ) : '✦ Generieren'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
