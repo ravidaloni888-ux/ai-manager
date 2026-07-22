@@ -159,9 +159,9 @@ export default function StakeholderPage() {
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'matrix', label: 'Matrix' },
-    { key: 'list', label: 'Team List' },
-    { key: 'comms', label: 'Comms Plan' },
-    { key: 'zoo', label: 'Animal Guide' },
+    { key: 'list', label: 'Teamliste' },
+    { key: 'comms', label: 'Kommunikationsplan' },
+    { key: 'zoo', label: 'Tier-Leitfaden' },
   ]
 
   return (
@@ -306,7 +306,7 @@ export default function StakeholderPage() {
               {!selected ? (
                 <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
                   <span className="text-4xl opacity-30">🗺️</span>
-                  <p className="text-sm text-slate-400">Klicke auf einen Stakeholder auf der Matrix, um sein Profil und die Taming-Strategie zu sehen.</p>
+                  <p className="text-sm text-slate-400">Klicke auf einen Stakeholder in der Matrix, um sein Profil und die Zähmungsstrategie zu sehen.</p>
                   <button onClick={openAdd} className="mt-2 text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                     + Stakeholder hinzufügen
                   </button>
@@ -325,7 +325,7 @@ export default function StakeholderPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200">
-                    {['Stakeholder', 'Animal Type', 'Quadrant', 'Power', 'Interest', 'Channel · Frequenz', ''].map(h => (
+                    {['Stakeholder', 'Tier-Typ', 'Quadrant', 'Macht', 'Interesse', 'Kanal · Frequenz', ''].map(h => (
                       <th key={h} className="text-left px-4 py-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
@@ -355,7 +355,7 @@ export default function StakeholderPage() {
                         <td className="px-4 py-3 tabular-nums text-slate-600">{s.interest}/10</td>
                         <td className="px-4 py-3 text-xs text-slate-400">{qi.channel}<br />{qi.freq}</td>
                         <td className="px-4 py-3">
-                          <button onClick={() => openEdit(s.id)} className="text-xs text-slate-400 hover:text-blue-600 border border-slate-200 hover:border-blue-300 px-2 py-1 rounded transition-colors">Edit</button>
+                          <button onClick={() => openEdit(s.id)} className="text-xs text-slate-400 hover:text-blue-600 border border-slate-200 hover:border-blue-300 px-2 py-1 rounded transition-colors">Bearbeiten</button>
                         </td>
                       </tr>
                     )
@@ -373,8 +373,8 @@ export default function StakeholderPage() {
         {tab === 'comms' && (
           <div className="p-6 overflow-auto h-full">
             <div className="mb-4">
-              <h2 className="text-base font-bold text-slate-800">Communication Matrix</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Auto-generated from stakeholder profiles — Mendelow quadrant + Animal type combined.</p>
+              <h2 className="text-base font-bold text-slate-800">Kommunikationsmatrix</h2>
+              <p className="text-xs text-slate-400 mt-0.5">Automatisch generiert aus Stakeholder-Profilen — Mendelow-Quadrant × Tier-Archetypus kombiniert.</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm" style={{ minWidth: 900 }}>
@@ -432,7 +432,7 @@ export default function StakeholderPage() {
                   </div>
                   <p className="text-xs text-slate-600 leading-relaxed mb-2">{a.desc}</p>
                   <div className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2 mb-2">⚠ {a.warn}</div>
-                  <div className="text-xs text-green-700 bg-green-50 rounded-lg px-3 py-2">✓ {a.tips[0]}</div>
+                  <div className="text-xs text-green-700 bg-green-50 rounded-lg px-3 py-2">✓ Tipp: {a.tips[0]}</div>
                 </div>
               ))}
             </div>
@@ -479,9 +479,9 @@ function DetailPanel({ s, onEdit, onDelete }: { s: Stakeholder; onEdit: () => vo
 
       {/* Bars */}
       <div>
-        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Power / Interest</div>
+        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Macht / Interesse</div>
         <div className="space-y-2">
-          {[{ label: 'Power', val: s.power, color: '#ef4444' }, { label: 'Interest', val: s.interest, color: '#3b82f6' }].map(b => (
+          {[{ label: 'Macht', val: s.power, color: '#ef4444' }, { label: 'Interesse', val: s.interest, color: '#3b82f6' }].map(b => (
             <div key={b.label} className="flex items-center gap-2 text-xs">
               <span className="w-12 text-slate-400 flex-shrink-0">{b.label}</span>
               <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -495,7 +495,7 @@ function DetailPanel({ s, onEdit, onDelete }: { s: Stakeholder; onEdit: () => vo
 
       {/* Animal */}
       <div>
-        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Animal Type</div>
+        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Tier-Archetypus</div>
         <div className="bg-slate-50 rounded-lg p-3 text-xs leading-relaxed">
           <span className="font-bold text-slate-700">{a.name} — {a.full}</span><br />
           <span className="text-slate-500">{a.desc}</span>
@@ -504,13 +504,13 @@ function DetailPanel({ s, onEdit, onDelete }: { s: Stakeholder; onEdit: () => vo
 
       {/* Warning */}
       <div>
-        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">⚠ Warning Signal</div>
+        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">⚠ Warnsignal</div>
         <div className="bg-orange-50 border border-orange-100 rounded-lg p-3 text-xs text-orange-700 font-medium">{a.warn}</div>
       </div>
 
       {/* Tips */}
       <div>
-        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">✓ Taming Tactics</div>
+        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">✓ Zähmungstaktiken</div>
         <div className="space-y-2">
           {a.tips.map((t, i) => (
             <div key={i} className="flex gap-2 text-xs text-slate-600 leading-relaxed">
@@ -523,10 +523,10 @@ function DetailPanel({ s, onEdit, onDelete }: { s: Stakeholder; onEdit: () => vo
 
       {/* Comms */}
       <div>
-        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Communication Strategy</div>
+        <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Kommunikationsstrategie</div>
         <div className="bg-slate-50 rounded-lg p-3 text-xs leading-relaxed text-slate-600">
           {qi.content}<br /><br />
-          <span className="text-slate-400">Channel:</span> {qi.channel}<br />
+          <span className="text-slate-400">Kanal:</span> {qi.channel}<br />
           <span className="text-slate-400">Frequenz:</span> {qi.freq}
         </div>
       </div>
@@ -534,15 +534,15 @@ function DetailPanel({ s, onEdit, onDelete }: { s: Stakeholder; onEdit: () => vo
       {/* Notes */}
       {s.notes && (
         <div>
-          <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Notes</div>
+          <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">Notizen</div>
           <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-500 leading-relaxed">{s.notes}</div>
         </div>
       )}
 
       {/* Actions */}
       <div className="flex gap-2 pt-2 border-t border-slate-200">
-        <button onClick={onEdit} className="flex-1 text-xs font-medium py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">Edit</button>
-        <button onClick={onDelete} className="text-xs font-medium px-3 py-2 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors">Remove</button>
+        <button onClick={onEdit} className="flex-1 text-xs font-medium py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">Bearbeiten</button>
+        <button onClick={onDelete} className="text-xs font-medium px-3 py-2 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors">Entfernen</button>
       </div>
     </div>
   )
