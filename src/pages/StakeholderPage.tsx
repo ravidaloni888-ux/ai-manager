@@ -476,6 +476,7 @@ export default function StakeholderPage() {
           onClose={() => setAiModal(false)}
           onAdd={(generated) => {
             setSh(prev => [...prev, ...sanitizeGenerated(generated).map(g => ({ ...g, id: uid() }))])
+            setTab('matrix')
             setAiModal(false)
           }}
         />
