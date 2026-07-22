@@ -117,7 +117,7 @@ const DEFAULT_SH: Stakeholder[] = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'ai_stakeholders_v1'
+const STORAGE_KEY = 'ai_stakeholders_v2'
 
 function loadSh(demo: boolean): Stakeholder[] {
   if (demo) return DEFAULT_SH
