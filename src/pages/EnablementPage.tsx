@@ -202,8 +202,210 @@ function Iso42001TrainingPanel({
   )
 }
 
+// ── Tag 14 · Schulungskonzept ─────────────────────────────────────────────
+
+const KUEBLER_ROSS = [
+  { block: 'Block 1', title: 'Verleugnung', icon: '🚫', feeling: '"Das passiert mir nicht." · "Die KI wird meinen Job nicht beeinflussen."', help: 'Klare, sachliche Kommunikation. Beruhigung und Zuhören.', phase: 'stopp' },
+  { block: 'Block 2', title: 'Zorn', icon: '😠', feeling: '"Warum ich?" · "Diese neue KI ist nutzlos/kompliziert."', help: 'Gefühle anerkennen. Sichere Räume für Feedback. Energie in konstruktive Maßnahmen.', phase: 'stopp' },
+  { block: 'Block 3', title: 'Verhandeln', icon: '💭', feeling: '"Wenn nur…" · "Können wir nicht das alte System behalten?"', help: 'Mitarbeitende in die Entscheidungsfindung einbeziehen. Vorteile und neue Möglichkeiten aufzeigen.', phase: 'stopp' },
+  { block: 'Block 4', title: 'Verhandlung', icon: '🤝', feeling: '"Wenn ich muss, dann unter diesen Bedingungen…"', help: 'Bedingungen klären · Würdigung zeigen.', phase: 'schulen' },
+  { block: 'Block 5', title: 'Akzeptanz ★', icon: '😊', feeling: 'Bereitschaft zur aktiven Auseinandersetzung.', help: 'Jetzt erst schulen! Ausprobieren ermöglichen.', phase: 'jetzt' },
+  { block: 'Block 6', title: 'Integration', icon: '💻', feeling: 'Aktive Nutzung · eigene Erfahrungen aufbauen.', help: 'Erfolge sichtbar machen · Peer-Learning.', phase: 'schulen' },
+]
+
+const LERNFORMATE = [
+  { nr: '1', title: 'Blended Learning', staerke: 'Flexibilität + Tiefe · beste Nachhaltigkeit', einsatz: 'Service-Ingenieure Bremen: E-Learning (30 Min.) + On-the-Job + Praxis-Session' },
+  { nr: '2', title: 'Microlearning', staerke: '3–7 Min. · direkt in den Arbeitsalltag integriert', einsatz: 'Internationale Agenten: 3–5 Einheiten · asynchron · Mobilgerät' },
+  { nr: '3', title: 'On-the-Job-Lernen', staerke: 'Lernen während der Arbeit, nicht davor', einsatz: 'Shadow Deployment ist de facto On-the-Job-Lernen' },
+  { nr: '4', title: 'Peer-Learning', staerke: 'Kolleg:innen lernen von Kolleg:innen · hohe Glaubwürdigkeit', einsatz: 'Kruse (Busan) berichtet in Bremen → mehr Wirkung als jede Präsentation' },
+  { nr: '5', title: 'E-Learning / Webinar', staerke: 'Skalierbar · asynchron oder synchron', einsatz: 'Alle Standorte gleichzeitig — aber nur mit Sprachanpassung wirksam' },
+]
+
+const KIRKPATRICK = [
+  { ebene: '1', title: 'Reaktion', was: 'War die Schulung gut? Hat sie gefallen?', hinweis: 'Fast immer gemessen — zu wenig.', color: 'text-slate-500', star: false },
+  { ebene: '2', title: 'Lernen', was: 'Wurde Wissen aufgebaut?', hinweis: '', color: 'text-slate-500', star: false },
+  { ebene: '3', title: 'Verhalten', was: 'Wird das Gelernte angewendet?', hinweis: 'Bei KI-Systemen Minimum-Standard.', color: 'text-orange-600', star: true },
+  { ebene: '4', title: 'Ergebnis', was: 'Hat die Schulung den Projekterfolg unterstützt?', hinweis: '', color: 'text-slate-500', star: false },
+]
+
+const SCHULUNGSBAUSTEINE = [
+  { baustein: 'Zielgruppen', was: 'Wer wird geschult? Welche Vorkenntnisse?', beispiel: '4 Gruppen · differenziert nach Aufgabe + Standort' },
+  { baustein: 'Lernziele', was: 'Was können sie danach konkret tun?', beispiel: '„Service-Ingenieur kann Quellenverweis interpretieren"' },
+  { baustein: 'Format', was: 'Blended · Microlearning · On-the-Job · Peer', beispiel: 'Je nach Gruppe differenziert' },
+  { baustein: 'Zeitpunkt', was: 'Kübler-Ross Phase 5 abwarten', beispiel: 'Erst nach Akzeptanz — nicht bei Frust' },
+  { baustein: 'Sprache', was: 'In welcher Sprache?', beispiel: 'DE · EN · KO · AR je nach Standort' },
+  { baustein: 'Erfolgsmessung', was: 'Welche Kirkpatrick-Ebene?', beispiel: 'Mindestens Ebene 3 bei KI-Systemen' },
+]
+
+function SchulungskonzeptTab() {
+  return (
+    <div className="space-y-6">
+      {/* Intro */}
+      <div className="bg-white border border-slate-200 border-l-4 border-l-slate-800 rounded-r-xl px-5 py-4 text-sm text-slate-700 leading-relaxed">
+        <strong>Lernziel Tag 14:</strong> Ein zielgruppengerechtes Schulungskonzept für ein KI-System entwickeln — differenziert nach Aufgabe, Vorkenntnissen, Sprache und emotionaler Phase.
+        <span className="block mt-1 text-slate-400 text-xs">Change Management · Zielgruppen · Kirkpatrick · Art. 4 KI-VO</span>
+      </div>
+
+      {/* Hype Cycle + Konsequenz */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Gartner Hype Cycle 2025 · Schulungsplanung</p>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: 'KI-Agenten + KI-Ready Data', where: 'Gipfel der überzogenen Erwartungen', color: 'border-red-200 bg-red-50 text-red-700' },
+            { label: 'Generative KI (allgemein)', where: 'Tal der Enttäuschungen', color: 'border-amber-200 bg-amber-50 text-amber-700' },
+            { label: 'RAG-Systeme', where: 'Pfad der Erleuchtung', color: 'border-green-200 bg-green-50 text-green-700' },
+          ].map(c => (
+            <div key={c.label} className={`rounded-lg border p-3 ${c.color}`}>
+              <p className="text-xs font-bold">{c.label}</p>
+              <p className="text-xs mt-1 opacity-80">{c.where}</p>
+            </div>
+          ))}
+        </div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-xs text-blue-800 leading-relaxed">
+          <strong>Konsequenz für Schulung:</strong> Mitarbeitende kommen nicht unvoreingenommen. Aufgabe der Schulung: Erwartungen kalibrieren, bevor Wissen vermittelt wird. Eine ehrliche Demo mit einer <em>falschen</em> Antwort zu Beginn ist wertvoller als zehn richtige.
+        </div>
+      </div>
+
+      {/* Kübler-Ross */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+        <div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kübler-Ross · Wann ist der richtige Schulungszeitpunkt?</p>
+          <p className="text-xs text-slate-400 mt-1">Schulungen erst ab Phase 5 (Akzeptanz). Wer in Phase 3 schult, verstärkt den Widerstand.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {KUEBLER_ROSS.map(b => (
+            <div key={b.block} className={`rounded-lg border p-3 space-y-1.5 ${b.phase === 'jetzt' ? 'border-orange-300 bg-orange-50' : b.phase === 'stopp' ? 'border-slate-200 bg-slate-50' : 'border-green-200 bg-green-50'}`}>
+              <div className="flex items-center gap-2">
+                <span className="text-base">{b.icon}</span>
+                <span className="text-xs font-bold text-slate-700">{b.block}: {b.title}</span>
+                {b.phase === 'jetzt' && <span className="ml-auto text-[10px] bg-orange-500 text-white px-1.5 py-0.5 rounded-full font-bold">JETZT SCHULEN</span>}
+                {b.phase === 'stopp' && <span className="ml-auto text-[10px] bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded-full">⏸ noch warten</span>}
+              </div>
+              <p className="text-[11px] text-slate-600 italic">{b.feeling}</p>
+              <p className="text-[11px] text-slate-500"><span className="font-semibold">Was hilft:</span> {b.help}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Fünf Lernformate */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Fünf Lernformate · Wann welches?</p>
+        <div className="grid grid-cols-1 gap-2">
+          {LERNFORMATE.map(f => (
+            <div key={f.nr} className="flex gap-3 items-start border border-slate-100 rounded-lg px-4 py-3 bg-slate-50">
+              <span className="w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{f.nr}</span>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">{f.title}</p>
+                <p className="text-xs text-slate-500 mt-0.5"><span className="font-medium">Stärke:</span> {f.staerke}</p>
+                <p className="text-xs text-slate-500"><span className="font-medium">Einsatz:</span> {f.einsatz}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Art. 4 KI-VO */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Art. 4 EU AI Act · KI-Kompetenz als Betreiberpflicht</p>
+        <p className="text-sm text-slate-700 leading-relaxed">
+          Art. 4 EU AI Act verpflichtet Betreiber, sicherzustellen, dass das Personal über ausreichende KI-Kompetenz verfügt — nicht nur technische Bedienung, sondern <strong>kritisches Urteilsvermögen.</strong>
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { title: 'Was kann das System — und was nicht?', body: 'Anwender:innen müssen die Grenzen des Systems kennen — nicht nur seine Funktionen.' },
+            { title: 'Wann ist eine Antwort plausibel?', body: 'Kritisches Prüfen von Quellenverweisen und Diagnose-Vorschlägen — nicht blindes Vertrauen.' },
+            { title: 'Fehler melden', body: 'Was tue ich, wenn es falsch liegt? Klarer Feedback-Kanal ist Teil der Schulungspflicht.' },
+          ].map(c => (
+            <div key={c.title} className="border border-slate-200 rounded-lg p-3 space-y-1">
+              <p className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-snug">{c.title}</p>
+              <p className="text-xs text-slate-500 leading-relaxed">{c.body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 text-xs text-amber-800">
+          <strong>Forschungshinweis (Türkei-Studie 2025):</strong> Schüler mit KI-Unterstützung → +18 % bei Hausaufgaben, aber −17 % in ununterstützten Tests. KI übernimmt das Denken — kritisches Urteilen verkümmert. Schulung muss aktives Urteilsvermögen aufbauen, nicht Abhängigkeit.
+        </div>
+      </div>
+
+      {/* Kirkpatrick */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+        <div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kirkpatrick-Modell · Vier Ebenen der Schulungsevaluation</p>
+          <p className="text-xs text-slate-400 mt-1">Kirkpatrick, D. (1959) — Evaluating Training Programs. Four Levels Model.</p>
+        </div>
+        <div className="space-y-2">
+          {KIRKPATRICK.map(k => (
+            <div key={k.ebene} className={`flex gap-3 items-start border rounded-lg px-4 py-3 ${k.star ? 'border-orange-300 bg-orange-50' : 'border-slate-100 bg-slate-50'}`}>
+              <span className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 ${k.star ? 'border-orange-500 text-orange-600' : 'border-slate-300 text-slate-500'}`}>{k.ebene}</span>
+              <div className="flex-1">
+                <p className={`text-sm font-semibold ${k.star ? 'text-orange-700' : 'text-slate-700'}`}>{k.title} {k.star && '★'}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{k.was}</p>
+                {k.hinweis && <p className={`text-[11px] mt-1 font-medium ${k.star ? 'text-orange-600' : 'text-slate-400'}`}>{k.hinweis}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="border border-orange-200 border-dashed rounded-lg px-4 py-2.5 text-xs text-orange-700 leading-relaxed">
+          <strong>★ Bei KI-Systemen sollte Ebene 3 Standard sein.</strong> Wissen über kritisches Prüfen muss in Verhalten übergehen — Kirkpatrick Ebene 1 allein reicht nicht.
+        </div>
+      </div>
+
+      {/* Aufbau Schulungskonzept */}
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="px-5 py-3 bg-slate-800 text-white">
+          <p className="text-sm font-bold">Aufbau eines Schulungskonzeptes</p>
+          <p className="text-xs text-slate-400 mt-0.5">Sechs Bausteine — differenziert nach Zielgruppe, Format, Zeitpunkt, Sprache und Erfolgsmessung</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                <th className="text-left py-2.5 px-4 font-semibold text-slate-500">Baustein</th>
+                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">Was es enthält</th>
+                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">WellSeal-Beispiel</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {SCHULUNGSBAUSTEINE.map(b => (
+                <tr key={b.baustein} className="hover:bg-slate-50 transition-colors">
+                  <td className="py-3 px-4 font-semibold text-slate-800">{b.baustein}</td>
+                  <td className="py-3 px-3 text-slate-600">{b.was}</td>
+                  <td className="py-3 px-3 text-slate-500 italic">{b.beispiel}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Kernbotschaften */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kernbotschaften Tag 14</p>
+        <div className="space-y-2">
+          {[
+            { nr: '1', title: 'KI-Schulung ist Change Management', body: 'Vertrauen, Kompetenz und Sicherheit aufbauen — nicht nur Klicks erklären.' },
+            { nr: '2', title: 'Kübler-Ross als Planungsrahmen', body: 'Schulungen erst ab Phase 5 (Akzeptanz). Wer in Phase 3 schult, verstärkt den Widerstand.' },
+            { nr: '3', title: 'Fünf Lernformate · situationsbezogen', body: 'Blended · Microlearning · On-the-Job · Peer-Learning · E-Learning. Je nach Zielgruppe kombinieren.' },
+            { nr: '4', title: 'Art. 4 KI-Verordnung', body: 'Kompetenzpflicht des Betreibers — nicht nur Bedienungsschulung: kritisches Urteilsvermögen ist gesetzliche Anforderung.' },
+            { nr: '5', title: 'Kirkpatrick Ebene 3 als Minimum', body: 'Vier Evaluationsebenen: Reaktion · Lernen · Verhalten · Ergebnis. Bei KI-Systemen muss Verhalten (Ebene 3) gemessen werden.' },
+          ].map(k => (
+            <div key={k.nr} className="flex gap-3 items-start">
+              <span className="w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{k.nr}</span>
+              <div>
+                <p className="text-sm font-semibold text-slate-800 uppercase tracking-wide text-[11px]">{k.title}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{k.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function EnablementPage() {
-  const [tab, setTab] = useState<'map' | 'library'>('map')
+  const [tab, setTab] = useState<'map' | 'library' | 'konzept'>('map')
   const { data, loading, saving, init, setStatus, save } = useEnablementStore()
   const user = useAuthStore(s => s.user)
 
@@ -272,13 +474,13 @@ export default function EnablementPage() {
 
       {/* Tab bar */}
       <div className="flex gap-1 bg-slate-100 p-1 rounded-lg w-fit">
-        {(['map', 'library'] as const).map(key => (
+        {(['map', 'library', 'konzept'] as const).map(key => (
           <button
             key={key}
             onClick={() => setTab(key)}
             className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${tab === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
-            {key === 'map' ? 'Training Map' : 'Topic Library'}
+            {key === 'map' ? 'Training Map' : key === 'library' ? 'Topic Library' : '📚 Schulungskonzept'}
           </button>
         ))}
       </div>
@@ -384,6 +586,9 @@ export default function EnablementPage() {
           </div>
         </div>
       )}
+
+      {/* Schulungskonzept */}
+      {tab === 'konzept' && <SchulungskonzeptTab />}
 
       {/* Topic Library */}
       {tab === 'library' && (
