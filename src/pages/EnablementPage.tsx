@@ -297,7 +297,9 @@ const BLOCK_COLORS: Record<string, { bg: string; border: string; activeBorder: s
 }
 
 function AdoptionPathTool() {
-  const [activeBlock, setActiveBlock] = useState(0)
+  const { data, setAdoptionPhase } = useEnablementStore()
+  const currentPhase = data.adoptionPhase ?? 0
+  const [activeBlock, setActiveBlock] = useState(currentPhase)
   const [detailTab, setDetailTab] = useState<'overview' | 'gate' | 'formate'>('overview')
   const [gateOpen, setGateOpen] = useState(false)
   const b: AdoptionBlock = ADOPTION_BLOCKS[activeBlock]
@@ -320,7 +322,8 @@ function AdoptionPathTool() {
                 >
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="text-base">{blk.icon}</span>
-                    {blk.schulungFreigabe && <span className="text-[9px] bg-green-500 text-white px-1.5 py-0.5 rounded-full font-bold ml-auto">▶ SCHULUNG</span>}
+                    {i === currentPhase && <span className="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded-full font-bold ml-auto">📍 Aktuell</span>}
+                    {blk.schulungFreigabe && i !== currentPhase && <span className="text-[9px] bg-green-500 text-white px-1.5 py-0.5 rounded-full font-bold ml-auto">▶ SCHULUNG</span>}
                   </div>
                   <p className={`text-[10px] font-bold ${isActive ? bc.text : 'text-slate-500'}`}>Block {blk.nr}</p>
                   <p className={`text-xs font-semibold leading-snug mt-0.5 ${isActive ? 'text-slate-800' : 'text-slate-600'}`}>{blk.title}</p>
@@ -335,18 +338,25 @@ function AdoptionPathTool() {
             )
           })}
         </div>
-        {!ADOPTION_BLOCKS[activeBlock].schulungFreigabe && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-slate-400 bg-slate-50 rounded-lg px-3 py-2">
-            <span className="text-base">⏸</span>
-            <span>Noch keine Schulungsfreigabe in dieser Phase — zuerst Akzeptanz herstellen.</span>
-          </div>
-        )}
-        {ADOPTION_BLOCKS[activeBlock].schulungFreigabe && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-            <span className="text-base">✅</span>
-            <span><strong>Schulungsfreigabe:</strong> Quality Gate erfüllt — jetzt strukturierte Schulungen starten.</span>
-          </div>
-        )}
+        <div className={`mt-3 flex items-center gap-2 text-xs rounded-lg px-3 py-2 ${ADOPTION_BLOCKS[activeBlock].schulungFreigabe ? 'text-green-700 bg-green-50 border border-green-200' : 'text-slate-400 bg-slate-50'}`}>
+          <span className="text-base">{ADOPTION_BLOCKS[activeBlock].schulungFreigabe ? '✅' : '⏸'}</span>
+          <span className="flex-1">
+            {ADOPTION_BLOCKS[activeBlock].schulungFreigabe
+              ? <><strong>Schulungsfreigabe:</strong> Quality Gate erfüllt — jetzt strukturierte Schulungen starten.</>
+              : 'Noch keine Schulungsfreigabe in dieser Phase — zuerst Akzeptanz herstellen.'}
+          </span>
+          {activeBlock !== currentPhase && (
+            <button
+              onClick={() => setAdoptionPhase(activeBlock)}
+              className="flex-shrink-0 text-[10px] font-bold bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-500 transition-colors"
+            >
+              📍 Als aktuell setzen
+            </button>
+          )}
+          {activeBlock === currentPhase && (
+            <span className="flex-shrink-0 text-[10px] font-bold text-blue-600">📍 Aktuelle Phase</span>
+          )}
+        </div>
       </div>
 
       {/* Detail panel */}

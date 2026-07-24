@@ -6,6 +6,7 @@ import { getDemoMode } from './demoStore'
 const D = 'done' as const, P = 'planned' as const, O = 'open' as const
 
 export const DEMO_ENABLEMENT: EnablementData = {
+  adoptionPhase: 2,
   trainingMap: {
     IT:                  { fundamentals: D, ai_types: D, data_safety: D, opportunities: D, prompting: D, compliance: D, use_cases: P },
     Sales:               { fundamentals: D, ai_types: P, data_safety: D, opportunities: D, prompting: D, compliance: P, use_cases: P },
@@ -25,6 +26,7 @@ interface EnablementStore {
   saving: boolean
   init: () => Promise<void>
   setStatus: (dept: string, topic: TrainingTopicKey, status: TrainingStatus) => void
+  setAdoptionPhase: (phase: number) => void
   save: () => Promise<void>
 }
 
@@ -40,6 +42,10 @@ export const useEnablementStore = create<EnablementStore>()((set, get) => ({
     }
     const data = await loadEnablement()
     set({ data, loading: false })
+  },
+
+  setAdoptionPhase: (phase) => {
+    set({ data: { ...get().data, adoptionPhase: phase } })
   },
 
   setStatus: (dept, topic, status) => {

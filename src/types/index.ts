@@ -339,7 +339,7 @@ export const TRAINING_TOPICS = [
 export type TrainingTopicKey = typeof TRAINING_TOPICS[number]['key']
 export type TrainingStatus = 'open' | 'planned' | 'done'
 export type TrainingMap = Partial<Record<string, Partial<Record<TrainingTopicKey, TrainingStatus>>>>
-export interface EnablementData { trainingMap: TrainingMap }
+export interface EnablementData { trainingMap: TrainingMap; adoptionPhase?: number }
 
 export type MeetingStatus = 'active' | 'pending' | 'skip'
 export interface MeetingConfig {
