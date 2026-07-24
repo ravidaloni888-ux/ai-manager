@@ -574,26 +574,6 @@ function SchulungskonzeptTab() {
         <span className="block mt-1 text-slate-400 text-xs">Change Management · Kübler-Ross · Lernformate · Kirkpatrick · Art. 4 KI-VO</span>
       </div>
 
-      {/* Hype Cycle */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Gartner Hype Cycle 2025 · Konsequenz für Schulungsplanung</p>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: 'KI-Agenten + KI-Ready Data', where: 'Gipfel der überzogenen Erwartungen', color: 'border-red-200 bg-red-50 text-red-700' },
-            { label: 'Generative KI (allgemein)', where: 'Tal der Enttäuschungen', color: 'border-amber-200 bg-amber-50 text-amber-700' },
-            { label: 'RAG-Systeme', where: 'Pfad der Erleuchtung', color: 'border-green-200 bg-green-50 text-green-700' },
-          ].map(c => (
-            <div key={c.label} className={`rounded-lg border p-3 ${c.color}`}>
-              <p className="text-xs font-bold">{c.label}</p>
-              <p className="text-xs mt-1 opacity-80">{c.where}</p>
-            </div>
-          ))}
-        </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-xs text-blue-800 leading-relaxed">
-          <strong>Konsequenz:</strong> Mitarbeitende kommen nicht unvoreingenommen. Erwartungen zuerst kalibrieren — eine ehrliche Demo mit einer <em>falschen</em> Antwort zu Beginn ist wertvoller als zehn richtige.
-        </div>
-      </div>
-
       {/* Interactive Adoption Path Tool */}
       <AdoptionPathTool />
     </div>
