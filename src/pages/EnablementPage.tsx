@@ -202,53 +202,371 @@ function Iso42001TrainingPanel({
   )
 }
 
-// ── Tag 14 · Schulungskonzept ─────────────────────────────────────────────
+// ── Tag 14 · Adoption Path & Schulungskonzept ─────────────────────────────
 
-const KUEBLER_ROSS = [
-  { block: 'Block 1', title: 'Verleugnung', icon: '🚫', feeling: '"Das passiert mir nicht." · "Die KI wird meinen Job nicht beeinflussen."', help: 'Klare, sachliche Kommunikation. Beruhigung und Zuhören.', phase: 'stopp' },
-  { block: 'Block 2', title: 'Zorn', icon: '😠', feeling: '"Warum ich?" · "Diese neue KI ist nutzlos/kompliziert."', help: 'Gefühle anerkennen. Sichere Räume für Feedback. Energie in konstruktive Maßnahmen.', phase: 'stopp' },
-  { block: 'Block 3', title: 'Verhandeln', icon: '💭', feeling: '"Wenn nur…" · "Können wir nicht das alte System behalten?"', help: 'Mitarbeitende in die Entscheidungsfindung einbeziehen. Vorteile und neue Möglichkeiten aufzeigen.', phase: 'stopp' },
-  { block: 'Block 4', title: 'Verhandlung', icon: '🤝', feeling: '"Wenn ich muss, dann unter diesen Bedingungen…"', help: 'Bedingungen klären · Würdigung zeigen.', phase: 'schulen' },
-  { block: 'Block 5', title: 'Akzeptanz ★', icon: '😊', feeling: 'Bereitschaft zur aktiven Auseinandersetzung.', help: 'Jetzt erst schulen! Ausprobieren ermöglichen.', phase: 'jetzt' },
-  { block: 'Block 6', title: 'Integration', icon: '💻', feeling: 'Aktive Nutzung · eigene Erfahrungen aufbauen.', help: 'Erfolge sichtbar machen · Peer-Learning.', phase: 'schulen' },
+const ADOPTION_BLOCKS = [
+  {
+    nr: 1,
+    title: 'Schock / Leugnung',
+    quote: '"Das brauchen wir nicht."',
+    icon: '😶',
+    colorKey: 'red',
+    verhalten: ['Ablehnung, Vermeidung', 'Angst vor Jobverlust', '"Das ist nichts für mich."'],
+    ziel: 'Aufmerksamkeit erzeugen, Veränderung real und relevant machen.',
+    wasTun: ['Klare Kommunikation: Warum jetzt? Was ändert sich – was bleibt?', 'Fakten statt Hype: Realistisches Bild (inkl. Grenzen).', 'Betroffene zu Wort kommen lassen (Ängste sammeln).'],
+    wasHilft: ['Persönliche Ansprache.', 'Transparenz über Ziele & Auswirkungen.', 'FAQ zu Jobs, Sicherheit, Datenschutz.'],
+    verantwortlich: 'Kommunikation + Change Lead · Linienführungskräfte',
+    schulungFreigabe: false,
+    lernformate: [],
+    qualityGate: {
+      pruefe: ['Awareness & Grundverständnis', 'Emotionale Ablehnung'],
+      kriterien: ['≥ 70 % können in eigenen Worten erklären, warum das Projekt gestartet wurde.', 'Anteil starker Ablehnung < 40 %.'],
+      methode: 'Pulse Survey · Kurzquiz · Feedbackrunden',
+      fallback: 'Persönliche Gespräche intensivieren, Führungskräfte aktiv einbinden, FAQ zu Jobs & Sicherheit erweitern.',
+    },
+  },
+  {
+    nr: 2,
+    title: 'Widerstand',
+    quote: '"Das macht nur mehr Arbeit."',
+    icon: '😠',
+    colorKey: 'orange',
+    verhalten: ['Kritik, Jammern', 'Fokus auf Probleme', 'Verbreitung negativer Botschaften'],
+    ziel: 'Kritik ernst nehmen, Vertrauen aufbauen, Nutzen greifbar machen.',
+    wasTun: ['Kritikformate (z. B. Dialogrunden).', 'Nutzenbeispiele aus der Praxis, Quick Wins sichtbar machen.', 'Botschafter aus dem Team gewinnen.', 'Kleine Entscheidungen mitbetreffen lassen.'],
+    wasHilft: ['Offene Q&A mit Führung.', '"Stimmen aus der Praxis".', 'Nutzen-Kalkulation für den Arbeitsalltag.', 'Ängste ernst nehmen, nicht wegreden.'],
+    verantwortlich: 'Change Lead + Führung · Botschafter',
+    schulungFreigabe: false,
+    lernformate: ['Peer-Learning (Botschafter-Berichte)', 'Microlearning (Nutzen-Demos, 3–5 Min.)'],
+    qualityGate: {
+      pruefe: ['Kritikniveau', 'Vertrauen in das Projekt'],
+      kriterien: ['≥ 60 % sehen mindestens einen persönlichen Nutzen.', 'Anteil "kritisch/negativ" < 30 %.', 'Teilnahme an Dialogformaten ≥ 50 %.'],
+      methode: 'Pulse Survey · Teilnahmequote · Feedbackprotokolle',
+      fallback: 'Ursachenanalyse: Welche Einwände dominieren? Führungskräfte aktiv einbinden, Nutzen-Cases konkretisieren.',
+    },
+  },
+  {
+    nr: 3,
+    title: 'Ausprobieren',
+    quote: '"Vielleicht ist da ja doch was."',
+    icon: '🤔',
+    colorKey: 'amber',
+    verhalten: ['Erste Neugier', 'Testet zögerlich', 'Fragt nach Nutzen'],
+    ziel: 'Positive Erfahrungen ermöglichen, Hürden abbauen, Nutzen bestätigen.',
+    wasTun: ['Hands-on Demos & Use Cases.', 'Sicherer Testraum anbieten.', 'Mikro-Piloten mit echten Nutzenden.', 'Individuelle Unterstützung (Coaching, Sprechstunden).', 'Erfolge öffentlich machen.'],
+    wasHilft: ['Geführte Übungen.', 'Erfolgserlebnisse in der Realarbeit.', 'Zeit zum Ausprobieren.', 'Einfacher Zugang & Support.'],
+    verantwortlich: 'Führung + Trainer · Anwender-Coaches',
+    schulungFreigabe: false,
+    lernformate: ['On-the-Job-Lernen (Shadow Deployment)', 'Peer-Learning (erste Erfolgsgeschichten)', 'Microlearning (kurze Praxis-Einheiten)'],
+    qualityGate: {
+      pruefe: ['Nutzungserfahrung', 'Erste Erfolge'],
+      kriterien: ['≥ 50 % haben das System mind. 1× im Test genutzt.', '≥ 50 % berichten von mind. einem nützlichen Ergebnis.', 'Weiterempfehlungsbereitschaft (NPS) ≥ 0.'],
+      methode: 'Nutzungsdaten · Umfrage · Kurzinterviews',
+      fallback: 'Kein Nutzen erkennbar → Use Cases anpassen, einfachere Aufgaben zuerst, technische Hürden prüfen.',
+    },
+  },
+  {
+    nr: 4,
+    title: 'Akzeptanz',
+    quote: '"Ich nutze es – es hilft mir."',
+    icon: '😊',
+    colorKey: 'green',
+    verhalten: ['Sieht Nutzen', 'Nutzt aktiv', 'Empfiehlt weiter'],
+    ziel: 'Erfolg verankern, Kompetenzen vertiefen, andere mitnehmen.',
+    wasTun: ['Schulungen & Deep Dives starten.', 'Best Practices teilen.', 'Anwender-Community aufbauen.', 'Feedback in Systemverbesserung einfließen lassen.'],
+    wasHilft: ['Anerkennung & Sichtbarkeit.', 'Weiterbildungsangebote.', 'Mitgestalten ermöglichen.', 'Erfolg messen & feiern.'],
+    verantwortlich: 'Führung + L&D · Community Lead',
+    schulungFreigabe: true,
+    lernformate: ['Blended Learning (E-Learning + On-the-Job + Praxis)', 'E-Learning / Webinar (skalierbar, mit Sprachanpassung)', 'Peer-Learning (Anwender-Community)', 'On-the-Job-Lernen'],
+    qualityGate: {
+      pruefe: ['Akzeptanz & Bereitschaft', 'Motivation'],
+      kriterien: ['Akzeptanzindex ≥ 70 %.', '≥ 70 % wollen das System regelmäßig nutzen.', 'Keine offene Ablehnung in der Gruppe.'],
+      methode: 'Akzeptanz-Umfrage · Führungseinschätzung',
+      fallback: 'Akzeptanzindex < 50 % nach Woche 3 → Ursachenanalyse & Maßnahmen nachsteuern. Eskalation an Führungskräfte.',
+    },
+  },
 ]
 
-const LERNFORMATE = [
-  { nr: '1', title: 'Blended Learning', staerke: 'Flexibilität + Tiefe · beste Nachhaltigkeit', einsatz: 'Service-Ingenieure Bremen: E-Learning (30 Min.) + On-the-Job + Praxis-Session' },
-  { nr: '2', title: 'Microlearning', staerke: '3–7 Min. · direkt in den Arbeitsalltag integriert', einsatz: 'Internationale Agenten: 3–5 Einheiten · asynchron · Mobilgerät' },
-  { nr: '3', title: 'On-the-Job-Lernen', staerke: 'Lernen während der Arbeit, nicht davor', einsatz: 'Shadow Deployment ist de facto On-the-Job-Lernen' },
-  { nr: '4', title: 'Peer-Learning', staerke: 'Kolleg:innen lernen von Kolleg:innen · hohe Glaubwürdigkeit', einsatz: 'Kruse (Busan) berichtet in Bremen → mehr Wirkung als jede Präsentation' },
-  { nr: '5', title: 'E-Learning / Webinar', staerke: 'Skalierbar · asynchron oder synchron', einsatz: 'Alle Standorte gleichzeitig — aber nur mit Sprachanpassung wirksam' },
-]
+type AdoptionBlock = typeof ADOPTION_BLOCKS[0]
 
-const KIRKPATRICK = [
-  { ebene: '1', title: 'Reaktion', was: 'War die Schulung gut? Hat sie gefallen?', hinweis: 'Fast immer gemessen — zu wenig.', color: 'text-slate-500', star: false },
-  { ebene: '2', title: 'Lernen', was: 'Wurde Wissen aufgebaut?', hinweis: '', color: 'text-slate-500', star: false },
-  { ebene: '3', title: 'Verhalten', was: 'Wird das Gelernte angewendet?', hinweis: 'Bei KI-Systemen Minimum-Standard.', color: 'text-orange-600', star: true },
-  { ebene: '4', title: 'Ergebnis', was: 'Hat die Schulung den Projekterfolg unterstützt?', hinweis: '', color: 'text-slate-500', star: false },
-]
+const BLOCK_COLORS: Record<string, { bg: string; border: string; activeBorder: string; dot: string; text: string; badge: string; light: string }> = {
+  red:    { bg: 'bg-red-50',    border: 'border-red-200',    activeBorder: 'border-red-500',    dot: 'bg-red-500',    text: 'text-red-700',    badge: 'bg-red-100 text-red-700',    light: 'bg-red-50' },
+  orange: { bg: 'bg-orange-50', border: 'border-orange-200', activeBorder: 'border-orange-500', dot: 'bg-orange-500', text: 'text-orange-700', badge: 'bg-orange-100 text-orange-700', light: 'bg-orange-50' },
+  amber:  { bg: 'bg-amber-50',  border: 'border-amber-200',  activeBorder: 'border-amber-500',  dot: 'bg-amber-500',  text: 'text-amber-700',  badge: 'bg-amber-100 text-amber-700',  light: 'bg-amber-50' },
+  green:  { bg: 'bg-green-50',  border: 'border-green-200',  activeBorder: 'border-green-500',  dot: 'bg-green-500',  text: 'text-green-700',  badge: 'bg-green-100 text-green-700',  light: 'bg-green-50' },
+}
 
-const SCHULUNGSBAUSTEINE = [
-  { baustein: 'Zielgruppen', was: 'Wer wird geschult? Welche Vorkenntnisse?', beispiel: '4 Gruppen · differenziert nach Aufgabe + Standort' },
-  { baustein: 'Lernziele', was: 'Was können sie danach konkret tun?', beispiel: '„Service-Ingenieur kann Quellenverweis interpretieren"' },
-  { baustein: 'Format', was: 'Blended · Microlearning · On-the-Job · Peer', beispiel: 'Je nach Gruppe differenziert' },
-  { baustein: 'Zeitpunkt', was: 'Kübler-Ross Phase 5 abwarten', beispiel: 'Erst nach Akzeptanz — nicht bei Frust' },
-  { baustein: 'Sprache', was: 'In welcher Sprache?', beispiel: 'DE · EN · KO · AR je nach Standort' },
-  { baustein: 'Erfolgsmessung', was: 'Welche Kirkpatrick-Ebene?', beispiel: 'Mindestens Ebene 3 bei KI-Systemen' },
-]
+function AdoptionPathTool() {
+  const [activeBlock, setActiveBlock] = useState(0)
+  const [detailTab, setDetailTab] = useState<'overview' | 'gate' | 'formate'>('overview')
+  const [gateOpen, setGateOpen] = useState(false)
+  const b: AdoptionBlock = ADOPTION_BLOCKS[activeBlock]
+  const c = BLOCK_COLORS[b.colorKey]
+
+  return (
+    <div className="space-y-4">
+      {/* Journey bar */}
+      <div className="bg-white rounded-xl border border-slate-200 p-4">
+        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-3">Adoption Path · Kübler-Ross</p>
+        <div className="flex items-stretch gap-1">
+          {ADOPTION_BLOCKS.map((blk, i) => {
+            const bc = BLOCK_COLORS[blk.colorKey]
+            const isActive = i === activeBlock
+            return (
+              <div key={blk.nr} className="flex items-center flex-1 gap-1">
+                <button
+                  onClick={() => { setActiveBlock(i); setDetailTab('overview'); setGateOpen(false) }}
+                  className={`flex-1 rounded-lg border-2 p-3 text-left transition-all ${isActive ? `${bc.activeBorder} ${bc.bg} shadow-sm` : 'border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-300'}`}
+                >
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-base">{blk.icon}</span>
+                    {blk.schulungFreigabe && <span className="text-[9px] bg-green-500 text-white px-1.5 py-0.5 rounded-full font-bold ml-auto">▶ SCHULUNG</span>}
+                  </div>
+                  <p className={`text-[10px] font-bold ${isActive ? bc.text : 'text-slate-500'}`}>Block {blk.nr}</p>
+                  <p className={`text-xs font-semibold leading-snug mt-0.5 ${isActive ? 'text-slate-800' : 'text-slate-600'}`}>{blk.title}</p>
+                  <p className="text-[10px] text-slate-400 mt-1 italic leading-snug">{blk.quote}</p>
+                </button>
+                {i < ADOPTION_BLOCKS.length - 1 && (
+                  <svg className="w-3 h-3 text-slate-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                )}
+              </div>
+            )
+          })}
+        </div>
+        {!ADOPTION_BLOCKS[activeBlock].schulungFreigabe && (
+          <div className="mt-3 flex items-center gap-2 text-xs text-slate-400 bg-slate-50 rounded-lg px-3 py-2">
+            <span className="text-base">⏸</span>
+            <span>Noch keine Schulungsfreigabe in dieser Phase — zuerst Akzeptanz herstellen.</span>
+          </div>
+        )}
+        {ADOPTION_BLOCKS[activeBlock].schulungFreigabe && (
+          <div className="mt-3 flex items-center gap-2 text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+            <span className="text-base">✅</span>
+            <span><strong>Schulungsfreigabe:</strong> Quality Gate erfüllt — jetzt strukturierte Schulungen starten.</span>
+          </div>
+        )}
+      </div>
+
+      {/* Detail panel */}
+      <div className={`bg-white rounded-xl border-2 ${c.activeBorder} overflow-hidden`}>
+        {/* Sub-tabs */}
+        <div className="flex border-b border-slate-100">
+          {(['overview', 'gate', 'formate'] as const).map(t => (
+            <button key={t} onClick={() => setDetailTab(t)}
+              className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${detailTab === t ? `${c.bg} ${c.text}` : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
+              {t === 'overview' ? '📋 Maßnahmen' : t === 'gate' ? '🔒 Quality Gate' : '📚 Lernformate'}
+            </button>
+          ))}
+        </div>
+
+        <div className="p-5">
+          {/* Overview tab */}
+          {detailTab === 'overview' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-2">Typisches Verhalten</p>
+                  <div className="space-y-1">
+                    {b.verhalten.map(v => (
+                      <div key={v} className={`flex items-start gap-2 text-xs px-2 py-1.5 rounded ${c.bg}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${c.dot} flex-shrink-0 mt-1`} />
+                        <span className="text-slate-700">{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Ziel dieser Phase</p>
+                  <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 rounded-lg px-3 py-2">{b.ziel}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Verantwortlich</p>
+                  <p className={`text-xs font-medium px-2 py-1 rounded ${c.badge}`}>{b.verantwortlich}</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-2">Was wir tun</p>
+                  <div className="space-y-1">
+                    {b.wasTun.map((w, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs">
+                        <span className={`text-[10px] font-bold ${c.text} flex-shrink-0 mt-0.5`}>{i + 1}.</span>
+                        <span className="text-slate-700 leading-relaxed">{w}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-2">Was hilft (konkret)</p>
+                  <div className="space-y-1">
+                    {b.wasHilft.map((w, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs">
+                        <span className="text-slate-400 flex-shrink-0">→</span>
+                        <span className="text-slate-700 leading-relaxed">{w}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Quality Gate tab */}
+          {detailTab === 'gate' && (
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 bg-slate-50 rounded-xl p-4">
+                <span className="text-2xl">🔒</span>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">Quality Gate — wann darf Block {b.nr + 1 <= 4 ? b.nr + 1 : '✓'} starten?</p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {b.nr < 4 ? `Alle Kriterien müssen erfüllt sein, bevor Block ${b.nr + 1} startet.` : 'Alle Kriterien erfüllt → strukturierte Schulungen freigegeben.'}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-2">Wir prüfen…</p>
+                  <div className="space-y-1.5">
+                    {b.qualityGate.pruefe.map(p => (
+                      <div key={p} className={`text-xs px-3 py-1.5 rounded-lg font-medium ${c.badge}`}>{p}</div>
+                    ))}
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-3 mb-1.5">Datenquelle / Methode</p>
+                  <p className="text-xs text-slate-600 bg-slate-50 rounded-lg px-3 py-2">{b.qualityGate.methode}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-2">Entscheidungskriterien</p>
+                  <div className="space-y-2">
+                    {b.qualityGate.kriterien.map((k, i) => (
+                      <div key={i} className="flex items-start gap-2 border border-slate-200 rounded-lg px-3 py-2 bg-white">
+                        <span className="text-green-500 flex-shrink-0 font-bold text-sm">✓</span>
+                        <span className="text-xs text-slate-700 leading-relaxed">{k}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 space-y-1">
+                <p className="text-[10px] font-bold text-red-600 uppercase tracking-wide">⚠ Fallback — wenn Kriterien nicht erfüllt</p>
+                <p className="text-xs text-red-700 leading-relaxed">{b.qualityGate.fallback}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Lernformate tab */}
+          {detailTab === 'formate' && (
+            <div className="space-y-3">
+              {b.schulungFreigabe === false && b.lernformate.length === 0 && (
+                <div className="text-center py-8 text-slate-400">
+                  <p className="text-2xl mb-2">⏸</p>
+                  <p className="text-sm font-medium">Keine Schulungsformate in dieser Phase.</p>
+                  <p className="text-xs mt-1">Erst kommunizieren, dann schulen. Jetzt sind Dialogformate gefragt.</p>
+                </div>
+              )}
+              {b.lernformate.length > 0 && (
+                <>
+                  <p className="text-xs text-slate-500">
+                    {b.schulungFreigabe
+                      ? 'Schulungsfreigabe erteilt — diese Formate jetzt einsetzen:'
+                      : 'Bereits sinnvoll in dieser Phase — noch kein Schulungsprogramm, aber:'}
+                  </p>
+                  <div className="space-y-2">
+                    {b.lernformate.map((f, i) => (
+                      <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${c.border} ${c.bg}`}>
+                        <span className={`w-6 h-6 rounded-full ${c.dot} text-white text-xs font-bold flex items-center justify-center flex-shrink-0`}>{i + 1}</span>
+                        <p className={`text-sm font-semibold ${c.text}`}>{f}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {b.schulungFreigabe && (
+                    <div className="mt-2 border-t border-slate-100 pt-3">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-2">Kirkpatrick-Ziel für diese Schulungen</p>
+                      <div className="flex gap-2">
+                        {['1 · Reaktion', '2 · Lernen', '3 · Verhalten ★', '4 · Ergebnis'].map((e, i) => (
+                          <div key={i} className={`flex-1 text-center text-[10px] px-2 py-1.5 rounded-lg border font-medium ${i === 2 ? 'bg-orange-100 border-orange-300 text-orange-700 font-bold' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>{e}</div>
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-orange-600 mt-1.5 font-medium">★ Ebene 3 (Verhalten) ist Minimum-Standard bei KI-Systemen (Art. 4 KI-VO).</p>
+                    </div>
+                  )}
+                </>
+              )}
+              {/* Alle 5 Formate */}
+              <div className="mt-2 border-t border-slate-100 pt-3">
+                <button onClick={() => setGateOpen(v => !v)} className="text-[10px] font-semibold text-slate-400 hover:text-slate-600 flex items-center gap-1">
+                  <svg className={`w-3 h-3 transition-transform ${gateOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                  ALLE 5 LERNFORMATE IM ÜBERBLICK
+                </button>
+                {gateOpen && (
+                  <div className="mt-2 space-y-1.5">
+                    {[
+                      { n: '1', t: 'Blended Learning', s: 'Flexibilität + Tiefe · beste Nachhaltigkeit', e: 'E-Learning (30 Min.) + On-the-Job + Praxis' },
+                      { n: '2', t: 'Microlearning', s: '3–7 Min. · direkt in den Alltag', e: 'Internationale Teams · asynchron · Mobilgerät' },
+                      { n: '3', t: 'On-the-Job-Lernen', s: 'Lernen während der Arbeit', e: 'Shadow Deployment = de facto On-the-Job' },
+                      { n: '4', t: 'Peer-Learning', s: 'Kolleg:innen → hohe Glaubwürdigkeit', e: 'Kruse (Busan) berichtet in Bremen' },
+                      { n: '5', t: 'E-Learning / Webinar', s: 'Skalierbar · synchron oder asynchron', e: 'Alle Standorte — nur mit Sprachanpassung wirksam' },
+                    ].map(f => (
+                      <div key={f.n} className="flex gap-2 items-start text-xs bg-slate-50 rounded-lg px-3 py-2">
+                        <span className="w-4 h-4 rounded-full bg-slate-300 text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{f.n}</span>
+                        <div><span className="font-semibold text-slate-700">{f.t}</span> — <span className="text-slate-500">{f.s}</span><br /><span className="text-slate-400">{f.e}</span></div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Art. 4 + Schulungsbausteine */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Art. 4 EU AI Act · Betreiberpflicht</p>
+          <p className="text-xs text-slate-600 leading-relaxed">KI-Kompetenz = nicht nur Bedienung, sondern <strong>kritisches Urteilsvermögen</strong> — was kann das System, wann ist eine Antwort plausibel, wie werden Fehler gemeldet?</p>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800">
+            <strong>Türkei-Studie 2025:</strong> KI-Nutzung → +18 % bei Hausaufgaben, −17 % in ununterstützten Tests. Schulung muss Urteilsvermögen aufbauen, nicht Abhängigkeit.
+          </div>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div className="px-4 py-3 bg-slate-800 text-white">
+            <p className="text-xs font-bold">Schulungskonzept · 6 Bausteine</p>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {[
+              { b: 'Zielgruppen', e: '4 Gruppen · Aufgabe + Standort' },
+              { b: 'Lernziele', e: 'Konkrete Fähigkeit danach' },
+              { b: 'Format', e: 'Blended · Micro · On-the-Job · Peer' },
+              { b: 'Zeitpunkt', e: 'Erst nach Akzeptanz (Block 4)' },
+              { b: 'Sprache', e: 'DE · EN · KO · AR je Standort' },
+              { b: 'Erfolgsmessung', e: 'Kirkpatrick Ebene 3 Minimum' },
+            ].map(r => (
+              <div key={r.b} className="flex items-center gap-3 px-4 py-2">
+                <span className="text-xs font-semibold text-slate-700 w-28 flex-shrink-0">{r.b}</span>
+                <span className="text-xs text-slate-400">{r.e}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function SchulungskonzeptTab() {
   return (
     <div className="space-y-6">
       {/* Intro */}
       <div className="bg-white border border-slate-200 border-l-4 border-l-slate-800 rounded-r-xl px-5 py-4 text-sm text-slate-700 leading-relaxed">
-        <strong>Lernziel Tag 14:</strong> Ein zielgruppengerechtes Schulungskonzept für ein KI-System entwickeln — differenziert nach Aufgabe, Vorkenntnissen, Sprache und emotionaler Phase.
-        <span className="block mt-1 text-slate-400 text-xs">Change Management · Zielgruppen · Kirkpatrick · Art. 4 KI-VO</span>
+        <strong>Lernziel Tag 14:</strong> Ein zielgruppengerechtes Schulungskonzept entwickeln — differenziert nach Aufgabe, Vorkenntnissen, Sprache und emotionaler Phase.
+        <span className="block mt-1 text-slate-400 text-xs">Change Management · Kübler-Ross · Lernformate · Kirkpatrick · Art. 4 KI-VO</span>
       </div>
 
-      {/* Hype Cycle + Konsequenz */}
+      {/* Hype Cycle */}
       <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Gartner Hype Cycle 2025 · Schulungsplanung</p>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Gartner Hype Cycle 2025 · Konsequenz für Schulungsplanung</p>
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'KI-Agenten + KI-Ready Data', where: 'Gipfel der überzogenen Erwartungen', color: 'border-red-200 bg-red-50 text-red-700' },
@@ -262,144 +580,12 @@ function SchulungskonzeptTab() {
           ))}
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-xs text-blue-800 leading-relaxed">
-          <strong>Konsequenz für Schulung:</strong> Mitarbeitende kommen nicht unvoreingenommen. Aufgabe der Schulung: Erwartungen kalibrieren, bevor Wissen vermittelt wird. Eine ehrliche Demo mit einer <em>falschen</em> Antwort zu Beginn ist wertvoller als zehn richtige.
+          <strong>Konsequenz:</strong> Mitarbeitende kommen nicht unvoreingenommen. Erwartungen zuerst kalibrieren — eine ehrliche Demo mit einer <em>falschen</em> Antwort zu Beginn ist wertvoller als zehn richtige.
         </div>
       </div>
 
-      {/* Kübler-Ross */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
-        <div>
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kübler-Ross · Wann ist der richtige Schulungszeitpunkt?</p>
-          <p className="text-xs text-slate-400 mt-1">Schulungen erst ab Phase 5 (Akzeptanz). Wer in Phase 3 schult, verstärkt den Widerstand.</p>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          {KUEBLER_ROSS.map(b => (
-            <div key={b.block} className={`rounded-lg border p-3 space-y-1.5 ${b.phase === 'jetzt' ? 'border-orange-300 bg-orange-50' : b.phase === 'stopp' ? 'border-slate-200 bg-slate-50' : 'border-green-200 bg-green-50'}`}>
-              <div className="flex items-center gap-2">
-                <span className="text-base">{b.icon}</span>
-                <span className="text-xs font-bold text-slate-700">{b.block}: {b.title}</span>
-                {b.phase === 'jetzt' && <span className="ml-auto text-[10px] bg-orange-500 text-white px-1.5 py-0.5 rounded-full font-bold">JETZT SCHULEN</span>}
-                {b.phase === 'stopp' && <span className="ml-auto text-[10px] bg-slate-300 text-slate-600 px-1.5 py-0.5 rounded-full">⏸ noch warten</span>}
-              </div>
-              <p className="text-[11px] text-slate-600 italic">{b.feeling}</p>
-              <p className="text-[11px] text-slate-500"><span className="font-semibold">Was hilft:</span> {b.help}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Fünf Lernformate */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Fünf Lernformate · Wann welches?</p>
-        <div className="grid grid-cols-1 gap-2">
-          {LERNFORMATE.map(f => (
-            <div key={f.nr} className="flex gap-3 items-start border border-slate-100 rounded-lg px-4 py-3 bg-slate-50">
-              <span className="w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{f.nr}</span>
-              <div>
-                <p className="text-sm font-semibold text-slate-800">{f.title}</p>
-                <p className="text-xs text-slate-500 mt-0.5"><span className="font-medium">Stärke:</span> {f.staerke}</p>
-                <p className="text-xs text-slate-500"><span className="font-medium">Einsatz:</span> {f.einsatz}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Art. 4 KI-VO */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Art. 4 EU AI Act · KI-Kompetenz als Betreiberpflicht</p>
-        <p className="text-sm text-slate-700 leading-relaxed">
-          Art. 4 EU AI Act verpflichtet Betreiber, sicherzustellen, dass das Personal über ausreichende KI-Kompetenz verfügt — nicht nur technische Bedienung, sondern <strong>kritisches Urteilsvermögen.</strong>
-        </p>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { title: 'Was kann das System — und was nicht?', body: 'Anwender:innen müssen die Grenzen des Systems kennen — nicht nur seine Funktionen.' },
-            { title: 'Wann ist eine Antwort plausibel?', body: 'Kritisches Prüfen von Quellenverweisen und Diagnose-Vorschlägen — nicht blindes Vertrauen.' },
-            { title: 'Fehler melden', body: 'Was tue ich, wenn es falsch liegt? Klarer Feedback-Kanal ist Teil der Schulungspflicht.' },
-          ].map(c => (
-            <div key={c.title} className="border border-slate-200 rounded-lg p-3 space-y-1">
-              <p className="text-xs font-bold text-slate-700 uppercase tracking-wide leading-snug">{c.title}</p>
-              <p className="text-xs text-slate-500 leading-relaxed">{c.body}</p>
-            </div>
-          ))}
-        </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 text-xs text-amber-800">
-          <strong>Forschungshinweis (Türkei-Studie 2025):</strong> Schüler mit KI-Unterstützung → +18 % bei Hausaufgaben, aber −17 % in ununterstützten Tests. KI übernimmt das Denken — kritisches Urteilen verkümmert. Schulung muss aktives Urteilsvermögen aufbauen, nicht Abhängigkeit.
-        </div>
-      </div>
-
-      {/* Kirkpatrick */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
-        <div>
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kirkpatrick-Modell · Vier Ebenen der Schulungsevaluation</p>
-          <p className="text-xs text-slate-400 mt-1">Kirkpatrick, D. (1959) — Evaluating Training Programs. Four Levels Model.</p>
-        </div>
-        <div className="space-y-2">
-          {KIRKPATRICK.map(k => (
-            <div key={k.ebene} className={`flex gap-3 items-start border rounded-lg px-4 py-3 ${k.star ? 'border-orange-300 bg-orange-50' : 'border-slate-100 bg-slate-50'}`}>
-              <span className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 ${k.star ? 'border-orange-500 text-orange-600' : 'border-slate-300 text-slate-500'}`}>{k.ebene}</span>
-              <div className="flex-1">
-                <p className={`text-sm font-semibold ${k.star ? 'text-orange-700' : 'text-slate-700'}`}>{k.title} {k.star && '★'}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{k.was}</p>
-                {k.hinweis && <p className={`text-[11px] mt-1 font-medium ${k.star ? 'text-orange-600' : 'text-slate-400'}`}>{k.hinweis}</p>}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="border border-orange-200 border-dashed rounded-lg px-4 py-2.5 text-xs text-orange-700 leading-relaxed">
-          <strong>★ Bei KI-Systemen sollte Ebene 3 Standard sein.</strong> Wissen über kritisches Prüfen muss in Verhalten übergehen — Kirkpatrick Ebene 1 allein reicht nicht.
-        </div>
-      </div>
-
-      {/* Aufbau Schulungskonzept */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <div className="px-5 py-3 bg-slate-800 text-white">
-          <p className="text-sm font-bold">Aufbau eines Schulungskonzeptes</p>
-          <p className="text-xs text-slate-400 mt-0.5">Sechs Bausteine — differenziert nach Zielgruppe, Format, Zeitpunkt, Sprache und Erfolgsmessung</p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50">
-                <th className="text-left py-2.5 px-4 font-semibold text-slate-500">Baustein</th>
-                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">Was es enthält</th>
-                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">WellSeal-Beispiel</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {SCHULUNGSBAUSTEINE.map(b => (
-                <tr key={b.baustein} className="hover:bg-slate-50 transition-colors">
-                  <td className="py-3 px-4 font-semibold text-slate-800">{b.baustein}</td>
-                  <td className="py-3 px-3 text-slate-600">{b.was}</td>
-                  <td className="py-3 px-3 text-slate-500 italic">{b.beispiel}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Kernbotschaften */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kernbotschaften Tag 14</p>
-        <div className="space-y-2">
-          {[
-            { nr: '1', title: 'KI-Schulung ist Change Management', body: 'Vertrauen, Kompetenz und Sicherheit aufbauen — nicht nur Klicks erklären.' },
-            { nr: '2', title: 'Kübler-Ross als Planungsrahmen', body: 'Schulungen erst ab Phase 5 (Akzeptanz). Wer in Phase 3 schult, verstärkt den Widerstand.' },
-            { nr: '3', title: 'Fünf Lernformate · situationsbezogen', body: 'Blended · Microlearning · On-the-Job · Peer-Learning · E-Learning. Je nach Zielgruppe kombinieren.' },
-            { nr: '4', title: 'Art. 4 KI-Verordnung', body: 'Kompetenzpflicht des Betreibers — nicht nur Bedienungsschulung: kritisches Urteilsvermögen ist gesetzliche Anforderung.' },
-            { nr: '5', title: 'Kirkpatrick Ebene 3 als Minimum', body: 'Vier Evaluationsebenen: Reaktion · Lernen · Verhalten · Ergebnis. Bei KI-Systemen muss Verhalten (Ebene 3) gemessen werden.' },
-          ].map(k => (
-            <div key={k.nr} className="flex gap-3 items-start">
-              <span className="w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{k.nr}</span>
-              <div>
-                <p className="text-sm font-semibold text-slate-800 uppercase tracking-wide text-[11px]">{k.title}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{k.body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Interactive Adoption Path Tool */}
+      <AdoptionPathTool />
     </div>
   )
 }
