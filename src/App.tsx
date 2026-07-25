@@ -23,6 +23,7 @@ import PromptLibraryPage from './pages/PromptLibraryPage'
 import DsgvoPage from './pages/DsgvoPage'
 import EthikPage from './pages/EthikPage'
 import EuAiActPage from './pages/EuAiActPage'
+import DataGovernancePage from './pages/DataGovernancePage'
 import ProjectPlanPage from './pages/ProjectPlanPage'
 import StakeholderPage from './pages/StakeholderPage'
 import LoginPage from './pages/LoginPage'
@@ -95,6 +96,7 @@ function AppRoutes() {
               <Route path="/dsgvo" element={<DsgvoPage />} />
               <Route path="/ethik" element={<EthikPage />} />
               <Route path="/eu-ai-act" element={<EuAiActPage />} />
+              <Route path="/data" element={<DataGovernancePage />} />
               <Route path="/project-plan" element={<ProjectPlanPage />} />
               <Route path="/stakeholders" element={<StakeholderPage />} />
               <Route path="/canvas/new" element={<ProtectedRoute><CanvasPage /></ProtectedRoute>} />

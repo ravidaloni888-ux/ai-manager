@@ -4,7 +4,7 @@ import NavItem from './NavItem'
 import {
   IconDashboard, IconList, IconChartBar, IconMap,
   IconAlert, IconBuilding, IconCurrency, IconFlag, IconSearch,
-  IconBrain, IconPlus, IconSettings, IconAcademic, IconCalendar, IconUsers, IconInfo, IconRocket, IconClipboard, IconStar, IconShield, IconSitemap,
+  IconBrain, IconPlus, IconSettings, IconAcademic, IconCalendar, IconUsers, IconInfo, IconRocket, IconClipboard, IconStar, IconShield, IconSitemap, IconDatabase,
 } from '../icons/NavIcons'
 import { useAuthStore } from '../../store/authStore'
 import BetaRequestModal from './BetaRequestModal'
@@ -51,6 +51,7 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/strategy" icon={<IconMap />} label="Strategie-Assistent" />
           <NavItem to="/maturity" icon={<IconChartBar />} label="Reifegradcheck" />
           <NavItem to="/governance" icon={<IconBuilding />} label="KI-Governance" />
+          <NavItem to="/data" icon={<IconDatabase />} label="Daten & Qualität" />
           <NavItem to="/use-cases" icon={<IconList />} label="KI-Anwendungsfälle" />
           <NavItem to="/risk" icon={<IconAlert />} label="Risikomanager" />
           <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap-Generator" />
