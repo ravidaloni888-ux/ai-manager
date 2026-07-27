@@ -408,25 +408,6 @@ function StoryKpiTab() {
         </div>
       </div>
 
-      {/* Roadmap statt Use-Case-Liste */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">KI-Roadmap statt Use-Case-Liste</p>
-        <div className="space-y-2">
-          {[
-            'Wir brauchen ein großes Sprachmodell.',
-            'Wir brauchen mehr Daten.',
-            'Wir brauchen eine KI-Richtlinie.',
-          ].map(f => (
-            <div key={f} className="flex items-center gap-2 text-sm text-slate-500 line-through decoration-red-400">
-              <span className="text-red-500 no-underline">❌</span>
-              <span>{f}</span>
-            </div>
-          ))}
-        </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3">
-          <p className="text-sm font-bold text-green-800">✓ Richtig: Diagnose vor Technologie.</p>
-        </div>
-      </div>
     </div>
   )
 }
