@@ -60,10 +60,191 @@ const DEPT_COLOURS: Record<string, string> = {
   Logistics: 'bg-teal-100 text-teal-700',
 }
 
+// ── BCG Three Horizons ───────────────────────────────────────────────────
+
+const HORIZONS = [
+  {
+    key: 'deploy',
+    label: 'Deploy',
+    zeitraum: '3–12 Monate',
+    titel: 'Bestehende Workflows verbessern',
+    body: 'Schneller Return on Investment. Bestehende Prozesse werden mit KI schneller, günstiger oder fehlerfreier — die Struktur des Geschäfts bleibt gleich.',
+    color: 'border-blue-300 bg-blue-50',
+    text: 'text-blue-700',
+    dot: 'bg-blue-500',
+  },
+  {
+    key: 'reshape',
+    label: 'Reshape',
+    zeitraum: '12–36 Monate',
+    titel: 'Grundlegendes Re-Design',
+    body: 'Wie das Unternehmen Wert schafft, wird neu gedacht. Prozesse, Rollen und Organisationsstrukturen werden um KI-Fähigkeiten herum umgebaut — nicht nur beschleunigt.',
+    color: 'border-amber-300 bg-amber-50',
+    text: 'text-amber-700',
+    dot: 'bg-amber-500',
+  },
+  {
+    key: 'invent',
+    label: 'Invent',
+    zeitraum: '2–5 Jahre',
+    titel: 'Neue Angebote & Marktpositionen',
+    body: 'Produkte, Services oder Geschäftsmodelle, die ohne KI nicht existieren könnten. Das größte Risiko — und das größte Differenzierungspotenzial.',
+    color: 'border-purple-300 bg-purple-50',
+    text: 'text-purple-700',
+    dot: 'bg-purple-500',
+  },
+] as const
+
+type HorizonKey = typeof HORIZONS[number]['key']
+
+const LS_HORIZON_KEY = 'ai_roadmap_horizons_v1'
+function lsLoadHorizons(): Record<string, HorizonKey> {
+  try { const r = localStorage.getItem(LS_HORIZON_KEY); return r ? JSON.parse(r) : {} } catch { return {} }
+}
+function lsSaveHorizons(h: Record<string, HorizonKey>) {
+  try { localStorage.setItem(LS_HORIZON_KEY, JSON.stringify(h)) } catch {}
+}
+
+function HorizonTool({ useCases, navigate }: { useCases: AIUseCase[]; navigate: (path: string) => void }) {
+  const [horizons, setHorizons] = useState<Record<string, HorizonKey>>(() => lsLoadHorizons())
+
+  const relevant = useCases.filter((uc) => uc.status !== 'Cancelled')
+  const assign = (id: string, h: HorizonKey) => {
+    const next = { ...horizons, [id]: horizons[id] === h ? undefined as unknown as HorizonKey : h }
+    if (!next[id]) delete next[id]
+    setHorizons(next)
+    lsSaveHorizons(next)
+  }
+
+  const counts: Record<HorizonKey, number> = { deploy: 0, reshape: 0, invent: 0 }
+  let unassigned = 0
+  for (const uc of relevant) {
+    const h = horizons[uc.id]
+    if (h) counts[h]++
+    else unassigned++
+  }
+  const classified = relevant.length - unassigned
+  const deployPct = classified > 0 ? Math.round((counts.deploy / classified) * 100) : 0
+  const pilotTrap = classified >= 3 && deployPct >= 70
+
+  return (
+    <div className="space-y-5">
+      {/* Intro */}
+      <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-slate-800 rounded-r-xl px-5 py-4 text-sm text-slate-700 leading-relaxed">
+        <strong>Boston Consulting Group · Drei „Horizonte".</strong> Der Quartalsplan sequenziert einzelne Anwendungsfälle — aber er beantwortet nicht die strategische Frage: <strong>Welchen Horizont adressieren wir eigentlich?</strong> Die drei Horizonte laufen parallel, nicht sequenziell. Automators (Reifegrad-Stufen 1–2) werden von Transformers (Stufen 3–4) mittelfristig überholt.
+      </div>
+
+      {/* Three horizon cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {HORIZONS.map((h) => (
+          <div key={h.key} className={`rounded-xl border-2 ${h.color} p-4 space-y-2`}>
+            <div className="flex items-center gap-2">
+              <span className={`w-2.5 h-2.5 rounded-full ${h.dot} flex-shrink-0`} />
+              <p className={`text-sm font-bold ${h.text}`}>{h.label}</p>
+              <span className="text-[11px] text-slate-500 ml-auto font-mono">{h.zeitraum}</span>
+            </div>
+            <p className="text-sm font-semibold text-slate-800">{h.titel}</p>
+            <p className="text-xs text-slate-600 leading-relaxed">{h.body}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Pilot trap warning */}
+      <div className="bg-red-50 border-2 border-red-300 rounded-xl px-5 py-4">
+        <p className="text-sm font-bold text-red-800">⚠ Die Pilotfalle</p>
+        <p className="text-xs text-red-700 mt-1.5 leading-relaxed">
+          <strong>74 %</strong> der Unternehmen verbleiben dauerhaft im Deploy-Horizont — und nennen es Strategie. Der Sprung zu Reshape oder Invent ist der schwierigste Schritt — und genau da scheitern die meisten.
+        </p>
+      </div>
+
+      {/* Portfolio classifier tool */}
+      <div className="bg-white rounded-xl border-2 border-slate-800 overflow-hidden">
+        <div className="px-5 py-3 bg-slate-800 text-white">
+          <p className="text-sm font-bold">🧭 Portfolio-Check · Welchem Horizont ordnest du deine Anwendungsfälle zu?</p>
+          <p className="text-xs text-slate-300 mt-0.5">Ordne jeden Anwendungsfall einem Horizont zu — die Verteilung zeigt, ob du in der Pilotfalle steckst.</p>
+        </div>
+
+        <div className="p-5 space-y-4">
+          {relevant.length === 0 && (
+            <p className="text-sm text-slate-400 text-center py-6">Noch keine Anwendungsfälle vorhanden.</p>
+          )}
+
+          {relevant.length > 0 && (
+            <>
+              {/* Distribution bar */}
+              {classified > 0 && (
+                <div className="space-y-1.5">
+                  <div className="flex h-3 rounded-full overflow-hidden bg-slate-100">
+                    {HORIZONS.map((h) => {
+                      const pct = (counts[h.key] / classified) * 100
+                      if (pct === 0) return null
+                      return <div key={h.key} className={h.dot} style={{ width: `${pct}%` }} title={`${h.label}: ${counts[h.key]}`} />
+                    })}
+                  </div>
+                  <div className="flex items-center gap-4 flex-wrap">
+                    {HORIZONS.map((h) => (
+                      <span key={h.key} className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                        <span className={`w-2 h-2 rounded-full ${h.dot}`} />
+                        {h.label} {counts[h.key]} ({classified > 0 ? Math.round((counts[h.key] / classified) * 100) : 0}%)
+                      </span>
+                    ))}
+                    {unassigned > 0 && <span className="text-[11px] text-slate-400">· {unassigned} noch offen</span>}
+                  </div>
+                </div>
+              )}
+
+              {pilotTrap && (
+                <div className="bg-red-50 border border-red-300 rounded-lg px-4 py-2.5 text-xs text-red-800">
+                  <strong>⚠ Pilotfalle erkannt:</strong> {deployPct}% deiner klassifizierten Anwendungsfälle liegen im Deploy-Horizont. Ohne Initiativen in Reshape oder Invent bleibt das Portfolio Optimierung statt Strategie.
+                </div>
+              )}
+              {!pilotTrap && classified >= 3 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 text-xs text-green-800">
+                  ✓ Portfolio verteilt sich über mehrere Horizonte — kein einseitiger Fokus auf reine Effizienzgewinne.
+                </div>
+              )}
+
+              {/* Case list */}
+              <div className="space-y-2">
+                {relevant.map((uc) => (
+                  <div key={uc.id} className="flex items-center gap-3 border border-slate-100 rounded-lg px-3 py-2 bg-slate-50">
+                    <p
+                      className="text-xs font-medium text-slate-700 flex-1 min-w-0 truncate hover:text-blue-600 cursor-pointer"
+                      onClick={() => navigate(`/canvas/${uc.id}`)}
+                    >
+                      {uc.title}
+                    </p>
+                    <div className="flex gap-1 flex-shrink-0">
+                      {HORIZONS.map((h) => (
+                        <button
+                          key={h.key}
+                          onClick={() => assign(uc.id, h.key)}
+                          className={`text-[10px] font-semibold px-2 py-1 rounded-md border transition-colors ${
+                            horizons[uc.id] === h.key
+                              ? `${h.dot} text-white border-transparent`
+                              : `bg-white ${h.text} border-slate-200 hover:border-slate-300`
+                          }`}
+                        >
+                          {h.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function RoadmapPage() {
   const { useCases } = useUseCasesStore()
   const { data: strategy } = useStrategyStore()
   const navigate = useNavigate()
+  const [tab, setTab] = useState<'plan' | 'horizonte'>('plan')
 
   // derive default quarterly cap from strategy budget (÷ 5 quarters)
   const defaultCap = strategy ? Math.round(strategy.budgetTotalK / 5) : 500
@@ -115,17 +296,43 @@ export default function RoadmapPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Roadmap Generator</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Auto-sequence use cases by priority score within quarterly budget caps. Drag cards to adjust.
+            {tab === 'plan'
+              ? 'Auto-sequence use cases by priority score within quarterly budget caps. Drag cards to adjust.'
+              : 'BCG Drei-Horizonte-Modell — die strategische Ebene über dem Quartalsplan.'}
           </p>
         </div>
-        <button
-          onClick={handleGenerate}
-          className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-        >
-          Regenerate Plan
-        </button>
+        {tab === 'plan' && (
+          <button
+            onClick={handleGenerate}
+            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+          >
+            Regenerate Plan
+          </button>
+        )}
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
+        {([
+          { id: 'plan', label: '📅 Quartalsplan' },
+          { id: 'horizonte', label: '🧭 Strategische Horizonte' },
+        ] as const).map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'horizonte' && <HorizonTool useCases={useCases} navigate={navigate} />}
+
+      {tab === 'plan' && (
+      <>
       {/* Settings bar */}
       <div className="flex items-center gap-6 bg-white rounded-xl shadow-sm p-4">
         <div className="flex items-center gap-2">
@@ -285,6 +492,8 @@ export default function RoadmapPage() {
           })}
         </div>
       </div>
+      </>
+      )}
     </div>
   )
 }
