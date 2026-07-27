@@ -4,7 +4,7 @@ import NavItem from './NavItem'
 import {
   IconDashboard, IconList, IconChartBar, IconMap,
   IconAlert, IconBuilding, IconCurrency, IconFlag, IconSearch,
-  IconBrain, IconPlus, IconSettings, IconAcademic, IconCalendar, IconUsers, IconInfo, IconRocket, IconClipboard, IconStar, IconShield, IconSitemap, IconDatabase,
+  IconBrain, IconPlus, IconSettings, IconAcademic, IconCalendar, IconUsers, IconInfo, IconRocket, IconClipboard, IconStar, IconShield, IconSitemap, IconDatabase, IconTrendingUp,
 } from '../icons/NavIcons'
 import { useAuthStore } from '../../store/authStore'
 import BetaRequestModal from './BetaRequestModal'
@@ -57,6 +57,7 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap-Generator" />
           <NavItem to="/roi" icon={<IconCurrency />} label="ROI-Rechner" />
           <NavItem to="/enablement" icon={<IconAcademic />} label="Schulung & Coaching" />
+          <NavItem to="/change" icon={<IconTrendingUp />} label="Change Management" />
           <NavItem to="/meetings" icon={<IconCalendar />} label="Regelmäßige Meetings" />
           <NavItem to="/stakeholders" icon={<IconSitemap />} label="Stakeholder-Analyse" />
 
