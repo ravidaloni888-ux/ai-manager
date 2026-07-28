@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { loadProgress } from '../../store/wizardStore'
+import { loadProgress, ALL_STEP_IDS } from '../../store/wizardStore'
 
-const TOTAL = 12
+const TOTAL = ALL_STEP_IDS.length
 
 export default function StartBanner() {
   const navigate = useNavigate()
