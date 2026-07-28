@@ -204,62 +204,6 @@ const BETREIBER_DUTIES = [
   { num: 7, art: 'Art. 27', title: 'FRIA — Grundrechte-Folgenabschätzung', desc: 'Betreiber von Hochrisiko-KI, die Behörden sind oder Dienstleistungen im öffentlichen Interesse erbringen, müssen vor Inbetriebnahme eine Grundrechte-Folgenabschätzung (Fundamental Rights Impact Assessment) durchführen und veröffentlichen.', highlight: true },
 ]
 
-const HUNDERT_TAGE = [
-  {
-    phase: '1',
-    label: 'Sehen',
-    days: 'Tag 1–30',
-    color: 'bg-blue-600',
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    text: 'text-blue-700',
-    desc: 'Vollständigen Überblick über den KI-Einsatz im Unternehmen gewinnen',
-    steps: [
-      'KI-Inventar erstellen — alle eingesetzten KI-Systeme erfassen (auch Shadow AI)',
-      'Risikoklassen gemäß Art. 6 + Anhang III vorläufig einordnen',
-      'Anbieter-Betreiber-Verhältnis für jedes System klären',
-      'Bestehende Verträge (AVV, Lizenzverträge) auf KI-Act-Klauseln prüfen',
-      'Erste Stakeholder identifizieren (IT, Recht, HR, Betriebsrat)',
-    ],
-  },
-  {
-    phase: '2',
-    label: 'Strukturieren',
-    days: 'Tag 31–70',
-    color: 'bg-amber-500',
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    text: 'text-amber-700',
-    desc: 'Governance-Rahmen aufbauen und Compliance-Lücken schließen',
-    steps: [
-      'KI-Beauftragten formal benennen und Rolle intern kommunizieren',
-      'Governance-Dokumente erstellen: KI-Richtlinie, Nutzungsrichtlinien, Eskalationspfade',
-      'Art. 4-Schulungen für Mitarbeitende planen und starten',
-      'DSFA und FRIA (Art. 27) für Hochrisiko-Systeme anstoßen',
-      'Betriebsrat einbinden (§87 BetrVG) — vor Ausweitung des Einsatzes',
-      'Meldeprozess für KI-Vorfälle etablieren (intern + extern)',
-    ],
-  },
-  {
-    phase: '3',
-    label: 'Wirksam werden',
-    days: 'Tag 71–100',
-    color: 'bg-green-600',
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    text: 'text-green-700',
-    desc: 'KI-Governance in den Regelbetrieb überführen',
-    steps: [
-      'KI-Register finalisieren und laufend aktualisieren',
-      'Monitoring-Prozesse etablieren: Wer prüft was, wie oft?',
-      'Schulungen abschließen — Dokumentation für Art. 4-Nachweis sichern',
-      'Reporting-Rhythmus mit Geschäftsführung und Betriebsrat festlegen',
-      'Erste Konformitätsprüfung für Hochrisiko-Systeme einleiten',
-      'Quick Wins kommunizieren — KI-Governance als Wettbewerbsvorteil positionieren',
-    ],
-  },
-]
-
 const FALLSTUDIEN = [
   {
     id: 'clearview',
@@ -683,7 +627,7 @@ function Art25Checker() {
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function EuAiActPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'roles' | 'copyright' | 'liability' | 'planung' | 'konformitaet'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'roles' | 'copyright' | 'liability' | 'konformitaet'>('overview')
   const [expandedRisk, setExpandedRisk] = useState<number | null>(null)
 
   const tabs: { id: typeof activeTab; label: string }[] = [
@@ -692,7 +636,6 @@ export default function EuAiActPage() {
     { id: 'konformitaet', label: 'Konformität & Monitoring' },
     { id: 'copyright', label: 'Urheberrecht' },
     { id: 'liability', label: 'Haftung & Fallstudien' },
-    { id: 'planung', label: '100-Tage-Plan' },
   ]
 
   return (
@@ -1336,61 +1279,6 @@ export default function EuAiActPage() {
         </div>
       )}
 
-      {/* Tab: 100-Tage-Plan */}
-      {activeTab === 'planung' && (
-        <div className="space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-3">
-            <p className="text-xs text-blue-700 leading-relaxed">
-              <span className="font-semibold">Ziel:</span> In 100 Tagen von "wir wissen nicht was wir haben" zu "wir haben Governance und können das nachweisen". Für neu bestellte KI-Beauftragte oder Unternehmen, die gerade erst anfangen.
-            </p>
-          </div>
-
-          {HUNDERT_TAGE.map((phase) => (
-            <div key={phase.phase} className={`rounded-xl border ${phase.border} overflow-hidden`}>
-              <div className={`px-5 py-4 ${phase.bg} flex items-center gap-4`}>
-                <span className={`w-10 h-10 rounded-full ${phase.color} text-white text-lg font-bold flex items-center justify-center flex-shrink-0`}>{phase.phase}</span>
-                <div>
-                  <p className={`text-base font-bold ${phase.text}`}>{phase.label}</p>
-                  <p className="text-xs text-slate-600">{phase.days} — {phase.desc}</p>
-                </div>
-              </div>
-              <div className="bg-white px-5 py-4">
-                <ul className="space-y-2">
-                  {phase.steps.map((step, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className={`mt-0.5 w-5 h-5 rounded-full ${phase.color} text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0`}>{i + 1}</span>
-                      <span className="text-xs text-slate-600 leading-relaxed">{step}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
-
-          <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
-            <p className="text-xs font-semibold text-slate-700 mb-2">Nach 100 Tagen sollten Sie haben:</p>
-            <ul className="space-y-1.5">
-              {[
-                'KI-Register (vollständig, aktuell)',
-                'Governance-Dokumentation (KI-Richtlinie, Nutzungsregeln)',
-                'Schulungsnachweis für Art. 4 (Kompetenzpflicht)',
-                'DSFA/FRIA für alle Hochrisiko-Systeme eingeleitet',
-                'Meldeprozess für KI-Vorfälle etabliert',
-                'Betriebsrat eingebunden (falls vorhanden)',
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-2">
-                  <span className="mt-0.5 w-4 h-4 rounded-full bg-green-500 flex-shrink-0 flex items-center justify-center">
-                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                    </svg>
-                  </span>
-                  <span className="text-xs text-slate-600">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
