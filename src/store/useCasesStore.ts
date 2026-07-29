@@ -3,14 +3,17 @@ import { nanoid } from 'nanoid'
 import { AIUseCase } from '../types'
 import { supabase, rowToUseCase, useCaseToRow } from '../lib/supabase'
 import { dummyData } from '../data/dummyData'
-import { getDemoMode } from './demoStore'
+import { getMandantType, getActiveMandantId } from './mandantStore'
+import { scopedGet, scopedSet } from '../lib/mandantData'
 
 const DUMMY_IDS = new Set(dummyData.map((d) => d.id))
+const BUCKET = 'usecases'
 
 interface UseCasesStore {
   useCases: AIUseCase[]
   loading: boolean
-  initializedFor: 'demo' | 'workspace' | null
+  /** Mandanten-ID, für die der Store zuletzt geladen wurde */
+  initializedFor: string | null
   init: () => Promise<void>
   resetStore: () => void
   addUseCase: (uc: AIUseCase) => void
@@ -26,36 +29,44 @@ export const useUseCasesStore = create<UseCasesStore>()((set, get) => ({
   initializedFor: null,
 
   init: async () => {
-    const mode = getDemoMode() ? 'demo' : 'workspace'
+    const mandantId = getActiveMandantId()
+    const type = getMandantType()
 
-    // Skip if already initialized for this mode — prevents wiping in-memory cases
-    if (get().initializedFor === mode) return
+    // Bereits für diesen Mandanten geladen — nicht erneut überschreiben
+    if (get().initializedFor === mandantId) return
 
-    if (mode === 'demo') {
-      set({ useCases: dummyData, loading: false, initializedFor: 'demo' })
+    if (type === 'demo') {
+      set({ useCases: dummyData, loading: false, initializedFor: mandantId })
       return
     }
 
-    // Real workspace — load from Supabase, exclude dummy-seeded records
+    if (type === 'client') {
+      set({ useCases: scopedGet<AIUseCase[]>(BUCKET, []), loading: false, initializedFor: mandantId })
+      return
+    }
+
+    // AI Hub — aus Supabase laden, Demo-Datensätze ausschliessen
     const { data, error } = await supabase
       .from('ai_use_cases')
       .select('*')
       .order('created_at', { ascending: false })
 
     if (error || !data) {
-      set({ useCases: [], loading: false, initializedFor: 'workspace' })
+      set({ useCases: [], loading: false, initializedFor: mandantId })
       return
     }
 
     const userRows = data.filter((row) => !DUMMY_IDS.has(row.id as string))
-    set({ useCases: userRows.map(rowToUseCase), loading: false, initializedFor: 'workspace' })
+    set({ useCases: userRows.map(rowToUseCase), loading: false, initializedFor: mandantId })
   },
 
   resetStore: () => set({ useCases: [], loading: true, initializedFor: null }),
 
   addUseCase: (uc) => {
     set((state) => ({ useCases: [...state.useCases, uc] }))
-    if (getDemoMode()) return
+    const type = getMandantType()
+    if (type === 'demo') return
+    if (type === 'client') { scopedSet(BUCKET, get().useCases); return }
     supabase.from('ai_use_cases').insert(useCaseToRow(uc)).then(({ error }) => {
       if (error) console.error('Failed to save:', error)
     })
@@ -63,7 +74,9 @@ export const useUseCasesStore = create<UseCasesStore>()((set, get) => ({
 
   updateUseCase: (uc) => {
     set((state) => ({ useCases: state.useCases.map((u) => (u.id === uc.id ? uc : u)) }))
-    if (getDemoMode()) return
+    const type = getMandantType()
+    if (type === 'demo') return
+    if (type === 'client') { scopedSet(BUCKET, get().useCases); return }
     supabase.from('ai_use_cases').update(useCaseToRow(uc)).eq('id', uc.id).then(({ error }) => {
       if (error) console.error('Failed to update:', error)
     })
@@ -71,7 +84,9 @@ export const useUseCasesStore = create<UseCasesStore>()((set, get) => ({
 
   deleteUseCase: (id) => {
     set((state) => ({ useCases: state.useCases.filter((u) => u.id !== id) }))
-    if (getDemoMode()) return
+    const type = getMandantType()
+    if (type === 'demo') return
+    if (type === 'client') { scopedSet(BUCKET, get().useCases); return }
     supabase.from('ai_use_cases').delete().eq('id', id).then(({ error }) => {
       if (error) console.error('Failed to delete:', error)
     })
@@ -89,7 +104,9 @@ export const useUseCasesStore = create<UseCasesStore>()((set, get) => ({
       updatedAt: new Date().toISOString(),
     }
     set((state) => ({ useCases: [...state.useCases, copy] }))
-    if (getDemoMode()) return
+    const type = getMandantType()
+    if (type === 'demo') return
+    if (type === 'client') { scopedSet(BUCKET, get().useCases); return }
     supabase.from('ai_use_cases').insert(useCaseToRow(copy)).then(({ error }) => {
       if (error) console.error('Failed to duplicate:', error)
     })

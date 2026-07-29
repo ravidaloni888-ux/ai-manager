@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { nanoid } from 'nanoid'
 import { useAuthStore } from '../store/authStore'
-import { useDemoStore } from '../store/demoStore'
+import { useIsDemo } from '../store/mandantStore'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -321,7 +321,7 @@ const RCKF_INFO = [
 
 export default function PromptLibraryPage() {
   const user = useAuthStore((s) => s.user)
-  const demoMode = useDemoStore((s) => s.demoMode)
+  const demoMode = useIsDemo()
 
   const [userPrompts, setUserPrompts] = useState<Prompt[]>(() => demoMode ? [] : loadPrompts())
   const [search, setSearch] = useState('')

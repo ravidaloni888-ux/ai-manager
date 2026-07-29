@@ -1,23 +1,8 @@
-import { create } from 'zustand'
+import { getMandantType } from './mandantStore'
 
-const LS_KEY = 'ai_demo_mode_v1'
-
+// Der frühere Demo-Schalter ist im Mandantenmodell aufgegangen:
+// "Demo" ist jetzt ein Mandant vom Typ 'demo'. Diese Funktion bleibt als
+// Adapter bestehen, damit die Stores unverändert danach fragen können.
 export function getDemoMode(): boolean {
-  try {
-    const raw = localStorage.getItem(LS_KEY)
-    return raw === null ? true : JSON.parse(raw) // default true for new users
-  } catch { return true }
+  return getMandantType() === 'demo'
 }
-
-interface DemoStore {
-  demoMode: boolean
-  setDemoMode: (v: boolean) => void
-}
-
-export const useDemoStore = create<DemoStore>()((set) => ({
-  demoMode: getDemoMode(),
-  setDemoMode: (v) => {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(v)) } catch {}
-    set({ demoMode: v })
-  },
-}))

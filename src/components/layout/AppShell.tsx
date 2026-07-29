@@ -8,7 +8,7 @@ import {
 } from '../icons/NavIcons'
 import { useAuthStore } from '../../store/authStore'
 import BetaRequestModal from './BetaRequestModal'
-import DemoToggle from './DemoToggle'
+import MandantSwitcher from './MandantSwitcher'
 import WizardBanner from './WizardBanner'
 
 interface AppShellProps {
@@ -96,7 +96,7 @@ export default function AppShell({ children }: AppShellProps) {
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
         <div className="flex-shrink-0 flex items-center justify-end gap-3 px-6 py-3" style={{ background: '#1a2538' }}>
-          <DemoToggle />
+          <MandantSwitcher />
           {user ? (
             <button
               onClick={() => navigate('/canvas/new')}

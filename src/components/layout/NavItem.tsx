@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useWizardStore, ROUTE_STEPS } from '../../store/wizardStore'
-import { useDemoStore } from '../../store/demoStore'
+import { useIsDemo } from '../../store/mandantStore'
 
 interface NavItemProps {
   to?: string
@@ -14,7 +14,7 @@ interface NavItemProps {
 export default function NavItem({ to, icon, label, disabled, badge }: NavItemProps) {
   const { search } = useLocation()
   const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
-  const demoMode = useDemoStore((s) => s.demoMode)
+  const demoMode = useIsDemo()
   const done = useWizardStore((s) => s.done)
   const steps = to ? ROUTE_STEPS[to] : undefined
   const incomplete = !demoMode && !!steps && !steps.some((id) => done.has(id))

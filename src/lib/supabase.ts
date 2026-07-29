@@ -97,7 +97,7 @@ export function useCaseToRow(uc: AIUseCase): Record<string, unknown> {
   }
 }
 
-const DEFAULT_GOVERNANCE: GovernanceData = {
+export const DEFAULT_GOVERNANCE: GovernanceData = {
   richtlinie: { zweck: '', daten: '', transparenz: '', verantwortlichkeiten: '', risikomanagement: '', ethik: '', schulung: '' },
   roles: { aiOwner: '', dpo: '', security: '', ethics: '', business: '' },
   steps: { step1: false, step2: false, step3: false, step4: false, step5: false, step6: false, step7: false, step8: false, step9: false },

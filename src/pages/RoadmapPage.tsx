@@ -2,7 +2,8 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUseCasesStore } from '../store/useCasesStore'
 import { useStrategyStore } from '../store/strategyStore'
-import { useDemoStore } from '../store/demoStore'
+import { useMandantId } from '../store/mandantStore'
+import { scopedGet, scopedSet } from '../lib/mandantData'
 import { AIUseCase } from '../types'
 
 // ── quarters ──────────────────────────────────────────────────────────────
@@ -11,14 +12,13 @@ const ALL_SLOTS = [...QUARTERS, 'Backlog'] as const
 type Slot = typeof ALL_SLOTS[number]
 type Plan = Record<Slot, string[]>
 
-// plan storage is scoped per demo/workspace mode, since use case IDs differ between the two
-const LS_KEY_BASE = 'ai_roadmap_v1'
-function lsKey(demoMode: boolean) { return `${LS_KEY_BASE}_${demoMode ? 'demo' : 'workspace'}` }
-function lsLoad(demoMode: boolean): Plan | null {
-  try { const r = localStorage.getItem(lsKey(demoMode)); return r ? JSON.parse(r) : null } catch { return null }
+// Plan und Horizonte werden je Mandant getrennt gespeichert —
+// die Use-Case-IDs unterscheiden sich zwischen den Mandanten.
+function lsLoad(): Plan | null {
+  return scopedGet<Plan | null>('roadmap', null)
 }
-function lsSave(demoMode: boolean, p: Plan) {
-  try { localStorage.setItem(lsKey(demoMode), JSON.stringify(p)) } catch {}
+function lsSave(p: Plan) {
+  scopedSet('roadmap', p)
 }
 // true if the plan references none of the current use case IDs (stale plan from a different dataset)
 function planIsStale(plan: Plan, useCases: AIUseCase[]): boolean {
@@ -108,12 +108,11 @@ const HORIZONS = [
 
 type HorizonKey = typeof HORIZONS[number]['key']
 
-const LS_HORIZON_KEY = 'ai_roadmap_horizons_v1'
 function lsLoadHorizons(): Record<string, HorizonKey> {
-  try { const r = localStorage.getItem(LS_HORIZON_KEY); return r ? JSON.parse(r) : {} } catch { return {} }
+  return scopedGet<Record<string, HorizonKey>>('horizons', {})
 }
 function lsSaveHorizons(h: Record<string, HorizonKey>) {
-  try { localStorage.setItem(LS_HORIZON_KEY, JSON.stringify(h)) } catch {}
+  scopedSet('horizons', h)
 }
 
 function HorizonTool({ useCases, navigate }: { useCases: AIUseCase[]; navigate: (path: string) => void }) {
@@ -254,7 +253,7 @@ function HorizonTool({ useCases, navigate }: { useCases: AIUseCase[]; navigate: 
 export default function RoadmapPage() {
   const { useCases } = useUseCasesStore()
   const { data: strategy } = useStrategyStore()
-  const { demoMode } = useDemoStore()
+  const mandantId = useMandantId()
   const navigate = useNavigate()
   const [tab, setTab] = useState<'plan' | 'horizonte'>('plan')
 
@@ -265,23 +264,23 @@ export default function RoadmapPage() {
   const [maxPerQ, setMaxPerQ]       = useState(4)
   const [dropTarget, setDropTarget] = useState<Slot | null>(null)
 
-  const [plan, setPlan] = useState<Plan>(() => lsLoad(demoMode) ?? generate(useCases, defaultCap, 4))
+  const [plan, setPlan] = useState<Plan>(() => lsLoad() ?? generate(useCases, defaultCap, 4))
 
   const dragRef = useRef<{ id: string; from: Slot } | null>(null)
 
-  // Demo/Workspace use different case IDs — reload (or regenerate) the plan whenever
-  // the mode switches or the current plan no longer matches the active dataset.
+  // Jeder Mandant hat eigene Use-Case-IDs — Plan neu laden bzw. neu erzeugen,
+  // sobald der Mandant wechselt oder der Plan nicht mehr zum Datenbestand passt.
   useEffect(() => {
-    const stored = lsLoad(demoMode)
+    const stored = lsLoad()
     if (stored && !planIsStale(stored, useCases)) {
       setPlan(stored)
     } else if (useCases.length > 0) {
       const next = generate(useCases, budgetCapK, maxPerQ)
       setPlan(next)
-      lsSave(demoMode, next)
+      lsSave(next)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [demoMode, useCases])
+  }, [mandantId, useCases])
 
   // ── helpers ──
   const ucMap = new Map(useCases.map((uc) => [uc.id, uc]))
@@ -295,8 +294,8 @@ export default function RoadmapPage() {
   const handleGenerate = useCallback(() => {
     const next = generate(useCases, budgetCapK, maxPerQ)
     setPlan(next)
-    lsSave(demoMode, next)
-  }, [useCases, budgetCapK, maxPerQ, demoMode])
+    lsSave(next)
+  }, [useCases, budgetCapK, maxPerQ])
 
   // ── drag & drop ──
   const handleDragStart = (id: string, from: Slot) => {
@@ -310,7 +309,7 @@ export default function RoadmapPage() {
     next[drag.from] = next[drag.from].filter((i) => i !== drag.id)
     next[to] = [...next[to], drag.id]
     setPlan(next)
-    lsSave(demoMode, next)
+    lsSave(next)
     dragRef.current = null
     setDropTarget(null)
   }

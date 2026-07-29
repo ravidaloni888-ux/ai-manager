@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { getDemoMode } from './demoStore'
+import { scopedGet, scopedSet, migrateLegacyKeys } from '../lib/mandantData'
 
 export type StepId =
   // Phase 1 · Fundament
@@ -46,22 +47,20 @@ export const ROUTE_STEPS: Record<string, StepId[]> = {
   '/meetings':     ['meetings'],
 }
 
-const LS_KEY = 'ai_start_v1'
+// Fortschritt wird je Mandant getrennt gespeichert
+const BUCKET = 'wizard'
 
 export function loadProgress(): Set<StepId> {
-  try {
-    if (getDemoMode()) return new Set(ALL_STEP_IDS)
-    const raw = localStorage.getItem(LS_KEY)
-    if (!raw) return new Set()
-    // drop unknown ids (e.g. from an older wizard version)
-    const parsed: string[] = JSON.parse(raw)
-    return new Set(parsed.filter((id): id is StepId => (ALL_STEP_IDS as string[]).includes(id)))
-  } catch { return new Set() }
+  migrateLegacyKeys()
+  if (getDemoMode()) return new Set(ALL_STEP_IDS)
+  // unbekannte IDs verwerfen (z. B. aus einer älteren Wizard-Version)
+  const stored = scopedGet<string[]>(BUCKET, [])
+  return new Set(stored.filter((id): id is StepId => (ALL_STEP_IDS as string[]).includes(id)))
 }
 
 export function saveProgress(done: Set<StepId>) {
   if (getDemoMode()) return
-  try { localStorage.setItem(LS_KEY, JSON.stringify([...done])) } catch {}
+  scopedSet(BUCKET, [...done])
 }
 
 interface WizardStore {

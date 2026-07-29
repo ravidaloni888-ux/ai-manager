@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { GovernanceData } from '../types'
-import { loadGovernance, saveGovernance } from '../lib/supabase'
+import { loadGovernance, saveGovernance, DEFAULT_GOVERNANCE } from '../lib/supabase'
 import { getDemoMode } from './demoStore'
+import { loadFor, saveFor } from '../lib/mandantData'
 
 export const DEMO_GOVERNANCE: GovernanceData = {
   richtlinie: {
@@ -53,13 +54,13 @@ export const useGovernanceStore = create<GovernanceStore>()((set) => ({
       set({ data: DEMO_GOVERNANCE, loading: false })
       return
     }
-    const data = await loadGovernance()
+    const data = await loadFor('governance', loadGovernance, DEFAULT_GOVERNANCE)
     set({ data, loading: false })
   },
 
   save: async (data) => {
     set({ saving: true })
-    if (!getDemoMode()) await saveGovernance(data)
+    await saveFor('governance', saveGovernance, data)
     set({ data, saving: false })
   },
 }))

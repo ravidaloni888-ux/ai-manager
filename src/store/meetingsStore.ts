@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { MeetingsData, MeetingConfig } from '../types'
 import { loadMeetings, saveMeetings } from '../lib/supabase'
 import { getDemoMode } from './demoStore'
+import { loadFor, saveFor } from '../lib/mandantData'
 
 export const DEMO_MEETINGS: MeetingsData = {
   configs: {
@@ -34,7 +35,7 @@ export const useMeetingsStore = create<MeetingsStore>()((set, get) => ({
       set({ data: DEMO_MEETINGS, loading: false })
       return
     }
-    const data = await loadMeetings()
+    const data = await loadFor('meetings', loadMeetings, { configs: {} })
     set({ data, loading: false })
   },
 
@@ -44,7 +45,7 @@ export const useMeetingsStore = create<MeetingsStore>()((set, get) => ({
 
   save: async () => {
     set({ saving: true })
-    if (!getDemoMode()) await saveMeetings(get().data)
+    await saveFor('meetings', saveMeetings, get().data)
     set({ saving: false })
   },
 }))

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDemoStore } from '../store/demoStore'
+import { useMandantStore } from '../store/mandantStore'
 import { useWizardStore, StepId } from '../store/wizardStore'
 
 interface Step {
@@ -275,11 +275,11 @@ const PHASE_STYLE: Record<string, { bg: string; border: string; text: string; ba
 // ── Page ───────────────────────────────────────────────────────────────────
 export default function StartPage() {
   const navigate = useNavigate()
-  const demoMode = useDemoStore((s) => s.demoMode)
+  const activeId = useMandantStore((s) => s.activeId)
   const { done, toggle, init } = useWizardStore()
   const [expanded, setExpanded] = useState<StepId | null>(null)
 
-  useEffect(() => { init() }, [demoMode])
+  useEffect(() => { init() }, [activeId, init])
 
   const completedCount = done.size
   const totalCount     = STEPS.length

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { useDemoStore } from '../store/demoStore'
+import { useIsDemo, useMandantId } from '../store/mandantStore'
+import { scopedKey } from '../lib/mandantData'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -117,12 +118,12 @@ const DEFAULT_SH: Stakeholder[] = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'ai_stakeholders_v2'
+const STORAGE_BUCKET = 'stakeholders'
 
 function loadSh(demo: boolean): Stakeholder[] {
   if (demo) return DEFAULT_SH
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(scopedKey(STORAGE_BUCKET))
     if (raw) return JSON.parse(raw) as Stakeholder[]
   } catch { /* ignore */ }
   return []
@@ -156,7 +157,8 @@ function sanitizeGenerated(raw: unknown[]): Omit<Stakeholder, 'id'>[] {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function StakeholderPage() {
-  const demoMode = useDemoStore(s => s.demoMode)
+  const demoMode = useIsDemo()
+  const mandantId = useMandantId()
   const demoModeRef = useRef(demoMode)
   const [sh, setSh] = useState<Stakeholder[]>(() => loadSh(demoMode))
   const [selId, setSelId] = useState<string | null>(null)
@@ -164,18 +166,18 @@ export default function StakeholderPage() {
   const [modal, setModal] = useState<{ open: boolean; editId: string | null }>({ open: false, editId: null })
   const [aiModal, setAiModal] = useState(false)
 
-  // When demo mode toggles: update ref first, then reload — ref ensures the save
-  // effect below never writes demo data into the user's personal localStorage slot
+  // Beim Mandantenwechsel: erst Ref aktualisieren, dann neu laden — die Ref
+  // verhindert, dass der Speicher-Effekt unten Demodaten in ein Mandat schreibt
   useEffect(() => {
     demoModeRef.current = demoMode
     setSh(loadSh(demoMode))
     setSelId(null)
-  }, [demoMode])
+  }, [mandantId, demoMode])
 
   // Persist only the user's own stakeholders; reads demoMode via ref so this
   // effect only re-runs when sh actually changes, not when the mode switches
   useEffect(() => {
-    if (!demoModeRef.current) localStorage.setItem(STORAGE_KEY, JSON.stringify(sh))
+    if (!demoModeRef.current) localStorage.setItem(scopedKey(STORAGE_BUCKET), JSON.stringify(sh))
   }, [sh])
 
   const selected = sh.find(s => s.id === selId) ?? null

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { IconGithub, IconGlobe, IconFolder, IconCopy, IconDatabase } from '../components/icons/NavIcons'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
+import { scopedKey } from '../lib/mandantData'
 
 const LOCAL_PATH = '/Users/ra/Downloads/git/ai-manager'
 const GITHUB_URL = 'https://github.com/ravidaloni888-ux/ai-manager'
@@ -75,7 +76,7 @@ function ResetButton() {
     setStatus('loading')
     await supabase.from('ai_use_cases').delete().eq('user_id', user.id)
     await supabase.from('ai_strategy').delete().eq('user_id', user.id)
-    localStorage.removeItem('ai_start_v1')
+    localStorage.removeItem(scopedKey('wizard'))
     setStatus('done')
     setTimeout(() => window.location.reload(), 800)
   }

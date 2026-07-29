@@ -31,6 +31,7 @@ import LoginPage from './pages/LoginPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import { useUseCasesStore } from './store/useCasesStore'
 import { useAuthStore } from './store/authStore'
+import { migrateLegacyKeys } from './lib/mandantData'
 
 function Spinner() {
   return (
@@ -56,6 +57,8 @@ function AppRoutes() {
   const dataLoading = useUseCasesStore((s) => s.loading)
   const initAuth = useAuthStore((s) => s.init)
   const authLoading = useAuthStore((s) => s.loading)
+
+  useEffect(() => { migrateLegacyKeys() }, [])
 
   useEffect(() => {
     const unsub = initAuth()

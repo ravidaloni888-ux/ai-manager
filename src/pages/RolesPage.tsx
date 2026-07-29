@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
-import { useDemoStore } from '../store/demoStore'
+import { useIsDemo } from '../store/mandantStore'
 
 const DEMO_ASSIGNMENTS: Assignments = {
   ai_architect:              'Alexander Koch (Senior Solutions Architect)',
@@ -268,7 +268,7 @@ function Iso42001Section({ assignments }: { assignments: Assignments }) {
 
 export default function RolesPage() {
   const user = useAuthStore((s) => s.user)
-  const demoMode = useDemoStore((s) => s.demoMode)
+  const demoMode = useIsDemo()
   const [assignments, setAssignments] = useState<Assignments>({})
   const [original, setOriginal] = useState<Assignments>({})
   const [loading, setLoading] = useState(true)

@@ -5,7 +5,8 @@ import {
 } from 'recharts'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
-import { useDemoStore } from '../store/demoStore'
+import { useIsDemo, useMandantId } from '../store/mandantStore'
+import { loadFor, saveFor } from '../lib/mandantData'
 
 const DEMO_SCORES: Scores = {
   strategy_0: 4, strategy_1: 4, strategy_2: 3,
@@ -135,7 +136,8 @@ const CustomTooltip = ({ active, payload }: any) => {
 
 export default function MaturityPage() {
   const user = useAuthStore((s) => s.user)
-  const demoMode = useDemoStore((s) => s.demoMode)
+  const demoMode = useIsDemo()
+  const mandantId = useMandantId()
   const [scores, setScores] = useState<Scores>({})
   const [original, setOriginal] = useState<Scores>({})
   const [loading, setLoading] = useState(true)
@@ -149,28 +151,32 @@ export default function MaturityPage() {
       return
     }
     async function load() {
-      try {
-        const { data } = await supabase
-          .from('ai_maturity')
-          .select('scores')
-          .eq('id', 'singleton')
-          .single()
-        const s = (data?.scores ?? {}) as Scores
-        setScores(s)
-        setOriginal(s)
-      } catch {}
+      const s = await loadFor<Scores>('maturity', async () => {
+        try {
+          const { data } = await supabase
+            .from('ai_maturity')
+            .select('scores')
+            .eq('id', 'singleton')
+            .single()
+          return (data?.scores ?? {}) as Scores
+        } catch { return {} }
+      }, {})
+      setScores(s)
+      setOriginal(s)
       setLoading(false)
     }
     load()
-  }, [demoMode])
+  }, [mandantId, demoMode])
 
   const isDirty = JSON.stringify(scores) !== JSON.stringify(original)
 
   const handleSave = async () => {
     setSaving(true)
-    await supabase.from('ai_maturity').upsert({
-      id: 'singleton', scores, updated_at: new Date().toISOString(),
-    })
+    await saveFor<Scores>('maturity', async (v) => {
+      await supabase.from('ai_maturity').upsert({
+        id: 'singleton', scores: v, updated_at: new Date().toISOString(),
+      })
+    }, scores)
     setOriginal({ ...scores })
     setSaving(false)
   }

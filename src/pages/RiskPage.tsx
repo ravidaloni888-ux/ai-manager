@@ -8,7 +8,8 @@ import {
   RISK_CATEGORIES, MITIGATION_STATUSES, MITIGATION_BG, EU_AI_ACT_BG, EuAiActRisk,
 } from '../types'
 import { nanoid } from 'nanoid'
-import { getDemoMode, useDemoStore } from '../store/demoStore'
+import { getDemoMode } from '../store/demoStore'
+import { useIsDemo } from '../store/mandantStore'
 import { deriveRisikoEntries, deriveAIRisks, RISIKOART_META, RisikoArt } from '../lib/deriveRisks'
 
 type Tab = 'register' | 'heatmap' | 'bae' | 'matrix'
@@ -324,7 +325,7 @@ export default function RiskPage() {
   useEffect(() => { init() }, [init])
   const { useCases, init: initUseCases } = useUseCasesStore()
   const user = useAuthStore((s) => s.user)
-  const demoMode = useDemoStore((s) => s.demoMode)
+  const demoMode = useIsDemo()
   useEffect(() => { initUseCases() }, [initUseCases, demoMode])
   const [tab, setTab] = useState<Tab>('register')
   const [showForm, setShowForm] = useState(false)

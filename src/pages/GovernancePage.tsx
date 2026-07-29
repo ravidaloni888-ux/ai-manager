@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useGovernanceStore } from '../store/governanceStore'
 import { useUseCasesStore } from '../store/useCasesStore'
 import { useAuthStore } from '../store/authStore'
-import { getDemoMode, useDemoStore } from '../store/demoStore'
+import { getDemoMode } from '../store/demoStore'
+import { useIsDemo } from '../store/mandantStore'
 import { GovernanceData, AimsClause, AIUseCase, EU_AI_ACT_BG, EuAiActRisk } from '../types'
 
 type Tab = 'steps' | 'richtlinie' | 'roles' | 'checklist' | 'aims' | 'compliance'
@@ -172,7 +173,7 @@ export default function GovernancePage() {
   const { data, loading, saving, init, save } = useGovernanceStore()
   const { useCases, init: initUseCases } = useUseCasesStore()
   const user = useAuthStore((s) => s.user)
-  const demoMode = useDemoStore((s) => s.demoMode)
+  const demoMode = useIsDemo()
   const navigate = useNavigate()
   const [local, setLocal] = useState<GovernanceData>(DEFAULT)
   const [saved, setSaved] = useState(false)

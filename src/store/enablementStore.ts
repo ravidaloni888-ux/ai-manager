@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { EnablementData, TrainingTopicKey, TrainingStatus } from '../types'
 import { loadEnablement, saveEnablement } from '../lib/supabase'
 import { getDemoMode } from './demoStore'
+import { loadFor, saveFor } from '../lib/mandantData'
 
 const D = 'done' as const, P = 'planned' as const, O = 'open' as const
 
@@ -40,7 +41,7 @@ export const useEnablementStore = create<EnablementStore>()((set, get) => ({
       set({ data: DEMO_ENABLEMENT, loading: false })
       return
     }
-    const data = await loadEnablement()
+    const data = await loadFor('enablement', loadEnablement, { trainingMap: {} })
     set({ data, loading: false })
   },
 
@@ -62,7 +63,7 @@ export const useEnablementStore = create<EnablementStore>()((set, get) => ({
 
   save: async () => {
     set({ saving: true })
-    if (!getDemoMode()) await saveEnablement(get().data)
+    await saveFor('enablement', saveEnablement, get().data)
     set({ saving: false })
   },
 }))

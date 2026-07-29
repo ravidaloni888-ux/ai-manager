@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { StrategyData, DEFAULT_STRATEGY } from '../types'
 import { supabase } from '../lib/supabase'
+import { loadFor, saveFor } from '../lib/mandantData'
 import { getDemoMode } from './demoStore'
 
 const BLANK_STRATEGY: StrategyData = {
@@ -32,32 +33,31 @@ export const useStrategyStore = create<StrategyStore>()((set) => ({
       set({ data: DEFAULT_STRATEGY, loading: false })
       return
     }
-    // My Workspace — load from Supabase, start blank for new users
-    try {
-      const { data, error } = await supabase
-        .from('ai_strategy')
-        .select('*')
-        .eq('id', 'singleton')
-        .single()
-      if (!error && data?.strategy_data) {
-        set({ data: { ...BLANK_STRATEGY, ...data.strategy_data }, loading: false })
-        return
-      }
-    } catch {}
-    set({ data: BLANK_STRATEGY, loading: false })
+    const loaded = await loadFor('strategy', async () => {
+      try {
+        const { data, error } = await supabase
+          .from('ai_strategy')
+          .select('*')
+          .eq('id', 'singleton')
+          .single()
+        if (!error && data?.strategy_data) return { ...BLANK_STRATEGY, ...data.strategy_data }
+      } catch {}
+      return BLANK_STRATEGY
+    }, BLANK_STRATEGY)
+    set({ data: loaded, loading: false })
   },
 
   save: async (d: StrategyData) => {
     set({ saving: true, data: d })
-    if (!getDemoMode()) {
+    await saveFor('strategy', async (v) => {
       try {
         await supabase.from('ai_strategy').upsert({
           id: 'singleton',
-          strategy_data: d,
+          strategy_data: v,
           updated_at: new Date().toISOString(),
         })
       } catch {}
-    }
+    }, d)
     set({ saving: false })
   },
 }))
