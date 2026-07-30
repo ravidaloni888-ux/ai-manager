@@ -4,7 +4,7 @@ import { create } from 'zustand'
 // Mandanten — für wen mache ich gerade KI-Management?
 //
 //   'demo'     → feste Beispieldaten (WellSeal), nichts wird gespeichert
-//   'internal' → syscovery AI Hub, liegt in Supabase (bestehende Daten)
+//   'internal' → eigenes Haus (Beraterfirma), liegt in Supabase (bestehende Daten)
 //   'client'   → Kundenmandat, bleibt ausschliesslich lokal im Browser
 //
 // Kundendaten gehen bewusst NICHT nach Supabase: das Backend hat aktuell
@@ -26,7 +26,7 @@ export const HUB_ID = 'hub'
 export const DEMO_ID = 'demo'
 
 const BUILTIN: Mandant[] = [
-  { id: HUB_ID,  name: 'syscovery AI Hub', type: 'internal', note: 'Internes KI-Programm' },
+  { id: HUB_ID,  name: 'Die Beraterfirma', type: 'internal', note: 'Eigenes Haus · internes KI-Programm' },
   { id: DEMO_ID, name: 'Demo (WellSeal)',  type: 'demo',     note: 'Lern- und Beispielmodus' },
 ]
 
