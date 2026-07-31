@@ -16,7 +16,7 @@ export type StepId =
   // Phase 5 · Risiko & Investition
   | 'risks' | 'roadmap' | 'roi'
   // Phase 6 · Umsetzung & Betrieb
-  | 'qa' | 'change' | 'enablement'
+  | 'qa' | 'data-integrity' | 'change' | 'enablement'
 
 export const ALL_STEP_IDS: StepId[] = [
   'vision', 'maturity',
@@ -24,7 +24,7 @@ export const ALL_STEP_IDS: StepId[] = [
   'governance', 'roles', 'stakeholders',
   'usecases', 'data-quality', 'score', 'eu-act', 'project-plan',
   'risks', 'roadmap', 'roi',
-  'qa', 'change', 'enablement',
+  'qa', 'data-integrity', 'change', 'enablement',
 ]
 
 // Which step IDs cover each route (a route is "done" if ANY of its steps is done)
@@ -37,7 +37,7 @@ export const ROUTE_STEPS: Record<string, StepId[]> = {
   '/governance':   ['governance', 'roles'],
   '/stakeholders': ['stakeholders'],
   '/use-cases':    ['usecases', 'score', 'eu-act'],
-  '/data':         ['data-quality'],
+  '/data':         ['data-integrity'],
   '/project-plan': ['project-plan'],
   '/risk':         ['risks'],
   '/roadmap':      ['roadmap'],

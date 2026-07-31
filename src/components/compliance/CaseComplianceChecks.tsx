@@ -2,6 +2,14 @@ import { useState, useEffect } from 'react'
 import { scopedGet, scopedSet } from '../../lib/mandantData'
 import { getMandantType } from '../../store/mandantStore'
 import { loadCaseChecks, saveCaseChecks } from '../../lib/supabase'
+import DataQualityCheck, { EMPTY_DATA_QUALITY } from '../assessments/DataQualityCheck'
+import type { DataQualityState } from '../assessments/DataQualityCheck'
+import FairCheck, { EMPTY_FAIR } from '../assessments/FairCheck'
+import type { FairState } from '../assessments/FairCheck'
+import EthicsCheck, { EMPTY_ETHICS } from '../assessments/EthicsCheck'
+import RiskClassCheck, { EMPTY_RISK_CLASS, TREE_NODES } from '../assessments/RiskClassCheck'
+import type { RiskClassState } from '../assessments/RiskClassCheck'
+import type { EthicsState } from '../assessments/EthicsCheck'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Datenschutz-Checks je Anwendungsfall.
@@ -21,12 +29,20 @@ export interface CaseChecks {
   dsfa: Record<string, boolean>
   avv: AvvState
   art22: Record<number, boolean>
+  dataQuality: DataQualityState
+  fair: FairState
+  ethics: EthicsState
+  riskClass: RiskClassState
 }
 
 const EMPTY_CHECKS: CaseChecks = {
   dsfa: {},
   avv: { external: null, personalData: null, avvExists: null },
   art22: {},
+  dataQuality: EMPTY_DATA_QUALITY,
+  fair: EMPTY_FAIR,
+  ethics: EMPTY_ETHICS,
+  riskClass: EMPTY_RISK_CLASS,
 }
 
 // Antworten liegen je Mandant unter einem Schlüssel, darin je Anwendungsfall.
@@ -296,8 +312,11 @@ function Art22Checker({ checked, setChecked }: {
 }
 
 /** Alle drei Fall-Checks — einklappbar, Antworten bleiben am Anwendungsfall. */
+type GroupKey = 'risiko' | 'datenschutz' | 'qualitaet' | 'fair' | 'ethik'
+
+/** Alle Prüfungen zu einem Anwendungsfall — Antworten bleiben am Fall. */
 export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
-  const [open, setOpen] = useState(false)
+  const [openGroup, setOpenGroup] = useState<GroupKey | null>(null)
   const [checks, setChecks] = useState<CaseChecks>(EMPTY_CHECKS)
   const [loaded, setLoaded] = useState(false)
 
@@ -321,62 +340,110 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
     if (loaded && persistent && ucId) void saveChecks(ucId, checks)
   }, [checks, loaded, persistent, ucId])
 
-  const answered =
+  const dsCount =
     Object.values(checks.dsfa).filter(Boolean).length +
     Object.values(checks.art22).filter(Boolean).length +
     (checks.avv.external !== null ? 1 : 0)
+  const dqCount = Object.values(checks.dataQuality.dims).filter((d) => d.rating !== null).length
+  const fairCount = Object.values(checks.fair).filter(Boolean).length
+
+  const rcResult = checks.riskClass.done && checks.riskClass.resultId
+    ? TREE_NODES[checks.riskClass.resultId].result?.name ?? '' : ''
+
+  const groups: { key: GroupKey; icon: string; title: string; hint: string; status: string }[] = [
+    { key: 'risiko',      icon: '⚖️', title: 'EU AI Act — Risikoklasse', hint: '1–3 Fragen bis zur Einstufung', status: rcResult },
+    { key: 'datenschutz', icon: '🛡️', title: 'Datenschutz',   hint: 'DSFA-Pflicht · AVV · Art. 22',              status: dsCount   ? `${dsCount} beantwortet` : '' },
+    { key: 'qualitaet',   icon: '🧪', title: 'Datenqualität', hint: 'Sechs Dimensionen — zweckbezogen bewertet', status: dqCount   ? `${dqCount}/6 bewertet` : '' },
+    { key: 'fair',        icon: '✅', title: 'FAIR-Check',    hint: 'Auffindbar · Zugänglich · Interoperabel · Wiederverwendbar', status: fairCount ? `${fairCount} erfüllt` : '' },
+    { key: 'ethik',       icon: '🧭', title: 'Ethik',         hint: 'FAST-Bewertung des Vorhabens',              status: checks.ethics.result ? checks.ethics.result.verdict : '' },
+  ]
 
   return (
     <section className="bg-white rounded-xl shadow-md overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-50 transition-colors text-left"
-      >
-        <span className="text-base leading-none flex-shrink-0">🛡️</span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-slate-700 uppercase tracking-wide leading-tight">
-            Datenschutz-Checks für diesen Fall
-          </p>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            DSFA-Pflicht · AVV · Art. 22 — hilft beim Setzen der Haken oben
-          </p>
-        </div>
-        {answered > 0 && (
-          <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full flex-shrink-0">
-            {answered} beantwortet
-          </span>
-        )}
-        <span className="text-[10px] font-semibold text-slate-400 flex-shrink-0">
-          {open ? 'Ausblenden' : 'Prüfen'}
-        </span>
-        <svg className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
-             fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-        </svg>
-      </button>
+      <div className="px-5 py-4 border-b border-slate-100">
+        <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Prüfungen zu diesem Fall</h2>
+        <p className="text-[11px] text-slate-400 mt-0.5">
+          {persistent
+            ? 'Antworten werden automatisch zu diesem Anwendungsfall gespeichert.'
+            : 'Im Demo-Mandanten werden Antworten nicht gespeichert.'}
+          {' '}Orientierungshilfe, kein Ersatz für rechtliche Beratung.
+        </p>
+      </div>
 
-      {open && (
-        <div className="border-t border-slate-100 p-5 space-y-4 bg-slate-50/50">
-          <DsfaChecker
-            checked={checks.dsfa}
-            setChecked={(fn) => setChecks((prev) => ({ ...prev, dsfa: fn(prev.dsfa) }))}
-          />
-          <AvvChecker
-            value={checks.avv}
-            onChange={(avv) => setChecks((prev) => ({ ...prev, avv }))}
-          />
-          <Art22Checker
-            checked={checks.art22}
-            setChecked={(fn) => setChecks((prev) => ({ ...prev, art22: fn(prev.art22) }))}
-          />
-          <p className="text-[10px] text-slate-400">
-            {persistent
-              ? 'Antworten werden automatisch zu diesem Anwendungsfall gespeichert. Orientierungshilfe, kein Ersatz für rechtliche Beratung.'
-              : 'Im Demo-Mandanten werden Antworten nicht gespeichert. Orientierungshilfe, kein Ersatz für rechtliche Beratung.'}
-          </p>
-        </div>
-      )}
+      <div className="divide-y divide-slate-100">
+        {groups.map((g) => {
+          const isOpen = openGroup === g.key
+          return (
+            <div key={g.key}>
+              <button
+                type="button"
+                onClick={() => setOpenGroup(isOpen ? null : g.key)}
+                className="w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors text-left"
+              >
+                <span className="text-base leading-none flex-shrink-0">{g.icon}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-slate-800 leading-tight">{g.title}</p>
+                  <p className="text-[11px] text-slate-400 leading-tight mt-0.5">{g.hint}</p>
+                </div>
+                {g.status && (
+                  <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                    {g.status}
+                  </span>
+                )}
+                <svg className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                     fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
+
+              {isOpen && (
+                <div className="px-5 pb-5 space-y-4 bg-slate-50/50">
+                  {g.key === 'risiko' && (
+                    <RiskClassCheck
+                      value={checks.riskClass}
+                      onChange={(fn) => setChecks((prev) => ({ ...prev, riskClass: fn(prev.riskClass) }))}
+                    />
+                  )}
+                  {g.key === 'datenschutz' && (
+                    <>
+                      <DsfaChecker
+                        checked={checks.dsfa}
+                        setChecked={(fn) => setChecks((prev) => ({ ...prev, dsfa: fn(prev.dsfa) }))}
+                      />
+                      <AvvChecker
+                        value={checks.avv}
+                        onChange={(avv) => setChecks((prev) => ({ ...prev, avv }))}
+                      />
+                      <Art22Checker
+                        checked={checks.art22}
+                        setChecked={(fn) => setChecks((prev) => ({ ...prev, art22: fn(prev.art22) }))}
+                      />
+                    </>
+                  )}
+                  {g.key === 'qualitaet' && (
+                    <DataQualityCheck
+                      value={checks.dataQuality}
+                      onChange={(fn) => setChecks((prev) => ({ ...prev, dataQuality: fn(prev.dataQuality) }))}
+                    />
+                  )}
+                  {g.key === 'fair' && (
+                    <FairCheck
+                      value={checks.fair}
+                      onChange={(fn) => setChecks((prev) => ({ ...prev, fair: fn(prev.fair) }))}
+                    />
+                  )}
+                  {g.key === 'ethik' && (
+                    <EthicsCheck
+                      value={checks.ethics}
+                      onChange={(fn) => setChecks((prev) => ({ ...prev, ethics: fn(prev.ethics) }))}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
     </section>
   )
 }
