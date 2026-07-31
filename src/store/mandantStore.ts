@@ -19,6 +19,10 @@ export interface Mandant {
   type: MandantType
   /** Kurzbeschreibung, z. B. Branche oder Projektname */
   note?: string
+  /** Welche Wizard-Schritte gelten für dieses Mandat? undefined = alle */
+  scope?: string[]
+  /** Name der gewählten Umfangsvorlage, nur zur Anzeige */
+  scopePreset?: string
   createdAt?: string
 }
 
@@ -79,7 +83,8 @@ interface MandantStore {
   activeId: string
   init: () => void
   setActive: (id: string) => void
-  addClient: (name: string, note?: string) => string
+  addClient: (name: string, note?: string, scope?: string[], scopePreset?: string) => string
+  setScope: (id: string, scope: string[] | undefined, scopePreset?: string) => void
   renameMandant: (id: string, name: string, note?: string) => void
   removeClient: (id: string) => void
 }
@@ -95,12 +100,21 @@ export const useMandantStore = create<MandantStore>()((set, get) => ({
     set({ activeId: id })
   },
 
-  addClient: (name, note) => {
+  addClient: (name, note, scope, scopePreset) => {
     const id = `c_${Date.now().toString(36)}`
-    const next = [...readClients(), { id, name, type: 'client' as const, note, createdAt: new Date().toISOString() }]
+    const next = [...readClients(), {
+      id, name, type: 'client' as const, note, scope, scopePreset,
+      createdAt: new Date().toISOString(),
+    }]
     writeClients(next)
     set({ mandanten: allMandanten() })
     return id
+  },
+
+  setScope: (id, scope, scopePreset) => {
+    if (id === HUB_ID || id === DEMO_ID) return
+    writeClients(readClients().map((m) => (m.id === id ? { ...m, scope, scopePreset } : m)))
+    set({ mandanten: allMandanten() })
   },
 
   renameMandant: (id, name, note) => {

@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom'
-import { loadProgress, ALL_STEP_IDS } from '../../store/wizardStore'
+import { loadProgress, getActiveScope } from '../../store/wizardStore'
 
-const TOTAL = ALL_STEP_IDS.length
+
 
 export default function StartBanner() {
   const navigate = useNavigate()
   const done = loadProgress()
+  const TOTAL = getActiveScope().length
   const count = done.size
 
   if (count >= TOTAL) return null

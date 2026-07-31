@@ -6,13 +6,14 @@ import { useRiskStore } from '../../store/riskStore'
 import { useGovernanceStore } from '../../store/governanceStore'
 import { useEnablementStore } from '../../store/enablementStore'
 import { useMeetingsStore } from '../../store/meetingsStore'
-import { useWizardStore } from '../../store/wizardStore'
+import { useWizardStore, SCOPE_PRESETS } from '../../store/wizardStore'
 
 export default function MandantSwitcher() {
   const { mandanten, activeId, setActive, addClient, removeClient } = useMandantStore()
   const [open, setOpen] = useState(false)
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
+  const [newPreset, setNewPreset] = useState(SCOPE_PRESETS[0].key)
   const boxRef = useRef<HTMLDivElement>(null)
 
   const resetCases  = useUseCasesStore((s) => s.resetStore)
@@ -65,8 +66,10 @@ export default function MandantSwitcher() {
   const create = () => {
     const name = newName.trim()
     if (!name) return
-    const id = addClient(name)
+    const preset = SCOPE_PRESETS.find((p) => p.key === newPreset) ?? SCOPE_PRESETS[0]
+    const id = addClient(name, undefined, preset.steps, preset.key)
     setNewName('')
+    setNewPreset(SCOPE_PRESETS[0].key)
     setCreating(false)
     switchTo(id)
   }
@@ -91,7 +94,7 @@ export default function MandantSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50">
+        <div className="absolute right-0 mt-2 w-80 max-h-[80vh] overflow-y-auto bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50">
           <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Mandat wählen</p>
 
           {mandanten.map((m) => {
@@ -155,6 +158,26 @@ export default function MandantSwitcher() {
                   placeholder="Kunde / Projektname"
                   className="w-full border border-slate-200 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Umfang</p>
+                  <div className="space-y-1">
+                    {SCOPE_PRESETS.map((preset) => (
+                      <label key={preset.key}
+                        className={`flex items-start gap-2 rounded-lg border px-2 py-1.5 cursor-pointer transition-colors ${
+                          newPreset === preset.key ? 'border-blue-400 bg-blue-50' : 'border-slate-200 hover:bg-slate-50'
+                        }`}>
+                        <input type="radio" name="scope-preset" checked={newPreset === preset.key}
+                          onChange={() => setNewPreset(preset.key)} className="mt-0.5 flex-shrink-0" />
+                        <span className="min-w-0">
+                          <span className="block text-xs font-semibold text-slate-800">
+                            {preset.label} <span className="font-normal text-slate-400">· {preset.steps.length}</span>
+                          </span>
+                          <span className="block text-[10px] text-slate-500 leading-snug">{preset.hint}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
                 <div className="flex gap-2">
                   <button onClick={create} disabled={!newName.trim()}
                     className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-xs font-semibold py-1.5 rounded-lg transition-colors">

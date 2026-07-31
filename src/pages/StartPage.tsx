@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useMandantStore } from '../store/mandantStore'
-import { useWizardStore, StepId } from '../store/wizardStore'
+import { useMandantStore, MANDANT_STYLE } from '../store/mandantStore'
+import { useWizardStore, StepId, useActiveScope, SCOPE_PRESETS, WORK_STEP_IDS } from '../store/wizardStore'
 
 interface Step {
   id: StepId
@@ -47,7 +47,7 @@ export const STEPS: Step[] = [
     num: 3,
     title: 'EU AI Act verstehen',
     description: 'Verschaffen Sie sich Überblick über Zeitplan, die vier Risikoklassen und die Pflichten je Klasse — bevor Sie eigene Systeme einordnen.',
-    detail: 'Sie können Anwendungsfälle nicht in Risikoklassen einsortieren, die Sie nicht kennen — dieser Schritt ist die Grundlage für Schritt 12. Die Kompetenzpflicht (Art. 4) und die Verbote (Art. 5) gelten bereits seit Februar 2025.',
+    detail: 'Sie können Anwendungsfälle nicht in Risikoklassen einsortieren, die Sie nicht kennen — dieser Schritt ist die Grundlage für die spätere Klassifizierung je Anwendungsfall. Die Kompetenzpflicht (Art. 4) und die Verbote (Art. 5) gelten bereits seit Februar 2025.',
     effort: '~45 Min.',
     to: '/eu-ai-act',
     cta: 'EU AI Act öffnen',
@@ -82,7 +82,7 @@ export const STEPS: Step[] = [
     num: 6,
     title: 'KI-Governance-Richtlinie aufsetzen',
     description: 'Dokumentieren Sie Ihre organisationsweite KI-Richtlinie in 7 Dimensionen: Zweck, Daten, Transparenz, Verantwortung, Risiko, Ethik und Schulung.',
-    detail: 'Die Richtlinie übersetzt EU AI Act, DSGVO und Ihren ethischen Rahmen (Schritte 3–5) in verbindliche Hausregeln. Sie ist unter dem EU AI Act erforderlich und verhindert Schatten-KI-Initiativen.',
+    detail: 'Die Richtlinie übersetzt EU AI Act, DSGVO und Ihren ethischen Rahmen in verbindliche Hausregeln. Sie ist unter dem EU AI Act erforderlich und verhindert Schatten-KI-Initiativen.',
     effort: '~1 Std.',
     to: '/governance',
     cta: 'KI-Governance öffnen',
@@ -104,7 +104,7 @@ export const STEPS: Step[] = [
     num: 8,
     title: 'Stakeholder-Analyse durchführen',
     description: 'Kartieren Sie alle Beteiligten nach Macht und Interesse (Mendelow-Matrix) und leiten Sie daraus die Kommunikationsstrategie je Quadrant ab.',
-    detail: 'Neben den formalen Rollen entscheidet die informelle Machtkarte über Erfolg oder Scheitern. Sie ist außerdem Voraussetzung für die Change-Diagnose in Schritt 19 — politischer Widerstand lässt sich ohne sie nicht erkennen.',
+    detail: 'Neben den formalen Rollen entscheidet die informelle Machtkarte über Erfolg oder Scheitern. Sie ist außerdem Voraussetzung für die Change-Diagnose — politischer Widerstand lässt sich ohne sie nicht erkennen.',
     effort: '~1 Std.',
     to: '/stakeholders',
     cta: 'Stakeholder-Analyse öffnen',
@@ -128,7 +128,7 @@ export const STEPS: Step[] = [
     num: 10,
     title: 'Datenqualität je Fall prüfen',
     description: 'Bewerten Sie die Datengrundlage jedes Kandidaten gegen die sechs Qualitätsdimensionen — zweckbezogen, nicht absolut — und prüfen Sie sie gegen die FAIR-Prinzipien.',
-    detail: 'Datenqualität ist Machbarkeit. Ein RAG-System mit 70 % der Daten kann schlechter sein als keins, wenn die fehlenden 30 % genau die kritischen Fälle abdecken. Diese Prüfung gehört vor die Bewertung — sonst schätzen Sie die Machbarkeit in Schritt 11 falsch ein.',
+    detail: 'Datenqualität ist Machbarkeit. Ein RAG-System mit 70 % der Daten kann schlechter sein als keins, wenn die fehlenden 30 % genau die kritischen Fälle abdecken. Diese Prüfung gehört vor die Bewertung — sonst schätzen Sie die Machbarkeit bei der Bewertung falsch ein.',
     effort: '~30 Min. pro Fall',
     to: '/data',
     cta: 'Daten & Qualität öffnen',
@@ -139,7 +139,7 @@ export const STEPS: Step[] = [
     num: 11,
     title: 'Portfolio bewerten & priorisieren',
     description: 'Füllen Sie das KI-Canvas für jeden Fall aus — Geschäftsnutzen, Machbarkeit, strategische Passung und Dringlichkeit — um ein Prioritätsranking zu errechnen.',
-    detail: 'Priorisierung löst das Problem "der Lauteste gewinnt". Das gewichtete Scoremodell gibt der Führungsebene eine objektive Grundlage für Investitionsentscheidungen — die Machbarkeit ist nach Schritt 10 belastbar.',
+    detail: 'Priorisierung löst das Problem "der Lauteste gewinnt". Das gewichtete Scoremodell gibt der Führungsebene eine objektive Grundlage für Investitionsentscheidungen — die Machbarkeit ist nach der Datenprüfung belastbar.',
     effort: '~30 Min. pro Fall',
     to: '/use-cases',
     cta: 'Anwendungsfälle bewerten',
@@ -150,7 +150,7 @@ export const STEPS: Step[] = [
     num: 12,
     title: 'EU AI Act-Risiko je Fall klassifizieren',
     description: 'Legen Sie das EU AI Act-Risikoniveau (Minimal / Limited / High / Unacceptable) für jeden Anwendungsfall fest und füllen Sie die Datenschutz-Checkliste für Hochrisikofälle aus.',
-    detail: 'Jetzt wenden Sie den Rahmen aus Schritt 3 auf Ihr eigenes Portfolio an. Hochrisiko-Systeme erfordern eine DSFA und zusätzliche Dokumentation — frühzeitige Identifikation vermeidet kostspielige Nachbesserungen.',
+    detail: 'Jetzt wenden Sie den Rahmen des EU AI Act auf Ihr eigenes Portfolio an. Hochrisiko-Systeme erfordern eine DSFA und zusätzliche Dokumentation — frühzeitige Identifikation vermeidet kostspielige Nachbesserungen.',
     effort: '~15 Min. pro Fall',
     to: '/use-cases',
     cta: 'Risikoniveaus prüfen',
@@ -161,7 +161,7 @@ export const STEPS: Step[] = [
     num: 13,
     title: 'Compliance-Projektplan erstellen',
     description: 'Lassen Sie sich für einen eingestuften Anwendungsfall einen maßgeschneiderten Projektplan mit allen Compliance-Aufgaben generieren.',
-    detail: 'Die Klassifizierung allein sagt nur, dass Pflichten bestehen — nicht, welche Aufgaben daraus konkret folgen. Der Plan übersetzt das Ergebnis aus Schritt 12 in eine abarbeitbare Liste.',
+    detail: 'Die Klassifizierung allein sagt nur, dass Pflichten bestehen — nicht, welche Aufgaben daraus konkret folgen. Der Plan übersetzt das Ergebnis der Risikoklassifizierung in eine abarbeitbare Liste.',
     effort: '~30 Min. pro Fall',
     to: '/project-plan',
     cta: 'Projektplan-Generator öffnen',
@@ -242,7 +242,7 @@ export const STEPS: Step[] = [
     num: 20,
     title: 'Team-Schulung planen',
     description: 'Definieren Sie Ihren Schulungsplan nach Zielgruppe, Format, Zeitpunkt und Sprache — und legen Sie fest, wie Sie den Erfolg messen.',
-    detail: 'Schulung wirkt erst ab der Akzeptanzphase. Wer bei Frust und Widerstand schult, verstärkt ihn — deshalb kommt Schritt 19 zuerst. Bei KI-Systemen ist Kirkpatrick-Ebene 3 (Verhalten) der Mindeststandard.',
+    detail: 'Schulung wirkt erst ab der Akzeptanzphase. Wer bei Frust und Widerstand schult, verstärkt ihn — deshalb kommt die Change-Diagnose zuerst. Bei KI-Systemen ist Kirkpatrick-Ebene 3 (Verhalten) der Mindeststandard.',
     effort: '~45 Min.',
     to: '/enablement',
     cta: 'Schulung & Coaching öffnen',
@@ -275,18 +275,32 @@ const PHASE_STYLE: Record<string, { bg: string; border: string; text: string; ba
 // ── Page ───────────────────────────────────────────────────────────────────
 export default function StartPage() {
   const navigate = useNavigate()
-  const activeId = useMandantStore((s) => s.activeId)
+  const activeId  = useMandantStore((s) => s.activeId)
+  const mandanten = useMandantStore((s) => s.mandanten)
+  const setScope  = useMandantStore((s) => s.setScope)
+  const scope     = useActiveScope()
   const { done, toggle, init } = useWizardStore()
   const [expanded, setExpanded] = useState<StepId | null>(null)
+  const [scopeOpen, setScopeOpen] = useState(false)
 
   useEffect(() => { init() }, [activeId, init])
 
-  const completedCount = done.size
-  const totalCount     = STEPS.length
-  const pct            = Math.round((completedCount / totalCount) * 100)
+  const mandant = mandanten.find((m) => m.id === activeId)
+  const isClient = mandant?.type === 'client'
+
+  // Nur Schritte im Umfang des Mandats — fortlaufend neu nummeriert,
+  // damit bei eingeschränktem Umfang keine Lücken entstehen.
+  const scopeSet = new Set<StepId>(scope)
+  const steps = STEPS
+    .filter((s) => scopeSet.has(s.id))
+    .map((s, i) => ({ ...s, num: i + 1 }))
+
+  const completedCount = steps.filter((s) => done.has(s.id)).length
+  const totalCount     = steps.length
+  const pct            = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
 
   // first incomplete step id
-  const nextStep = STEPS.find((s) => !done.has(s.id))
+  const nextStep = steps.find((s) => !done.has(s.id))
 
   return (
     <div className="p-6 space-y-6 max-w-3xl">
@@ -294,9 +308,67 @@ export default function StartPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Einstieg</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Ihr KI-Manager-Playbook — folgen Sie diesen Schritten, um ein solides KI-Programm aufzubauen.
+          {isClient
+            ? 'Die Schritte, die für dieses Kundenmandat gelten — in fachlicher Reihenfolge.'
+            : 'Ihr KI-Manager-Playbook — folgen Sie diesen Schritten, um ein solides KI-Programm aufzubauen.'}
         </p>
       </div>
+
+      {/* Mandat & Umfang */}
+      {mandant && (
+        <div className="bg-white rounded-xl border border-slate-200 px-4 py-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-base leading-none">{MANDANT_STYLE[mandant.type].icon}</span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-slate-800 leading-tight">{mandant.name}</p>
+              <p className="text-[11px] text-slate-400 leading-tight">
+                Umfang: {mandant.scopePreset
+                  ? SCOPE_PRESETS.find((p) => p.key === mandant.scopePreset)?.label ?? 'Individuell'
+                  : isClient ? 'Individuell' : 'Komplettes Programm'} · {totalCount} Schritte
+              </p>
+            </div>
+            {isClient && (
+              <button
+                onClick={() => setScopeOpen((v) => !v)}
+                className="ml-auto text-xs font-semibold text-blue-600 hover:text-blue-500"
+              >
+                {scopeOpen ? 'Schließen' : 'Umfang ändern'}
+              </button>
+            )}
+          </div>
+
+          {isClient && scopeOpen && (
+            <div className="mt-3 pt-3 border-t border-slate-100 space-y-2">
+              {SCOPE_PRESETS.map((preset) => {
+                const isCurrent = mandant.scopePreset === preset.key
+                return (
+                  <button
+                    key={preset.key}
+                    onClick={() => { setScope(mandant.id, preset.steps, preset.key); setScopeOpen(false) }}
+                    className={`w-full text-left rounded-lg border px-3 py-2 transition-colors ${
+                      isCurrent ? 'border-blue-400 bg-blue-50' : 'border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-slate-800">{preset.label}</p>
+                      <span className="text-[10px] text-slate-400">{preset.steps.length} Schritte</span>
+                      {isCurrent && <span className="ml-auto text-[10px] font-bold text-blue-600">aktiv</span>}
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{preset.hint}</p>
+                  </button>
+                )
+              })}
+              <button
+                onClick={() => { setScope(mandant.id, WORK_STEP_IDS, undefined); setScopeOpen(false) }}
+                className="w-full text-left rounded-lg border border-slate-200 hover:bg-slate-50 px-3 py-2"
+              >
+                <p className="text-sm font-semibold text-slate-800">Alle Arbeitsschritte</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Ohne die eigenen Wissensmodule (Rechtsrahmen &amp; Ethik).</p>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Progress bar */}
       <div className="bg-white rounded-xl shadow-sm p-5">
@@ -322,8 +394,8 @@ export default function StartPage() {
       </div>
 
       {/* Steps by phase */}
-      {PHASES.map((phase) => {
-        const phaseSteps  = STEPS.filter((s) => s.phase === phase)
+      {PHASES.filter((phase) => steps.some((s) => s.phase === phase)).map((phase) => {
+        const phaseSteps  = steps.filter((s) => s.phase === phase)
         const phaseDone   = phaseSteps.filter((s) => done.has(s.id)).length
         const style       = PHASE_STYLE[phase]
 
@@ -437,7 +509,7 @@ export default function StartPage() {
 
       {/* Footer note */}
       <p className="text-xs text-slate-400 pb-2">
-        Schritte können in beliebiger Reihenfolge abgeschlossen werden — die obige Sequenz spiegelt den empfohlenen Ansatz für neue KI-Manager wider.
+        Schritte können in beliebiger Reihenfolge abgeschlossen werden — die obige Sequenz spiegelt die fachlichen Abhängigkeiten wider.
         Fortschritt wird automatisch im Browser gespeichert.
       </p>
     </div>
