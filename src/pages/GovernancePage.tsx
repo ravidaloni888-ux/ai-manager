@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useGovernanceStore } from '../store/governanceStore'
 import { useUseCasesStore } from '../store/useCasesStore'
 import { useAuthStore } from '../store/authStore'
@@ -168,8 +168,15 @@ const DEFAULT: GovernanceData = {
 const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-slate-50 disabled:text-slate-400'
 const textareaCls = `${inputCls} resize-none`
 
+// Welcher Reiter gehört zu welchem Assistenten-Schritt?
+const WIZARD_TAB: Record<string, Tab> = { governance: 'richtlinie', roles: 'roles' }
+
 export default function GovernancePage() {
-  const [tab, setTab] = useState<Tab>('steps')
+  const { search } = useLocation()
+  const params = new URLSearchParams(search)
+  const fromWizard = params.get('from') === 'wizard'
+  const wizardTab = fromWizard ? WIZARD_TAB[params.get('step') ?? ''] : undefined
+  const [tab, setTab] = useState<Tab>(wizardTab ?? 'steps')
   const { data, loading, saving, init, save } = useGovernanceStore()
   const { useCases, init: initUseCases } = useUseCasesStore()
   const user = useAuthStore((s) => s.user)
@@ -195,10 +202,10 @@ export default function GovernancePage() {
   }
 
   const TABS: { id: Tab; label: string; badge: string }[] = [
-    { id: 'steps',     label: '9-Step Planning',        badge: `${stepsCount}/9`    },
-    { id: 'richtlinie',label: 'AI Policy',              badge: `${richtCount}/7`    },
-    { id: 'roles',     label: 'Responsible Parties',    badge: `${rolesCount}/5`    },
-    { id: 'checklist', label: 'Privacy Checklist',      badge: `${useCases.length}` },
+    { id: 'richtlinie', label: 'KI-Richtlinie',          badge: `${richtCount}/7`    },
+    { id: 'roles',      label: 'Verantwortlichkeiten',   badge: `${rolesCount}/5`    },
+    { id: 'steps',      label: '9-Schritte-Planung',     badge: `${stepsCount}/9`    },
+    { id: 'checklist',  label: 'Datenschutz-Checkliste', badge: `${useCases.length}` },
     { id: 'aims',       label: 'ISO 42001 AIMS',         badge: `${aimsCount}/7`     },
     { id: 'compliance', label: 'Compliance-Check',       badge: '8'                  },
   ]
@@ -249,9 +256,20 @@ export default function GovernancePage() {
             <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
               tab === t.id ? 'bg-blue-100 text-blue-700' : 'bg-slate-200 text-slate-500'
             }`}>{t.badge}</span>
+            {wizardTab === t.id && (
+              <span className="text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded-full">nötig</span>
+            )}
           </button>
         ))}
       </div>
+
+      {fromWizard && wizardTab && (
+        <p className="text-[11px] text-slate-400 -mt-3">
+          Für diesen Assistenten-Schritt zählt nur <strong className="text-slate-500">
+            {wizardTab === 'richtlinie' ? 'KI-Richtlinie' : 'Verantwortlichkeiten'}
+          </strong>. Die übrigen Reiter sind eigenständige Werkzeuge und gehören nicht zu diesem Schritt.
+        </p>
+      )}
 
       {/* Tab content */}
       {tab === 'steps' && (
