@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { scopedGet, scopedSet } from '../../lib/mandantData'
+import { getMandantType } from '../../store/mandantStore'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Datenschutz-Checks je Anwendungsfall.
@@ -7,6 +9,37 @@ import { useState } from 'react'
 // welcher Anbieter, welche Entscheidungen. Sie gehören deshalb an den
 // Anwendungsfall und nicht auf die allgemeine DSGVO-Seite.
 // ─────────────────────────────────────────────────────────────────────────
+
+interface AvvState {
+  external: boolean | null
+  personalData: boolean | null
+  avvExists: boolean | null
+}
+
+export interface CaseChecks {
+  dsfa: Record<string, boolean>
+  avv: AvvState
+  art22: Record<number, boolean>
+}
+
+const EMPTY_CHECKS: CaseChecks = {
+  dsfa: {},
+  avv: { external: null, personalData: null, avvExists: null },
+  art22: {},
+}
+
+// Antworten liegen je Mandant unter einem Schlüssel, darin je Anwendungsfall.
+const BUCKET = 'casechecks'
+
+function loadChecks(ucId: string): CaseChecks {
+  const all = scopedGet<Record<string, CaseChecks>>(BUCKET, {})
+  return { ...EMPTY_CHECKS, ...(all[ucId] ?? {}) }
+}
+
+function saveChecks(ucId: string, checks: CaseChecks) {
+  const all = scopedGet<Record<string, CaseChecks>>(BUCKET, {})
+  scopedSet(BUCKET, { ...all, [ucId]: checks })
+}
 
 const DSFA_TRIGGERS = [
   { id: 'employees', label: 'Mitarbeiterdaten werden systematisch verarbeitet', risk: true },
@@ -24,10 +57,11 @@ const ART22_CHECKS = [
   'Die Zeit für die menschliche Prüfung ist ausreichend — kein "Fließband-Nicken"',
 ]
 
-function DsfaChecker() {
-  const [checked, setChecked] = useState<Record<string, boolean>>({})
-
-  const toggle = (id: string) => setChecked((prev) => ({ ...prev, [id]: !prev[id] }))
+function DsfaChecker({ checked, setChecked }: {
+  checked: Record<string, boolean>
+  setChecked: (next: Record<string, boolean>) => void
+}) {
+  const toggle = (id: string) => setChecked({ ...checked, [id]: !checked[id] })
   const triggersActive = DSFA_TRIGGERS.filter((t) => checked[t.id]).length
   const required = triggersActive >= 1
 
@@ -78,10 +112,11 @@ function DsfaChecker() {
   )
 }
 
-function AvvChecker() {
-  const [external, setExternal] = useState<boolean | null>(null)
-  const [personalData, setPersonalData] = useState<boolean | null>(null)
-  const [avvExists, setAvvExists] = useState<boolean | null>(null)
+function AvvChecker({ value, onChange }: { value: AvvState; onChange: (next: AvvState) => void }) {
+  const { external, personalData, avvExists } = value
+  const setExternal     = (v: boolean | null) => onChange({ ...value, external: v })
+  const setPersonalData = (v: boolean | null) => onChange({ ...value, personalData: v })
+  const setAvvExists    = (v: boolean | null) => onChange({ ...value, avvExists: v })
 
   const showAvvQuestion = external === true && personalData === true
   const result = showAvvQuestion && avvExists !== null
@@ -92,7 +127,7 @@ function AvvChecker() {
       ? { ok: true, text: external === false ? 'Kein externer Anbieter — kein AVV erforderlich.' : 'Keine personenbezogenen Daten — kein AVV erforderlich.' }
       : null
 
-  const reset = () => { setExternal(null); setPersonalData(null); setAvvExists(null) }
+  const reset = () => onChange({ external: null, personalData: null, avvExists: null })
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -115,7 +150,7 @@ function AvvChecker() {
           <p className="text-sm font-medium text-slate-700 mb-2">Läuft das KI-System auf Servern eines externen Anbieters?</p>
           <div className="flex gap-2">
             {([true, false] as const).map((v) => (
-              <button type="button" key={String(v)} onClick={() => { setExternal(v); setPersonalData(null); setAvvExists(null) }}
+              <button type="button" key={String(v)} onClick={() => onChange({ external: v, personalData: null, avvExists: null })}
                 className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${external === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
                 {v ? 'Ja' : 'Nein'}
               </button>
@@ -129,7 +164,7 @@ function AvvChecker() {
             <p className="text-sm font-medium text-slate-700 mb-2">Werden dabei personenbezogene Daten verarbeitet?</p>
             <div className="flex gap-2">
               {([true, false] as const).map((v) => (
-                <button type="button" key={String(v)} onClick={() => { setPersonalData(v); setAvvExists(null) }}
+                <button type="button" key={String(v)} onClick={() => onChange({ ...value, personalData: v, avvExists: null })}
                   className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${personalData === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
                   {v ? 'Ja' : 'Nein'}
                 </button>
@@ -169,10 +204,11 @@ function AvvChecker() {
   )
 }
 
-function Art22Checker() {
-  const [checked, setChecked] = useState<Record<number, boolean>>({})
-
-  const toggle = (i: number) => setChecked((prev) => ({ ...prev, [i]: !prev[i] }))
+function Art22Checker({ checked, setChecked }: {
+  checked: Record<number, boolean>
+  setChecked: (next: Record<number, boolean>) => void
+}) {
+  const toggle = (i: number) => setChecked({ ...checked, [i]: !checked[i] })
   const passed = ART22_CHECKS.filter((_, i) => checked[i]).length
   const all = ART22_CHECKS.length
 
@@ -239,13 +275,32 @@ function Art22Checker() {
   )
 }
 
-/** Alle drei Fall-Checks — einklappbar, damit das Canvas nicht überladen wirkt. */
-export default function CaseComplianceChecks() {
+/** Alle drei Fall-Checks — einklappbar, Antworten bleiben am Anwendungsfall. */
+export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
   const [open, setOpen] = useState(false)
+  const [checks, setChecks] = useState<CaseChecks>(EMPTY_CHECKS)
+
+  // Im Demo-Mandanten wird nichts geschrieben, sonst je Mandant + Fall
+  const persistent = !!ucId && getMandantType() !== 'demo'
+
+  useEffect(() => {
+    setChecks(ucId ? loadChecks(ucId) : EMPTY_CHECKS)
+  }, [ucId])
+
+  const update = (next: CaseChecks) => {
+    setChecks(next)
+    if (persistent && ucId) saveChecks(ucId, next)
+  }
+
+  const answered =
+    Object.values(checks.dsfa).filter(Boolean).length +
+    Object.values(checks.art22).filter(Boolean).length +
+    (checks.avv.external !== null ? 1 : 0)
 
   return (
     <section className="bg-white rounded-xl shadow-md overflow-hidden">
-      <button type="button"
+      <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-50 transition-colors text-left"
       >
@@ -258,6 +313,11 @@ export default function CaseComplianceChecks() {
             DSFA-Pflicht · AVV · Art. 22 — hilft beim Setzen der Haken oben
           </p>
         </div>
+        {answered > 0 && (
+          <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full flex-shrink-0">
+            {answered} beantwortet
+          </span>
+        )}
         <span className="text-[10px] font-semibold text-slate-400 flex-shrink-0">
           {open ? 'Ausblenden' : 'Prüfen'}
         </span>
@@ -269,11 +329,22 @@ export default function CaseComplianceChecks() {
 
       {open && (
         <div className="border-t border-slate-100 p-5 space-y-4 bg-slate-50/50">
-          <DsfaChecker />
-          <AvvChecker />
-          <Art22Checker />
+          <DsfaChecker
+            checked={checks.dsfa}
+            setChecked={(dsfa) => update({ ...checks, dsfa })}
+          />
+          <AvvChecker
+            value={checks.avv}
+            onChange={(avv) => update({ ...checks, avv })}
+          />
+          <Art22Checker
+            checked={checks.art22}
+            setChecked={(art22) => update({ ...checks, art22 })}
+          />
           <p className="text-[10px] text-slate-400">
-            Orientierungshilfe, kein Ersatz für rechtliche Beratung. Bei Stufe-3-Sachverhalten: DSB oder Anwalt einbinden.
+            {persistent
+              ? 'Antworten werden automatisch zu diesem Anwendungsfall gespeichert. Orientierungshilfe, kein Ersatz für rechtliche Beratung.'
+              : 'Im Demo-Mandanten werden Antworten nicht gespeichert. Orientierungshilfe, kein Ersatz für rechtliche Beratung.'}
           </p>
         </div>
       )}

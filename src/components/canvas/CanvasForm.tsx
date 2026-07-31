@@ -618,7 +618,7 @@ export default function CanvasForm({ existing }: Props) {
         </section>
 
         {/* Fall-Checks: DSFA-Pflicht, AVV, Art. 22 */}
-        <CaseComplianceChecks />
+        <CaseComplianceChecks ucId={existing?.id} />
 
         {/* Section 6: Documentation (Step 9) */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
