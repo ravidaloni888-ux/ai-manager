@@ -463,18 +463,21 @@ export default function UseCaseTable() {
           <tbody className="divide-y divide-slate-200">
             {table.getRowModel().rows.length === 0 && (
               <tr>
-                <td colSpan={columns.length} className="text-center py-12">
-                  <p className="text-slate-500 text-sm font-medium">Noch keine Anwendungsfälle</p>
-                  <p className="text-slate-400 text-xs mt-1">
-                    Legen Sie den ersten an — Titel und Geschäftsproblem genügen für den Start.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/canvas/new')}
-                    className="mt-4 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-                  >
-                    + Anwendungsfall anlegen
-                  </button>
+                <td colSpan={columns.length} className="py-12">
+                  {/* an den linken Rand geheftet — die Tabelle ist breiter als der Bildschirm */}
+                  <div className="sticky left-0 px-8 max-w-lg">
+                    <p className="text-slate-500 text-sm font-medium">Noch keine Anwendungsfälle</p>
+                    <p className="text-slate-400 text-xs mt-1">
+                      Legen Sie den ersten an — Titel und Geschäftsproblem genügen für den Start.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/canvas/new')}
+                      className="mt-4 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                    >
+                      + Anwendungsfall anlegen
+                    </button>
+                  </div>
                 </td>
               </tr>
             )}
