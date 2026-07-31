@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { scopedGet, scopedSet } from '../../lib/mandantData'
 import { getMandantType } from '../../store/mandantStore'
+import { loadCaseChecks, saveCaseChecks } from '../../lib/supabase'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Datenschutz-Checks je Anwendungsfall.
@@ -31,14 +32,33 @@ const EMPTY_CHECKS: CaseChecks = {
 // Antworten liegen je Mandant unter einem Schlüssel, darin je Anwendungsfall.
 const BUCKET = 'casechecks'
 
-function loadChecks(ucId: string): CaseChecks {
+function loadLocal(ucId: string): CaseChecks {
   const all = scopedGet<Record<string, CaseChecks>>(BUCKET, {})
   return { ...EMPTY_CHECKS, ...(all[ucId] ?? {}) }
 }
 
-function saveChecks(ucId: string, checks: CaseChecks) {
+function saveLocal(ucId: string, checks: CaseChecks) {
   const all = scopedGet<Record<string, CaseChecks>>(BUCKET, {})
   scopedSet(BUCKET, { ...all, [ucId]: checks })
+}
+
+/** Beim eigenen Haus liegt der Stand in Supabase, bei Kundenmandaten lokal. */
+async function loadChecks(ucId: string): Promise<CaseChecks> {
+  if (getMandantType() === 'internal') {
+    const remote = await loadCaseChecks(ucId)
+    if (remote) return { ...EMPTY_CHECKS, ...(remote as Partial<CaseChecks>) }
+    // Tabelle fehlt oder noch kein Eintrag — lokaler Stand als Ausgangspunkt
+  }
+  return loadLocal(ucId)
+}
+
+async function saveChecks(ucId: string, checks: CaseChecks) {
+  if (getMandantType() === 'internal') {
+    const ok = await saveCaseChecks(ucId, checks)
+    if (ok) return
+    // Migration noch nicht eingespielt — nicht verlieren, lokal sichern
+  }
+  saveLocal(ucId, checks)
 }
 
 const DSFA_TRIGGERS = [
@@ -285,13 +305,20 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
   const persistent = !!ucId && getMandantType() !== 'demo'
 
   useEffect(() => {
-    setChecks(ucId ? loadChecks(ucId) : EMPTY_CHECKS)
-    setLoaded(true)
+    let aktiv = true
+    setLoaded(false)
+    if (!ucId) { setChecks(EMPTY_CHECKS); setLoaded(true); return }
+    loadChecks(ucId).then((c) => {
+      if (!aktiv) return
+      setChecks(c)
+      setLoaded(true)
+    })
+    return () => { aktiv = false }
   }, [ucId])
 
   // Speichern als Effekt — nicht im Updater, der kann mehrfach laufen
   useEffect(() => {
-    if (loaded && persistent && ucId) saveChecks(ucId, checks)
+    if (loaded && persistent && ucId) void saveChecks(ucId, checks)
   }, [checks, loaded, persistent, ucId])
 
   const answered =

@@ -207,3 +207,31 @@ export async function saveGovernance(g: GovernanceData): Promise<void> {
     updated_at: new Date().toISOString(),
   })
 }
+
+// ── Datenschutz-Checks je Anwendungsfall ──────────────────────────────────
+// Gibt null zurück, wenn die Tabelle fehlt (Migration noch nicht eingespielt) —
+// die Aufrufer weichen dann auf localStorage aus.
+
+export async function loadCaseChecks(useCaseId: string): Promise<unknown | null> {
+  try {
+    const { data, error } = await supabase
+      .from('ai_case_checks')
+      .select('checks')
+      .eq('use_case_id', useCaseId)
+      .maybeSingle()
+    if (error) return null
+    return data?.checks ?? null
+  } catch { return null }
+}
+
+/** true = in Supabase gespeichert, false = Tabelle fehlt oder Fehler */
+export async function saveCaseChecks(useCaseId: string, checks: unknown): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('ai_case_checks').upsert({
+      use_case_id: useCaseId,
+      checks,
+      updated_at: new Date().toISOString(),
+    })
+    return !error
+  } catch { return false }
+}
