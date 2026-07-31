@@ -393,9 +393,17 @@ export default function StartPage() {
           />
         </div>
         {nextStep && (
-          <p className="text-xs text-slate-400 mt-2">
-            Als nächstes: <span className="font-semibold text-slate-600">Schritt {nextStep.num} — {nextStep.title}</span>
-          </p>
+          <div className="flex items-center justify-between gap-4 mt-3">
+            <p className="text-xs text-slate-400 min-w-0">
+              Als nächstes: <span className="font-semibold text-slate-600">Schritt {nextStep.num} — {nextStep.title}</span>
+            </p>
+            <button
+              onClick={() => navigate(`${nextStep.to}?from=wizard&step=${nextStep.id}`)}
+              className="flex-shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+            >
+              Fortsetzen →
+            </button>
+          </div>
         )}
       </div>
 
