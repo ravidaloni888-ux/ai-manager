@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import CaseComplianceChecks from '../compliance/CaseComplianceChecks'
 import { useForm, useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { nanoid } from 'nanoid'
@@ -615,6 +616,9 @@ export default function CanvasForm({ existing }: Props) {
             })}
           </div>
         </section>
+
+        {/* Fall-Checks: DSFA-Pflicht, AVV, Art. 22 */}
+        <CaseComplianceChecks />
 
         {/* Section 6: Documentation (Step 9) */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">

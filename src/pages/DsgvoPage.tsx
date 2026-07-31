@@ -71,14 +71,6 @@ const ARTICLES: Article[] = [
   },
 ]
 
-const DSFA_TRIGGERS = [
-  { id: 'employees', label: 'Mitarbeiterdaten werden systematisch verarbeitet', risk: true },
-  { id: 'profiling', label: 'KI-gestütztes Profiling von Personen findet statt', risk: true },
-  { id: 'new', label: 'Das System wird neu eingesetzt (kein geringfügiges Update)', risk: true },
-  { id: 'decisions', label: 'Das System trifft oder beeinflusst erhebliche Entscheidungen über Personen', risk: true },
-  { id: 'sensitive', label: 'Es werden besondere Kategorien (Gesundheit, Herkunft etc.) verarbeitet', risk: true },
-]
-
 const DREISTUFENMODELL = [
   {
     stufe: 1 as Stufe,
@@ -456,228 +448,8 @@ function ArticleCard({ article }: { article: Article }) {
   )
 }
 
-function DsfaChecker() {
-  const [checked, setChecked] = useState<Record<string, boolean>>({})
 
-  const toggle = (id: string) => setChecked((prev) => ({ ...prev, [id]: !prev[id] }))
-  const triggersActive = DSFA_TRIGGERS.filter((t) => checked[t.id]).length
-  const required = triggersActive >= 1
 
-  return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </span>
-          <div>
-            <p className="text-sm font-semibold text-slate-800">DSFA-Trigger-Check (Art. 35)</p>
-            <p className="text-xs text-slate-500">Prüfe ob eine Datenschutz-Folgenabschätzung erforderlich ist</p>
-          </div>
-        </div>
-      </div>
-      <div className="px-5 py-4 space-y-3">
-        {DSFA_TRIGGERS.map((trigger) => (
-          <label key={trigger.id} className="flex items-start gap-3 cursor-pointer group">
-            <div className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
-              checked[trigger.id] ? 'bg-purple-600 border-purple-600' : 'border-slate-300 group-hover:border-purple-400'
-            }`} onClick={() => toggle(trigger.id)}>
-              {checked[trigger.id] && (
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-              )}
-            </div>
-            <span className="text-sm text-slate-700 leading-relaxed" onClick={() => toggle(trigger.id)}>{trigger.label}</span>
-          </label>
-        ))}
-      </div>
-      {triggersActive > 0 && (
-        <div className={`mx-5 mb-5 px-4 py-3 rounded-lg ${required ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
-          <p className={`text-sm font-semibold ${required ? 'text-red-700' : 'text-green-700'}`}>
-            {required ? '⚠ DSFA erforderlich' : '✓ DSFA wahrscheinlich nicht erforderlich'}
-          </p>
-          <p className={`text-xs mt-1 leading-relaxed ${required ? 'text-red-600' : 'text-green-600'}`}>
-            {required
-              ? `${triggersActive} Auslöser aktiv. Die DSFA muss VOR dem Systemeinsatz durchgeführt werden. Einbeziehung des DSB empfohlen (Dreistufenmodell Stufe 2).`
-              : 'Kein Auslöser aktiv. Beachte: Eine DSFA kann auch bei nicht aufgelisteten Szenarien erforderlich sein.'}
-          </p>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function AvvChecker() {
-  const [external, setExternal] = useState<boolean | null>(null)
-  const [personalData, setPersonalData] = useState<boolean | null>(null)
-  const [avvExists, setAvvExists] = useState<boolean | null>(null)
-
-  const showAvvQuestion = external === true && personalData === true
-  const result = showAvvQuestion && avvExists !== null
-    ? avvExists
-      ? { ok: true, text: 'Rechtmäßig. AVV vorhanden — Voraussetzung für die Verarbeitung ist erfüllt.' }
-      : { ok: false, text: 'Rechtswidrig. Ohne AVV ist die gesamte Verarbeitung rechtswidrig — auch bei namhaften Anbietern.' }
-    : external === false || personalData === false
-      ? { ok: true, text: external === false ? 'Kein externer Anbieter — kein AVV erforderlich.' : 'Keine personenbezogenen Daten — kein AVV erforderlich.' }
-      : null
-
-  const reset = () => { setExternal(null); setPersonalData(null); setAvvExists(null) }
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-            </svg>
-          </span>
-          <div>
-            <p className="text-sm font-semibold text-slate-800">AVV-Pflicht-Check (Art. 28)</p>
-            <p className="text-xs text-slate-500">Prüfe ob ein Auftragsverarbeitungsvertrag erforderlich ist</p>
-          </div>
-        </div>
-      </div>
-      <div className="px-5 py-4 space-y-4">
-        {/* Q1 */}
-        <div>
-          <p className="text-sm font-medium text-slate-700 mb-2">Läuft das KI-System auf Servern eines externen Anbieters?</p>
-          <div className="flex gap-2">
-            {([true, false] as const).map((v) => (
-              <button key={String(v)} onClick={() => { setExternal(v); setPersonalData(null); setAvvExists(null) }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${external === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
-                {v ? 'Ja' : 'Nein'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Q2 */}
-        {external === true && (
-          <div>
-            <p className="text-sm font-medium text-slate-700 mb-2">Werden dabei personenbezogene Daten verarbeitet?</p>
-            <div className="flex gap-2">
-              {([true, false] as const).map((v) => (
-                <button key={String(v)} onClick={() => { setPersonalData(v); setAvvExists(null) }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${personalData === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
-                  {v ? 'Ja' : 'Nein'}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Q3 */}
-        {showAvvQuestion && (
-          <div>
-            <p className="text-sm font-medium text-slate-700 mb-2">Ist ein AVV mit dem Anbieter vorhanden?</p>
-            <div className="flex gap-2">
-              {([true, false] as const).map((v) => (
-                <button key={String(v)} onClick={() => setAvvExists(v)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${avvExists === v ? 'bg-indind-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
-                  {v ? 'Ja' : 'Nein'}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {result && (
-          <div className={`px-4 py-3 rounded-lg ${result.ok ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-            <p className={`text-sm font-semibold ${result.ok ? 'text-green-700' : 'text-red-700'}`}>
-              {result.ok ? '✓' : '✗'} {result.text}
-            </p>
-            {!result.ok && (
-              <p className="text-xs text-red-600 mt-1">→ AVV umgehend mit dem Anbieter abschließen oder System offline nehmen bis AVV vorliegt.</p>
-            )}
-            <button onClick={reset} className="mt-2 text-xs text-slate-500 underline hover:text-slate-700">Neu prüfen</button>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-const ART22_CHECKS = [
-  'Der Mensch erhält alle relevanten Informationen — nicht nur das KI-Ergebnis',
-  'Der Mensch kann die Empfehlung der KI tatsächlich überstimmen (kein sozialer/technischer Druck)',
-  'Die Entscheidung des Menschen wird dokumentiert — nicht nur das KI-Ergebnis',
-  'Es gibt Fälle, in denen Menschen tatsächlich abweichend von der KI entschieden haben',
-  'Die Zeit für die menschliche Prüfung ist ausreichend — kein "Fließband-Nicken"',
-]
-
-function Art22Checker() {
-  const [checked, setChecked] = useState<Record<number, boolean>>({})
-
-  const toggle = (i: number) => setChecked((prev) => ({ ...prev, [i]: !prev[i] }))
-  const passed = ART22_CHECKS.filter((_, i) => checked[i]).length
-  const all = ART22_CHECKS.length
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-slate-800">Art. 22 — Human-in-the-Loop-Qualität</p>
-              <p className="text-xs text-slate-500">EuGH C-634/21: Formale Kontrolle reicht nicht — der Mensch muss tatsächlich entscheiden</p>
-            </div>
-          </div>
-          {passed > 0 && (
-            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${
-              passed === all ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-            }`}>
-              {passed}/{all}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="px-5 py-4">
-        <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-          Prüfe ob dein Human-in-the-Loop-Prozess der Art. 22-Anforderung genügt:
-        </p>
-        <div className="space-y-1">
-          {ART22_CHECKS.map((check, i) => (
-            <label key={i} onClick={() => toggle(i)}
-              className="flex items-start gap-3 py-2.5 border-b border-slate-50 last:border-0 cursor-pointer group hover:bg-slate-50 -mx-5 px-5 rounded transition-colors">
-              <div className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
-                checked[i] ? 'bg-rose-600 border-rose-600' : 'border-slate-300 group-hover:border-rose-400'
-              }`}>
-                {checked[i] && (
-                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                )}
-              </div>
-              <p className={`text-xs leading-relaxed transition-colors ${checked[i] ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
-                {check}
-              </p>
-            </label>
-          ))}
-        </div>
-        {passed === all && (
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
-            <p className="text-xs font-semibold text-green-700">✓ Alle Punkte erfüllt — Human-in-the-Loop-Prozess sieht gut aus</p>
-          </div>
-        )}
-        {passed > 0 && passed < all && (
-          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-            <p className="text-xs font-semibold text-amber-700">⚠ {all - passed} Punkt{all - passed > 1 ? 'e' : ''} noch offen — Prozess überprüfen</p>
-          </div>
-        )}
-        <p className="text-[10px] text-slate-400 mt-4">Diese Checkliste dient der Orientierung. Bei tatsächlichen Art. 22-Sachverhalten: Dreistufenmodell Stufe 3 → DSB/Anwalt.</p>
-      </div>
-    </div>
-  )
-}
 
 function DreistufenmodellSection() {
   const [activeStufe, setActiveStufe] = useState<Stufe>(null)
@@ -740,11 +512,10 @@ function DreistufenmodellSection() {
 export default function DsgvoPage() {
   const { search } = useLocation()
   const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
-  const [activeTab, setActiveTab] = useState<'dreistufen' | 'tools' | 'articles'>('dreistufen')
+  const [activeTab, setActiveTab] = useState<'dreistufen' | 'articles'>('dreistufen')
 
   const tabs: { id: typeof activeTab; label: string }[] = [
     { id: 'dreistufen', label: '🧭 Dreistufen-Assistent' },
-    { id: 'tools', label: 'Compliance-Checks' },
     { id: 'articles', label: 'Artikel-Referenz' },
   ]
 
@@ -851,23 +622,6 @@ export default function DsgvoPage() {
         </div>
       )}
 
-      {/* Tab: Tools */}
-      {activeTab === 'tools' && (
-        <div className="space-y-4">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3.5">
-            <p className="text-sm font-semibold text-amber-900">Diese Checks gelten je Anwendungsfall — nicht einmalig.</p>
-            <p className="text-xs text-amber-800 mt-1 leading-relaxed">
-              Alle drei brauchen ein konkretes System: Welche Daten, welcher Anbieter, welche Entscheidungen?
-              Sie gehören daher in den Schritt <strong>„EU AI Act-Risiko je Fall klassifizieren"</strong> — dort füllen Sie
-              die Datenschutz-Checkliste je Fall aus. Kein Ersatz für rechtliche Beratung.
-            </p>
-          </div>
-          <DsfaChecker />
-          <AvvChecker />
-
-          <Art22Checker />
-        </div>
-      )}
 
       {/* Tab: Dreistufenmodell */}
       {activeTab === 'dreistufen' && (
