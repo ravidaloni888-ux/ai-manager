@@ -183,17 +183,6 @@ export const STEPS: Step[] = [
     cta: 'Risikomanager öffnen',
   },
   {
-    id: 'vendors',
-    phase: 'Risiko & Investition',
-    num: 15,
-    title: 'Anbieter vergleichen & auswählen',
-    description: 'Vergleichen Sie in Frage kommende Anbieter nach Leistungsfähigkeit, Datenschutz und Kosten — und prüfen Sie deren Compliance-Zusagen kritisch.',
-    detail: '"Der Anbieter hält Art. 10 ein, damit sind wir als Betreiber fein" ist falsch — die Vendor-Risk-Transfer-Illusion. Als Betreiber müssen Sie die Einhaltung selbst prüfen und dokumentieren können. Die Auswahl beeinflusst außerdem die Kosten in der Roadmap.',
-    effort: '~1–2 Std.',
-    to: '/vendors',
-    cta: 'Anbietervergleich öffnen',
-  },
-  {
     id: 'roadmap',
     phase: 'Risiko & Investition',
     num: 16,
@@ -249,17 +238,6 @@ export const STEPS: Step[] = [
     effort: '~45 Min.',
     to: '/enablement',
     cta: 'Schulung & Coaching öffnen',
-  },
-  {
-    id: 'meetings',
-    phase: 'Umsetzung & Betrieb',
-    num: 21,
-    title: 'Governance-Meetings etablieren',
-    description: 'Etablieren Sie einen regelmäßigen KI-Lenkungsausschuss, monatliches Portfolio-Review und quartalsweises Strategie-Check-in. Dokumentieren Sie Agenda und Teilnehmende.',
-    detail: 'Nachhaltige KI-Fortschritte erfordern einen Governance-Rhythmus. Ohne geplante Check-ins driftet das Portfolio, und Verantwortlichkeit schwindet innerhalb von 3–6 Monaten. Das ist die Verankerung, die den Wandel dauerhaft macht.',
-    effort: '~20 Min.',
-    to: '/meetings',
-    cta: 'Meetings öffnen',
   },
 ]
 
