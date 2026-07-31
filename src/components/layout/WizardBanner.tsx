@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { STEPS } from '../../pages/StartPage'
-import { useWizardStore } from '../../store/wizardStore'
+import { useWizardStore, useActiveScope } from '../../store/wizardStore'
 
 export default function WizardBanner() {
   const { search } = useLocation()
@@ -11,12 +11,20 @@ export default function WizardBanner() {
   const stepId = params.get('step')
   const [dismissed, setDismissed] = useState(false)
   const { done, toggle } = useWizardStore()
+  const scope = useActiveScope()
 
   if (!fromWizard || dismissed) return null
 
-  const currentStep = STEPS.find((s) => s.id === stepId)
-  const currentIdx  = currentStep ? STEPS.indexOf(currentStep) : -1
-  const nextStep    = STEPS[currentIdx + 1] ?? null
+  // Nur Schritte im Umfang des Mandats, und nur solche mit Ergebnis —
+  // fortlaufend nummeriert wie im Einstieg.
+  const scopeSet = new Set<string>(scope)
+  const steps = STEPS
+    .filter((s) => scopeSet.has(s.id) && s.kind !== 'read')
+    .map((s, i) => ({ ...s, num: i + 1 }))
+
+  const currentIdx  = steps.findIndex((s) => s.id === stepId)
+  const currentStep = currentIdx >= 0 ? steps[currentIdx] : null
+  const nextStep    = currentIdx >= 0 ? steps[currentIdx + 1] ?? null : null
   const isComplete  = currentStep ? done.has(currentStep.id) : false
 
   if (!currentStep) return null
@@ -44,7 +52,7 @@ export default function WizardBanner() {
 
       {/* Progress */}
       <p className="text-xs text-blue-100 flex-shrink-0 hidden sm:block">
-        Schritt {currentStep.num} von {STEPS.length}
+        Schritt {currentStep.num} von {steps.length}
       </p>
 
       {/* Spacer */}

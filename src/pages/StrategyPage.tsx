@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { nanoid } from 'nanoid'
 import { useStrategyStore } from '../store/strategyStore'
@@ -73,6 +74,8 @@ export default function StrategyPage() {
   const { data, loading, saving, init, save } = useStrategyStore()
   const { useCases } = useUseCasesStore()
   const user = useAuthStore((s) => s.user)
+  const { search } = useLocation()
+  const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
   const [tab, setTab] = useState<Tab>('vision')
   const [local, setLocal] = useState<StrategyData>(DEFAULT_STRATEGY)
   const [saved, setSaved] = useState(false)
@@ -125,18 +128,28 @@ export default function StrategyPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="space-y-1.5">
+        <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
+                tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              {t.label}
+              {fromWizard && t.id === 'vision' && (
+                <span className="text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded-full">nötig</span>
+              )}
+            </button>
+          ))}
+        </div>
+        {fromWizard && (
+          <p className="text-[11px] text-slate-400">
+            Für den Assistenten-Schritt zählt nur <strong className="text-slate-500">KI-Vision</strong>. Schwerpunkte, Timeline und Investitionen können Sie später ergänzen.
+          </p>
+        )}
       </div>
 
       {/* Tab content */}
@@ -165,8 +178,45 @@ function KpiCard({ icon, label, value, ok }: { icon: string; label: string; valu
 function VisionTab({ local, setLocal, readonly }: { local: StrategyData; setLocal: (d: StrategyData) => void; readonly: boolean }) {
   const upd = (patch: Partial<StrategyData>) => setLocal({ ...local, ...patch })
 
+  const filledObjectives = local.objectives.filter((o) => (o ?? '').trim().length > 0).length
+  const required = [
+    { label: 'Vision-Statement formuliert',        ok: local.vision.trim().length > 0 },
+    { label: 'Strategischen Horizont gewählt',     ok: !!local.horizon },
+    { label: 'Drei strategische Ziele benannt',    ok: filledObjectives >= 3, partial: `${filledObjectives}/3` },
+    { label: 'Zentrale Herausforderung beschrieben', ok: local.challenge.trim().length > 0 },
+  ]
+  const openCount = required.filter((r) => !r.ok).length
+
   return (
     <div className="space-y-4">
+      {/* Was dieser Schritt braucht */}
+      <div className={`rounded-xl border-2 px-5 py-4 ${openCount === 0 ? 'border-green-300 bg-green-50' : 'border-blue-300 bg-blue-50'}`}>
+        <p className={`text-sm font-bold ${openCount === 0 ? 'text-green-800' : 'text-blue-800'}`}>
+          {openCount === 0 ? '✓ Alles ausgefüllt — Schritt kann abgeschlossen werden' : `Für diesen Schritt auszufüllen — noch ${openCount} offen`}
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 mt-2.5">
+          {required.map((r) => (
+            <div key={r.label} className="flex items-center gap-2">
+              <span className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center border ${
+                r.ok ? 'bg-green-500 border-transparent' : 'border-slate-300 bg-white'
+              }`}>
+                {r.ok && (
+                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                )}
+              </span>
+              <span className={`text-xs ${r.ok ? 'text-slate-500 line-through' : 'text-slate-700'}`}>
+                {r.label}
+                {!r.ok && r.partial && <span className="text-slate-400"> · {r.partial}</span>}
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] text-slate-500 mt-2.5">
+          Nicht vergessen: oben rechts <strong>Speichern</strong>.
+        </p>
+      </div>
       {/* Vision statement */}
       <div className="bg-white rounded-xl shadow-md p-5 space-y-2">
         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">KI-Vision Statement</h3>
