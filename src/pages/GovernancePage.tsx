@@ -7,7 +7,7 @@ import { getDemoMode } from '../store/demoStore'
 import { useIsDemo } from '../store/mandantStore'
 import { GovernanceData, AimsClause, AIUseCase, EU_AI_ACT_BG, EuAiActRisk } from '../types'
 
-type Tab = 'steps' | 'richtlinie' | 'roles' | 'checklist' | 'aims' | 'compliance'
+type Tab = 'richtlinie' | 'roles' | 'checklist' | 'aims' | 'compliance'
 
 const RICHTLINIE_FIELDS: { key: keyof GovernanceData['richtlinie']; title: string; desc: string }[] = [
   { key: 'zweck',                title: 'Purpose & Scope',                desc: 'For what purposes and in which areas may AI be used in the company?' },
@@ -57,99 +57,6 @@ const AIMS_DEFAULT: NonNullable<GovernanceData['aims']> = {
   kl10: { status: 'not_started', note: '' },
 }
 
-const STEPS: { n: number; key: keyof GovernanceData['steps']; title: string; desc: string; details: string[]; link?: { label: string; href: string } }[] = [
-  {
-    n: 1, key: 'step1', title: 'Define goals and use cases',
-    desc: 'Which concrete business problems should AI solve?',
-    details: [
-      'Collect 3–10 prioritised AI use cases from business units',
-      'Define measurable success criteria (KPIs) for each use case',
-      'Score and rank by business impact, feasibility and strategic fit',
-      'Document all use cases in the AI Canvas (this tool)',
-    ],
-  },
-  {
-    n: 2, key: 'step2', title: 'Formulate AI policy',
-    desc: 'Purpose, data, transparency, governance, risk, ethics, training',
-    details: [
-      'Draft the policy across all 7 dimensions (see AI Policy tab)',
-      'Get review and sign-off from Legal, Compliance and C-level',
-      'Publish internally so all employees know the boundaries',
-      'Review annually or after major regulatory changes',
-    ],
-  },
-  {
-    n: 3, key: 'step3', title: 'Data privacy & legal requirements',
-    desc: 'GDPR, EU AI Act — review and document legal foundations',
-    details: [
-      'Classify each use case by EU AI Act risk category (Minimal / Limited / High / Unacceptable)',
-      'Conduct a DPIA (Data Protection Impact Assessment) for high-risk processing under GDPR Art. 35',
-      'Verify GDPR legal basis for all personal data used in AI systems',
-      'Document findings per use case in the Privacy Checklist tab',
-    ],
-    link: { label: 'ICO: How do we do a DPIA? →', href: DPIA_URL },
-  },
-  {
-    n: 4, key: 'step4', title: 'Train employees',
-    desc: 'Build AI competency, establish awareness program',
-    details: [
-      'Identify skill gaps by role (managers, developers, end-users)',
-      'Design role-specific training paths covering the 7 K7.0069 topics',
-      'Appoint AI Champions as peer coaches within each department',
-      'Track completion using the Enablement & Coaching matrix',
-    ],
-  },
-  {
-    n: 5, key: 'step5', title: 'Implement security measures',
-    desc: 'Cybersecurity, access controls, monitoring',
-    details: [
-      'Conduct threat modelling for each AI system (prompt injection, data poisoning, model extraction)',
-      'Define access control per model, data source and environment',
-      'Enable logging and monitoring for all inference calls in production',
-      'Test adversarial robustness before go-live',
-    ],
-  },
-  {
-    n: 6, key: 'step6', title: 'Extend risk management system',
-    desc: 'Integrate AI-specific risks into existing risk framework',
-    details: [
-      'Catalogue AI-specific risks: hallucinations, bias, model drift, vendor lock-in',
-      'Integrate into the enterprise risk register with likelihood and impact ratings',
-      'Define monitoring thresholds and automated alerts',
-      'Establish escalation paths and incident response procedures',
-    ],
-  },
-  {
-    n: 7, key: 'step7', title: 'Assign responsible parties',
-    desc: 'Define AI Owner, DPO, Security, Ethics, Business Sign-off',
-    details: [
-      'Formally appoint AI Owner, DPO, IT Security, Ethics Reviewer and Business Sign-off',
-      'Document in the Responsible Parties tab with names and scope',
-      'Ensure no conflicts of interest (e.g. developer should not be sole auditor)',
-      'Communicate responsibilities to all relevant stakeholders',
-    ],
-  },
-  {
-    n: 8, key: 'step8', title: 'Use pilot phase',
-    desc: 'Roll out use cases incrementally, document learnings',
-    details: [
-      'Select 1–2 low-risk use cases as first pilots',
-      'Define clear success metrics and a time-boxed evaluation period',
-      'Collect structured feedback from users and affected stakeholders',
-      'Document learnings and gate criteria before scaling to production',
-    ],
-  },
-  {
-    n: 9, key: 'step9', title: 'Document steps 1–8',
-    desc: 'Create audit trail, fulfil documentation obligations',
-    details: [
-      'Maintain a central AI governance log with versioned records',
-      'Store policy decisions, risk assessments, training completion and role appointments',
-      'Ensure all records are timestamped and signed off — audit-ready',
-      'Schedule an annual governance review to keep documentation current',
-    ],
-  },
-]
 
 const COMPLIANCE_COLS: { key: keyof AIUseCase; short: string; title: string }[] = [
   { key: 'complianceLegal',         short: 'Legal',       title: 'Compliance with legal requirements (GDPR, EU AI Act)' },
@@ -179,7 +86,7 @@ export default function GovernancePage() {
   const params = new URLSearchParams(search)
   const fromWizard = params.get('from') === 'wizard'
   const wizardTab = fromWizard ? WIZARD_TAB[params.get('step') ?? ''] : undefined
-  const [tab, setTab] = useState<Tab>(wizardTab ?? 'steps')
+  const [tab, setTab] = useState<Tab>(wizardTab ?? 'richtlinie')
   const { data, loading, saving, init, save } = useGovernanceStore()
   const { useCases, init: initUseCases } = useUseCasesStore()
   const user = useAuthStore((s) => s.user)
@@ -192,7 +99,6 @@ export default function GovernancePage() {
   useEffect(() => { initUseCases() }, [initUseCases, demoMode])
   useEffect(() => { if (data) setLocal(data) }, [data])
 
-  const stepsCount   = Object.values(local.steps).filter(Boolean).length
   const richtCount   = Object.values(local.richtlinie).filter((v) => v.trim().length > 0).length
   const rolesCount   = Object.values(local.roles).filter((v) => v.trim().length > 0).length
   const aimsData     = local.aims ?? AIMS_DEFAULT
@@ -207,7 +113,6 @@ export default function GovernancePage() {
   const TABS: { id: Tab; label: string; badge: string }[] = [
     { id: 'richtlinie', label: 'KI-Richtlinie',          badge: `${richtCount}/7`    },
     { id: 'roles',      label: 'Verantwortlichkeiten',   badge: `${rolesCount}/5`    },
-    { id: 'steps',      label: '9-Schritte-Planung',     badge: `${stepsCount}/9`    },
     { id: 'checklist',  label: 'Datenschutz-Checkliste', badge: `${useCases.length}` },
     { id: 'aims',       label: 'ISO 42001 AIMS',         badge: `${aimsCount}/7`     },
     { id: 'compliance', label: 'Compliance-Check',       badge: '8'                  },
@@ -239,8 +144,7 @@ export default function GovernancePage() {
       </div>
 
       {/* KPI row */}
-      <div className="grid grid-cols-3 gap-4">
-        <KpiCard label="Planning Complete"  value={`${stepsCount} / 9`}   pct={stepsCount / 9}   color="blue"   />
+      <div className="grid grid-cols-2 gap-4">
         <KpiCard label="AI Policy Filled"   value={`${richtCount} / 7`}   pct={richtCount / 7}   color="violet" />
         <KpiCard label="Roles Assigned"     value={`${rolesCount} / 5`}   pct={rolesCount / 5}   color="emerald"/>
       </div>
@@ -287,13 +191,6 @@ export default function GovernancePage() {
       </p>
 
       {/* Tab content */}
-      {tab === 'steps' && (
-        <StepsTab
-          steps={local.steps}
-          onChange={(steps) => setLocal((p) => ({ ...p, steps }))}
-          readonly={!user}
-        />
-      )}
       {tab === 'richtlinie' && (
         <RichtlinieTab
           richtlinie={local.richtlinie}
@@ -343,108 +240,6 @@ function KpiCard({ label, value, pct, color }: { label: string; value: string; p
 }
 
 // ─── Steps tab ───────────────────────────────────────────────────────────────
-function StepsTab({ steps, onChange, readonly }: {
-  steps: GovernanceData['steps']
-  onChange: (s: GovernanceData['steps']) => void
-  readonly: boolean
-}) {
-  const [expanded, setExpanded] = useState<Set<string>>(new Set())
-  const done = Object.values(steps).filter(Boolean).length
-  const pct = Math.round((done / 9) * 100)
-
-  const toggle = (key: string) => setExpanded((prev) => {
-    const next = new Set(prev)
-    next.has(key) ? next.delete(key) : next.add(key)
-    return next
-  })
-
-  return (
-    <div className="space-y-4">
-      <div className="bg-white rounded-xl shadow-md p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-slate-700">Strategic AI Deployment Planning</h3>
-          <span className="text-sm font-bold text-blue-700">{pct}%</span>
-        </div>
-        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-5">
-          <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
-        </div>
-        <div className="space-y-2">
-          {STEPS.map((s) => {
-            const checked = steps[s.key]
-            const isExpanded = expanded.has(s.key)
-            return (
-              <div
-                key={s.key}
-                className={`rounded-lg border transition-colors ${
-                  checked ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-100'
-                }`}
-              >
-                {/* Main row */}
-                <div className="flex items-start gap-3 p-3">
-                  <label className="flex items-start gap-3 flex-1 min-w-0 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      disabled={readonly}
-                      onChange={(e) => onChange({ ...steps, [s.key]: e.target.checked })}
-                      className="mt-0.5 w-4 h-4 accent-blue-600 flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                          checked ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'
-                        }`}>{s.n}</span>
-                        <span className={`text-sm font-medium ${checked ? 'text-blue-800' : 'text-slate-700'}`}>{s.title}</span>
-                      </div>
-                      <p className="text-xs text-slate-400 mt-0.5 ml-7">{s.desc}</p>
-                    </div>
-                  </label>
-                  {/* Expand toggle */}
-                  <button
-                    onClick={() => toggle(s.key)}
-                    className="flex-shrink-0 p-1 rounded hover:bg-slate-200/60 transition-colors"
-                    title={isExpanded ? 'Details ausblenden' : 'Details anzeigen'}
-                  >
-                    <svg
-                      className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                      fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Expanded details */}
-                {isExpanded && (
-                  <div className="px-3 pb-3 ml-10">
-                    <ul className="space-y-1.5 border-t border-slate-200/70 pt-2.5">
-                      {s.details.map((d, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-slate-600 leading-snug">
-                          <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${checked ? 'bg-blue-400' : 'bg-slate-300'}`} />
-                          {d}
-                        </li>
-                      ))}
-                    </ul>
-                    {s.link && (
-                      <a
-                        href={s.link.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 mt-2.5 text-xs font-semibold text-blue-600 hover:text-blue-800 underline"
-                      >
-                        {s.link.label}
-                      </a>
-                    )}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // ─── Richtlinie tab ──────────────────────────────────────────────────────────
 function RichtlinieTab({ richtlinie, onChange, readonly }: {
