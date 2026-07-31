@@ -59,9 +59,9 @@ const ART22_CHECKS = [
 
 function DsfaChecker({ checked, setChecked }: {
   checked: Record<string, boolean>
-  setChecked: (next: Record<string, boolean>) => void
+  setChecked: (fn: (prev: Record<string, boolean>) => Record<string, boolean>) => void
 }) {
-  const toggle = (id: string) => setChecked({ ...checked, [id]: !checked[id] })
+  const toggle = (id: string) => setChecked((prev) => ({ ...prev, [id]: !prev[id] }))
   const triggersActive = DSFA_TRIGGERS.filter((t) => checked[t.id]).length
   const required = triggersActive >= 1
 
@@ -206,9 +206,9 @@ function AvvChecker({ value, onChange }: { value: AvvState; onChange: (next: Avv
 
 function Art22Checker({ checked, setChecked }: {
   checked: Record<number, boolean>
-  setChecked: (next: Record<number, boolean>) => void
+  setChecked: (fn: (prev: Record<number, boolean>) => Record<number, boolean>) => void
 }) {
-  const toggle = (i: number) => setChecked({ ...checked, [i]: !checked[i] })
+  const toggle = (i: number) => setChecked((prev) => ({ ...prev, [i]: !prev[i] }))
   const passed = ART22_CHECKS.filter((_, i) => checked[i]).length
   const all = ART22_CHECKS.length
 
@@ -279,18 +279,20 @@ function Art22Checker({ checked, setChecked }: {
 export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
   const [open, setOpen] = useState(false)
   const [checks, setChecks] = useState<CaseChecks>(EMPTY_CHECKS)
+  const [loaded, setLoaded] = useState(false)
 
   // Im Demo-Mandanten wird nichts geschrieben, sonst je Mandant + Fall
   const persistent = !!ucId && getMandantType() !== 'demo'
 
   useEffect(() => {
     setChecks(ucId ? loadChecks(ucId) : EMPTY_CHECKS)
+    setLoaded(true)
   }, [ucId])
 
-  const update = (next: CaseChecks) => {
-    setChecks(next)
-    if (persistent && ucId) saveChecks(ucId, next)
-  }
+  // Speichern als Effekt — nicht im Updater, der kann mehrfach laufen
+  useEffect(() => {
+    if (loaded && persistent && ucId) saveChecks(ucId, checks)
+  }, [checks, loaded, persistent, ucId])
 
   const answered =
     Object.values(checks.dsfa).filter(Boolean).length +
@@ -331,15 +333,15 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
         <div className="border-t border-slate-100 p-5 space-y-4 bg-slate-50/50">
           <DsfaChecker
             checked={checks.dsfa}
-            setChecked={(dsfa) => update({ ...checks, dsfa })}
+            setChecked={(fn) => setChecks((prev) => ({ ...prev, dsfa: fn(prev.dsfa) }))}
           />
           <AvvChecker
             value={checks.avv}
-            onChange={(avv) => update({ ...checks, avv })}
+            onChange={(avv) => setChecks((prev) => ({ ...prev, avv }))}
           />
           <Art22Checker
             checked={checks.art22}
-            setChecked={(art22) => update({ ...checks, art22 })}
+            setChecked={(fn) => setChecks((prev) => ({ ...prev, art22: fn(prev.art22) }))}
           />
           <p className="text-[10px] text-slate-400">
             {persistent
