@@ -337,6 +337,14 @@ export default function ListPage() {
           </p>
         </div>
 
+        <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate('/canvas/new')}
+          className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+        >
+          + Anwendungsfall anlegen
+        </button>
+
         {/* View toggle */}
         <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
           <button
@@ -369,7 +377,8 @@ export default function ListPage() {
           >
             <IconPilot /> Pilot-Auswahl
           </button>
-        </div>
+          </div>
+      </div>
       </div>
 
       <Iso42001RegisterPanel useCases={useCases} />
