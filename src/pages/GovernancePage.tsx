@@ -170,6 +170,9 @@ const textareaCls = `${inputCls} resize-none`
 
 // Welcher Reiter gehört zu welchem Assistenten-Schritt?
 const WIZARD_TAB: Record<string, Tab> = { governance: 'richtlinie', roles: 'roles' }
+// Diese Seite bedient zwei Schritte — beide gehören zum Assistenten.
+const WIZARD_TABS: Tab[] = ['richtlinie', 'roles']
+const TAB_LABEL: Record<string, string> = { richtlinie: 'KI-Richtlinie', roles: 'Verantwortlichkeiten' }
 
 export default function GovernancePage() {
   const { search } = useLocation()
@@ -256,8 +259,11 @@ export default function GovernancePage() {
             <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
               tab === t.id ? 'bg-blue-100 text-blue-700' : 'bg-slate-200 text-slate-500'
             }`}>{t.badge}</span>
-            {wizardTab === t.id && (
-              <span className="text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded-full">nötig</span>
+            {fromWizard && wizardTab === t.id && (
+              <span className="text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded-full">jetzt</span>
+            )}
+            {fromWizard && wizardTab !== t.id && WIZARD_TABS.includes(t.id) && (
+              <span className="text-[9px] font-bold bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded-full">eigener Schritt</span>
             )}
           </button>
         ))}
@@ -265,9 +271,10 @@ export default function GovernancePage() {
 
       {fromWizard && wizardTab && (
         <p className="text-[11px] text-slate-400 -mt-3">
-          Für diesen Assistenten-Schritt zählt nur <strong className="text-slate-500">
-            {wizardTab === 'richtlinie' ? 'KI-Richtlinie' : 'Verantwortlichkeiten'}
-          </strong>. Die übrigen Reiter sind eigenständige Werkzeuge und gehören nicht zu diesem Schritt.
+          Jetzt dran: <strong className="text-slate-500">{TAB_LABEL[wizardTab]}</strong>.
+          {' '}<strong className="text-slate-500">{TAB_LABEL[WIZARD_TABS.find((t) => t !== wizardTab) as string]}</strong>
+          {' '}ist ein eigener Assistenten-Schritt — der kommt gleich danach.
+          Die restlichen Reiter sind eigenständige Werkzeuge und gehören zu keinem Schritt.
         </p>
       )}
 
