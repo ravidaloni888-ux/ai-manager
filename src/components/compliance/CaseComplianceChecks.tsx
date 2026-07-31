@@ -115,7 +115,7 @@ function AvvChecker() {
           <p className="text-sm font-medium text-slate-700 mb-2">Läuft das KI-System auf Servern eines externen Anbieters?</p>
           <div className="flex gap-2">
             {([true, false] as const).map((v) => (
-              <button key={String(v)} onClick={() => { setExternal(v); setPersonalData(null); setAvvExists(null) }}
+              <button type="button" key={String(v)} onClick={() => { setExternal(v); setPersonalData(null); setAvvExists(null) }}
                 className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${external === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
                 {v ? 'Ja' : 'Nein'}
               </button>
@@ -129,7 +129,7 @@ function AvvChecker() {
             <p className="text-sm font-medium text-slate-700 mb-2">Werden dabei personenbezogene Daten verarbeitet?</p>
             <div className="flex gap-2">
               {([true, false] as const).map((v) => (
-                <button key={String(v)} onClick={() => { setPersonalData(v); setAvvExists(null) }}
+                <button type="button" key={String(v)} onClick={() => { setPersonalData(v); setAvvExists(null) }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${personalData === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
                   {v ? 'Ja' : 'Nein'}
                 </button>
@@ -144,7 +144,7 @@ function AvvChecker() {
             <p className="text-sm font-medium text-slate-700 mb-2">Ist ein AVV mit dem Anbieter vorhanden?</p>
             <div className="flex gap-2">
               {([true, false] as const).map((v) => (
-                <button key={String(v)} onClick={() => setAvvExists(v)}
+                <button type="button" key={String(v)} onClick={() => setAvvExists(v)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${avvExists === v ? 'bg-indind-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
                   {v ? 'Ja' : 'Nein'}
                 </button>
@@ -161,7 +161,7 @@ function AvvChecker() {
             {!result.ok && (
               <p className="text-xs text-red-600 mt-1">→ AVV umgehend mit dem Anbieter abschließen oder System offline nehmen bis AVV vorliegt.</p>
             )}
-            <button onClick={reset} className="mt-2 text-xs text-slate-500 underline hover:text-slate-700">Neu prüfen</button>
+            <button type="button" onClick={reset} className="mt-2 text-xs text-slate-500 underline hover:text-slate-700">Neu prüfen</button>
           </div>
         )}
       </div>
@@ -245,7 +245,7 @@ export default function CaseComplianceChecks() {
 
   return (
     <section className="bg-white rounded-xl shadow-md overflow-hidden">
-      <button
+      <button type="button"
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-50 transition-colors text-left"
       >
