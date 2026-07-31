@@ -66,13 +66,13 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/qa" icon={<IconClipboard />} label="KI-Qualitätssicherung" />
           <NavItem to="/change" icon={<IconTrendingUp />} label="Change Management" />
           <NavItem to="/enablement" icon={<IconAcademic />} label="Schulung & Coaching" />
-          <NavItem to="/meetings" icon={<IconCalendar />} label="Regelmäßige Meetings" />
 
           <div className="pt-4" />
 
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
             Mehr
           </p>
+          <NavItem to="/meetings" icon={<IconCalendar />} label="Regelmäßige Meetings" />
           <NavItem to="/roles" icon={<IconUsers />} label="Team & Rollen" />
           <NavItem to="/glossary" icon={<IconSearch />} label="KI-Glossar" />
           <NavItem to="/prompts" icon={<IconStar />} label="Prompt-Bibliothek" />
