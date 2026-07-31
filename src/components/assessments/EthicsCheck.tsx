@@ -138,7 +138,7 @@ export default function EthicsCheck({ value, onChange }: {
           <p className="text-xs text-slate-400 mt-1">Je mehr Kontext, desto präziser die Analyse — Datenquellen, Entscheidungslogik, Zielgruppe.</p>
         </div>
 
-        <button
+        <button type="button"
           onClick={analyze}
           disabled={loading || !text.trim()}
           className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white text-sm font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"

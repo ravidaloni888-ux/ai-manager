@@ -126,7 +126,7 @@ export default function FairCheck({ value, onChange }: {
                     const id = `${p.key}-${i}`
                     const on = !!checked[id]
                     return (
-                      <button key={id} onClick={() => toggle(id)}
+                      <button type="button" key={id} onClick={() => toggle(id)}
                         className={`w-full flex items-start gap-2.5 text-left rounded-lg border px-3 py-2 transition-colors ${on ? `${c.border} ${c.bg}` : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
                         <span className={`w-4 h-4 rounded flex-shrink-0 mt-0.5 flex items-center justify-center border ${on ? `${c.dot} border-transparent` : 'border-slate-300'}`}>
                           {on && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>}

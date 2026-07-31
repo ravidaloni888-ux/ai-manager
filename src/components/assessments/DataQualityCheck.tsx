@@ -168,7 +168,7 @@ export default function DataQualityCheck({ value, onChange }: {
                         <p className="text-[11px] text-slate-500 leading-snug">{d.check}</p>
                       </div>
                     </div>
-                    <button
+                    <button type="button"
                       onClick={() => toggleCritical(d.key)}
                       className={`flex-shrink-0 text-[10px] font-bold px-2 py-1 rounded-md border transition-colors ${st.critical ? 'bg-orange-500 text-white border-orange-500' : 'text-slate-400 border-slate-200 hover:border-orange-300'}`}
                     >
@@ -180,7 +180,7 @@ export default function DataQualityCheck({ value, onChange }: {
                       const m = RATING_META[r]
                       const active = st.rating === r
                       return (
-                        <button key={r} onClick={() => setRating(d.key, r)}
+                        <button type="button" key={r} onClick={() => setRating(d.key, r)}
                           className={`flex-1 text-xs font-semibold py-1.5 rounded-md border transition-colors ${active ? m.activeColor : `bg-white ${m.color} hover:bg-slate-50`}`}>
                           {m.label}
                         </button>

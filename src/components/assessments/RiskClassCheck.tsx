@@ -148,7 +148,7 @@ export default function RiskClassCheck({ value, onChange }: {
           <p className="text-xs text-slate-500 mt-0.5">Beantworte 1–3 Fragen um die Risikoklasse zu ermitteln</p>
         </div>
         {(answeredQuestions.length > 0 || done) && (
-          <button onClick={reset} className="text-xs text-slate-400 hover:text-slate-600 underline flex-shrink-0">
+          <button type="button" onClick={reset} className="text-xs text-slate-400 hover:text-slate-600 underline flex-shrink-0">
             Neu starten
           </button>
         )}
@@ -219,11 +219,11 @@ export default function RiskClassCheck({ value, onChange }: {
                 )}
               </div>
               <div className="flex gap-3">
-                <button onClick={() => answer(currentNode, true)}
+                <button type="button" onClick={() => answer(currentNode, true)}
                   className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors">
                   Ja
                 </button>
-                <button onClick={() => answer(currentNode, false)}
+                <button type="button" onClick={() => answer(currentNode, false)}
                   className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
                   Nein
                 </button>
