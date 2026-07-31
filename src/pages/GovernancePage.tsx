@@ -259,24 +259,32 @@ export default function GovernancePage() {
             <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
               tab === t.id ? 'bg-blue-100 text-blue-700' : 'bg-slate-200 text-slate-500'
             }`}>{t.badge}</span>
-            {fromWizard && wizardTab === t.id && (
-              <span className="text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded-full">jetzt</span>
-            )}
-            {fromWizard && wizardTab !== t.id && WIZARD_TABS.includes(t.id) && (
-              <span className="text-[9px] font-bold bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded-full">eigener Schritt</span>
+            {WIZARD_TABS.includes(t.id) && (
+              wizardTab === t.id ? (
+                <span className="text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded-full">jetzt</span>
+              ) : (
+                <span className="text-[9px] font-bold text-blue-700 border border-blue-300 bg-blue-50 px-1.5 py-0.5 rounded-full">nötig</span>
+              )
             )}
           </button>
         ))}
       </div>
 
-      {fromWizard && wizardTab && (
-        <p className="text-[11px] text-slate-400 -mt-3">
-          Jetzt dran: <strong className="text-slate-500">{TAB_LABEL[wizardTab]}</strong>.
-          {' '}<strong className="text-slate-500">{TAB_LABEL[WIZARD_TABS.find((t) => t !== wizardTab) as string]}</strong>
-          {' '}ist ein eigener Assistenten-Schritt — der kommt gleich danach.
-          Die restlichen Reiter sind eigenständige Werkzeuge und gehören zu keinem Schritt.
-        </p>
-      )}
+      <p className="text-[11px] text-slate-400 -mt-3">
+        {wizardTab ? (
+          <>
+            Jetzt dran: <strong className="text-slate-500">{TAB_LABEL[wizardTab]}</strong>.
+            {' '}Auch nötig: <strong className="text-slate-500">{TAB_LABEL[WIZARD_TABS.find((t) => t !== wizardTab) as string]}</strong>
+            {' '}— eigener Assistenten-Schritt, kommt gleich danach.
+          </>
+        ) : (
+          <>
+            Für den Assistenten nötig: <strong className="text-slate-500">KI-Richtlinie</strong> und
+            {' '}<strong className="text-slate-500">Verantwortlichkeiten</strong> — zwei eigene Schritte.
+          </>
+        )}
+        {' '}Die restlichen Reiter sind eigenständige Werkzeuge und gehören zu keinem Schritt.
+      </p>
 
       {/* Tab content */}
       {tab === 'steps' && (
