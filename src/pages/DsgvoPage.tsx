@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import TheoryBlock from '../components/ui/TheoryBlock'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -736,12 +737,12 @@ function DreistufenmodellSection() {
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function DsgvoPage() {
-  const [activeTab, setActiveTab] = useState<'articles' | 'tools' | 'dreistufen'>('articles')
+  const [activeTab, setActiveTab] = useState<'dreistufen' | 'tools' | 'articles'>('dreistufen')
 
   const tabs: { id: typeof activeTab; label: string }[] = [
-    { id: 'articles', label: 'Artikel-Referenz' },
+    { id: 'dreistufen', label: '🧭 Dreistufen-Assistent' },
     { id: 'tools', label: 'Compliance-Checks' },
-    { id: 'dreistufen', label: 'Dreistufenmodell' },
+    { id: 'articles', label: 'Artikel-Referenz' },
   ]
 
   return (
@@ -858,7 +859,9 @@ export default function DsgvoPage() {
             </p>
           </div>
           <DreistufenWizard />
-          <DreistufenmodellSection />
+          <TheoryBlock title="Das Dreistufenmodell im Detail" hint="Was auf jeder Stufe gilt und wer entscheidet">
+            <DreistufenmodellSection />
+          </TheoryBlock>
         </div>
       )}
 

@@ -48,19 +48,25 @@ export default function AppShell({ children }: AppShellProps) {
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
             KI-Programm
           </p>
+          {/* Reihenfolge folgt den Schritten des Einstiegs-Assistenten */}
           <NavItem to="/strategy" icon={<IconMap />} label="Strategie-Assistent" />
           <NavItem to="/maturity" icon={<IconChartBar />} label="Reifegradcheck" />
+          <NavItem to="/eu-ai-act" icon={<IconFlag />} label="EU AI Act" />
+          <NavItem to="/dsgvo" icon={<IconShield />} label="DSGVO & Datenschutz" />
+          <NavItem to="/ethik" icon={<IconFlag />} label="KI-Ethik" />
           <NavItem to="/governance" icon={<IconBuilding />} label="KI-Governance" />
-          <NavItem to="/data" icon={<IconDatabase />} label="Daten & Qualität" />
-          <NavItem to="/use-cases" icon={<IconList />} label="KI-Anwendungsfälle" />
-          <NavItem to="/risk" icon={<IconAlert />} label="Risikomanager" />
-          <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap-Generator" />
-          <NavItem to="/project-plan" icon={<IconClipboard />} label="Projektplan-Generator" />
-          <NavItem to="/roi" icon={<IconCurrency />} label="ROI-Rechner" />
-          <NavItem to="/enablement" icon={<IconAcademic />} label="Schulung & Coaching" />
-          <NavItem to="/change" icon={<IconTrendingUp />} label="Change Management" />
-          <NavItem to="/meetings" icon={<IconCalendar />} label="Regelmäßige Meetings" />
           <NavItem to="/stakeholders" icon={<IconSitemap />} label="Stakeholder-Analyse" />
+          <NavItem to="/use-cases" icon={<IconList />} label="KI-Anwendungsfälle" />
+          <NavItem to="/data" icon={<IconDatabase />} label="Daten & Qualität" />
+          <NavItem to="/project-plan" icon={<IconClipboard />} label="Projektplan-Generator" />
+          <NavItem to="/risk" icon={<IconAlert />} label="Risikomanager" />
+          <NavItem to="/vendors" icon={<IconSearch />} label="Anbietervergleich" />
+          <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap-Generator" />
+          <NavItem to="/roi" icon={<IconCurrency />} label="ROI-Rechner" />
+          <NavItem to="/qa" icon={<IconClipboard />} label="KI-Qualitätssicherung" />
+          <NavItem to="/change" icon={<IconTrendingUp />} label="Change Management" />
+          <NavItem to="/enablement" icon={<IconAcademic />} label="Schulung & Coaching" />
+          <NavItem to="/meetings" icon={<IconCalendar />} label="Regelmäßige Meetings" />
 
           <div className="pt-4" />
 
@@ -68,13 +74,8 @@ export default function AppShell({ children }: AppShellProps) {
             Mehr
           </p>
           <NavItem to="/roles" icon={<IconUsers />} label="Team & Rollen" />
-          <NavItem to="/vendors" icon={<IconSearch />} label="Anbietervergleich" />
-          <NavItem to="/qa" icon={<IconClipboard />} label="KI-Qualitätssicherung" />
           <NavItem to="/glossary" icon={<IconSearch />} label="KI-Glossar" />
           <NavItem to="/prompts" icon={<IconStar />} label="Prompt-Bibliothek" />
-          <NavItem to="/eu-ai-act" icon={<IconFlag />} label="EU AI Act" />
-          <NavItem to="/dsgvo" icon={<IconShield />} label="DSGVO & Datenschutz" />
-          <NavItem to="/ethik" icon={<IconFlag />} label="KI-Ethik" />
           <NavItem to="/settings" icon={<IconSettings />} label="Einstellungen" />
           <NavItem to="/about" icon={<IconInfo />} label="Über uns" />
         </nav>
