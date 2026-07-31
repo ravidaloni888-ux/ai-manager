@@ -4,7 +4,7 @@ import NavItem from './NavItem'
 import {
   IconDashboard, IconList, IconChartBar, IconMap,
   IconAlert, IconBuilding, IconCurrency, IconFlag, IconSearch,
-  IconBrain, IconPlus, IconSettings, IconAcademic, IconCalendar, IconUsers, IconInfo, IconRocket, IconClipboard, IconStar, IconShield, IconSitemap, IconDatabase, IconTrendingUp,
+  IconBrain, IconSettings, IconAcademic, IconCalendar, IconUsers, IconInfo, IconRocket, IconClipboard, IconStar, IconShield, IconSitemap, IconDatabase, IconTrendingUp,
 } from '../icons/NavIcons'
 import { useAuthStore } from '../../store/authStore'
 import BetaRequestModal from './BetaRequestModal'
@@ -98,14 +98,8 @@ export default function AppShell({ children }: AppShellProps) {
         {/* Top bar */}
         <div className="flex-shrink-0 flex items-center justify-end gap-3 px-6 py-3" style={{ background: '#1a2538' }}>
           <MandantSwitcher />
-          {user ? (
-            <button
-              onClick={() => navigate('/canvas/new')}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
-            >
-              <IconPlus /> Neuer Anwendungsfall
-            </button>
-          ) : (
+          {/* Anwendungsfälle werden auf der Seite selbst angelegt, nicht hier oben. */}
+          {!user && (
             <>
               <button
                 onClick={() => setShowBeta(true)}
