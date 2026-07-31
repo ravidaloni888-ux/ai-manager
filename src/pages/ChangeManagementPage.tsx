@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import TheoryBlock from '../components/ui/TheoryBlock'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Tag 16 · Change Management — Umgang mit Widerständen
@@ -356,7 +357,15 @@ function ModelleTab() {
         <strong>Drei Change-Modelle — unterschiedliche Fokusebenen.</strong> Kotter (Organisation/Transformation), ADKAR (Individuum), Lewin (Team). Sie widersprechen sich nicht — sie ergänzen sich je nach Ebene.
       </div>
 
-      {/* Model overview */}
+      {/* ADKAR interactive tool */}
+      <AdkarTool />
+
+      <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 text-xs text-orange-800 leading-relaxed">
+        <strong>ADKAR-Pointe:</strong> Wer beim skeptischen Werkmeister mit Schulung (Knowledge) beginnt, ohne das <strong>Desire</strong>-Problem gelöst zu haben, verschwendet Ressourcen. Der richtige Einstieg ist das persönliche Gespräch — das Desire-Element. <span className="text-orange-600">Prosci-Modell (Jeff Hiatt, 2006).</span>
+      </div>
+
+      {/* Theorie — bei Bedarf */}
+      <TheoryBlock title="Kotter · ADKAR · Lewin im Überblick" hint="Welches Modell auf welcher Ebene ansetzt">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {[
           { name: 'Kotter', detail: '8 Stufen', focus: 'Transformation (Organisation)', color: 'border-indigo-200 bg-indigo-50 text-indigo-700' },
@@ -370,13 +379,7 @@ function ModelleTab() {
           </div>
         ))}
       </div>
-
-      {/* ADKAR interactive tool */}
-      <AdkarTool />
-
-      <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-3 text-xs text-orange-800 leading-relaxed">
-        <strong>ADKAR-Pointe:</strong> Wer beim skeptischen Werkmeister mit Schulung (Knowledge) beginnt, ohne das <strong>Desire</strong>-Problem gelöst zu haben, verschwendet Ressourcen. Der richtige Einstieg ist das persönliche Gespräch — das Desire-Element. <span className="text-orange-600">Prosci-Modell (Jeff Hiatt, 2006).</span>
-      </div>
+      </TheoryBlock>
 
       {/* Lewin */}
       <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
@@ -571,7 +574,7 @@ function StoryKpiTab() {
 // ── Page ─────────────────────────────────────────────────────────────────
 
 export default function ChangeManagementPage() {
-  const [tab, setTab] = useState<'widerstand' | 'modelle' | 'story'>('widerstand')
+  const [tab, setTab] = useState<'modelle' | 'widerstand' | 'story'>('modelle')
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -587,8 +590,8 @@ export default function ChangeManagementPage() {
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
         {([
+          { id: 'modelle',    label: '🎯 ADKAR-Diagnose' },
           { id: 'widerstand', label: '🛡️ Widerstände' },
-          { id: 'modelle',    label: '🎯 Change-Modelle' },
           { id: 'story',      label: '📖 Story & KPIs' },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}

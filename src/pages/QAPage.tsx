@@ -101,7 +101,7 @@ function AnforderungsGenerator() {
 }
 
 export default function QAPage() {
-  const [tab, setTab] = useState<'tests' | 'ki' | 'abnahme' | 'case' | 'generator'>('tests')
+  const [tab, setTab] = useState<'generator' | 'tests' | 'ki' | 'abnahme' | 'case'>('generator')
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -117,11 +117,11 @@ export default function QAPage() {
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
         {([
+          { id: 'generator', label: '📋 Anforderungs-Generator' },
           { id: 'tests',  label: 'Test-Typen & Methoden' },
           { id: 'ki',     label: 'KI-Besonderheiten' },
           { id: 'abnahme',label: 'Abnahmestrategien' },
           { id: 'case',      label: 'Fallstudie: Vibe Citing' },
-          { id: 'generator', label: '📋 Anforderungs-Generator' },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>

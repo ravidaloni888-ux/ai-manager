@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import TheoryBlock from '../components/ui/TheoryBlock'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Tag 15 · Datenmanagement & -Governance
@@ -125,20 +126,6 @@ function DatenqualitaetTool() {
         <span className="block mt-1 text-xs text-slate-400">Quelle: DAMA DMBOK2 Revised Edition (März 2024)</span>
       </div>
 
-      {/* The 6 dimensions as info cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {QUALITY_DIMENSIONS.map(d => (
-          <div key={d.key} className="bg-white rounded-xl border border-slate-200 p-4 space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{d.icon}</span>
-              <p className="text-sm font-bold text-slate-800">{d.title}</p>
-            </div>
-            <p className="text-xs text-slate-600">{d.frage}</p>
-            <p className="text-[11px] text-slate-400 italic">{d.beispiel}</p>
-          </div>
-        ))}
-      </div>
-
       {/* Assessment tool */}
       <div className="bg-white rounded-xl border-2 border-slate-800 overflow-hidden">
         <div className="px-5 py-3 bg-slate-800 text-white">
@@ -221,6 +208,22 @@ function DatenqualitaetTool() {
           )}
         </div>
       </div>
+
+      {/* Theorie — bei Bedarf */}
+      <TheoryBlock title="Die sechs Dimensionen der Datenqualität" hint="Was jede Dimension bedeutet, mit Beispielen">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {QUALITY_DIMENSIONS.map(d => (
+            <div key={d.key} className="bg-white rounded-xl border border-slate-200 p-4 space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">{d.icon}</span>
+                <p className="text-sm font-bold text-slate-800">{d.title}</p>
+              </div>
+              <p className="text-xs text-slate-600">{d.frage}</p>
+              <p className="text-[11px] text-slate-400 italic">{d.beispiel}</p>
+            </div>
+          ))}
+        </div>
+      </TheoryBlock>
 
       {/* Synthese */}
       <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm text-slate-700 leading-relaxed">
@@ -393,26 +396,6 @@ function FairTab() {
         <span className="block mt-1 text-xs text-slate-400">go-fair.org/fair-principles</span>
       </div>
 
-      {/* Principle info cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {FAIR_PRINCIPLES.map(p => {
-          const c = FAIR_COLORS[p.letter]
-          return (
-            <div key={p.key} className={`bg-white rounded-xl border ${c.border} p-4 space-y-2`}>
-              <div className="flex items-center gap-3">
-                <span className={`w-9 h-9 rounded-lg ${c.bg} ${c.text} text-lg font-bold flex items-center justify-center flex-shrink-0`}>{p.letter}</span>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">{p.title}</p>
-                  <p className="text-xs text-slate-400">{p.bedeutung}</p>
-                </div>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">{p.inhalt}</p>
-              <p className={`text-xs italic leading-relaxed ${c.text} ${c.bg} rounded-lg px-2.5 py-1.5`}>„{p.praxisfrage}"</p>
-            </div>
-          )
-        })}
-      </div>
-
       {/* FAIR Check tool */}
       <div className="bg-white rounded-xl border-2 border-slate-800 overflow-hidden">
         <div className="px-5 py-3 bg-slate-800 text-white flex items-center justify-between">
@@ -472,6 +455,28 @@ function FairTab() {
           )}
         </div>
       </div>
+
+      {/* Theorie — bei Bedarf */}
+      <TheoryBlock title="Die vier FAIR-Prinzipien" hint="Bedeutung und Praxisfrage je Prinzip">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {FAIR_PRINCIPLES.map(p => {
+          const c = FAIR_COLORS[p.letter]
+          return (
+            <div key={p.key} className={`bg-white rounded-xl border ${c.border} p-4 space-y-2`}>
+              <div className="flex items-center gap-3">
+                <span className={`w-9 h-9 rounded-lg ${c.bg} ${c.text} text-lg font-bold flex items-center justify-center flex-shrink-0`}>{p.letter}</span>
+                <div>
+                  <p className="text-sm font-bold text-slate-800">{p.title}</p>
+                  <p className="text-xs text-slate-400">{p.bedeutung}</p>
+                </div>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">{p.inhalt}</p>
+              <p className={`text-xs italic leading-relaxed ${c.text} ${c.bg} rounded-lg px-2.5 py-1.5`}>„{p.praxisfrage}"</p>
+            </div>
+          )
+        })}
+      </div>
+      </TheoryBlock>
     </div>
   )
 }

@@ -7,6 +7,8 @@ interface Step {
   id: StepId
   phase: string
   num: number
+  /** 'read' = reines Nachschlagewerk, gehört nicht in die Aufgabenliste */
+  kind?: 'do' | 'read'
   title: string
   description: string
   detail: string
@@ -45,6 +47,7 @@ export const STEPS: Step[] = [
     id: 'eu-act-basics',
     phase: 'Rechtsrahmen & Ethik',
     num: 3,
+    kind: 'read',
     title: 'EU AI Act verstehen',
     description: 'Verschaffen Sie sich Überblick über Zeitplan, die vier Risikoklassen und die Pflichten je Klasse — bevor Sie eigene Systeme einordnen.',
     detail: 'Sie können Anwendungsfälle nicht in Risikoklassen einsortieren, die Sie nicht kennen — dieser Schritt ist die Grundlage für die spätere Klassifizierung je Anwendungsfall. Die Kompetenzpflicht (Art. 4) und die Verbote (Art. 5) gelten bereits seit Februar 2025.',
@@ -291,9 +294,12 @@ export default function StartPage() {
   // Nur Schritte im Umfang des Mandats — fortlaufend neu nummeriert,
   // damit bei eingeschränktem Umfang keine Lücken entstehen.
   const scopeSet = new Set<StepId>(scope)
-  const steps = STEPS
-    .filter((s) => scopeSet.has(s.id))
+  const inScope = STEPS.filter((s) => scopeSet.has(s.id))
+  // Nur Schritte, bei denen tatsächlich etwas entsteht, sind abhakbare Aufgaben.
+  const steps = inScope
+    .filter((s) => s.kind !== 'read')
     .map((s, i) => ({ ...s, num: i + 1 }))
+  const readSteps = inScope.filter((s) => s.kind === 'read')
 
   const completedCount = steps.filter((s) => done.has(s.id)).length
   const totalCount     = steps.length
@@ -506,6 +512,32 @@ export default function StartPage() {
           </div>
         )
       })}
+
+      {/* Nachschlagewerke — kein Fortschritt, nur Referenz */}
+      {readSteps.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 px-5 py-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Wissensgrundlagen</p>
+          <p className="text-[11px] text-slate-400 mb-3">
+            Nachschlagewerke ohne Fortschritt — hier wird nichts abgehakt, Sie schlagen bei Bedarf nach.
+          </p>
+          <div className="space-y-2">
+            {readSteps.map((step) => (
+              <button
+                key={step.id}
+                onClick={() => navigate(step.to)}
+                className="w-full flex items-center gap-3 text-left border border-slate-100 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors"
+              >
+                <span className="text-base leading-none flex-shrink-0">📖</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-slate-700 leading-tight">{step.title}</p>
+                  <p className="text-[11px] text-slate-400 leading-snug mt-0.5">{step.description}</p>
+                </div>
+                <span className="text-xs text-slate-300 flex-shrink-0">→</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Footer note */}
       <p className="text-xs text-slate-400 pb-2">
