@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { getDemoMode } from './demoStore'
 import { scopedGet, scopedSet, migrateLegacyKeys } from '../lib/mandantData'
 import { getActiveMandant, useMandantStore, allMandanten } from './mandantStore'
+import type { MandantType } from './mandantStore'
 
 export type StepId =
   // Phase 1 · Fundament
@@ -86,15 +87,17 @@ export const SCOPE_PRESETS: ScopePreset[] = [
 ]
 
 /** Schritte, die für den aktiven Mandanten gelten — in fachlicher Reihenfolge. */
-export function resolveScope(scope: string[] | undefined): StepId[] {
-  if (!scope) return ALL_STEP_IDS
+export function resolveScope(scope: string[] | undefined, type?: MandantType): StepId[] {
+  // Ohne gesetzten Umfang: Kundenmandate ohne die eigenen Wissensmodule
+  if (!scope) return type === 'client' ? WORK_STEP_IDS : ALL_STEP_IDS
   const set = new Set(scope)
   // immer entlang der definierten Gesamtreihenfolge, nie in Auswahlreihenfolge
   return ALL_STEP_IDS.filter((id) => set.has(id))
 }
 
 export function getActiveScope(): StepId[] {
-  return resolveScope(getActiveMandant().scope)
+  const m = getActiveMandant()
+  return resolveScope(m.scope, m.type)
 }
 
 /** Reaktive Variante für Komponenten. */
@@ -102,7 +105,7 @@ export function useActiveScope(): StepId[] {
   const activeId = useMandantStore((s) => s.activeId)
   const mandanten = useMandantStore((s) => s.mandanten)
   const m = mandanten.find((x) => x.id === activeId) ?? allMandanten().find((x) => x.id === activeId)
-  return resolveScope(m?.scope)
+  return resolveScope(m?.scope, m?.type)
 }
 
 // Fortschritt wird je Mandant getrennt gespeichert
