@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMandantStore, MANDANT_STYLE } from '../store/mandantStore'
-import { useWizardStore, StepId, useActiveScope, SCOPE_PRESETS, WORK_STEP_IDS } from '../store/wizardStore'
+import { useWizardStore, StepId, useActiveScope, SCOPE_PRESETS, WORK_STEP_IDS, deriveStepNotes } from '../store/wizardStore'
+import { useProfil, useProfilStore } from '../store/mandantProfil'
+import { useUseCasesStore } from '../store/useCasesStore'
+import MandatProfil from '../components/start/MandatProfil'
 
 interface Step {
   id: StepId
@@ -163,11 +166,11 @@ export const STEPS: Step[] = [
     phase: 'Portfolio & Priorisierung',
     num: 13,
     title: 'Compliance-Projektplan erstellen',
-    description: 'Lassen Sie sich für einen eingestuften Anwendungsfall einen maßgeschneiderten Projektplan mit allen Compliance-Aufgaben generieren.',
+    description: 'Der Plan entsteht im Anwendungsfall aus Mandanten-Profil und den dort erledigten Prüfungen — gefragt wird nur noch, was offen ist.',
     detail: 'Die Klassifizierung allein sagt nur, dass Pflichten bestehen — nicht, welche Aufgaben daraus konkret folgen. Der Plan übersetzt das Ergebnis der Risikoklassifizierung in eine abarbeitbare Liste.',
     effort: '~30 Min. pro Fall',
-    to: '/project-plan',
-    cta: 'Projektplan-Generator öffnen',
+    to: '/use-cases',
+    cta: 'Anwendungsfälle öffnen',
   },
 
   // ── Phase 5 · Risiko & Investition ──
@@ -272,10 +275,13 @@ export default function StartPage() {
   const setScope  = useMandantStore((s) => s.setScope)
   const scope     = useActiveScope()
   const { done, toggle, init } = useWizardStore()
+  const profil = useProfil()
+  const initProfil = useProfilStore((p) => p.init)
+  const { useCases } = useUseCasesStore()
   const [expanded, setExpanded] = useState<StepId | null>(null)
   const [scopeOpen, setScopeOpen] = useState(false)
 
-  useEffect(() => { init() }, [activeId, init])
+  useEffect(() => { init(); initProfil() }, [activeId, init, initProfil])
 
   const mandant = mandanten.find((m) => m.id === activeId)
   const isClient = mandant?.type === 'client'
@@ -290,12 +296,21 @@ export default function StartPage() {
     .map((s, i) => ({ ...s, num: i + 1 }))
   const readSteps = inScope.filter((s) => s.kind === 'read')
 
-  const completedCount = steps.filter((s) => done.has(s.id)).length
-  const totalCount     = steps.length
+  // Schritte, die für dieses Mandat nicht greifen — markiert, nicht versteckt
+  const notes = deriveStepNotes({
+    iso42001: profil.iso42001,
+    faelle: useCases.length,
+    hatHochrisiko: useCases.some((uc) => uc.euAiActRisk === 'High Risk' || uc.euAiActRisk === 'Unacceptable Risk'),
+  })
+  const entfallen = steps.filter((s) => notes[s.id]?.entfaellt)
+  const pflicht = steps.filter((s) => !notes[s.id]?.entfaellt)
+
+  const completedCount = pflicht.filter((s) => done.has(s.id)).length
+  const totalCount     = pflicht.length
   const pct            = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
 
   // first incomplete step id
-  const nextStep = steps.find((s) => !done.has(s.id))
+  const nextStep = pflicht.find((s) => !done.has(s.id))
 
   return (
     <div className="p-6 space-y-6 max-w-3xl">
@@ -320,6 +335,7 @@ export default function StartPage() {
                 Umfang: {mandant.scopePreset
                   ? SCOPE_PRESETS.find((p) => p.key === mandant.scopePreset)?.label ?? 'Individuell'
                   : isClient ? 'Individuell' : 'Komplettes Programm'} · {totalCount} Schritte
+                {entfallen.length > 0 && ` · ${entfallen.length} entfallen`}
               </p>
             </div>
             {isClient && (
@@ -364,6 +380,8 @@ export default function StartPage() {
           )}
         </div>
       )}
+
+      <MandatProfil />
 
       {/* Progress bar */}
       <div className="bg-white rounded-xl shadow-sm p-5">
@@ -415,6 +433,8 @@ export default function StartPage() {
             {/* Step cards */}
             <div className="space-y-2">
               {phaseSteps.map((step) => {
+                const note       = notes[step.id]
+                const skipped    = !!note?.entfaellt
                 const isComplete = done.has(step.id)
                 const isNext     = nextStep?.id === step.id
                 const isExpanded = expanded === step.id
@@ -423,7 +443,9 @@ export default function StartPage() {
                   <div
                     key={step.id}
                     className={`bg-white rounded-xl border-2 transition-all ${
-                      isComplete
+                      skipped
+                        ? 'border-slate-100 opacity-60'
+                        : isComplete
                         ? 'border-slate-100 opacity-70'
                         : isNext
                         ? 'border-blue-400 shadow-md'
@@ -460,11 +482,24 @@ export default function StartPage() {
                               <p className={`text-sm font-semibold ${isComplete ? 'line-through text-slate-400' : 'text-slate-800'}`}>
                                 {step.title}
                               </p>
-                              {isNext && (
+                              {isNext && !skipped && (
                                 <span className="text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded-full">Weiter</span>
+                              )}
+                              {skipped && (
+                                <span className="text-[10px] font-bold bg-slate-200 text-slate-500 px-2 py-0.5 rounded-full">entfällt</span>
                               )}
                             </div>
                             <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{step.description}</p>
+                            {note?.grund && (
+                              <p className="text-[11px] text-slate-500 mt-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 leading-relaxed">
+                                <strong className="text-slate-600">Warum entfällt das?</strong> {note.grund}
+                              </p>
+                            )}
+                            {note?.hinweis && (
+                              <p className="text-[11px] text-amber-800 mt-1.5 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 leading-relaxed">
+                                {note.hinweis}
+                              </p>
+                            )}
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span className="text-[10px] text-slate-400 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full whitespace-nowrap">

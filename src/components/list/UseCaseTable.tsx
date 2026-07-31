@@ -231,7 +231,7 @@ export default function UseCaseTable() {
         <div className="flex items-center gap-1">
           <ActionBtn label="✏️" title="Bearbeiten" onClick={() => navigate(`/canvas/${i.row.original.id}`)} />
           <ActionBtn label="📋" title="Duplizieren" onClick={() => duplicateUseCase(i.row.original.id)} />
-          <ActionBtn label="📝" title="Projektplan erstellen" onClick={() => navigate(`/project-plan?ucid=${i.row.original.id}`)} />
+          <ActionBtn label="📝" title="Projektplan erstellen" onClick={() => navigate(`/canvas/${i.row.original.id}`)} />
           <ActionBtn
             label="🗑️"
             title="Löschen"
@@ -569,7 +569,7 @@ export default function UseCaseTable() {
           </button>
           <button
             className="w-full flex items-center gap-2.5 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-            onClick={() => { navigate(`/project-plan?ucid=${contextMenu.row.id}`); setContextMenu(null) }}
+            onClick={() => { navigate(`/canvas/${contextMenu.row.id}`); setContextMenu(null) }}
           >
             <span className="text-base">📝</span> Projektplan erstellen
           </button>

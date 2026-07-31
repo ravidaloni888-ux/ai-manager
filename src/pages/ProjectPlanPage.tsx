@@ -1,12 +1,27 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useUseCasesStore } from '../store/useCasesStore'
+import { getProfil } from '../store/mandantProfil'
+import { loadCaseChecks } from '../lib/supabase'
+import { scopedGet } from '../lib/mandantData'
+import { getMandantType } from '../store/mandantStore'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
 type RiskLevel = 'high' | 'limited' | 'minimal' | null
 type AkteurRolle = 'anbieter' | 'betreiber' | null
 type Step = 'form' | 'questions' | 'plan'
+
+/** Nur die Felder, die der Plan aus den Fallprüfungen braucht. */
+interface CaseChecksShape {
+  avv?: { external: boolean | null; personalData: boolean | null }
+  dsfa?: Record<string, boolean>
+}
+
+function leseLokaleChecks(ucId: string): CaseChecksShape | null {
+  const all = scopedGet<Record<string, CaseChecksShape>>('casechecks', {})
+  return all[ucId] ?? null
+}
 
 interface FormData {
   name: string
@@ -500,39 +515,83 @@ function euAiActRiskToLevel(risk?: string): RiskLevel {
   return null
 }
 
+
+const LEERE_ANTWORTEN: Answers = {
+  akteurRolle: null,
+  riskLevel: null,
+  personalData: null,
+  hrContext: null,
+  externalProvider: null,
+  worksCouncil: null,
+  commercialOutput: null,
+  notifiedBody: null,
+}
+
+/** Index der nächsten unbeantworteten Frage, oder -1 wenn alles beantwortet ist. */
+function naechsteOffeneFrage(a: Answers, ab = 0): number {
+  if (ab <= 0 && a.akteurRolle === null) return 0
+  if (ab <= 1 && a.riskLevel === null) return 1
+  const bqs = getBoolQuestions(a)
+  for (let i = 0; i < bqs.length; i++) {
+    if (2 + i >= ab && a[bqs[i].key] === null) return 2 + i
+  }
+  return -1
+}
+
 export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
   const { useCases } = useUseCasesStore()
   const [step, setStep] = useState<Step>('form')
   const [form, setForm] = useState<FormData>({ name: '', description: '' })
-  const [answers, setAnswers] = useState<Answers>({
-    akteurRolle: null,
-    riskLevel: null,
-    personalData: null,
-    hrContext: null,
-    externalProvider: null,
-    worksCouncil: null,
-    commercialOutput: null,
-    notifiedBody: null,
-  })
+  const [answers, setAnswers] = useState<Answers>(LEERE_ANTWORTEN)
   const [qIndex, setQIndex] = useState(0)
   const [plan, setPlan] = useState<Phase[] | null>(null)
   const [checked, setChecked] = useState<Record<string, boolean>>({})
   const [notes, setNotes] = useState<Record<string, string>>({})
   const [showNote, setShowNote] = useState<Record<string, boolean>>({})
 
-  // Pre-fill from ucid prop
+  // Vorbelegen aus Mandanten-Profil und den Prüfungen am Anwendungsfall —
+  // gefragt wird nur noch, was dort nicht schon beantwortet wurde.
   useEffect(() => {
     if (!ucid) return
     const uc = useCases.find((u) => u.id === ucid)
     if (!uc) return
     setForm({ name: uc.title, description: uc.businessProblem ?? '' })
-    setAnswers((prev) => ({
-      ...prev,
-      riskLevel: euAiActRiskToLevel(uc.euAiActRisk),
-      personalData: uc.compliancePersonalData ?? null,
-    }))
-    setQIndex(0)
-    setStep('questions')
+
+    let aktiv = true
+    const profil = getProfil()
+
+    const uebernehmen = (checks: CaseChecksShape | null) => {
+      if (!aktiv) return
+      const avv = checks?.avv
+      const dsfa = checks?.dsfa
+      const merged: Answers = {
+        ...LEERE_ANTWORTEN,
+        akteurRolle:      profil.rolle ?? null,
+        worksCouncil:     profil.betriebsrat ?? null,
+        riskLevel:        euAiActRiskToLevel(uc.euAiActRisk),
+        personalData:     avv?.personalData ?? uc.compliancePersonalData ?? null,
+        externalProvider: avv?.external ?? null,
+        hrContext:        dsfa?.employees ?? null,
+      }
+      setAnswers(merged)
+      const i = naechsteOffeneFrage(merged)
+      if (i < 0) {
+        // Alles schon aus Profil und Prüfungen bekannt — Plan direkt erzeugen
+        setPlan(generatePlan({ name: uc.title, description: uc.businessProblem ?? '' }, merged))
+        setStep('plan')
+        return
+      }
+      setQIndex(i)
+      setStep('questions')
+    }
+
+    const type = getMandantType()
+    if (type === 'internal') {
+      loadCaseChecks(ucid).then((r) => uebernehmen((r as CaseChecksShape) ?? leseLokaleChecks(ucid)))
+    } else {
+      uebernehmen(leseLokaleChecks(ucid))
+    }
+    return () => { aktiv = false }
   }, [ucid, useCases])
 
   const totalItems = plan?.reduce((sum, p) => sum + p.items.length, 0) ?? 0
@@ -543,36 +602,27 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
 
   const startQuestions = () => {
     if (!form.name.trim()) return
-    setQIndex(0)
+    const i = naechsteOffeneFrage(answers)
+    if (i < 0) { weiter(answers, 0); return }
+    setQIndex(i)
     setStep('questions')
   }
 
-  const answerRolle = (rolle: AkteurRolle) => {
-    setAnswers((a) => ({ ...a, akteurRolle: rolle }))
-    setQIndex(1)
-  }
-
-  const answerRisk = (level: RiskLevel) => {
-    setAnswers((a) => ({ ...a, riskLevel: level }))
-    setQIndex(2)
-  }
-
-  const answerBool = (key: keyof Answers, val: boolean) => {
-    const next = { ...answers, [key]: val }
+  /** Zur nächsten offenen Frage — oder Plan erzeugen, wenn keine mehr offen ist. */
+  const weiter = (next: Answers, ab: number) => {
     setAnswers(next)
-    const bqs = getBoolQuestions(next)
-    const boolIdx = qIndex - 2  // qIndex 0=Rolle, 1=Risiko, 2+=Bool
-    if (boolIdx < bqs.length - 1) {
-      setQIndex(qIndex + 1)
-    } else {
-      const generated = generatePlan(form, next)
-      setPlan(generated)
-      setChecked({})
-      setNotes({})
-      setShowNote({})
-      setStep('plan')
-    }
+    const i = naechsteOffeneFrage(next, ab)
+    if (i >= 0) { setQIndex(i); return }
+    setPlan(generatePlan(form, next))
+    setChecked({})
+    setNotes({})
+    setShowNote({})
+    setStep('plan')
   }
+
+  const answerRolle = (rolle: AkteurRolle) => weiter({ ...answers, akteurRolle: rolle }, 1)
+  const answerRisk  = (level: RiskLevel)  => weiter({ ...answers, riskLevel: level }, 2)
+  const answerBool  = (key: keyof Answers, val: boolean) => weiter({ ...answers, [key]: val }, qIndex + 1)
 
   const reset = () => {
     setStep('form')

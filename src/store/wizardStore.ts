@@ -38,7 +38,6 @@ export const ROUTE_STEPS: Record<string, StepId[]> = {
   '/stakeholders': ['stakeholders'],
   '/use-cases':    ['usecases', 'score', 'eu-act'],
   '/data':         ['data-integrity'],
-  '/project-plan': ['project-plan'],
   '/risk':         ['risks'],
   '/roadmap':      ['roadmap'],
   '/roi':          ['roi'],
@@ -142,3 +141,51 @@ export const useWizardStore = create<WizardStore>()((set, get) => ({
     set({ done: next })
   },
 }))
+
+// ── Welche Schritte greifen für dieses Mandat? ───────────────────────────
+//
+// Schritte werden nie versteckt, nur als "entfällt" markiert — mit Grund und
+// weiterhin offenbar. Eine Einstufung kann sich ändern; verschwundene Schritte
+// wären dann stillschweigend weg.
+
+export interface StepNote {
+  entfaellt?: boolean
+  /** Warum der Schritt entfällt — wird dem Nutzer angezeigt */
+  grund?: string
+  /** Zusatzhinweis ohne Entfall */
+  hinweis?: string
+}
+
+interface RelevanceInput {
+  iso42001?: 'ja' | 'nein' | 'spaeter'
+  /** Anzahl erfasster Anwendungsfälle */
+  faelle: number
+  /** Ist mindestens ein Fall als Hochrisiko oder inakzeptabel eingestuft? */
+  hatHochrisiko: boolean
+}
+
+export function deriveStepNotes(input: RelevanceInput): Partial<Record<StepId, StepNote>> {
+  const notes: Partial<Record<StepId, StepNote>> = {}
+
+  // Solange nichts erfasst ist, lässt sich nichts ableiten — alles bleibt offen.
+  const bewertbar = input.faelle > 0
+
+  if (bewertbar && !input.hatHochrisiko) {
+    notes.risks = {
+      entfaellt: true,
+      grund: 'Kein Anwendungsfall ist als Hochrisiko eingestuft — ein förmliches Risikoregister ist nicht vorgeschrieben. Sobald ein Fall auf Hochrisiko wechselt, wird der Schritt wieder fällig.',
+    }
+    notes['data-integrity'] = {
+      entfaellt: true,
+      grund: 'Die Protokollierungspflicht nach Art. 12 EU AI Act greift nur bei Hochrisiko-Systemen. Als gute Praxis bleibt der Schritt sinnvoll — Sie können ihn jederzeit öffnen.',
+    }
+  }
+
+  if (input.iso42001 === 'nein') {
+    notes.governance = {
+      hinweis: 'ISO 42001 ist für dieses Mandat nicht angestrebt — der AIMS-Reiter auf der Governance-Seite ist für Sie nicht relevant.',
+    }
+  }
+
+  return notes
+}

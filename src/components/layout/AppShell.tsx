@@ -58,7 +58,6 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/stakeholders" icon={<IconSitemap />} label="Stakeholder-Analyse" />
           <NavItem to="/use-cases" icon={<IconList />} label="KI-Anwendungsfälle" />
           <NavItem to="/data" icon={<IconDatabase />} label="Daten & Qualität" />
-          <NavItem to="/project-plan" icon={<IconClipboard />} label="Projektplan-Generator" />
           <NavItem to="/risk" icon={<IconAlert />} label="Risikomanager" />
           <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap-Generator" />
           <NavItem to="/roi" icon={<IconCurrency />} label="ROI-Rechner" />
