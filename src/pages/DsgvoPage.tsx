@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import TheoryBlock from '../components/ui/TheoryBlock'
+import { useLocation } from 'react-router-dom'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -737,6 +738,8 @@ function DreistufenmodellSection() {
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function DsgvoPage() {
+  const { search } = useLocation()
+  const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
   const [activeTab, setActiveTab] = useState<'dreistufen' | 'tools' | 'articles'>('dreistufen')
 
   const tabs: { id: typeof activeTab; label: string }[] = [
@@ -778,9 +781,18 @@ export default function DsgvoPage() {
               activeTab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}>
             {t.label}
+            {fromWizard && t.id === 'dreistufen' && (
+              <span className="ml-1.5 text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.5 rounded-full">nötig</span>
+            )}
           </button>
         ))}
       </div>
+
+      {fromWizard && (
+        <p className="text-[11px] text-slate-400 -mt-2">
+          Für den Assistenten-Schritt zählt der <strong className="text-slate-500">Dreistufen-Assistent</strong>. Die Compliance-Checks führen Sie später pro Anwendungsfall durch.
+        </p>
+      )}
 
       {/* Tab: Articles */}
       {activeTab === 'articles' && (
@@ -842,7 +854,14 @@ export default function DsgvoPage() {
       {/* Tab: Tools */}
       {activeTab === 'tools' && (
         <div className="space-y-4">
-          <p className="text-sm text-slate-500">Interaktive Checks für häufige Compliance-Fragen — kein Ersatz für rechtliche Beratung.</p>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3.5">
+            <p className="text-sm font-semibold text-amber-900">Diese Checks gelten je Anwendungsfall — nicht einmalig.</p>
+            <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+              Alle drei brauchen ein konkretes System: Welche Daten, welcher Anbieter, welche Entscheidungen?
+              Sie gehören daher in den Schritt <strong>„EU AI Act-Risiko je Fall klassifizieren"</strong> — dort füllen Sie
+              die Datenschutz-Checkliste je Fall aus. Kein Ersatz für rechtliche Beratung.
+            </p>
+          </div>
           <DsfaChecker />
           <AvvChecker />
 

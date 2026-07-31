@@ -153,7 +153,7 @@ export const STEPS: Step[] = [
     num: 12,
     title: 'EU AI Act-Risiko je Fall klassifizieren',
     description: 'Legen Sie das EU AI Act-Risikoniveau (Minimal / Limited / High / Unacceptable) für jeden Anwendungsfall fest und füllen Sie die Datenschutz-Checkliste für Hochrisikofälle aus.',
-    detail: 'Jetzt wenden Sie den Rahmen des EU AI Act auf Ihr eigenes Portfolio an. Hochrisiko-Systeme erfordern eine DSFA und zusätzliche Dokumentation — frühzeitige Identifikation vermeidet kostspielige Nachbesserungen.',
+    detail: 'Jetzt wenden Sie den Rahmen des EU AI Act auf Ihr eigenes Portfolio an. Hochrisiko-Systeme erfordern eine DSFA und zusätzliche Dokumentation — frühzeitige Identifikation vermeidet kostspielige Nachbesserungen. Hilfsmittel dafür: die Compliance-Checks unter DSGVO & Datenschutz (DSFA-Pflicht, AVV, Art. 22).',
     effort: '~15 Min. pro Fall',
     to: '/use-cases',
     cta: 'Risikoniveaus prüfen',
