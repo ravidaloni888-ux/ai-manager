@@ -60,7 +60,6 @@ export default function AppShell({ children }: AppShellProps) {
           <NavItem to="/data" icon={<IconDatabase />} label="Daten & Qualität" />
           <NavItem to="/project-plan" icon={<IconClipboard />} label="Projektplan-Generator" />
           <NavItem to="/risk" icon={<IconAlert />} label="Risikomanager" />
-          <NavItem to="/vendors" icon={<IconSearch />} label="Anbietervergleich" />
           <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap-Generator" />
           <NavItem to="/roi" icon={<IconCurrency />} label="ROI-Rechner" />
           <NavItem to="/qa" icon={<IconClipboard />} label="KI-Qualitätssicherung" />
@@ -72,6 +71,7 @@ export default function AppShell({ children }: AppShellProps) {
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
             Mehr
           </p>
+          <NavItem to="/vendors" icon={<IconSearch />} label="Anbietervergleich" />
           <NavItem to="/meetings" icon={<IconCalendar />} label="Regelmäßige Meetings" />
           <NavItem to="/roles" icon={<IconUsers />} label="Team & Rollen" />
           <NavItem to="/glossary" icon={<IconSearch />} label="KI-Glossar" />
