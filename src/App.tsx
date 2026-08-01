@@ -17,6 +17,7 @@ import RoiPage from './pages/RoiPage'
 import RoadmapPage from './pages/RoadmapPage'
 import VendorPage from './pages/VendorPage'
 import StartPage from './pages/StartPage'
+import GuidePage from './pages/GuidePage'
 import QAPage from './pages/QAPage'
 import GlossaryPage from './pages/GlossaryPage'
 import PromptLibraryPage from './pages/PromptLibraryPage'
@@ -93,6 +94,7 @@ function AppRoutes() {
               <Route path="/roadmap" element={<RoadmapPage />} />
               <Route path="/vendors" element={<VendorPage />} />
               <Route path="/start" element={<StartPage />} />
+              <Route path="/guide" element={<GuidePage />} />
               <Route path="/qa" element={<QAPage />} />
               <Route path="/glossary" element={<GlossaryPage />} />
               <Route path="/prompts" element={<PromptLibraryPage />} />

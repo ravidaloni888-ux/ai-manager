@@ -15,6 +15,8 @@ interface Step {
   title: string
   description: string
   detail: string
+  /** Was genau einzutragen ist — die Punkte, die der geführte Modus abfragt */
+  eingaben?: string[]
   effort: string
   to: string
   cta: string
@@ -29,6 +31,12 @@ export const STEPS: Step[] = [
     title: 'KI-Vision definieren',
     description: 'Legen Sie die strategische Ausrichtung fest — Zeithorizont, 3 Kernziele und die Wettbewerbsherausforderung, die den KI-Einsatz antreibt.',
     detail: 'Eine klare Vision richtet die Organisation aus und gibt jeder Anwendungsfallentscheidung einen "Nordstern". Ohne sie zerfallen KI-Bemühungen in isolierte Experimente, die sich nie verstärken.',
+    eingaben: [
+      'Zeithorizont der Vision (z. B. 3 Jahre)',
+      'Drei Kernziele, je in einem Satz',
+      'Die Wettbewerbsherausforderung, die KI beantworten soll',
+      'Schwerpunktbereiche mit Zielbild',
+    ],
     effort: '~30 Min.',
     to: '/strategy',
     cta: 'Strategie-Assistent öffnen',
@@ -40,6 +48,10 @@ export const STEPS: Step[] = [
     title: 'KI-Reifegrad einschätzen',
     description: 'Schließen Sie die Reifegradbeurteilung ab, um zu verstehen, wo Ihre Organisation in Bezug auf Daten, Talente, Tools und Governance steht.',
     detail: 'Der Reifegradscore zeigt, welche Anwendungsfälle heute realistisch sind und wo Sie investieren müssen, bevor Sie skalieren. Er verhindert Überversprechen gegenüber Stakeholdern.',
+    eingaben: [
+      'Je Dimension (Daten, Talente, Technologie, Governance, Kultur) eine Reifestufe 1–5',
+      'Kurze Begründung, woran Sie die Stufe festmachen',
+    ],
     effort: '~45 Min.',
     to: '/maturity',
     cta: 'Bewertung starten',
@@ -65,6 +77,10 @@ export const STEPS: Step[] = [
     title: 'DSGVO-Grundlagen klären',
     description: 'Marktortprinzip, Rechtsgrundlagen der Verarbeitung, Auftragsverarbeitung und die Anforderungen an eine Datenschutz-Folgenabschätzung (DSFA).',
     detail: 'KI-Systeme verarbeiten fast immer personenbezogene Daten. Ohne saubere Rechtsgrundlage und AVV ist ein Projekt rechtswidrig — unabhängig davon, wie gut es funktioniert. Diese Basis brauchen Sie für die Governance-Richtlinie und die Fallprüfung.',
+    eingaben: [
+      'Die Dreistufen-Prüfung für Ihr Haus durchgehen',
+      'Festhalten, welche Rechtsgrundlage Sie üblicherweise heranziehen',
+    ],
     effort: '~45 Min.',
     to: '/dsgvo',
     cta: 'DSGVO & Datenschutz öffnen',
@@ -76,6 +92,10 @@ export const STEPS: Step[] = [
     title: 'Ethischen Maßstab erarbeiten',
     description: 'FAST-Prinzipien, SUM-Werte und das Drei-Zonen-Modell als Maßstab für die spätere Bewertung einzelner Vorhaben.',
     detail: 'Legal ist nicht gleich vertretbar. Hier erarbeiten Sie den Maßstab; angewendet wird er später je Anwendungsfall unter „Prüfungen zu diesem Fall". Festgeschrieben wird er in der Ethik-Dimension Ihrer Governance-Richtlinie — ohne diesen Schritt füllen Sie die dort ins Blaue.',
+    eingaben: [
+      'Den ethischen Maßstab für Ihr Haus festlegen (FAST/SUM, Drei-Zonen)',
+      'Notieren, welche Zone für Sie tabu ist',
+    ],
     effort: '~30 Min.',
     to: '/ethik',
     cta: 'KI-Ethik öffnen',
@@ -89,6 +109,10 @@ export const STEPS: Step[] = [
     title: 'KI-Governance-Richtlinie aufsetzen',
     description: 'Dokumentieren Sie Ihre organisationsweite KI-Richtlinie in 7 Dimensionen: Zweck, Daten, Transparenz, Verantwortung, Risiko, Ethik und Schulung.',
     detail: 'Die Richtlinie übersetzt EU AI Act, DSGVO und Ihren ethischen Rahmen in verbindliche Hausregeln. Sie ist unter dem EU AI Act erforderlich und verhindert Schatten-KI-Initiativen.',
+    eingaben: [
+      'Je Dimension (Zweck, Daten, Transparenz, Verantwortung, Risiko, Ethik, Schulung) die Hausregel formulieren',
+      'Geltungsbereich und Inkrafttreten eintragen',
+    ],
     effort: '~1 Std.',
     to: '/governance',
     cta: 'KI-Governance öffnen',
@@ -100,6 +124,12 @@ export const STEPS: Step[] = [
     title: 'Rollen & Verantwortlichkeiten zuweisen',
     description: 'Benennen Sie KI-Verantwortlichen, Datenschutzbeauftragten, Data Owner, Ethik-Prüfer und weitere Schlüsselrollen — und dokumentieren Sie, wer wofür verantwortlich ist.',
     detail: 'Der EU AI Act erfordert benannte Verantwortlichkeit. Wichtig: Die KI-Beauftragte verantwortet den Prozess, die fachliche Datenverantwortung liegt bei den Data Ownern im Fachbereich.',
+    eingaben: [
+      'KI-Verantwortliche:n benennen',
+      'Datenschutzbeauftragte:n benennen',
+      'Data Owner je Fachbereich benennen',
+      'Ethik-Prüfer:in benennen',
+    ],
     effort: '~20 Min.',
     to: '/governance',
     cta: 'Rollen zuweisen',
@@ -111,6 +141,11 @@ export const STEPS: Step[] = [
     title: 'Stakeholder-Analyse durchführen',
     description: 'Kartieren Sie alle Beteiligten nach Macht und Interesse (Mendelow-Matrix) und leiten Sie daraus die Kommunikationsstrategie je Quadrant ab.',
     detail: 'Neben den formalen Rollen entscheidet die informelle Machtkarte über Erfolg oder Scheitern. Sie ist außerdem Voraussetzung für die Change-Diagnose — politischer Widerstand lässt sich ohne sie nicht erkennen.',
+    eingaben: [
+      'Alle Beteiligten erfassen',
+      'Je Person Macht und Interesse einschätzen',
+      'Kommunikationsstrategie je Quadrant ableiten',
+    ],
     effort: '~1 Std.',
     to: '/stakeholders',
     cta: 'Stakeholder-Analyse öffnen',
@@ -124,6 +159,11 @@ export const STEPS: Step[] = [
     title: 'KI-Anwendungsfälle inventarisieren',
     description: 'Fügen Sie jede KI-Initiative — in Betrieb, in Evaluierung oder nur eine Idee — zum Portfolio hinzu. Inkl. Abteilung, Status und kurzer Problembeschreibung.',
     detail: 'Man kann nur managen, was man sieht. Viele Organisationen entdecken in dieser Phase Schatten-KI-Projekte — Initiativen, die ohne Governance oder Risikoprüfung laufen.',
+    eingaben: [
+      'Je Initiative: Titel, Abteilung, Status',
+      'Kurze Problembeschreibung',
+      'Auch laufende und nur angedachte Vorhaben aufnehmen',
+    ],
     effort: '~1–2 Std.',
     to: '/use-cases',
     cta: 'Anwendungsfälle öffnen',
@@ -135,6 +175,11 @@ export const STEPS: Step[] = [
     title: 'Datenqualität je Fall prüfen',
     description: 'Bewerten Sie die Datengrundlage jedes Kandidaten gegen die sechs Qualitätsdimensionen und die FAIR-Prinzipien — im Anwendungsfall unter „Prüfungen zu diesem Fall".',
     detail: 'Datenqualität ist Machbarkeit. Ein RAG-System mit 70 % der Daten kann schlechter sein als keins, wenn die fehlenden 30 % genau die kritischen Fälle abdecken. Diese Prüfung gehört vor die Bewertung — sonst schätzen Sie die Machbarkeit bei der Bewertung falsch ein.',
+    eingaben: [
+      'Je Fall die sechs Qualitätsdimensionen bewerten',
+      'Je Fall die FAIR-Prinzipien prüfen',
+      '(im Anwendungsfall unter „Prüfungen zu diesem Fall")',
+    ],
     effort: '~30 Min. pro Fall',
     to: '/use-cases',
     cta: 'Anwendungsfälle öffnen',
@@ -146,6 +191,10 @@ export const STEPS: Step[] = [
     title: 'Portfolio bewerten & priorisieren',
     description: 'Füllen Sie das KI-Canvas für jeden Fall aus — Geschäftsnutzen, Machbarkeit, strategische Passung und Dringlichkeit — um ein Prioritätsranking zu errechnen.',
     detail: 'Priorisierung löst das Problem "der Lauteste gewinnt". Das gewichtete Scoremodell gibt der Führungsebene eine objektive Grundlage für Investitionsentscheidungen — die Machbarkeit ist nach der Datenprüfung belastbar.',
+    eingaben: [
+      'Je Fall: Geschäftsnutzen, Machbarkeit, strategische Passung, Dringlichkeit',
+      'Canvas-Felder zum Vorhaben ausfüllen',
+    ],
     effort: '~30 Min. pro Fall',
     to: '/use-cases',
     cta: 'Anwendungsfälle bewerten',
@@ -157,6 +206,10 @@ export const STEPS: Step[] = [
     title: 'EU AI Act-Risiko je Fall klassifizieren',
     description: 'Legen Sie das EU AI Act-Risikoniveau (Minimal / Limited / High / Unacceptable) für jeden Anwendungsfall fest und füllen Sie die Datenschutz-Checkliste für Hochrisikofälle aus.',
     detail: 'Jetzt wenden Sie den Rahmen des EU AI Act auf Ihr eigenes Portfolio an. Hochrisiko-Systeme erfordern eine DSFA und zusätzliche Dokumentation — frühzeitige Identifikation vermeidet kostspielige Nachbesserungen. Hilfsmittel dafür: die Compliance-Checks unter DSGVO & Datenschutz (DSFA-Pflicht, AVV, Art. 22).',
+    eingaben: [
+      'Je Fall den Risikoklassen-Check durchlaufen',
+      'Je Fall DSFA-Pflicht, AVV und Art. 22 prüfen',
+    ],
     effort: '~15 Min. pro Fall',
     to: '/use-cases',
     cta: 'Risikoniveaus prüfen',
@@ -168,6 +221,10 @@ export const STEPS: Step[] = [
     title: 'Compliance-Projektplan erstellen',
     description: 'Der Plan entsteht im Anwendungsfall aus Mandanten-Profil und den dort erledigten Prüfungen — gefragt wird nur noch, was offen ist.',
     detail: 'Die Klassifizierung allein sagt nur, dass Pflichten bestehen — nicht, welche Aufgaben daraus konkret folgen. Der Plan übersetzt das Ergebnis der Risikoklassifizierung in eine abarbeitbare Liste.',
+    eingaben: [
+      'Im Anwendungsfall die offenen Fragen des Plans beantworten',
+      'Der Rest wird aus Profil und Prüfungen übernommen',
+    ],
     effort: '~30 Min. pro Fall',
     to: '/use-cases',
     cta: 'Anwendungsfälle öffnen',
@@ -181,6 +238,10 @@ export const STEPS: Step[] = [
     title: 'KI-Risiken erfassen & bewerten',
     description: 'Erfassen Sie technische, ethische und operative Risiken Ihres Portfolios. Bewerten Sie B×A×E, weisen Sie Verantwortliche zu und verfolgen Sie den Maßnahmenstatus.',
     detail: 'KI-Risiken (Bias, Modell-Drift, Vendor Lock-in) sind oft unsichtbar, bis sie einen Vorfall verursachen. Ein Risikoregister macht sie sichtbar und handhabbar, bevor sie eskalieren.',
+    eingaben: [
+      'Je Risiko: Beschreibung, Kategorie, Bewertung B×A×E',
+      'Verantwortliche:n und Maßnahme zuweisen',
+    ],
     effort: '~1 Std.',
     to: '/risk',
     cta: 'Risikomanager öffnen',
@@ -192,6 +253,11 @@ export const STEPS: Step[] = [
     title: 'Roadmap generieren',
     description: 'Sequenzieren Sie Anwendungsfälle in Quartale nach Prioritätsscore und Budgetobergrenze — und ordnen Sie das Portfolio den drei strategischen Horizonten zu.',
     detail: 'Eine Roadmap wandelt das Prioritätsranking in eine Lieferverpflichtung um. Der Horizonte-Check zeigt zusätzlich, ob Sie in der Pilotfalle stecken: 74 % der Unternehmen bleiben dauerhaft im Deploy-Horizont und nennen das Strategie.',
+    eingaben: [
+      'Budgetobergrenze je Quartal setzen',
+      'Fälle den Quartalen zuordnen',
+      'Portfolio den drei Horizonten zuordnen',
+    ],
     effort: '~30 Min.',
     to: '/roadmap',
     cta: 'Roadmap-Generator öffnen',
@@ -203,6 +269,10 @@ export const STEPS: Step[] = [
     title: 'ROI für Schlüsselfälle berechnen',
     description: 'Modellieren Sie für Ihre Hochprioritätsfälle Investitionskosten, Jahresnutzen, Amortisationszeit und Break-even-Punkt.',
     detail: 'Finanzen und Führungsebene werden ROI-Zahlen vor der Budgetfreigabe verlangen. Zusammen mit der Roadmap ergibt das den Business Case, den Sie zur Freigabe vorlegen.',
+    eingaben: [
+      'Je Schlüsselfall: Investitionskosten und Jahresnutzen',
+      'Laufende Kosten eintragen',
+    ],
     effort: '~15 Min. pro Fall',
     to: '/roi',
     cta: 'ROI-Rechner öffnen',
@@ -216,6 +286,10 @@ export const STEPS: Step[] = [
     title: 'QS & Abnahmekriterien festlegen',
     description: 'Legen Sie Test-Typen, Abnahmestrategie und einen prüfbaren Anforderungskatalog mit Messgrößen und Schwellenwerten fest.',
     detail: '"Besser werden" ist keine Anforderung — eine Zahl ist eine Anforderung. Abnahmekriterien müssen stehen, bevor gebaut wird; sonst diskutieren Sie am Ende darüber, ob das Ergebnis gut genug ist.',
+    eingaben: [
+      'Test-Typen und Abnahmestrategie wählen',
+      'Anforderungen mit Messgröße und Schwellenwert formulieren',
+    ],
     effort: '~1–2 Std.',
     to: '/qa',
     cta: 'KI-Qualitätssicherung öffnen',
@@ -227,6 +301,11 @@ export const STEPS: Step[] = [
     title: 'Datenintegrität sicherstellen',
     description: 'Prüfsummen, Audit-Trail und Versionierung festlegen — die Mechanismen, die dafür sorgen, dass Daten das bleiben, was sie sein sollen.',
     detail: 'Bei Hochrisiko-Systemen ist die Protokollierung nach Art. 12 EU AI Act Pflicht (Frist 2. Dezember 2027). Anders als die Datenqualität gilt das nicht je Fall, sondern ist Infrastruktur — einmal eingerichtet, für alle Systeme wirksam.',
+    eingaben: [
+      'Prüfsummen-Verfahren festlegen',
+      'Audit-Trail und Aufbewahrungsdauer festlegen',
+      'Versionierung von Daten und Modellen festlegen',
+    ],
     effort: '~45 Min.',
     to: '/data',
     cta: 'Daten & Qualität öffnen',
@@ -238,6 +317,11 @@ export const STEPS: Step[] = [
     title: 'Change-Widerstände diagnostizieren',
     description: 'Bestimmen Sie je Schlüsselperson die Widerstandsdimension (rational / emotional / politisch) und den ADKAR-Barrierepunkt — und leiten Sie daraus Maßnahmen ab.',
     detail: 'KI-Projekte scheitern selten an der Technologie, meist an der Organisation. Wer die Dimension verwechselt, greift falsch ein: Emotionaler Widerstand, mit Fakten bekämpft, verhärtet sich. Erst diagnostizieren, dann handeln — und erst dann schulen.',
+    eingaben: [
+      'Je Schlüsselperson die Widerstandsdimension bestimmen',
+      'Je Person den ADKAR-Barrierepunkt bestimmen',
+      'Maßnahme je Person ableiten',
+    ],
     effort: '~1 Std.',
     to: '/change',
     cta: 'Change Management öffnen',
@@ -249,6 +333,11 @@ export const STEPS: Step[] = [
     title: 'Team-Schulung planen',
     description: 'Definieren Sie Ihren Schulungsplan nach Zielgruppe, Format, Zeitpunkt und Sprache — und legen Sie fest, wie Sie den Erfolg messen.',
     detail: 'Schulung wirkt erst ab der Akzeptanzphase. Wer bei Frust und Widerstand schult, verstärkt ihn — deshalb kommt die Change-Diagnose zuerst. Bei KI-Systemen ist Kirkpatrick-Ebene 3 (Verhalten) der Mindeststandard.',
+    eingaben: [
+      'Zielgruppen und Formate festlegen',
+      'Zeitpunkt und Sprache je Schulung',
+      'Messgröße für den Schulungserfolg',
+    ],
     effort: '~45 Min.',
     to: '/enablement',
     cta: 'Schulung & Coaching öffnen',
@@ -405,7 +494,7 @@ export default function StartPage() {
               Als nächstes: <span className="font-semibold text-slate-600">Schritt {nextStep.num} — {nextStep.title}</span>
             </p>
             <button
-              onClick={() => navigate(`${nextStep.to}?from=wizard&step=${nextStep.id}`)}
+              onClick={() => navigate(`/guide?step=${nextStep.id}`)}
               className="flex-shrink-0 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
             >
               Fortsetzen →
@@ -519,7 +608,7 @@ export default function StartPage() {
                         {/* Actions */}
                         <div className="flex items-center gap-3 mt-2.5">
                           <button
-                            onClick={() => navigate(`${step.to}?from=wizard&step=${step.id}`)}
+                            onClick={() => navigate(`/guide?step=${step.id}`)}
                             className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
                               isComplete
                                 ? 'text-slate-500 bg-slate-50 hover:bg-slate-100'

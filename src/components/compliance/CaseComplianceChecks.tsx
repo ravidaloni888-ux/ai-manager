@@ -35,7 +35,7 @@ export interface CaseChecks {
   riskClass: RiskClassState
 }
 
-const EMPTY_CHECKS: CaseChecks = {
+export const EMPTY_CHECKS: CaseChecks = {
   dsfa: {},
   avv: { external: null, personalData: null, avvExists: null },
   art22: {},
@@ -68,7 +68,7 @@ async function loadChecks(ucId: string): Promise<CaseChecks> {
   return loadLocal(ucId)
 }
 
-async function saveChecks(ucId: string, checks: CaseChecks) {
+export async function saveChecks(ucId: string, checks: CaseChecks) {
   if (getMandantType() === 'internal') {
     const ok = await saveCaseChecks(ucId, checks)
     if (ok) return

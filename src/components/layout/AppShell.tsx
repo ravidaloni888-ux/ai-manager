@@ -40,7 +40,8 @@ export default function AppShell({ children }: AppShellProps) {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-          <NavItem to="/start" icon={<IconRocket />} label="Einstieg" />
+          <NavItem to="/guide" icon={<IconRocket />} label="Geführter Modus" />
+          <NavItem to="/start" icon={<IconClipboard />} label="Einstieg · Übersicht" />
           <NavItem to="/dashboard" icon={<IconDashboard />} label="Dashboard" />
 
           <div className="pt-4" />
