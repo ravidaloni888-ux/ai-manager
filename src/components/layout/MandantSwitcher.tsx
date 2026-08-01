@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useMandantStore, MANDANT_STYLE, HUB_ID, DEMO_ID } from '../../store/mandantStore'
 import { useUseCasesStore } from '../../store/useCasesStore'
 import { useStrategyStore } from '../../store/strategyStore'
@@ -6,14 +7,12 @@ import { useRiskStore } from '../../store/riskStore'
 import { useGovernanceStore } from '../../store/governanceStore'
 import { useEnablementStore } from '../../store/enablementStore'
 import { useMeetingsStore } from '../../store/meetingsStore'
-import { useWizardStore, SCOPE_PRESETS } from '../../store/wizardStore'
+import { useWizardStore } from '../../store/wizardStore'
 
 export default function MandantSwitcher() {
+  const navigate = useNavigate()
   const { mandanten, activeId, setActive, addClient, removeClient } = useMandantStore()
   const [open, setOpen] = useState(false)
-  const [creating, setCreating] = useState(false)
-  const [newName, setNewName] = useState('')
-  const [newPreset, setNewPreset] = useState(SCOPE_PRESETS[0].key)
   const boxRef = useRef<HTMLDivElement>(null)
 
   const resetCases  = useUseCasesStore((s) => s.resetStore)
@@ -33,7 +32,6 @@ export default function MandantSwitcher() {
     const onDown = (e: MouseEvent) => {
       if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
         setOpen(false)
-        setCreating(false)
       }
     }
     document.addEventListener('mousedown', onDown)
@@ -60,19 +58,8 @@ export default function MandantSwitcher() {
       reloadAll()
     }
     setOpen(false)
-    setCreating(false)
   }
 
-  const create = () => {
-    const name = newName.trim()
-    if (!name) return
-    const preset = SCOPE_PRESETS.find((p) => p.key === newPreset) ?? SCOPE_PRESETS[0]
-    const id = addClient(name, undefined, preset.steps, preset.key)
-    setNewName('')
-    setNewPreset(SCOPE_PRESETS[0].key)
-    setCreating(false)
-    switchTo(id)
-  }
 
   const style = MANDANT_STYLE[active.type]
 
@@ -141,55 +128,12 @@ export default function MandantSwitcher() {
           })}
 
           <div className="border-t border-slate-100 mt-1 pt-1">
-            {!creating ? (
-              <button
-                onClick={() => setCreating(true)}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
-              >
-                <span className="text-base leading-none">＋</span> Neues Kundenmandat
-              </button>
-            ) : (
-              <div className="px-3 py-2 space-y-2">
-                <input
-                  autoFocus
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') create(); if (e.key === 'Escape') setCreating(false) }}
-                  placeholder="Kunde / Projektname"
-                  className="w-full border border-slate-200 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Umfang</p>
-                  <div className="space-y-1">
-                    {SCOPE_PRESETS.map((preset) => (
-                      <label key={preset.key}
-                        className={`flex items-start gap-2 rounded-lg border px-2 py-1.5 cursor-pointer transition-colors ${
-                          newPreset === preset.key ? 'border-blue-400 bg-blue-50' : 'border-slate-200 hover:bg-slate-50'
-                        }`}>
-                        <input type="radio" name="scope-preset" checked={newPreset === preset.key}
-                          onChange={() => setNewPreset(preset.key)} className="mt-0.5 flex-shrink-0" />
-                        <span className="min-w-0">
-                          <span className="block text-xs font-semibold text-slate-800">
-                            {preset.label} <span className="font-normal text-slate-400">· {preset.steps.length}</span>
-                          </span>
-                          <span className="block text-[10px] text-slate-500 leading-snug">{preset.hint}</span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={create} disabled={!newName.trim()}
-                    className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-xs font-semibold py-1.5 rounded-lg transition-colors">
-                    Anlegen
-                  </button>
-                  <button onClick={() => { setCreating(false); setNewName('') }}
-                    className="px-3 text-xs text-slate-500 hover:text-slate-700">
-                    Abbrechen
-                  </button>
-                </div>
-              </div>
-            )}
+            <button
+              onClick={() => { setOpen(false); navigate('/mandant/neu') }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+            >
+              <span className="text-base leading-none">＋</span> Neue Firma anlegen (Interview)
+            </button>
           </div>
 
           <p className="px-3 pt-1.5 pb-1 text-[10px] text-slate-400 leading-relaxed border-t border-slate-100 mt-1">
