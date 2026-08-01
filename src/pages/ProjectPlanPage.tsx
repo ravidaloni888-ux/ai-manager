@@ -493,11 +493,11 @@ function QuestionCard({
         {sub && <p className="text-xs text-blue-600 mt-1">{sub}</p>}
       </div>
       <div className="flex gap-3">
-        <button onClick={() => onAnswer(true)}
+        <button type="button" onClick={() => onAnswer(true)}
           className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors">
           {yes}
         </button>
-        <button onClick={() => onAnswer(false)}
+        <button type="button" onClick={() => onAnswer(false)}
           className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
           {no}
         </button>
@@ -662,7 +662,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
           </p>
         </div>
         {step !== 'form' && (
-          <button onClick={reset}
+          <button type="button" onClick={reset}
             className="text-xs border border-slate-200 text-slate-500 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors">
             Neu starten
           </button>
@@ -725,7 +725,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
               className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
           </div>
-          <button
+          <button type="button"
             onClick={startQuestions}
             disabled={!form.name.trim()}
             className="w-full py-3 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
@@ -772,7 +772,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
                 <p className="text-xs text-slate-500 mt-1">Das ist die wichtigste Weichenstellung im EU AI Act — Anbieter und Betreiber haben grundlegend verschiedene Pflichten (Art. 3 Nr. 3/4).</p>
               </div>
               <div className="space-y-2">
-                <button onClick={() => answerRolle('anbieter')}
+                <button type="button" onClick={() => answerRolle('anbieter')}
                   className="w-full flex items-start gap-4 px-4 py-4 border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-xl text-left transition-colors group">
                   <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-lg flex-shrink-0 mt-0.5">🏭</div>
                   <div className="flex-1">
@@ -782,7 +782,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
                   </div>
                   <svg className="w-4 h-4 text-slate-400 mt-1 flex-shrink-0 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                 </button>
-                <button onClick={() => answerRolle('betreiber')}
+                <button type="button" onClick={() => answerRolle('betreiber')}
                   className="w-full flex items-start gap-4 px-4 py-4 border-2 border-violet-200 bg-violet-50 hover:bg-violet-100 rounded-xl text-left transition-colors group">
                   <div className="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center text-lg flex-shrink-0 mt-0.5">🏢</div>
                   <div className="flex-1">
@@ -827,7 +827,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
                           <p className="text-[11px] font-mono text-slate-500 mt-1">{detected.law}</p>
                         )}
                       </div>
-                      <button
+                      <button type="button"
                         onClick={() => answerRisk(detected.level)}
                         className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
                           detected.level === 'high' ? 'bg-orange-500 hover:bg-orange-600 text-white' :
@@ -876,7 +876,7 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
                           : 'border-green-300 bg-green-50 hover:bg-green-100',
                       },
                     ].map((opt) => (
-                      <button key={opt.level} onClick={() => answerRisk(opt.level)}
+                      <button type="button" key={opt.level} onClick={() => answerRisk(opt.level)}
                         className={`w-full flex items-start gap-3 px-4 py-3 border rounded-lg text-left transition-colors ${opt.color}`}>
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-slate-800">{opt.label}</p>

@@ -10,6 +10,7 @@ import EthicsCheck, { EMPTY_ETHICS } from '../assessments/EthicsCheck'
 import RiskClassCheck, { EMPTY_RISK_CLASS, TREE_NODES } from '../assessments/RiskClassCheck'
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import type { EthicsState } from '../assessments/EthicsCheck'
+import { ProjectPlanContent } from '../../pages/ProjectPlanPage'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Datenschutz-Checks je Anwendungsfall.
@@ -312,7 +313,7 @@ function Art22Checker({ checked, setChecked }: {
 }
 
 /** Alle drei Fall-Checks — einklappbar, Antworten bleiben am Anwendungsfall. */
-type GroupKey = 'risiko' | 'datenschutz' | 'qualitaet' | 'fair' | 'ethik'
+type GroupKey = 'risiko' | 'datenschutz' | 'qualitaet' | 'fair' | 'ethik' | 'plan'
 
 /** Alle Prüfungen zu einem Anwendungsfall — Antworten bleiben am Fall. */
 export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
@@ -356,6 +357,7 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
     { key: 'qualitaet',   icon: '🧪', title: 'Datenqualität', hint: 'Sechs Dimensionen — zweckbezogen bewertet', status: dqCount   ? `${dqCount}/6 bewertet` : '' },
     { key: 'fair',        icon: '✅', title: 'FAIR-Check',    hint: 'Auffindbar · Zugänglich · Interoperabel · Wiederverwendbar', status: fairCount ? `${fairCount} erfüllt` : '' },
     { key: 'ethik',       icon: '🧭', title: 'Ethik',         hint: 'FAST-Bewertung des Vorhabens',              status: checks.ethics.result ? checks.ethics.result.verdict : '' },
+    { key: 'plan',        icon: '📋', title: 'To-do-Plan',    hint: 'Compliance-Projektplan aus Profil und Prüfungen', status: '' },
   ]
 
   return (
@@ -438,6 +440,7 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
                       onChange={(fn) => setChecks((prev) => ({ ...prev, ethics: fn(prev.ethics) }))}
                     />
                   )}
+                  {g.key === 'plan' && <ProjectPlanContent ucid={ucId ?? null} />}
                 </div>
               )}
             </div>
