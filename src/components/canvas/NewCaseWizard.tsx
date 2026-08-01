@@ -38,6 +38,16 @@ const RESULT_TO_RISK: Record<string, EuAiActRisk> = {
 const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
 const labelCls = 'block text-xs font-semibold text-slate-600 mb-1'
 
+/** Nur Formular im Schritt — die Erklärung liegt hinter diesem Link. */
+function InfoLink({ to, label = 'Erklärung' }: { to: string; label?: string }) {
+  return (
+    <a href={to} target="_blank" rel="noreferrer"
+      className="text-[11px] text-blue-600 hover:text-blue-500 underline decoration-dotted">
+      {label} ↗
+    </a>
+  )
+}
+
 function JaNein({ value, onChange }: { value: boolean | null; onChange: (v: boolean) => void }) {
   return (
     <div className="flex gap-2">
@@ -232,11 +242,10 @@ export default function NewCaseWizard() {
         {step === 'rolle' && (
           <>
             <div>
-              <label className={labelCls}>Welche Rolle nimmt Ihr Haus bei diesem System ein?</label>
-              <p className="text-[11px] text-slate-400 mb-2">
-                Anbieter entwickeln oder vertreiben das System unter eigenem Namen; Betreiber setzen es nur ein.
-                Händler und Importeure haben eigene, schmalere Pflichten — im Zweifel wie Betreiber starten.
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <label className={`${labelCls} mb-0`}>Welche Rolle nimmt Ihr Haus bei diesem System ein?</label>
+                <InfoLink to="/eu-ai-act" label="Was ist Anbieter/Betreiber?" />
+              </div>
               <div className="flex gap-2">
                 {([['betreiber', 'Betreiber — wir setzen es ein'], ['anbieter', 'Anbieter — wir entwickeln/vertreiben es']] as [Rolle, string][]).map(([v, l]) => (
                   <button key={v} type="button" onClick={() => setRolle(v)}
@@ -252,8 +261,10 @@ export default function NewCaseWizard() {
               )}
             </div>
             <div>
-              <label className={labelCls}>Werden personenbezogene Daten verarbeitet?</label>
-              <p className="text-[11px] text-slate-400 mb-2">Namen, E-Mails, Mitarbeiter- oder Kundendaten, IP-Adressen.</p>
+              <div className="flex items-center justify-between mb-2">
+                <label className={`${labelCls} mb-0`}>Werden personenbezogene Daten verarbeitet?</label>
+                <InfoLink to="/dsgvo" label="Was zählt dazu?" />
+              </div>
               <JaNein value={personalData} onChange={setPersonalData} />
             </div>
             <div>
@@ -261,8 +272,10 @@ export default function NewCaseWizard() {
               <JaNein value={externalProvider} onChange={setExternalProvider} />
             </div>
             <div>
-              <label className={labelCls}>Wird das System im HR-Kontext eingesetzt?</label>
-              <p className="text-[11px] text-slate-400 mb-2">Bewerbung, Leistungsbewertung, Personalentscheidungen — dann greifen §26 BDSG und meist die DSFA-Pflicht.</p>
+              <div className="flex items-center justify-between mb-2">
+                <label className={`${labelCls} mb-0`}>Wird das System im HR-Kontext eingesetzt?</label>
+                <InfoLink to="/dsgvo" label="Warum ist das wichtig?" />
+              </div>
               <JaNein value={hrContext} onChange={setHrContext} />
             </div>
           </>
@@ -275,11 +288,10 @@ export default function NewCaseWizard() {
         {step === 'iso' && (
           <>
             <div>
-              <label className={labelCls}>Strebt das Unternehmen eine ISO-42001-Zertifizierung an?</label>
-              <p className="text-[11px] text-slate-400 mb-2">
-                Das ist eine Entscheidung je Firma, nicht je Fall. Bei „Ja“ nimmt der Plan die AIMS-Vorgaben
-                (Managementsystem, interne Audits, Managementbewertung) als Aufgaben mit auf.
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <label className={`${labelCls} mb-0`}>Strebt das Unternehmen eine ISO-42001-Zertifizierung an?</label>
+                <InfoLink to="/governance" label="Was ist ISO 42001?" />
+              </div>
               <div className="flex gap-2">
                 {([['ja', 'Ja'], ['nein', 'Nein'], ['spaeter', 'Später entscheiden']] as [IsoZiel, string][]).map(([v, l]) => (
                   <button key={v} type="button" onClick={() => setIso(v)}
@@ -301,9 +313,9 @@ export default function NewCaseWizard() {
 
         {step === 'score' && (
           <>
-            <p className="text-xs text-slate-500">
-              Grobe Ersteinschätzung für das Prioritätsranking — lässt sich später im Canvas verfeinern.
-            </p>
+            <div className="flex justify-end">
+              <InfoLink to="/use-cases" label="Wie wird der Score berechnet?" />
+            </div>
             <Slider label="Geschäftsnutzen" value={businessImpact} onChange={setBusinessImpact} />
             <Slider label="Machbarkeit" value={feasibility} onChange={setFeasibility} />
             <Slider label="Strategische Passung" value={strategicFit} onChange={setStrategicFit} />
