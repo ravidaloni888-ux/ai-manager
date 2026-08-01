@@ -1,14 +1,10 @@
 import { ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import NavItem from './NavItem'
-import {
-  IconDashboard, IconList, IconChartBar, IconMap,
-  IconAlert, IconBuilding, IconCurrency, IconFlag, IconSearch,
-  IconBrain, IconSettings, IconAcademic, IconCalendar, IconUsers, IconInfo, IconRocket, IconClipboard, IconStar, IconShield, IconSitemap, IconDatabase, IconTrendingUp,
-} from '../icons/NavIcons'
+import { IconBrain } from '../icons/NavIcons'
 import { useAuthStore } from '../../store/authStore'
 import BetaRequestModal from './BetaRequestModal'
 import MandantSwitcher from './MandantSwitcher'
+import NavDropdown from './NavDropdown'
 import WizardBanner from './WizardBanner'
 
 interface AppShellProps {
@@ -22,84 +18,28 @@ export default function AppShell({ children }: AppShellProps) {
   const [showBeta, setShowBeta] = useState(false)
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#e8eff7' }}>
-      {/* Sidebar */}
-      <aside className="w-56 flex-shrink-0 flex flex-col no-print" style={{ background: '#1a2538' }}>
-        {/* Brand */}
-        <div className="px-4 py-5 border-b border-white/10">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
-              <IconBrain />
-            </div>
-            <div>
-              <p className="text-white font-semibold text-sm leading-tight">AI Manager</p>
-              <p className="text-slate-400 text-xs">Release 1.0</p>
-            </div>
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#e8eff7' }}>
+      {/* Top bar: Marke + Navigation als Dropdown + Mandant/Konto */}
+      <header className="flex-shrink-0 flex items-center gap-4 px-4 py-3 no-print" style={{ background: '#1a2538' }}>
+        <button
+          type="button"
+          onClick={() => navigate('/guide')}
+          className="flex items-center gap-2.5 flex-shrink-0"
+        >
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+            <IconBrain />
           </div>
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
-          <NavItem to="/guide" icon={<IconRocket />} label="Geführter Modus" />
-          <NavItem to="/start" icon={<IconClipboard />} label="Einstieg · Übersicht" />
-          <NavItem to="/dashboard" icon={<IconDashboard />} label="Dashboard" />
-
-          <div className="pt-4" />
-
-          <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
-            KI-Programm
-          </p>
-          {/* Reihenfolge folgt den Schritten des Einstiegs-Assistenten */}
-          <NavItem to="/strategy" icon={<IconMap />} label="Strategie-Assistent" />
-          <NavItem to="/maturity" icon={<IconChartBar />} label="Reifegradcheck" />
-          <NavItem to="/eu-ai-act" icon={<IconFlag />} label="EU AI Act" />
-          <NavItem to="/dsgvo" icon={<IconShield />} label="DSGVO & Datenschutz" />
-          <NavItem to="/ethik" icon={<IconFlag />} label="KI-Ethik" />
-          <NavItem to="/governance" icon={<IconBuilding />} label="KI-Governance" />
-          <NavItem to="/stakeholders" icon={<IconSitemap />} label="Stakeholder-Analyse" />
-          <NavItem to="/use-cases" icon={<IconList />} label="KI-Anwendungsfälle" />
-          <NavItem to="/data" icon={<IconDatabase />} label="Daten & Qualität" />
-          <NavItem to="/risk" icon={<IconAlert />} label="Risikomanager" />
-          <NavItem to="/roadmap" icon={<IconFlag />} label="Roadmap-Generator" />
-          <NavItem to="/roi" icon={<IconCurrency />} label="ROI-Rechner" />
-          <NavItem to="/qa" icon={<IconClipboard />} label="KI-Qualitätssicherung" />
-          <NavItem to="/change" icon={<IconTrendingUp />} label="Change Management" />
-          <NavItem to="/enablement" icon={<IconAcademic />} label="Schulung & Coaching" />
-
-          <div className="pt-4" />
-
-          <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pb-2">
-            Mehr
-          </p>
-          <NavItem to="/vendors" icon={<IconSearch />} label="Anbietervergleich" />
-          <NavItem to="/meetings" icon={<IconCalendar />} label="Regelmäßige Meetings" />
-          <NavItem to="/roles" icon={<IconUsers />} label="Team & Rollen" />
-          <NavItem to="/glossary" icon={<IconSearch />} label="KI-Glossar" />
-          <NavItem to="/prompts" icon={<IconStar />} label="Prompt-Bibliothek" />
-          <NavItem to="/settings" icon={<IconSettings />} label="Einstellungen" />
-          <NavItem to="/about" icon={<IconInfo />} label="Über uns" />
-        </nav>
-
-        {/* Sidebar footer — user info when logged in */}
-        {user && (
-          <div className="px-3 py-4 border-t border-white/10">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs text-slate-400 truncate max-w-[130px]">{user.email}</span>
-              <button onClick={() => signOut()} className="text-xs text-slate-400 hover:text-white transition-colors">
-                Abmelden
-              </button>
-            </div>
+          <div className="text-left hidden sm:block">
+            <p className="text-white font-semibold text-sm leading-tight">AI Manager</p>
+            <p className="text-slate-400 text-xs">Release 1.0</p>
           </div>
-        )}
-      </aside>
+        </button>
 
-      {/* Main content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <div className="flex-shrink-0 flex items-center justify-end gap-3 px-6 py-3" style={{ background: '#1a2538' }}>
+        <NavDropdown />
+
+        <div className="ml-auto flex items-center gap-3">
           <MandantSwitcher />
-          {/* Anwendungsfälle werden auf der Seite selbst angelegt, nicht hier oben. */}
-          {!user && (
+          {!user ? (
             <>
               <button
                 onClick={() => setShowBeta(true)}
@@ -114,9 +54,19 @@ export default function AppShell({ children }: AppShellProps) {
                 Anmelden
               </button>
             </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400 truncate max-w-[160px] hidden md:inline">{user.email}</span>
+              <button onClick={() => signOut()} className="text-xs text-slate-400 hover:text-white transition-colors">
+                Abmelden
+              </button>
+            </div>
           )}
         </div>
+      </header>
 
+      {/* Main content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
         <WizardBanner />
         <div className="flex-1 overflow-y-auto">
           {children}
