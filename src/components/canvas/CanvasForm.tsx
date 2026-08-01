@@ -444,6 +444,9 @@ export default function CanvasForm({ existing }: Props) {
           </div>
         </section>
 
+        {/* Fall-Wizard: Datenqualität → FAIR → Risikoklasse → Datenschutz → Ethik → To-do-Plan */}
+        {existing && <CaseComplianceChecks ucId={existing.id} />}
+
         {/* Section 2: AI Use Case Canvas */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
@@ -616,9 +619,6 @@ export default function CanvasForm({ existing }: Props) {
             })}
           </div>
         </section>
-
-        {/* Fall-Checks: DSFA-Pflicht, AVV, Art. 22 */}
-        <CaseComplianceChecks ucId={existing?.id} />
 
         {/* Section 6: Documentation (Step 9) */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">

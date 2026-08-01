@@ -318,6 +318,7 @@ type GroupKey = 'risiko' | 'datenschutz' | 'qualitaet' | 'fair' | 'ethik' | 'pla
 /** Alle Prüfungen zu einem Anwendungsfall — Antworten bleiben am Fall. */
 export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
   const [openGroup, setOpenGroup] = useState<GroupKey | null>(null)
+  const [autoOpened, setAutoOpened] = useState(false)
   const [checks, setChecks] = useState<CaseChecks>(EMPTY_CHECKS)
   const [loaded, setLoaded] = useState(false)
 
@@ -351,20 +352,45 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
   const rcResult = checks.riskClass.done && checks.riskClass.resultId
     ? TREE_NODES[checks.riskClass.resultId].result?.name ?? '' : ''
 
-  const groups: { key: GroupKey; icon: string; title: string; hint: string; status: string }[] = [
-    { key: 'risiko',      icon: '⚖️', title: 'EU AI Act — Risikoklasse', hint: '1–3 Fragen bis zur Einstufung', status: rcResult },
-    { key: 'datenschutz', icon: '🛡️', title: 'Datenschutz',   hint: 'DSFA-Pflicht · AVV · Art. 22',              status: dsCount   ? `${dsCount} beantwortet` : '' },
-    { key: 'qualitaet',   icon: '🧪', title: 'Datenqualität', hint: 'Sechs Dimensionen — zweckbezogen bewertet', status: dqCount   ? `${dqCount}/6 bewertet` : '' },
-    { key: 'fair',        icon: '✅', title: 'FAIR-Check',    hint: 'Auffindbar · Zugänglich · Interoperabel · Wiederverwendbar', status: fairCount ? `${fairCount} erfüllt` : '' },
-    { key: 'ethik',       icon: '🧭', title: 'Ethik',         hint: 'FAST-Bewertung des Vorhabens',              status: checks.ethics.result ? checks.ethics.result.verdict : '' },
-    { key: 'plan',        icon: '📋', title: 'To-do-Plan',    hint: 'Compliance-Projektplan aus Profil und Prüfungen', status: '' },
+  // Reihenfolge wie im KI-Programm: erst Datengrundlage, dann Recht, dann Plan.
+  const groups: { key: GroupKey; icon: string; title: string; hint: string; status: string; done: boolean }[] = [
+    { key: 'qualitaet',   icon: '🧪', title: 'Datenqualität prüfen', hint: 'Sechs Dimensionen — zweckbezogen bewertet', status: dqCount ? `${dqCount}/6 bewertet` : '', done: dqCount === 6 },
+    { key: 'fair',        icon: '✅', title: 'FAIR-Check',    hint: 'Auffindbar · Zugänglich · Interoperabel · Wiederverwendbar', status: fairCount ? `${fairCount} erfüllt` : '', done: fairCount === 4 },
+    { key: 'risiko',      icon: '⚖️', title: 'EU AI Act — Risikoklasse', hint: '1–3 Fragen bis zur Einstufung', status: rcResult, done: checks.riskClass.done },
+    { key: 'datenschutz', icon: '🛡️', title: 'Datenschutz',   hint: 'DSFA-Pflicht · AVV · Art. 22',              status: dsCount ? `${dsCount} beantwortet` : '', done: checks.avv.external !== null && checks.avv.personalData !== null },
+    { key: 'ethik',       icon: '🧭', title: 'Ethik',         hint: 'FAST-Bewertung des Vorhabens',              status: checks.ethics.result ? checks.ethics.result.verdict : '', done: !!checks.ethics.result },
+    { key: 'plan',        icon: '📋', title: 'To-do-Plan erstellen', hint: 'Compliance-Projektplan aus Profil und Prüfungen', status: '', done: false },
   ]
+
+  const doneCount = groups.filter((g) => g.done).length
+
+  // Beim Laden den ersten offenen Schritt aufklappen — der Wizard führt.
+  useEffect(() => {
+    if (!loaded || autoOpened) return
+    setAutoOpened(true)
+    const first = groups.find((g) => !g.done)
+    if (first) setOpenGroup(first.key)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, autoOpened])
+
+  const weiter = (key: GroupKey) => {
+    const i = groups.findIndex((g) => g.key === key)
+    const next = groups.slice(i + 1).find((g) => !g.done) ?? groups[i + 1]
+    setOpenGroup(next ? next.key : null)
+  }
 
   return (
     <section className="bg-white rounded-xl shadow-md overflow-hidden">
       <div className="px-5 py-4 border-b border-slate-100">
-        <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Prüfungen zu diesem Fall</h2>
-        <p className="text-[11px] text-slate-400 mt-0.5">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Fall-Wizard · Prüfungen &amp; Plan</h2>
+          <span className="text-[11px] font-semibold text-blue-600 flex-shrink-0">{doneCount}/{groups.length} erledigt</span>
+        </div>
+        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mt-2">
+          <div className="h-full rounded-full bg-blue-500 transition-all duration-500"
+               style={{ width: `${Math.round((doneCount / groups.length) * 100)}%` }} />
+        </div>
+        <p className="text-[11px] text-slate-400 mt-2">
           {persistent
             ? 'Antworten werden automatisch zu diesem Anwendungsfall gespeichert.'
             : 'Im Demo-Mandanten werden Antworten nicht gespeichert.'}
@@ -373,7 +399,7 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
       </div>
 
       <div className="divide-y divide-slate-100">
-        {groups.map((g) => {
+        {groups.map((g, gi) => {
           const isOpen = openGroup === g.key
           return (
             <div key={g.key}>
@@ -382,6 +408,11 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
                 onClick={() => setOpenGroup(isOpen ? null : g.key)}
                 className="w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors text-left"
               >
+                <span className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-bold ${
+                  g.done ? 'bg-green-500 text-white' : isOpen ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'
+                }`}>
+                  {g.done ? '✓' : gi + 1}
+                </span>
                 <span className="text-base leading-none flex-shrink-0">{g.icon}</span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-slate-800 leading-tight">{g.title}</p>
@@ -441,6 +472,18 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
                     />
                   )}
                   {g.key === 'plan' && <ProjectPlanContent ucid={ucId ?? null} />}
+
+                  {g.key !== 'plan' && (
+                    <div className="flex justify-end pt-1">
+                      <button
+                        type="button"
+                        onClick={() => weiter(g.key)}
+                        className="text-xs font-semibold px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-colors"
+                      >
+                        {g.done ? 'Weiter →' : 'Später — nächster Schritt →'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
