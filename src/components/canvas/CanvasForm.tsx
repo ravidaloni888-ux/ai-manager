@@ -444,9 +444,6 @@ export default function CanvasForm({ existing }: Props) {
           </div>
         </section>
 
-        {/* Fall-Wizard: Datenqualität → FAIR → Risikoklasse → Datenschutz → Ethik → To-do-Plan */}
-        {existing && <CaseComplianceChecks ucId={existing.id} />}
-
         {/* Section 2: AI Use Case Canvas */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
@@ -585,7 +582,16 @@ export default function CanvasForm({ existing }: Props) {
             <SliderField label="Strategische Passung"  name="strategicFit"   weight="20%" register={register} value={Number(watched.strategicFit ?? 7)} />
             <SliderField label="Dringlichkeit"         name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
           </div>
+          {existing && (
+            <p className="text-[11px] text-slate-400 mt-4 pt-3 border-t border-slate-100">
+              Die Machbarkeit lässt sich erst nach der Datenqualitätsprüfung unten belastbar einschätzen —
+              danach hier gegebenenfalls nachschärfen.
+            </p>
+          )}
         </section>
+
+        {/* Erst nach Beschreibung und Bewertung: die geführten Prüfungen bis zum To-do-Plan */}
+        {existing && <CaseComplianceChecks ucId={existing.id} />}
 
         {/* Section 5: Privacy & Compliance Checklist */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
