@@ -10,21 +10,21 @@ import { GovernanceData, AimsClause, AIUseCase, EU_AI_ACT_BG, EuAiActRisk } from
 type Tab = 'richtlinie' | 'roles' | 'checklist' | 'aims' | 'compliance'
 
 const RICHTLINIE_FIELDS: { key: keyof GovernanceData['richtlinie']; title: string; desc: string }[] = [
-  { key: 'zweck',                title: 'Purpose & Scope',                desc: 'For what purposes and in which areas may AI be used in the company?' },
-  { key: 'daten',                title: 'Data & Privacy',                 desc: 'Which data may be used and how is its protection ensured?' },
-  { key: 'transparenz',          title: 'Transparency & Explainability',  desc: 'How are AI decisions made explainable and auditable?' },
-  { key: 'verantwortlichkeiten', title: 'Responsibilities & Governance',  desc: 'Who is responsible for the development, deployment and control of AI?' },
-  { key: 'risikomanagement',     title: 'Risk Management & Compliance',   desc: 'What risks exist and how are legal requirements met?' },
-  { key: 'ethik',                title: 'Ethics & Fairness',              desc: 'How is it ensured that AI operates without discrimination and responsibly?' },
-  { key: 'schulung',             title: 'Training & Awareness',           desc: 'How are employees equipped to use AI safely and effectively?' },
+  { key: 'zweck',                title: 'Zweck & Geltungsbereich',        desc: 'Wofür und in welchen Bereichen darf KI im Unternehmen eingesetzt werden?' },
+  { key: 'daten',                title: 'Daten & Datenschutz',            desc: 'Welche Daten dürfen verwendet werden und wie wird ihr Schutz sichergestellt?' },
+  { key: 'transparenz',          title: 'Transparenz & Nachvollziehbarkeit', desc: 'Wie werden Entscheidungen der KI erklärbar und prüfbar gemacht?' },
+  { key: 'verantwortlichkeiten', title: 'Verantwortung & Steuerung',      desc: 'Wer verantwortet Entwicklung, Einsatz und Kontrolle der KI?' },
+  { key: 'risikomanagement',     title: 'Risikomanagement & Compliance',  desc: 'Welche Risiken bestehen und wie werden die rechtlichen Vorgaben erfüllt?' },
+  { key: 'ethik',                title: 'Ethik & Fairness',               desc: 'Wie wird sichergestellt, dass die KI diskriminierungsfrei und verantwortbar arbeitet?' },
+  { key: 'schulung',             title: 'Schulung & Sensibilisierung',    desc: 'Wie werden Mitarbeitende befähigt, KI sicher und wirksam einzusetzen?' },
 ]
 
 const ROLES: { key: keyof GovernanceData['roles']; title: string; desc: string; icon: string }[] = [
-  { key: 'aiOwner',  title: 'AI Owner',                       desc: 'Overall responsibility for AI strategy and deployment',      icon: '🎯' },
-  { key: 'dpo',      title: 'Data Protection Officer (DPO)',  desc: 'GDPR compliance, DPIA, personal data',                      icon: '🔒' },
-  { key: 'security', title: 'IT Security',                    desc: 'Cybersecurity, access controls, attack resilience',          icon: '🛡️' },
-  { key: 'ethics',   title: 'Ethics & Bias Reviewer',         desc: 'Anti-bias review, fairness, non-discrimination',            icon: '⚖️' },
-  { key: 'business', title: 'Business Approval',              desc: 'Business sign-off before production deployment',            icon: '✅' },
+  { key: 'aiOwner',  title: 'KI-Verantwortliche:r',           desc: 'Gesamtverantwortung für KI-Strategie und -Einsatz',          icon: '🎯' },
+  { key: 'dpo',      title: 'Datenschutzbeauftragte:r (DSB)', desc: 'DSGVO-Konformität, DSFA, personenbezogene Daten',           icon: '🔒' },
+  { key: 'security', title: 'IT-Sicherheit',                  desc: 'Cybersicherheit, Zugriffsrechte, Angriffsfestigkeit',        icon: '🛡️' },
+  { key: 'ethics',   title: 'Ethik- & Bias-Prüfer:in',        desc: 'Prüfung auf Verzerrung, Fairness, Diskriminierungsfreiheit', icon: '⚖️' },
+  { key: 'business', title: 'Fachliche Freigabe',             desc: 'Freigabe durch den Fachbereich vor dem Produktivgang',       icon: '✅' },
 ]
 
 const DPIA_URL = 'https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/how-do-we-do-a-dpia/'
@@ -38,11 +38,11 @@ const AIMS_CLAUSES: {
   desc: string
   coveredBy?: string
 }[] = [
-  { key: 'kl4',  kl: '4',  title: 'Kontext der Organisation', desc: 'Scope festlegen, KI-Systeme inventarisieren, Stakeholder-Analyse, interne & externe Anforderungen', coveredBy: 'Use Case Liste' },
+  { key: 'kl4',  kl: '4',  title: 'Kontext der Organisation', desc: 'Scope festlegen, KI-Systeme inventarisieren, Stakeholder-Analyse, interne & externe Anforderungen', coveredBy: 'Anwendungsfall-Liste' },
   { key: 'kl5',  kl: '5',  title: 'Führung & KI-Politik',     desc: 'Top-Management-Commitment, schriftliche KI-Politik, Rollen & Verantwortlichkeiten. Kl. 5.3 = normativer Anker des KI-Beauftragten', coveredBy: 'AI Policy Tab' },
   { key: 'kl6',  kl: '6',  title: 'Planung & Impact Assessment', desc: 'Risikobewertung für KI-Systeme, KI-Folgenabschätzung (A.5) für Betroffene, KI-Ziele festlegen' },
   { key: 'kl7',  kl: '7',  title: 'Kompetenz & Training',     desc: 'KI-Kompetenzen sicherstellen, dokumentierte Nachweise. Deckungsgleich mit EU AI Act Art. 4.', coveredBy: 'Enablement' },
-  { key: 'kl8',  kl: '8',  title: 'Betrieb & KI-Lebenszyklus', desc: 'Datenerfassung → Training → Validierung → Betrieb → Ausmusterung. Anhang-A-Controls operationalisieren.', coveredBy: 'Use Case Steckbriefe' },
+  { key: 'kl8',  kl: '8',  title: 'Betrieb & KI-Lebenszyklus', desc: 'Datenerfassung → Training → Validierung → Betrieb → Ausmusterung. Anhang-A-Controls operationalisieren.', coveredBy: 'Anwendungsfall-Steckbriefe' },
   { key: 'kl9',  kl: '9',  title: 'Monitoring & Audit',       desc: 'Modellleistung überwachen (Drift, Bias), internes Audit (QMB), Managementbewertung. Brücke zu EU AI Act Art. 72.' },
   { key: 'kl10', kl: '10', title: 'Verbesserung & Vorfälle',  desc: 'Nichtkonformitäten bearbeiten, Vorfallregister führen, Modell-Updates als wesentliche Änderung prüfen (Art. 6/83).' },
 ]
@@ -59,11 +59,11 @@ const AIMS_DEFAULT: NonNullable<GovernanceData['aims']> = {
 
 
 const COMPLIANCE_COLS: { key: keyof AIUseCase; short: string; title: string }[] = [
-  { key: 'complianceLegal',         short: 'Legal',       title: 'Compliance with legal requirements (GDPR, EU AI Act)' },
-  { key: 'compliancePersonalData',  short: 'Pers. Data',  title: 'Personal data & legal basis documented' },
-  { key: 'complianceDataMin',       short: 'Data Min.',   title: 'Data minimisation & purpose limitation ensured' },
-  { key: 'complianceDocumentation', short: 'Docs',        title: 'Documentation & proof obligations fulfilled' },
-  { key: 'complianceLiability',     short: 'Liability',   title: 'Liability & responsibility defined' },
+  { key: 'complianceLegal',         short: 'Recht',       title: 'Rechtliche Vorgaben eingehalten (DSGVO, EU AI Act)' },
+  { key: 'compliancePersonalData',  short: 'Personendaten', title: 'Personenbezogene Daten und Rechtsgrundlage dokumentiert' },
+  { key: 'complianceDataMin',       short: 'Datenmin.',   title: 'Datenminimierung und Zweckbindung sichergestellt' },
+  { key: 'complianceDocumentation', short: 'Doku',        title: 'Dokumentations- und Nachweispflichten erfüllt' },
+  { key: 'complianceLiability',     short: 'Haftung',     title: 'Haftung und Verantwortung festgelegt' },
 ]
 
 const DEFAULT: GovernanceData = {
@@ -129,8 +129,8 @@ export default function GovernancePage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">AI Governance</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Strategic Planning · AI Policy · Data Privacy — K7.0069</p>
+          <h1 className="text-2xl font-bold text-slate-800">KI-Governance</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Strategische Planung · KI-Richtlinie · Datenschutz — K7.0069</p>
         </div>
         {user && (
           <button
@@ -145,8 +145,8 @@ export default function GovernancePage() {
 
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-4">
-        <KpiCard label="AI Policy Filled"   value={`${richtCount} / 7`}   pct={richtCount / 7}   color="violet" />
-        <KpiCard label="Roles Assigned"     value={`${rolesCount} / 5`}   pct={rolesCount / 5}   color="emerald"/>
+        <KpiCard label="Richtlinie ausgefüllt" value={`${richtCount} / 7`}   pct={richtCount / 7}   color="violet" />
+        <KpiCard label="Rollen benannt"        value={`${rolesCount} / 5`}   pct={rolesCount / 5}   color="emerald"/>
       </div>
 
       {/* Tabs */}
@@ -319,14 +319,14 @@ function ChecklistTab({ useCases, navigate }: { useCases: AIUseCase[]; navigate:
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
       <div className="p-4 border-b border-slate-100">
         <p className="text-sm text-slate-500">
-          Click a use case to open its canvas and fill in the compliance checklist.
+          Einen Anwendungsfall anklicken, um seinen Canvas zu öffnen und die Compliance-Checkliste auszufüllen.
         </p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Use Case</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Anwendungsfall</th>
               <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">EU AI Act</th>
               {COMPLIANCE_COLS.map((c) => (
                 <th key={c.key as string} title={c.title} className="text-center px-3 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">
@@ -1272,9 +1272,9 @@ const RISIKOARTEN_INFO: { art: RisikoArt; kern: string; beispiel: string }[] = [
 ]
 
 const NIST_TRIAS = [
-  { label: 'Harm to People',       desc: 'Individuum: Rechte, Gesundheit, wirtschaftliche Chancen. Gruppe: Diskriminierung. Gesellschaft: demokratische Teilhabe.' },
-  { label: 'Harm to Organization', desc: 'Geschäftsbetrieb, Reputation, finanzielle Verluste, Sicherheitsverletzungen, Compliance-Strafen.' },
-  { label: 'Harm to Ecosystem',    desc: 'Globales Finanzsystem, Lieferketten, vernetzte Systeme, natürliche Ressourcen, Umwelt.' },
+  { label: 'Schaden für Menschen (Harm to People)',            desc: 'Individuum: Rechte, Gesundheit, wirtschaftliche Chancen. Gruppe: Diskriminierung. Gesellschaft: demokratische Teilhabe.' },
+  { label: 'Schaden für die Organisation (Harm to Organization)', desc: 'Geschäftsbetrieb, Reputation, finanzielle Verluste, Sicherheitsverletzungen, Compliance-Strafen.' },
+  { label: 'Schaden für das Umfeld (Harm to Ecosystem)',        desc: 'Globales Finanzsystem, Lieferketten, vernetzte Systeme, natürliche Ressourcen, Umwelt.' },
 ]
 
 const EMPTY_RISIKO: Omit<RisikoEntry, 'id'> = {
@@ -1336,7 +1336,7 @@ function RisikoUebersicht({ useCases, isDemo }: { useCases: AIUseCase[]; isDemo:
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-xl shadow-md p-5">
-        <h2 className="text-base font-bold text-slate-800 mb-1">Risikoübersicht · alle Use Cases</h2>
+        <h2 className="text-base font-bold text-slate-800 mb-1">Risikoübersicht · alle Anwendungsfälle</h2>
         <p className="text-xs text-slate-400 mb-2">Automatisch abgeleitet aus EU AI Act Einstufung + Compliance-Lücken</p>
         <div className="flex flex-wrap gap-4 text-xs text-slate-600">
           <span><span className="font-mono font-bold text-slate-800">RPZ</span> = Risiko-Prioritäts-Zahl (1–1000)</span>
@@ -1594,16 +1594,16 @@ function RisikoTab({ isDemo }: { isDemo: boolean }) {
           </div>
         </div>
 
-        {/* Use Case selector */}
+        {/* Auswahl des Anwendungsfalls */}
         <div className="flex gap-2 flex-wrap items-end">
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs text-slate-400 mb-1">Use Case auswählen → Risiken automatisch ableiten</label>
+            <label className="block text-xs text-slate-400 mb-1">Anwendungsfall auswählen → Risiken automatisch ableiten</label>
             <select
               value={selectedUcId}
               onChange={(e) => setSelectedUcId(e.target.value)}
               className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">— Use Case wählen —</option>
+              <option value="">— Anwendungsfall wählen —</option>
               {useCases.map((uc) => (
                 <option key={uc.id} value={uc.id}>{uc.title || uc.id}</option>
               ))}
