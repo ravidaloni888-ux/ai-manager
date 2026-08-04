@@ -6,6 +6,7 @@ import { useProfil, useProfilStore } from '../store/mandantProfil'
 import { useUseCasesStore } from '../store/useCasesStore'
 import { useMandantStore, MANDANT_STYLE } from '../store/mandantStore'
 import MandatProfil from '../components/start/MandatProfil'
+import FaelleAuswahl from '../components/start/FaelleAuswahl'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Geführter Modus — Plan und Werkzeug auf einer Seite.
@@ -243,8 +244,8 @@ export default function GuidePage() {
                 </ul>
                 {IM_FALL.includes(current.id) && (
                   <p className="text-[11px] text-blue-800 mt-2.5 leading-relaxed">
-                    Diese Eingaben machen Sie je Anwendungsfall — unten einen Fall öffnen, dann im Canvas
-                    unter „Prüfungen zu diesem Fall“.
+                    Diese Eingaben machen Sie je Anwendungsfall — wählen Sie unten einen Fall,
+                    dann öffnet sich der Canvas direkt an dieser Prüfung.
                   </p>
                 )}
               </div>
@@ -283,7 +284,12 @@ export default function GuidePage() {
           </div>
         )}
 
-        {/* Werkzeug */}
+        {/* Bei Arbeit je Fall: erst die Fälle zur Auswahl, kein Werkzeug einbetten */}
+        {IM_FALL.includes(current.id) ? (
+          <div className="pb-24">
+            <FaelleAuswahl step={current.id} />
+          </div>
+        ) : (
         <div className="pb-24">
           <Suspense
             fallback={
@@ -297,6 +303,7 @@ export default function GuidePage() {
             )}
           </Suspense>
         </div>
+        )}
 
         {/* Fußleiste: weiter im Plan */}
         <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 backdrop-blur px-6 py-3 flex items-center gap-3 no-print">

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { scopedGet, scopedSet } from '../../lib/mandantData'
 import { getMandantType } from '../../store/mandantStore'
 import { loadCaseChecks, saveCaseChecks } from '../../lib/supabase'
@@ -313,12 +314,20 @@ function Art22Checker({ checked, setChecked }: {
 }
 
 /** Alle drei Fall-Checks — einklappbar, Antworten bleiben am Anwendungsfall. */
-type GroupKey = 'risiko' | 'datenschutz' | 'qualitaet' | 'fair' | 'ethik' | 'plan'
+export type GroupKey = 'risiko' | 'datenschutz' | 'qualitaet' | 'fair' | 'ethik' | 'plan'
+
+const GROUP_KEYS: GroupKey[] = ['risiko', 'datenschutz', 'qualitaet', 'fair', 'ethik', 'plan']
 
 /** Alle Prüfungen zu einem Anwendungsfall — Antworten bleiben am Fall. */
 export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
-  const [openGroup, setOpenGroup] = useState<GroupKey | null>(null)
-  const [autoOpened, setAutoOpened] = useState(false)
+  const [params] = useSearchParams()
+  const gewuenscht = params.get('check') as GroupKey | null
+  const vorgewaehlt = gewuenscht && GROUP_KEYS.includes(gewuenscht) ? gewuenscht : null
+
+  const [openGroup, setOpenGroup] = useState<GroupKey | null>(vorgewaehlt)
+  // Kommt der Nutzer aus dem geführten Modus, ist die Gruppe schon gesetzt —
+  // dann nicht noch einmal automatisch auf den ersten offenen Schritt springen.
+  const [autoOpened, setAutoOpened] = useState(!!vorgewaehlt)
   const [checks, setChecks] = useState<CaseChecks>(EMPTY_CHECKS)
   const [loaded, setLoaded] = useState(false)
 
@@ -357,7 +366,7 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
   const groups: { key: GroupKey; icon: string; title: string; hint: string; status: string; done: boolean }[] = [
     { key: 'qualitaet',   icon: '🧪', title: 'Datenqualität prüfen', hint: 'Sechs Dimensionen — zweckbezogen bewertet', status: dqCount ? `${dqCount}/6 bewertet` : '', done: dqCount === 6 },
     { key: 'fair',        icon: '✅', title: 'FAIR-Check',    hint: 'Auffindbar · Zugänglich · Interoperabel · Wiederverwendbar', status: fairCount ? `${fairCount} erfüllt` : '', done: fairCount === 4 },
-    { key: 'risiko',      icon: '⚖️', title: 'EU AI Act — Risikoklasse', hint: '1–3 Fragen bis zur Einstufung', status: rcResult, done: checks.riskClass.done },
+    { key: 'risiko',      icon: '⚖️', title: 'EU AI Act — Risikoklasse', hint: 'Prüfpfad der Verordnung — meist 3–5 Fragen', status: rcResult, done: checks.riskClass.done },
     { key: 'datenschutz', icon: '🛡️', title: 'Datenschutz',   hint: 'DSFA-Pflicht · AVV · Art. 22',              status: dsCount ? `${dsCount} beantwortet` : '', done: checks.avv.external !== null && checks.avv.personalData !== null },
     { key: 'ethik',       icon: '🧭', title: 'Ethik',         hint: 'FAST-Bewertung des Vorhabens',              status: checks.ethics.result ? checks.ethics.result.verdict : '', done: !!checks.ethics.result },
     { key: 'plan',        icon: '📋', title: 'To-do-Plan erstellen', hint: 'Compliance-Projektplan aus Profil und Prüfungen', status: '', done: false },
@@ -381,7 +390,7 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
   }
 
   return (
-    <section className="bg-white rounded-xl shadow-md overflow-hidden">
+    <section id="fall-wizard" className="bg-white rounded-xl shadow-md overflow-hidden">
       <div className="px-5 py-4 border-b border-slate-100">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Fall-Wizard · Prüfungen &amp; Plan</h2>

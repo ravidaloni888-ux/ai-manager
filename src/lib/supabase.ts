@@ -224,6 +224,17 @@ export async function loadCaseChecks(useCaseId: string): Promise<unknown | null>
   } catch { return null }
 }
 
+/** Alle Fall-Prüfungen auf einmal — für Übersichten über das ganze Portfolio. */
+export async function loadAllCaseChecks(): Promise<Record<string, unknown>> {
+  try {
+    const { data, error } = await supabase
+      .from('ai_case_checks')
+      .select('use_case_id, checks')
+    if (error || !data) return {}
+    return Object.fromEntries(data.map((r) => [r.use_case_id as string, r.checks]))
+  } catch { return {} }
+}
+
 /** true = in Supabase gespeichert, false = Tabelle fehlt oder Fehler */
 export async function saveCaseChecks(useCaseId: string, checks: unknown): Promise<boolean> {
   try {

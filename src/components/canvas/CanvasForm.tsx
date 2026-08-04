@@ -569,7 +569,7 @@ export default function CanvasForm({ existing }: Props) {
         </section>
 
         {/* Section 3: Portfolio Scoring */}
-        <section className="bg-white rounded-xl shadow-md p-5">
+        <section id="bewertung" className="bg-white rounded-xl shadow-md p-5">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">
             Portfolio-Bewertung
           </h2>
