@@ -8,6 +8,7 @@ import { useMandantStore, MANDANT_STYLE } from '../store/mandantStore'
 import { useIsDemo } from '../store/mandantStore'
 import MandatProfil from '../components/start/MandatProfil'
 import FaelleAuswahl from '../components/start/FaelleAuswahl'
+import CanvasPage from './CanvasPage'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Geführter Modus — Plan und Werkzeug auf einer Seite.
@@ -58,7 +59,7 @@ const TOOL: Record<StepId, React.LazyExoticComponent<() => JSX.Element>> = {
 } as Record<StepId, React.LazyExoticComponent<() => JSX.Element>>
 
 /** Schritte, deren Eingaben im einzelnen Anwendungsfall stattfinden. */
-const IM_FALL: StepId[] = ['data-quality', 'score', 'eu-act', 'project-plan']
+const IM_FALL: StepId[] = ['usecases', 'data-quality', 'score', 'eu-act', 'project-plan']
 
 export default function GuidePage() {
   const navigate = useNavigate()
@@ -72,6 +73,12 @@ export default function GuidePage() {
   const { useCases } = useUseCasesStore()
   const [theorieOffen, setTheorieOffen] = useState(false)
   const istDemo = useIsDemo()
+
+  // Der geführte Modus behält den Rahmen: Anlegen und Fallbearbeitung
+  // laufen als Unterzustand in der URL, nicht als eigene Seite.
+  const fallId = params.get('fall')
+  const fallCheck = params.get('check') ?? ''
+  const legtAn = params.get('neu') === '1'
 
   useEffect(() => { init(); initProfil() }, [activeId, init, initProfil])
 
@@ -100,7 +107,7 @@ export default function GuidePage() {
   const current = steps.find((s) => s.id === urlStep) ?? offen ?? pflicht[pflicht.length - 1] ?? steps[0]
 
   const geheZu = (id: StepId) => {
-    setParams({ step: id })
+    setParams({ step: id })   // fall/neu fallen dabei weg — bewusst
     setTheorieOffen(false)
     document.querySelector('[data-guide-main]')?.scrollTo({ top: 0 })
   }
@@ -309,10 +316,37 @@ export default function GuidePage() {
           </div>
         )}
 
-        {/* Bei Arbeit je Fall: erst die Fälle zur Auswahl, kein Werkzeug einbetten */}
+        {/* Bei Arbeit je Fall: Auswahl, Anlage und Bearbeitung — alles im Rahmen */}
         {IM_FALL.includes(current.id) ? (
-          <div className="pb-24">
-            <FaelleAuswahl step={current.id} />
+          <div className="pb-24 px-6 pt-5">
+            {(legtAn || fallId) && (
+              <button
+                type="button"
+                onClick={() => setParams({ step: current.id })}
+                className="text-xs font-semibold text-slate-500 hover:text-slate-700 mb-4"
+              >
+                ← Zurück zur Fallübersicht
+              </button>
+            )}
+
+            {legtAn ? (
+              <CanvasPage
+                eingebettet
+                onAngelegt={(id) => setParams({ step: current.id, fall: id, check: 'risiko' })}
+                onAbbrechen={() => setParams({ step: current.id })}
+              />
+            ) : fallId ? (
+              <CanvasPage id={fallId} check={fallCheck} eingebettet />
+            ) : (
+              <div className="-mx-6 -mt-5">
+                <FaelleAuswahl
+                  step={current.id}
+                  onNeu={() => setParams({ step: current.id, neu: '1' })}
+                  onFallWaehlen={(id, check) =>
+                    setParams(check ? { step: current.id, fall: id, check } : { step: current.id, fall: id })}
+                />
+              </div>
+            )}
           </div>
         ) : (
         <div className="pb-24">

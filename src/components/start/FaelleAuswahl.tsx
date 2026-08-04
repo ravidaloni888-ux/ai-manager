@@ -16,6 +16,7 @@ import type { StepId } from '../../store/wizardStore'
 
 /** Welcher Wizard-Schritt prüft was, und wo im Canvas liegt das? */
 const ZIEL: Record<string, { check: string; label: string }> = {
+  'usecases':     { check: '',           label: 'Anwendungsfälle' },
   'data-quality': { check: 'qualitaet',  label: 'Datenqualität' },
   'score':        { check: 'bewertung',  label: 'Bewertung' },
   'eu-act':       { check: 'risiko',     label: 'Risikoklasse' },
@@ -24,6 +25,8 @@ const ZIEL: Record<string, { check: string; label: string }> = {
 
 /** Ist die Prüfung für diesen Fall erledigt? */
 function istErledigt(step: StepId, checks: CaseChecks | undefined, uc: { businessImpact?: number }): boolean {
+  // Beim Inventarisieren zählt allein, dass der Fall existiert
+  if (step === 'usecases') return true
   if (step === 'score') return typeof uc.businessImpact === 'number'
   if (!checks) return false
   switch (step) {
@@ -40,7 +43,15 @@ function istErledigt(step: StepId, checks: CaseChecks | undefined, uc: { busines
   }
 }
 
-export default function FaelleAuswahl({ step }: { step: StepId }) {
+interface Props {
+  step: StepId
+  /** Im geführten Modus: Fall im Rahmen öffnen statt wegzunavigieren */
+  onFallWaehlen?: (id: string, check: string) => void
+  /** Im geführten Modus: Anlage-Wizard im Rahmen öffnen */
+  onNeu?: () => void
+}
+
+export default function FaelleAuswahl({ step, onFallWaehlen, onNeu }: Props) {
   const navigate = useNavigate()
   const { useCases } = useUseCasesStore()
   const [alleChecks, setAlleChecks] = useState<Record<string, CaseChecks>>({})
@@ -76,22 +87,24 @@ export default function FaelleAuswahl({ step }: { step: StepId }) {
         <div className="px-5 py-4 border-b border-slate-100">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-slate-800">
-              {ziel.label} je Anwendungsfall
+              {step === 'usecases' ? 'Erfasste Anwendungsfälle' : `${ziel.label} je Anwendungsfall`}
             </p>
             {useCases.length > 0 && (
               <span className="text-xs font-semibold text-blue-600 flex-shrink-0">
-                {fertig.length}/{useCases.length} erledigt
+                {step === 'usecases' ? `${useCases.length} erfasst` : `${fertig.length}/${useCases.length} erledigt`}
               </span>
             )}
           </div>
-          {useCases.length > 0 && (
+          {useCases.length > 0 && step !== 'usecases' && (
             <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mt-2">
               <div className="h-full rounded-full bg-blue-500 transition-all duration-500"
                    style={{ width: `${Math.round((fertig.length / useCases.length) * 100)}%` }} />
             </div>
           )}
           <p className="text-[11px] text-slate-400 mt-2">
-            Ein Klick öffnet den Fall direkt an dieser Prüfung.
+            {step === 'usecases'
+              ? 'Jede KI-Initiative gehört hier hinein — auch laufende und nur angedachte.'
+              : 'Ein Klick öffnet den Fall direkt an dieser Prüfung.'}
           </p>
         </div>
 
@@ -100,7 +113,7 @@ export default function FaelleAuswahl({ step }: { step: StepId }) {
             <p className="text-sm text-slate-500">Noch kein Anwendungsfall erfasst.</p>
             <button
               type="button"
-              onClick={() => navigate('/canvas/new')}
+              onClick={() => (onNeu ? onNeu() : navigate('/canvas/new'))}
               className="mt-3 text-xs font-semibold px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-colors"
             >
               Ersten Anwendungsfall anlegen →
@@ -114,7 +127,9 @@ export default function FaelleAuswahl({ step }: { step: StepId }) {
                 <button
                   key={uc.id}
                   type="button"
-                  onClick={() => navigate(`/canvas/${uc.id}?check=${ziel.check}`)}
+                  onClick={() => onFallWaehlen
+                    ? onFallWaehlen(uc.id, ziel.check)
+                    : navigate(`/canvas/${uc.id}${ziel.check ? `?check=${ziel.check}` : ''}`)}
                   className="w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors text-left"
                 >
                   <span className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-bold ${
@@ -134,6 +149,18 @@ export default function FaelleAuswahl({ step }: { step: StepId }) {
                 </button>
               )
             })}
+          </div>
+        )}
+
+        {useCases.length > 0 && (
+          <div className="px-5 py-3 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => (onNeu ? onNeu() : navigate('/canvas/new'))}
+              className="text-xs font-semibold px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-colors"
+            >
+              + Weiteren Anwendungsfall anlegen
+            </button>
           </div>
         )}
 

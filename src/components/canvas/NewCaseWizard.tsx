@@ -78,7 +78,7 @@ function Slider({ label, value, onChange }: { label: string; value: number; onCh
   )
 }
 
-export default function NewCaseWizard() {
+export default function NewCaseWizard({ onAngelegt, onAbbrechen }: { onAngelegt?: (id: string) => void; onAbbrechen?: () => void } = {}) {
   const navigate = useNavigate()
   const addUseCase = useUseCasesStore((s) => s.addUseCase)
   const profil = useProfil()
@@ -167,7 +167,9 @@ export default function NewCaseWizard() {
       dsfa: hrContext !== null ? { employees: hrContext } : {},
     })
 
-    navigate(`/canvas/${uc.id}`)
+    // Im geführten Modus bleibt der Rahmen stehen — dann übernimmt der Aufrufer
+    if (onAngelegt) onAngelegt(uc.id)
+    else navigate(`/canvas/${uc.id}`)
   }
 
   return (
@@ -350,7 +352,7 @@ export default function NewCaseWizard() {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          onClick={() => (idx > 0 ? setStep(ORDER[idx - 1]) : navigate('/use-cases'))}
+          onClick={() => (idx > 0 ? setStep(ORDER[idx - 1]) : onAbbrechen ? onAbbrechen() : navigate('/use-cases'))}
           className="text-xs font-semibold text-slate-500 hover:text-slate-700 px-3 py-2"
         >
           ← {idx > 0 ? 'Zurück' : 'Abbrechen'}
