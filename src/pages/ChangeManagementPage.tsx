@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import TheoryBlock from '../components/ui/TheoryBlock'
+import ChangeDiagnoseWizard from '../components/change/ChangeDiagnoseWizard'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Tag 16 · Change Management — Umgang mit Widerständen
@@ -574,7 +575,7 @@ function StoryKpiTab() {
 // ── Page ─────────────────────────────────────────────────────────────────
 
 export default function ChangeManagementPage() {
-  const [tab, setTab] = useState<'modelle' | 'widerstand' | 'story'>('modelle')
+  const [tab, setTab] = useState<'diagnose' | 'modelle' | 'widerstand' | 'story'>('diagnose')
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -590,6 +591,7 @@ export default function ChangeManagementPage() {
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
         {([
+          { id: 'diagnose',   label: '🧭 Diagnose je Person' },
           { id: 'modelle',    label: '🎯 ADKAR-Diagnose' },
           { id: 'widerstand', label: '🛡️ Widerstände' },
           { id: 'story',      label: '📖 Story & KPIs' },
@@ -601,6 +603,7 @@ export default function ChangeManagementPage() {
         ))}
       </div>
 
+      {tab === 'diagnose' && <ChangeDiagnoseWizard />}
       {tab === 'widerstand' && <WiderstaendeTab />}
       {tab === 'modelle' && <ModelleTab />}
       {tab === 'story' && <StoryKpiTab />}
