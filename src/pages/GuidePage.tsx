@@ -5,6 +5,7 @@ import { useWizardStore, StepId, useActiveScope, deriveStepNotes } from '../stor
 import { useProfil, useProfilStore } from '../store/mandantProfil'
 import { useUseCasesStore } from '../store/useCasesStore'
 import { useMandantStore, MANDANT_STYLE } from '../store/mandantStore'
+import { useIsDemo } from '../store/mandantStore'
 import MandatProfil from '../components/start/MandatProfil'
 import FaelleAuswahl from '../components/start/FaelleAuswahl'
 
@@ -70,6 +71,7 @@ export default function GuidePage() {
   const initProfil = useProfilStore((p) => p.init)
   const { useCases } = useUseCasesStore()
   const [theorieOffen, setTheorieOffen] = useState(false)
+  const istDemo = useIsDemo()
 
   useEffect(() => { init(); initProfil() }, [activeId, init, initProfil])
 
@@ -141,6 +143,17 @@ export default function GuidePage() {
           <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mt-2">
             <div className="h-full rounded-full bg-blue-500 transition-all duration-500" style={{ width: `${pct}%` }} />
           </div>
+          {gesamt - erledigt > 0 && (
+            <p className="text-[11px] text-slate-400 mt-1.5">
+              <span className="font-semibold text-slate-600">{gesamt - erledigt} offen</span> · {erledigt} erledigt
+            </p>
+          )}
+          {istDemo && (
+            <p className="text-[10px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 mt-2 leading-relaxed">
+              Demo-Mandant: Alle Schritte gelten als erledigt, damit Sie jeden anschauen können.
+              Für echten Fortschritt ein eigenes Mandat wählen.
+            </p>
+          )}
         </div>
 
         <nav className="py-2">
@@ -163,29 +176,41 @@ export default function GuidePage() {
                     aktiv ? 'bg-blue-50 border-l-2 border-blue-600' : 'border-l-2 border-transparent hover:bg-slate-50'
                   }`}
                 >
+                  {/* Der Kreis zeigt immer den Status — gefüllter Haken heisst
+                      erledigt, offener Ring heisst offen. „Aktiv" wird nur
+                      über Hintergrund und Balken markiert, nie über den Kreis,
+                      sonst verdeckt die Auswahl den Fortschritt. */}
                   <span
                     className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold mt-0.5 ${
                       fertig ? 'bg-green-500 text-white'
-                      : skipped ? 'bg-slate-100 text-slate-300'
-                      : aktiv ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-500'
+                      : skipped ? 'border-2 border-dashed border-slate-200 text-slate-300'
+                      : aktiv ? 'border-2 border-blue-500 bg-white text-blue-600'
+                      : 'border-2 border-slate-300 bg-white text-slate-500'
                     }`}
                   >
                     {fertig ? '✓' : skipped ? '–' : s.num}
                   </span>
-                  <span className="min-w-0">
+                  <span className="min-w-0 flex-1">
                     <span
                       className={`block text-xs leading-snug ${
-                        aktiv ? 'font-semibold text-blue-800'
-                        : fertig ? 'text-slate-400 line-through'
-                        : skipped ? 'text-slate-300'
-                        : 'text-slate-600'
+                        skipped ? 'text-slate-300'
+                        : fertig ? `text-slate-400 line-through ${aktiv ? 'font-semibold' : ''}`
+                        : aktiv ? 'font-semibold text-blue-800'
+                        : 'text-slate-700'
                       }`}
                     >
                       {s.title}
                     </span>
                     {skipped && <span className="block text-[10px] text-slate-400">entfällt</span>}
                   </span>
+                  {/* Farbe allein reicht nicht — der Stand steht auch als Wort da */}
+                  {!skipped && (
+                    <span className={`text-[9px] font-semibold uppercase tracking-wide flex-shrink-0 mt-1 ${
+                      fertig ? 'text-green-600' : 'text-slate-400'
+                    }`}>
+                      {fertig ? 'fertig' : 'offen'}
+                    </span>
+                  )}
                 </button>
               </div>
             )
