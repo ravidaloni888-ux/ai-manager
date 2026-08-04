@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useEnablementStore } from '../store/enablementStore'
 import { useAuthStore } from '../store/authStore'
+import SchulungsbedarfWizard from '../components/enablement/SchulungsbedarfWizard'
 import { TRAINING_TOPICS, DEPARTMENTS, TrainingTopicKey, TrainingStatus, EnablementData } from '../types'
 
 const TOPIC_CLR: Record<string, { border: string; badge: string; badgeText: string }> = {
@@ -581,7 +582,7 @@ function SchulungskonzeptTab() {
 }
 
 export default function EnablementPage() {
-  const [tab, setTab] = useState<'map' | 'library' | 'konzept'>('map')
+  const [tab, setTab] = useState<'bedarf' | 'map' | 'library' | 'konzept'>('map')
   const { data, loading, saving, init, setStatus, save } = useEnablementStore()
   const user = useAuthStore(s => s.user)
 
@@ -650,13 +651,13 @@ export default function EnablementPage() {
 
       {/* Tab bar */}
       <div className="flex gap-1 bg-slate-100 p-1 rounded-lg w-fit">
-        {(['map', 'library', 'konzept'] as const).map(key => (
+        {(['bedarf', 'map', 'library', 'konzept'] as const).map(key => (
           <button
             key={key}
             onClick={() => setTab(key)}
             className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${tab === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
-            {key === 'map' ? 'Training Map' : key === 'library' ? 'Topic Library' : '📚 Schulungskonzept'}
+            {key === 'bedarf' ? '🎯 Bedarfsanalyse' : key === 'map' ? 'Training Map' : key === 'library' ? 'Topic Library' : '📚 Schulungskonzept'}
           </button>
         ))}
       </div>
@@ -764,6 +765,8 @@ export default function EnablementPage() {
       )}
 
       {/* Schulungskonzept */}
+      {tab === 'bedarf' && <SchulungsbedarfWizard />}
+
       {tab === 'konzept' && <SchulungskonzeptTab />}
 
       {/* Topic Library */}
