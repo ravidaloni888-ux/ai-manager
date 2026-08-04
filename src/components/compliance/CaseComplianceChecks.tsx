@@ -7,7 +7,7 @@ import type { DataQualityState } from '../assessments/DataQualityCheck'
 import FairCheck, { EMPTY_FAIR } from '../assessments/FairCheck'
 import type { FairState } from '../assessments/FairCheck'
 import EthicsCheck, { EMPTY_ETHICS } from '../assessments/EthicsCheck'
-import RiskClassCheck, { EMPTY_RISK_CLASS, TREE_NODES } from '../assessments/RiskClassCheck'
+import RiskClassCheck, { EMPTY_RISK_CLASS, resultName } from '../assessments/RiskClassCheck'
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import type { EthicsState } from '../assessments/EthicsCheck'
 import { ProjectPlanContent } from '../../pages/ProjectPlanPage'
@@ -349,8 +349,9 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
   const dqCount = Object.values(checks.dataQuality.dims).filter((d) => d.rating !== null).length
   const fairCount = Object.values(checks.fair).filter(Boolean).length
 
-  const rcResult = checks.riskClass.done && checks.riskClass.resultId
-    ? TREE_NODES[checks.riskClass.resultId].result?.name ?? '' : ''
+  // Nie direkt in TREE_NODES greifen — gespeicherte Stände können IDs aus
+  // einer älteren Baumversion enthalten.
+  const rcResult = checks.riskClass.done ? resultName(checks.riskClass.resultId) : ''
 
   // Reihenfolge wie im KI-Programm: erst Datengrundlage, dann Recht, dann Plan.
   const groups: { key: GroupKey; icon: string; title: string; hint: string; status: string; done: boolean }[] = [

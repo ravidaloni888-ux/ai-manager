@@ -6,7 +6,7 @@ import { computePriorityScore } from '../../lib/scoring'
 import { useUseCasesStore } from '../../store/useCasesStore'
 import { useProfil, useProfilStore } from '../../store/mandantProfil'
 import type { Rolle, IsoZiel } from '../../store/mandantProfil'
-import RiskClassCheck, { EMPTY_RISK_CLASS, TREE_NODES } from '../assessments/RiskClassCheck'
+import RiskClassCheck, { EMPTY_RISK_CLASS, TREE_NODES, riskFromResult } from '../assessments/RiskClassCheck'
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import { EMPTY_CHECKS, saveChecks } from '../compliance/CaseComplianceChecks'
 
@@ -26,13 +26,6 @@ const STEP_LABEL: Record<WStep, string> = {
   iso: 'ISO 42001',
   score: 'Bewertung',
   summary: 'Anlegen',
-}
-
-const RESULT_TO_RISK: Record<string, EuAiActRisk> = {
-  r1: 'Unacceptable Risk',
-  r2: 'High Risk',
-  r3: 'Limited Risk',
-  r4: 'Minimal Risk',
 }
 
 const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
@@ -119,8 +112,8 @@ export default function NewCaseWizard() {
   const [urgency, setUrgency] = useState(5)
 
   const idx = ORDER.indexOf(step)
-  const euRisk: EuAiActRisk | undefined = riskClass.resultId ? RESULT_TO_RISK[riskClass.resultId] : undefined
-  const riskResult = riskClass.resultId ? TREE_NODES[riskClass.resultId].result : null
+  const euRisk: EuAiActRisk | undefined = riskFromResult(riskClass.resultId)
+  const riskResult = riskClass.resultId ? TREE_NODES[riskClass.resultId]?.result ?? null : null
 
   const kannWeiter: Record<WStep, boolean> = {
     basics: title.trim().length > 0,
