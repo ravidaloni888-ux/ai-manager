@@ -39,6 +39,7 @@ const TOOL: Record<StepId, React.LazyExoticComponent<() => JSX.Element>> = {
   'swot':           StrategyPage,
   'vision':         StrategyPage,
   'gap':            StrategyPage,
+  'strategie':      StrategyPage,
   'maturity':       MaturityPage,
   'eu-act-basics':  EuAiActPage,
   'dsgvo':          DsgvoPage,

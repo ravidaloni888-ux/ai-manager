@@ -21,7 +21,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'swot',       label: '① SWOT' },
   { id: 'vision',     label: '② KI-Vision' },
   { id: 'gap',        label: '③ Gap-Analyse' },
-  { id: 'focus',      label: 'Schwerpunkte' },
+  { id: 'focus',      label: '④ Schwerpunkte' },
   { id: 'roadmap',    label: 'Timeline' },
   { id: 'investment', label: 'Investitionen' },
 ]
@@ -83,8 +83,10 @@ export default function StrategyPage() {
   const { search } = useLocation()
   const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
   const [suchParams] = useSearchParams()
-  // Im geführten Modus heisst der Parameter 'step' und traegt dieselben IDs
-  const gewuenscht = (suchParams.get('tab') ?? suchParams.get('step')) as Tab | null
+  // Im geführten Modus heisst der Parameter 'step'. Die IDs sind bis auf
+  // den Strategieschritt deckungsgleich — der zeigt auf die Schwerpunkte.
+  const roh = suchParams.get('tab') ?? suchParams.get('step')
+  const gewuenscht = (roh === 'strategie' ? 'focus' : roh) as Tab | null
   const [tab, setTab] = useState<Tab>(
     gewuenscht && TABS.some((t) => t.id === gewuenscht) ? gewuenscht : 'vision',
   )

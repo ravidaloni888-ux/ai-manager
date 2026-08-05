@@ -91,6 +91,24 @@ export const STEPS: Step[] = [
     cta: 'Gap-Analyse öffnen',
   },
 
+  {
+    id: 'strategie',
+    phase: 'Fundament',
+    num: 5,
+    title: 'Strategische Schwerpunkte festlegen',
+    description: 'Aus der größten Lücke die Schwerpunkte ableiten, priorisieren und mit Budget und Kennzahlen hinterlegen.',
+    detail: 'Die Strategie ist die Antwort auf die Gap-Analyse — sie sagt, wie die Lücke geschlossen wird. Wer hier Schwerpunkte setzt, die nichts mit dem ermittelten Engpass zu tun haben, hat entweder die Lücke falsch bestimmt oder die Strategie an ihr vorbei gebaut. Budget und Kennzahlen machen aus der Absicht eine Verpflichtung.',
+    eingaben: [
+      'Je Schwerpunkt eine Priorität setzen — der Engpass aus der Gap-Analyse zuerst',
+      'Zielbild je Schwerpunkt in einem Satz',
+      'Gesamtbudget und Ziel-Rendite eintragen',
+      'Kennzahlen mit Ist, Ziel und Frist',
+    ],
+    effort: '~1 Std.',
+    to: '/strategy?tab=focus',
+    cta: 'Schwerpunkte öffnen',
+  },
+
   // ── Phase 2 · Rechtsrahmen & Ethik ──
   {
     id: 'eu-act-basics',
