@@ -88,9 +88,9 @@ export default function StrategyPage() {
   const user = useAuthStore((s) => s.user)
   const istDemo = useIsDemo()
   const mandantId = useMandantId()
-  const { search } = useLocation()
+  const { search, pathname } = useLocation()
   const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
-  const [suchParams] = useSearchParams()
+  const [suchParams, setSuchParams] = useSearchParams()
   // Im geführten Modus heisst der Parameter 'step'. Die IDs sind bis auf
   // den Strategieschritt deckungsgleich — der zeigt auf die Schwerpunkte.
   // Stand des Reifegrads für die Kennzahl oben — dieselbe Quelle wie der Reiter
@@ -111,6 +111,19 @@ export default function StrategyPage() {
 
   const roh = suchParams.get('tab') ?? suchParams.get('step')
   const gewuenscht = (roh === 'strategie' ? 'focus' : roh) as Tab | null
+
+  // Im geführten Modus muss ein Reiterwechsel auch die Schiene mitnehmen,
+  // sonst zeigen linke Markierung und offener Reiter auf Verschiedenes.
+  const imGuide = pathname === '/guide'
+  const alsSchritt: Partial<Record<Tab, string>> = {
+    swot: 'swot', vision: 'vision', maturity: 'maturity', gap: 'gap', focus: 'strategie',
+  }
+  const waehleTab = (t: Tab) => {
+    setTab(t)
+    const schritt = alsSchritt[t]
+    if (imGuide && schritt) setSuchParams({ step: schritt }, { replace: true })
+    else if (!imGuide) setSuchParams({ tab: t }, { replace: true })
+  }
   const [tab, setTab] = useState<Tab>(
     gewuenscht && TABS.some((t) => t.id === gewuenscht) ? gewuenscht : 'vision',
   )
@@ -177,7 +190,7 @@ export default function StrategyPage() {
           {TABS.map((t) => (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() => waehleTab(t.id)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
                 tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
               }`}

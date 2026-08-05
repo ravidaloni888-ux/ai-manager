@@ -109,6 +109,13 @@ export default function GuidePage() {
   const urlStep = params.get('step') as StepId | null
   const current = steps.find((s) => s.id === urlStep) ?? offen ?? pflicht[pflicht.length - 1] ?? steps[0]
 
+  // Ohne Schritt in der URL wüsste ein eingebettetes Werkzeug nicht, wo es
+  // steht — die Strategieseite etwa fiele auf ihren Standardreiter zurück
+  // und widerspräche der Markierung in der Schiene.
+  useEffect(() => {
+    if (!urlStep && current) setParams({ step: current.id }, { replace: true })
+  }, [urlStep, current, setParams])
+
   const geheZu = (id: StepId) => {
     setParams({ step: id })   // fall/neu fallen dabei weg — bewusst
     setTheorieOffen(false)
