@@ -88,6 +88,12 @@ export default function StrategyPage() {
   const [tab, setTab] = useState<Tab>(
     gewuenscht && TABS.some((t) => t.id === gewuenscht) ? gewuenscht : 'vision',
   )
+
+  // Im geführten Modus bleibt diese Seite montiert, während der Schritt
+  // wechselt — ohne diesen Effekt bliebe der zuerst geöffnete Reiter stehen.
+  useEffect(() => {
+    if (gewuenscht && TABS.some((t) => t.id === gewuenscht)) setTab(gewuenscht)
+  }, [gewuenscht])
   const [local, setLocal] = useState<StrategyData>(DEFAULT_STRATEGY)
   const [saved, setSaved] = useState(false)
 
