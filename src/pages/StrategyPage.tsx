@@ -15,6 +15,9 @@ import SwotTool from '../components/strategy/SwotTool'
 import GapAnalyse from '../components/strategy/GapAnalyse'
 import MaturityPage from './MaturityPage'
 import { useSearchParams } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { loadFor } from '../lib/mandantData'
+import { useIsDemo, useMandantId } from '../store/mandantStore'
 
 type Tab = 'swot' | 'vision' | 'maturity' | 'gap' | 'focus' | 'roadmap' | 'investment'
 
@@ -82,11 +85,29 @@ export default function StrategyPage() {
   const { data, loading, saving, init, save } = useStrategyStore()
   const { useCases } = useUseCasesStore()
   const user = useAuthStore((s) => s.user)
+  const istDemo = useIsDemo()
+  const mandantId = useMandantId()
   const { search } = useLocation()
   const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
   const [suchParams] = useSearchParams()
   // Im geführten Modus heisst der Parameter 'step'. Die IDs sind bis auf
   // den Strategieschritt deckungsgleich — der zeigt auf die Schwerpunkte.
+  // Stand des Reifegrads für die Kennzahl oben — dieselbe Quelle wie der Reiter
+  const [reifeBeantwortet, setReifeBeantwortet] = useState(0)
+  useEffect(() => {
+    let aktiv = true
+    if (istDemo) { setReifeBeantwortet(18); return }
+    loadFor<Record<string, number>>('maturity', async () => {
+      try {
+        const { data } = await supabase.from('ai_maturity').select('scores').eq('id', 'singleton').single()
+        return (data?.scores ?? {}) as Record<string, number>
+      } catch { return {} }
+    }, {}).then((sc) => {
+      if (aktiv) setReifeBeantwortet(Object.values(sc).filter((v) => v > 0).length)
+    })
+    return () => { aktiv = false }
+  }, [mandantId, istDemo])
+
   const roh = suchParams.get('tab') ?? suchParams.get('step')
   const gewuenscht = (roh === 'strategie' ? 'focus' : roh) as Tab | null
   const [tab, setTab] = useState<Tab>(
@@ -127,7 +148,7 @@ export default function StrategyPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">KI-Strategie</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Vision · Schwerpunkte · Roadmap · Investitionen — K7.0069</p>
+          <p className="text-sm text-slate-500 mt-0.5">SWOT · Vision · Reifegrad · Gap · Schwerpunkte — K7.0069</p>
         </div>
         {tab !== 'roadmap' && user && (
           <button
@@ -141,11 +162,12 @@ export default function StrategyPage() {
       </div>
 
       {/* KPI strip */}
-      <div className="grid grid-cols-4 gap-4">
-        <KpiCard icon="🎯" label="Vision"          value={visionFilled ? '✓ Gesetzt' : '— Leer'} ok={visionFilled} />
-        <KpiCard icon="🎚️" label="Schwerpunkte"  value={`${focusSet} / 8`}                    ok={focusSet >= 4} />
-        <KpiCard icon="💶" label="Budget"          value={budgetSet ? `€${local.budgetTotalK.toLocaleString()}k` : '— Nicht gesetzt'} ok={budgetSet} />
-        <KpiCard icon="📌" label="KPIs verfolgt"  value={`${kpiCount}`}                        ok={kpiCount > 0} />
+      <div className="grid grid-cols-5 gap-4">
+        <KpiCard icon="🎯" label="Vision"        value={visionFilled ? '✓ Gesetzt' : '— Leer'} ok={visionFilled} />
+        <KpiCard icon="📊" label="Reifegrad"     value={reifeBeantwortet > 0 ? `${reifeBeantwortet} / 18` : '— Offen'} ok={reifeBeantwortet >= 18} />
+        <KpiCard icon="🎚️" label="Schwerpunkte" value={`${focusSet} / 8`}                    ok={focusSet >= 4} />
+        <KpiCard icon="💶" label="Budget"        value={budgetSet ? `€${local.budgetTotalK.toLocaleString()}k` : '— Nicht gesetzt'} ok={budgetSet} />
+        <KpiCard icon="📌" label="KPIs verfolgt" value={`${kpiCount}`}                        ok={kpiCount > 0} />
       </div>
 
       {/* Tabs */}
