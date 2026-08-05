@@ -6,7 +6,7 @@ import type { MandantType } from './mandantStore'
 
 export type StepId =
   // Phase 1 · Fundament
-  | 'vision' | 'maturity'
+  | 'swot' | 'vision' | 'maturity' | 'gap'
   // Phase 2 · Rechtsrahmen & Ethik
   | 'eu-act-basics' | 'dsgvo' | 'ethics'
   // Phase 3 · Governance & Stakeholder
@@ -19,7 +19,7 @@ export type StepId =
   | 'qa' | 'data-integrity' | 'change' | 'enablement'
 
 export const ALL_STEP_IDS: StepId[] = [
-  'vision', 'maturity',
+  'swot', 'vision', 'maturity', 'gap',
   'eu-act-basics', 'dsgvo', 'ethics',
   'governance', 'roles', 'stakeholders',
   'usecases', 'data-quality', 'score', 'eu-act', 'project-plan',
@@ -29,7 +29,7 @@ export const ALL_STEP_IDS: StepId[] = [
 
 // Which step IDs cover each route (a route is "done" if ANY of its steps is done)
 export const ROUTE_STEPS: Record<string, StepId[]> = {
-  '/strategy':     ['vision'],
+  '/strategy':     ['swot', 'vision', 'gap'],
   '/maturity':     ['maturity'],
   '/eu-ai-act':    ['eu-act-basics'],
   '/dsgvo':        ['dsgvo'],

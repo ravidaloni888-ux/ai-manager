@@ -36,7 +36,9 @@ const EnablementPage       = lazy(() => import('./EnablementPage'))
 
 /** Welches Werkzeug gehört zu welchem Schritt? */
 const TOOL: Record<StepId, React.LazyExoticComponent<() => JSX.Element>> = {
+  'swot':           StrategyPage,
   'vision':         StrategyPage,
+  'gap':            StrategyPage,
   'maturity':       MaturityPage,
   'eu-act-basics':  EuAiActPage,
   'dsgvo':          DsgvoPage,

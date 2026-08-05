@@ -25,6 +25,23 @@ interface Step {
 export const STEPS: Step[] = [
   // ── Phase 1 · Fundament ──
   {
+    id: 'swot',
+    phase: 'Fundament',
+    num: 1,
+    title: 'SWOT für den KI-Einsatz',
+    description: 'Stärken, Schwächen, Chancen und Risiken erfassen — grob, zwei bis vier Punkte je Feld.',
+    detail: 'Die Standortbestimmung kommt vor die Vision, damit das Zielbild nicht am Markt oder an der eigenen Lage vorbeigeht. Entscheidend sind die unbequemen Felder: Wer Schwächen und Risiken auslässt, formuliert eine Vision, die im ersten Quartal an der Wirklichkeit zerschellt.',
+    eingaben: [
+      'Stärken — welche Daten, welches Fachwissen, welcher Rückhalt',
+      'Schwächen — wo Daten, Kompetenzen oder Entscheidungswege fehlen',
+      'Chancen — Marktlücken, reife Technologie, Partnerschaften',
+      'Risiken — Auflagen, Wettbewerb, Abhängigkeit von Anbietern',
+    ],
+    effort: '~45 Min.',
+    to: '/strategy?tab=swot',
+    cta: 'SWOT öffnen',
+  },
+  {
     id: 'vision',
     phase: 'Fundament',
     num: 1,
@@ -38,8 +55,8 @@ export const STEPS: Step[] = [
       'Schwerpunktbereiche mit Zielbild',
     ],
     effort: '~30 Min.',
-    to: '/strategy',
-    cta: 'Strategie-Assistent öffnen',
+    to: '/strategy?tab=vision',
+    cta: 'Vision-Assistent öffnen',
   },
   {
     id: 'maturity',
@@ -55,6 +72,23 @@ export const STEPS: Step[] = [
     effort: '~45 Min.',
     to: '/maturity',
     cta: 'Bewertung starten',
+  },
+
+  {
+    id: 'gap',
+    phase: 'Fundament',
+    num: 4,
+    title: 'Gap-Analyse — Lücke bestimmen',
+    description: 'Die Differenz zwischen Anspruch und Reife je Dimension, sortiert nach Größe.',
+    detail: 'Keine eigene Erhebung, sondern Rechenarbeit: Soll kommt aus dem Ambitionsniveau der Vision, Ist aus dem Reifegradcheck. Deshalb steht dieser Schritt zwingend nach beiden. Die größte Lücke bestimmt, worauf die Strategie antworten muss — alles andere ist Beiwerk.',
+    eingaben: [
+      'Nichts einzutragen — Vision und Reifegrad müssen vorliegen',
+      'Ergebnis prüfen: ist der Engpass plausibel?',
+      'Bei „keine Lücke": Ambitionsniveau womöglich zu niedrig gewählt',
+    ],
+    effort: '~15 Min.',
+    to: '/strategy?tab=gap',
+    cta: 'Gap-Analyse öffnen',
   },
 
   // ── Phase 2 · Rechtsrahmen & Ethik ──

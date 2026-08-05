@@ -11,14 +11,19 @@ import {
 } from '../types'
 import { scoreColor } from '../lib/scoring'
 import VisionWizard, { zielSatz } from '../components/strategy/VisionWizard'
+import SwotTool from '../components/strategy/SwotTool'
+import GapAnalyse from '../components/strategy/GapAnalyse'
+import { useSearchParams } from 'react-router-dom'
 
-type Tab = 'vision' | 'focus' | 'roadmap' | 'investment'
+type Tab = 'swot' | 'vision' | 'gap' | 'focus' | 'roadmap' | 'investment'
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'vision',     label: 'KI-Vision'      },
-  { id: 'focus',      label: 'Schwerpunkte'   },
-  { id: 'roadmap',    label: 'Timeline'       },
-  { id: 'investment', label: 'Investitionen'  },
+  { id: 'swot',       label: '① SWOT' },
+  { id: 'vision',     label: '② KI-Vision' },
+  { id: 'gap',        label: '③ Gap-Analyse' },
+  { id: 'focus',      label: 'Schwerpunkte' },
+  { id: 'roadmap',    label: 'Timeline' },
+  { id: 'investment', label: 'Investitionen' },
 ]
 
 const inputCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-slate-50 disabled:text-slate-400'
@@ -77,7 +82,12 @@ export default function StrategyPage() {
   const user = useAuthStore((s) => s.user)
   const { search } = useLocation()
   const fromWizard = new URLSearchParams(search).get('from') === 'wizard'
-  const [tab, setTab] = useState<Tab>('vision')
+  const [suchParams] = useSearchParams()
+  // Im geführten Modus heisst der Parameter 'step' und traegt dieselben IDs
+  const gewuenscht = (suchParams.get('tab') ?? suchParams.get('step')) as Tab | null
+  const [tab, setTab] = useState<Tab>(
+    gewuenscht && TABS.some((t) => t.id === gewuenscht) ? gewuenscht : 'vision',
+  )
   const [local, setLocal] = useState<StrategyData>(DEFAULT_STRATEGY)
   const [saved, setSaved] = useState(false)
 
@@ -154,6 +164,8 @@ export default function StrategyPage() {
       </div>
 
       {/* Tab content */}
+      {tab === 'swot'       && <SwotTool />}
+      {tab === 'gap'        && <GapAnalyse strategie={local} />}
       {tab === 'vision'     && <VisionTab     local={local} setLocal={setLocal} readonly={!user} />}
       {tab === 'focus'      && <FocusTab      local={local} setLocal={setLocal} readonly={!user} />}
       {tab === 'roadmap'    && <RoadmapTab    useCases={useCases} />}
