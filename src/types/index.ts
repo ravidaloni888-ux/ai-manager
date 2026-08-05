@@ -134,11 +134,25 @@ export interface StrategyKPI {
   deadline: string
 }
 
+/** Wie tief will das Haus selbst in KI einsteigen? Setzt den Maßstab für den Reifegrad. */
+export type Ambition = 'anwender' | 'integrator' | 'entwickler'
+
+/** Bausteine eines Ziels — der Wizard führt sie, gespeichert wird auch der Satz. */
+export interface ZielBaustein {
+  was: string
+  mess: string
+  frist: string
+}
+
 export interface StrategyData {
   vision: string
   horizon: '1' | '2' | '3' | '5'
   objectives: string[]
   challenge: string
+  /** aus dem Vision-Assistenten — optional, damit alte Stände weiter laden */
+  ambition?: Ambition
+  treiber?: string[]
+  zielBausteine?: ZielBaustein[]
   focusAreas: StrategyFocusArea[]
   budgetTotalK: number
   targetRoiPct: number
@@ -146,31 +160,33 @@ export interface StrategyData {
 }
 
 export const DEFAULT_STRATEGY: StrategyData = {
-  vision: 'By 2029, AI will be embedded in every customer-facing and core operational process — enabling our teams to focus on high-value decisions while intelligent systems handle routine tasks, forecasting, and quality control at scale.',
+  vision: 'Bis 2029 verbinden wir erprobte KI-Werkzeuge mit unseren eigenen Daten in Kundenservice, Betrieb und Vertrieb — um im Wettbewerb anschlussfähig zu bleiben und vermeidbaren manuellen Aufwand abzubauen. Die menschliche Entscheidung bleibt dort, wo sie hingehört.',
   horizon: '3',
+  ambition: 'integrator',
+  treiber: ['wettbewerb', 'kosten'],
   objectives: [
-    'Deploy AI in production across at least 12 use cases by Q4 2027, covering Sales, Operations and Finance',
-    'Achieve €2M in annual AI-driven cost savings and revenue uplift by end of 2027',
-    'Ensure 80+ employees are AI-literate and 5 certified AI Champions active across departments by Q1 2027',
+    'KI produktiv in Vertrieb, Betrieb und Finanzen — mindestens 12 Anwendungsfälle bis Q4 2027',
+    'Jährlicher Effekt aus KI — 2 Mio. € an Einsparungen und Mehrertrag bis Ende 2027',
+    'KI-Kompetenz in der Breite — 80 geschulte Mitarbeitende und 5 Multiplikatoren bis Q1 2027',
   ],
-  challenge: 'A key competitor launched an AI-powered pricing and service platform in Q1 2026, reducing our win rate by 11% in the enterprise segment. Manual processes in Operations and Finance are costing an estimated €4M per year in avoidable overhead. Without accelerating AI adoption now, the gap will widen.',
+  challenge: 'Ein wichtiger Wettbewerber hat im ersten Quartal 2026 eine KI-gestützte Preis- und Serviceplattform eingeführt; unsere Abschlussquote im Großkundengeschäft ist seither um 11 % gefallen. Manuelle Abläufe in Betrieb und Finanzen kosten geschätzt 4 Mio. € vermeidbaren Aufwand pro Jahr. Ohne Tempo beim KI-Einsatz wächst der Rückstand weiter.',
   focusAreas: [
-    { theme: 'Customer Experience',    priority: 'High',   note: 'Chatbot rollout + personalised service automation across all touchpoints' },
-    { theme: 'Operational Efficiency', priority: 'High',   note: 'Predictive maintenance, demand forecasting and invoice automation in scope' },
-    { theme: 'Revenue Growth',         priority: 'High',   note: 'Recommendation engine and dynamic pricing already in production' },
-    { theme: 'Risk & Compliance',      priority: 'Medium', note: 'Fraud detection live; credit risk AI under regulatory review' },
-    { theme: 'Innovation & R&D',       priority: 'Low',    note: 'Exploratory budget reserved for GenAI prototypes in H2' },
-    { theme: 'HR & Talent',            priority: 'Medium', note: 'Resume screening and attrition prediction planned for next cycle' },
-    { theme: 'Data & Analytics',       priority: 'Medium', note: 'Sentiment analysis and lead scoring to improve decision-making' },
-    { theme: 'Sustainability',         priority: 'Low',    note: 'Energy forecasting pilot to support ESG reporting commitments' },
+    { theme: 'Customer Experience',    priority: 'High',   note: 'Chatbot-Einführung und personalisierte Servicevorgänge über alle Kanäle' },
+    { theme: 'Operational Efficiency', priority: 'High',   note: 'Vorausschauende Wartung, Bedarfsprognose und Rechnungsverarbeitung im Umfang' },
+    { theme: 'Revenue Growth',         priority: 'High',   note: 'Empfehlungssystem und dynamische Preise bereits produktiv' },
+    { theme: 'Risk & Compliance',      priority: 'Medium', note: 'Betrugserkennung läuft; Kreditrisiko-KI in der aufsichtsrechtlichen Prüfung' },
+    { theme: 'Innovation & R&D',       priority: 'Low',    note: 'Erkundungsbudget für generative Prototypen im zweiten Halbjahr' },
+    { theme: 'HR & Talent',            priority: 'Medium', note: 'Bewerbungssichtung und Fluktuationsprognose für den nächsten Zyklus geplant' },
+    { theme: 'Data & Analytics',       priority: 'Medium', note: 'Stimmungsanalyse und Lead-Bewertung als Entscheidungsgrundlage' },
+    { theme: 'Sustainability',         priority: 'Low',    note: 'Pilot zur Energieprognose für die ESG-Berichtspflichten' },
   ],
   budgetTotalK: 2500,
   targetRoiPct: 250,
   kpis: [
-    { id: 'kpi-1', metric: 'Use cases in production',           current: '5',   target: '12',   deadline: 'Q4 2027' },
-    { id: 'kpi-2', metric: 'AI-trained employees',              current: '12',  target: '80',   deadline: 'Q1 2027' },
-    { id: 'kpi-3', metric: 'Annual AI-driven savings (€k)',     current: '0',   target: '2000', deadline: 'Q4 2027' },
-    { id: 'kpi-4', metric: '% of key processes AI-supported',  current: '8%',  target: '30%',  deadline: 'Q2 2027' },
+    { id: 'kpi-1', metric: 'Anwendungsfälle im Produktivbetrieb', current: '5',  target: '12',   deadline: 'Q4 2027' },
+    { id: 'kpi-2', metric: 'Geschulte Mitarbeitende',            current: '12',  target: '80',   deadline: 'Q1 2027' },
+    { id: 'kpi-3', metric: 'Jährliche Einsparung durch KI (T€)', current: '0',   target: '2000', deadline: 'Q4 2027' },
+    { id: 'kpi-4', metric: 'Kernprozesse mit KI-Unterstützung',  current: '8 %', target: '30 %', deadline: 'Q2 2027' },
     { id: 'kpi-5', metric: 'Avg. priority score across portfolio', current: '7.4', target: '8.0', deadline: 'Q4 2026' },
   ],
 }

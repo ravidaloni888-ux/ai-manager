@@ -10,6 +10,7 @@ import {
   DEFAULT_STRATEGY, STATUS_BG, Status, DEPARTMENTS, AIUseCase,
 } from '../types'
 import { scoreColor } from '../lib/scoring'
+import VisionWizard, { zielSatz } from '../components/strategy/VisionWizard'
 
 type Tab = 'vision' | 'focus' | 'roadmap' | 'investment'
 
@@ -178,6 +179,22 @@ function KpiCard({ icon, label, value, ok }: { icon: string; label: string; valu
 function VisionTab({ local, setLocal, readonly }: { local: StrategyData; setLocal: (d: StrategyData) => void; readonly: boolean }) {
   const upd = (patch: Partial<StrategyData>) => setLocal({ ...local, ...patch })
 
+  // Solange nichts steht, führt der Assistent. Danach zeigt die Seite das
+  // Ergebnis und lässt es überarbeiten oder von Hand nachschärfen.
+  const leer = !local.vision.trim()
+  const [assistentAn, setAssistentAn] = useState(leer)
+  const [freiformAn, setFreiformAn] = useState(false)
+
+  if (assistentAn && !readonly) {
+    return (
+      <VisionWizard
+        data={local}
+        onFertig={(patch) => { upd(patch); setAssistentAn(false) }}
+        onAbbrechen={leer ? undefined : () => setAssistentAn(false)}
+      />
+    )
+  }
+
   const filledObjectives = local.objectives.filter((o) => (o ?? '').trim().length > 0).length
   const required = [
     { label: 'Vision-Statement formuliert',        ok: local.vision.trim().length > 0 },
@@ -217,18 +234,51 @@ function VisionTab({ local, setLocal, readonly }: { local: StrategyData; setLoca
           Nicht vergessen: oben rechts <strong>Speichern</strong>.
         </p>
       </div>
-      {/* Vision statement */}
-      <div className="bg-white rounded-xl shadow-md p-5 space-y-2">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">KI-Vision Statement</h3>
-        <p className="text-xs text-slate-400">Wohin soll KI Ihre Organisation führen? Beschreiben Sie eine Vision für {local.horizon} Jahre ab heute.</p>
-        <textarea
-          rows={4}
-          disabled={readonly}
-          value={local.vision}
-          onChange={(e) => upd({ vision: e.target.value })}
-          placeholder="In 3 Jahren wird KI es uns ermöglichen, …"
-          className={textareaCls}
-        />
+      {/* Ergebnis des Assistenten */}
+      <div className="bg-white rounded-xl shadow-md p-5 space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide">KI-Vision</h3>
+          {!readonly && (
+            <button
+              type="button"
+              onClick={() => setAssistentAn(true)}
+              className="text-xs font-semibold text-blue-600 hover:text-blue-500 flex-shrink-0"
+            >
+              Mit dem Assistenten überarbeiten →
+            </button>
+          )}
+        </div>
+        <p className="text-base text-slate-800 leading-relaxed">{local.vision || '—'}</p>
+
+        <div className="flex flex-wrap gap-x-5 gap-y-1 pt-1 border-t border-slate-100 text-[11px] text-slate-500">
+          <span>Horizont: <strong className="text-slate-700">bis {new Date().getFullYear() + Number(local.horizon)}</strong></span>
+          {local.ambition && (
+            <span>Ambition: <strong className="text-slate-700">
+              {local.ambition === 'anwender' ? 'Anwender' : local.ambition === 'integrator' ? 'Integrator' : 'Entwickler'}
+            </strong></span>
+          )}
+          {local.treiber && local.treiber.length > 0 && (
+            <span>Auslöser: <strong className="text-slate-700">{local.treiber.length}</strong></span>
+          )}
+        </div>
+
+        {!readonly && (
+          <button
+            type="button"
+            onClick={() => setFreiformAn((v) => !v)}
+            className="text-[11px] text-slate-400 hover:text-slate-600"
+          >
+            {freiformAn ? 'Direktbearbeitung ausblenden' : 'Satz von Hand nachschärfen'}
+          </button>
+        )}
+        {freiformAn && !readonly && (
+          <textarea
+            rows={4}
+            value={local.vision}
+            onChange={(e) => upd({ vision: e.target.value })}
+            className={textareaCls}
+          />
+        )}
       </div>
 
       {/* Horizon */}
