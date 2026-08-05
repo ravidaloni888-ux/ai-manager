@@ -13,6 +13,7 @@ import { scoreColor } from '../lib/scoring'
 import VisionWizard, { zielSatz } from '../components/strategy/VisionWizard'
 import SwotTool from '../components/strategy/SwotTool'
 import GapAnalyse from '../components/strategy/GapAnalyse'
+import StrategieErgebnis from '../components/strategy/StrategieErgebnis'
 import MaturityPage from './MaturityPage'
 import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -200,7 +201,12 @@ export default function StrategyPage() {
       {tab === 'maturity'   && <MaturityPage eingebettet />}
       {tab === 'gap'        && <GapAnalyse strategie={local} />}
       {tab === 'vision'     && <VisionTab     local={local} setLocal={setLocal} readonly={!user} />}
-      {tab === 'focus'      && <FocusTab      local={local} setLocal={setLocal} readonly={!user} />}
+      {tab === 'focus'      && (
+        <div className="space-y-5">
+          <StrategieErgebnis strategie={local} />
+          <FocusTab local={local} setLocal={setLocal} readonly={!user} />
+        </div>
+      )}
       {tab === 'roadmap'    && <RoadmapTab    useCases={useCases} />}
       {tab === 'investment' && <InvestmentTab local={local} setLocal={setLocal} readonly={!user} useCases={useCases} />}
     </div>

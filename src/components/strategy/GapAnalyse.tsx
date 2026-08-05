@@ -64,8 +64,30 @@ const DEMO_SCORES: Scores = {
   adoption_0: 5, adoption_1: 4, adoption_2: 3,
 }
 
-export default function GapAnalyse({ strategie }: { strategie: StrategyData }) {
-  const navigate = useNavigate()
+export interface GapZeile {
+  id: string
+  label: string
+  ist: number | null
+  soll: number
+  luecke: number | null
+}
+
+export interface GapDaten {
+  geladen: boolean
+  ambition?: Ambition
+  beantwortet: number
+  zeilen: GapZeile[]
+  /** Lücken > 0, größte zuerst */
+  offen: GapZeile[]
+}
+
+export { MASSNAHME, ZIEL as GAP_ZIEL }
+
+/**
+ * Ist gegen Soll — dieselbe Rechnung für die Gap-Analyse und die Strategie,
+ * damit beide nicht auseinanderlaufen können.
+ */
+export function useGapDaten(strategie: StrategyData): GapDaten {
   const demo = useIsDemo()
   const mandantId = useMandantId()
   const [scores, setScores] = useState<Scores>({})
@@ -83,16 +105,33 @@ export default function GapAnalyse({ strategie }: { strategie: StrategyData }) {
     return () => { aktiv = false }
   }, [mandantId, demo])
 
-  const ambition = strategie.ambition
-
-  /** Ist-Wert je Dimension: Mittel der drei Antworten, sofern beantwortet. */
   const istWert = (dim: string): number | null => {
     const werte = [0, 1, 2].map((i) => scores[`${dim}_${i}`]).filter((v): v is number => typeof v === 'number')
     if (werte.length === 0) return null
     return werte.reduce((a, b) => a + b, 0) / werte.length
   }
 
-  const beantwortet = DIMS.filter((d) => istWert(d.id) !== null).length
+  const ambition = strategie.ambition
+  const soll = ambition ? SOLL[ambition] : null
+
+  const zeilen: GapZeile[] = DIMS.map((d) => {
+    const ist = istWert(d.id)
+    const s = soll ? soll[d.id] : 0
+    return { ...d, ist, soll: s, luecke: ist === null || !soll ? null : Math.round((s - ist) * 10) / 10 }
+  })
+
+  return {
+    geladen,
+    ambition,
+    beantwortet: zeilen.filter((z) => z.ist !== null).length,
+    zeilen,
+    offen: zeilen.filter((z) => z.luecke !== null && z.luecke > 0).sort((a, b) => (b.luecke ?? 0) - (a.luecke ?? 0)),
+  }
+}
+
+export default function GapAnalyse({ strategie }: { strategie: StrategyData }) {
+  const navigate = useNavigate()
+  const { geladen, ambition, beantwortet, zeilen, offen } = useGapDaten(strategie)
 
   // Beide Enden müssen stehen — sonst wird die Lücke geraten
   if (!geladen) {
@@ -129,16 +168,6 @@ export default function GapAnalyse({ strategie }: { strategie: StrategyData }) {
     )
   }
 
-  const soll = SOLL[ambition]
-  const zeilen = DIMS.map((d) => {
-    const ist = istWert(d.id)
-    const s = soll[d.id]
-    return { ...d, ist, soll: s, luecke: ist === null ? null : Math.round((s - ist) * 10) / 10 }
-  })
-
-  const offen = zeilen
-    .filter((z) => z.luecke !== null && z.luecke > 0)
-    .sort((a, b) => (b.luecke ?? 0) - (a.luecke ?? 0))
   const erfuellt = zeilen.filter((z) => z.luecke !== null && z.luecke <= 0)
   const groesste = offen[0]
 
