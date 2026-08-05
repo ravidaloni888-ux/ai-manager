@@ -30,73 +30,73 @@ interface DimDef {
 const DIMS: DimDef[] = [
   {
     id: 'strategy',
-    label: 'Strategy & Vision',
-    shortLabel: 'Strategy',
+    label: 'Strategie & Vision',
+    shortLabel: 'Strategie',
     color: '#3b82f6',
     questions: [
-      'We have a documented AI strategy aligned to business goals.',
-      'Leadership actively sponsors and funds AI initiatives.',
-      'We measure ROI and value created from AI use cases.',
+      'Es gibt eine schriftliche KI-Strategie, die zu den Unternehmenszielen passt.',
+      'Die Führung trägt KI-Vorhaben aktiv mit und stellt Mittel bereit.',
+      'Wir messen, welchen Wert die Anwendungsfälle tatsächlich schaffen.',
     ],
   },
   {
     id: 'people',
-    label: 'People & Culture',
-    shortLabel: 'People',
+    label: 'Menschen & Kompetenzen',
+    shortLabel: 'Menschen',
     color: '#8b5cf6',
     questions: [
-      'Employees have access to AI training and upskilling.',
-      'We have specialized AI talent (engineers, MLOps, prompt designers).',
-      'Our culture encourages safe experimentation with AI.',
+      'Mitarbeitende haben Zugang zu Schulung und Weiterbildung im KI-Bereich.',
+      'Wir haben Fachleute für KI im Haus (Entwicklung, Betrieb, Datenarbeit).',
+      'Bei uns darf man mit KI gefahrlos ausprobieren.',
     ],
   },
   {
     id: 'technology',
-    label: 'Technology',
-    shortLabel: 'Technology',
+    label: 'Technologie',
+    shortLabel: 'Technologie',
     color: '#06b6d4',
     questions: [
-      'We have a scalable platform to build and deploy AI solutions.',
-      'We can use multiple foundation models (proprietary and open).',
-      'MLOps / LLMOps practices cover the full lifecycle.',
+      'Es gibt eine tragfähige Plattform, um KI-Lösungen zu bauen und zu betreiben.',
+      'Wir können mehrere Modelle einsetzen — kommerzielle wie offene.',
+      'Der Betrieb ist über den ganzen Lebenszyklus geregelt, nicht nur bis zum Start.',
     ],
   },
   {
     id: 'data',
-    label: 'Data',
-    shortLabel: 'Data',
+    label: 'Daten',
+    shortLabel: 'Daten',
     color: '#10b981',
     questions: [
-      'Our data is well-governed, high-quality and accessible for AI.',
-      'We have vector stores and retrieval pipelines for enterprise knowledge.',
-      'Data lineage and access controls support trusted outputs.',
+      'Unsere Daten sind gepflegt, von guter Qualität und für KI erreichbar.',
+      'Firmenwissen ist so aufbereitet, dass eine KI gezielt darauf zugreifen kann.',
+      'Herkunft und Zugriffsrechte sind nachvollziehbar — Ergebnisse sind belegbar.',
     ],
   },
   {
     id: 'governance',
-    label: 'Governance & Risk',
+    label: 'Governance & Risiko',
     shortLabel: 'Governance',
     color: '#f59e0b',
     questions: [
-      'We have a Responsible AI framework (bias, fairness, transparency).',
-      'AI risks are tracked and mitigated (security, IP, hallucinations).',
-      'We comply with relevant AI regulations.',
+      'Es gibt einen verbindlichen Rahmen für verantwortliche KI (Verzerrung, Fairness, Transparenz).',
+      'KI-Risiken werden erfasst und gemindert — Sicherheit, Urheberrecht, falsche Ausgaben.',
+      'Wir erfüllen die für uns geltenden KI-Vorschriften.',
     ],
   },
   {
     id: 'adoption',
-    label: 'Use Cases & Adoption',
-    shortLabel: 'Adoption',
+    label: 'Anwendung & Akzeptanz',
+    shortLabel: 'Akzeptanz',
     color: '#ec4899',
     questions: [
-      'We have AI use cases live across multiple business areas.',
-      'Use cases move beyond pilots into production at scale.',
-      'AI creates measurable impact for users or customers.',
+      'In mehreren Bereichen laufen KI-Anwendungsfälle produktiv.',
+      'Vorhaben kommen über den Pilotstatus hinaus in den Regelbetrieb.',
+      'KI bewirkt etwas Messbares für Nutzende oder Kundschaft.',
     ],
   },
 ]
 
-const LEVEL_LABELS = ['Initial', 'Developing', 'Defined', 'Managed', 'Optimized']
+const LEVEL_LABELS = ['Anfänglich', 'Im Aufbau', 'Definiert', 'Gesteuert', 'Optimiert']
 const LEVEL_COLORS = ['text-red-500', 'text-orange-500', 'text-amber-500', 'text-blue-500', 'text-green-500']
 const LEVEL_BG    = ['bg-red-100 text-red-700', 'bg-orange-100 text-orange-700', 'bg-amber-100 text-amber-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700']
 
@@ -134,7 +134,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   )
 }
 
-export default function MaturityPage() {
+export default function MaturityPage({ eingebettet }: { eingebettet?: boolean } = {}) {
   const user = useAuthStore((s) => s.user)
   const demoMode = useIsDemo()
   const mandantId = useMandantId()
@@ -197,14 +197,25 @@ export default function MaturityPage() {
   const oli = levelIdx(totalOverall)
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
+    <div className={eingebettet ? 'space-y-6' : 'p-6 space-y-6'}>
+      {/* Header — als Reiter trägt die Strategieseite schon eine Überschrift */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Maturity Assessment</h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Rate your organization 1–5 across 6 AI dimensions · {answered}/18 answered
-          </p>
+          {eingebettet ? (
+            <>
+              <h3 className="text-base font-bold text-slate-800">KI-Reifegrad einschätzen</h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Sechs Dimensionen, je drei Aussagen von 1 bis 5 · {answered}/18 beantwortet
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold text-slate-800">KI-Reifegrad</h1>
+              <p className="text-sm text-slate-500 mt-0.5">
+                Sechs Dimensionen, je drei Aussagen von 1 bis 5 · {answered}/18 beantwortet
+              </p>
+            </>
+          )}
         </div>
         {user && isDirty && (
           <button
@@ -212,7 +223,7 @@ export default function MaturityPage() {
             disabled={saving}
             className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-60"
           >
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? 'Wird gespeichert…' : 'Speichern'}
           </button>
         )}
       </div>

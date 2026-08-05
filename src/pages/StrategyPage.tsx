@@ -13,15 +13,17 @@ import { scoreColor } from '../lib/scoring'
 import VisionWizard, { zielSatz } from '../components/strategy/VisionWizard'
 import SwotTool from '../components/strategy/SwotTool'
 import GapAnalyse from '../components/strategy/GapAnalyse'
+import MaturityPage from './MaturityPage'
 import { useSearchParams } from 'react-router-dom'
 
-type Tab = 'swot' | 'vision' | 'gap' | 'focus' | 'roadmap' | 'investment'
+type Tab = 'swot' | 'vision' | 'maturity' | 'gap' | 'focus' | 'roadmap' | 'investment'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'swot',       label: '① SWOT' },
   { id: 'vision',     label: '② KI-Vision' },
-  { id: 'gap',        label: '③ Gap-Analyse' },
-  { id: 'focus',      label: '④ Schwerpunkte' },
+  { id: 'maturity',   label: '③ Reifegrad' },
+  { id: 'gap',        label: '④ Gap-Analyse' },
+  { id: 'focus',      label: '⑤ Schwerpunkte' },
   { id: 'roadmap',    label: 'Timeline' },
   { id: 'investment', label: 'Investitionen' },
 ]
@@ -173,6 +175,7 @@ export default function StrategyPage() {
 
       {/* Tab content */}
       {tab === 'swot'       && <SwotTool />}
+      {tab === 'maturity'   && <MaturityPage eingebettet />}
       {tab === 'gap'        && <GapAnalyse strategie={local} />}
       {tab === 'vision'     && <VisionTab     local={local} setLocal={setLocal} readonly={!user} />}
       {tab === 'focus'      && <FocusTab      local={local} setLocal={setLocal} readonly={!user} />}

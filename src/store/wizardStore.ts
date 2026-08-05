@@ -29,7 +29,7 @@ export const ALL_STEP_IDS: StepId[] = [
 
 // Which step IDs cover each route (a route is "done" if ANY of its steps is done)
 export const ROUTE_STEPS: Record<string, StepId[]> = {
-  '/strategy':     ['swot', 'vision', 'gap', 'strategie'],
+  '/strategy':     ['swot', 'vision', 'maturity', 'gap', 'strategie'],
   '/maturity':     ['maturity'],
   '/eu-ai-act':    ['eu-act-basics'],
   '/dsgvo':        ['dsgvo'],

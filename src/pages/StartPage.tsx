@@ -70,8 +70,8 @@ export const STEPS: Step[] = [
       'Kurze Begründung, woran Sie die Stufe festmachen',
     ],
     effort: '~45 Min.',
-    to: '/maturity',
-    cta: 'Bewertung starten',
+    to: '/strategy?tab=maturity',
+    cta: 'Reifegrad einschätzen',
   },
 
   {
