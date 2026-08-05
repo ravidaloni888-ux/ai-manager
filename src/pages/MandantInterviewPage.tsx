@@ -119,8 +119,11 @@ const FRAGEN: Frage[] = [
   {
     id: 'strategie',
     frage: 'Gibt es eine schriftliche KI-Strategie oder Vision?',
+    hinweis: 'Daran hängt die ganze strategische Grundlage — Standortbestimmung, Zielbild, Lücke und Schwerpunkte.',
     optionen: [
-      { wert: 'ja',      label: 'Ja, liegt vor',       steps: ['vision'], erledigt: ['vision'] },
+      // Auch wenn die Vision steht, fehlen meist die Schritte davor und danach:
+      // eine dokumentierte SWOT und eine Lücke, die gegen den Anspruch gerechnet ist.
+      { wert: 'ja',      label: 'Ja, liegt vor',        steps: ['vision'], erledigt: ['vision'] },
       { wert: 'nein',    label: 'Nein, wird gebraucht', steps: ['vision'] },
       { wert: 'unnoetig', label: 'Nicht Teil des Auftrags' },
     ],
@@ -212,6 +215,15 @@ function ableiten(a: Antworten) {
   // Abhängigkeiten, die sich aus der Kombination ergeben
   if (steps.has('eu-act') || steps.has('score')) steps.add('usecases')
   if (steps.has('project-plan')) steps.add('eu-act')
+
+  // Die strategische Kette hängt zusammen: Die SWOT ist Vorarbeit zur Vision,
+  // die Gap-Analyse braucht Vision und Reifegrad als beide Enden der Rechnung,
+  // und die Schwerpunkte sind die Antwort auf die ermittelte Lücke.
+  if (steps.has('vision')) steps.add('swot')
+  if (steps.has('vision') && steps.has('maturity')) {
+    steps.add('gap')
+    steps.add('strategie')
+  }
 
   return {
     scope: ALL_STEP_IDS.filter((s) => steps.has(s)),
