@@ -9,6 +9,8 @@ import FairCheck, { EMPTY_FAIR } from '../assessments/FairCheck'
 import type { FairState } from '../assessments/FairCheck'
 import EthicsCheck, { EMPTY_ETHICS } from '../assessments/EthicsCheck'
 import RiskClassCheck, { EMPTY_RISK_CLASS, resultName } from '../assessments/RiskClassCheck'
+import DatenverfuegbarkeitCheck, { EMPTY_VERFUEGBARKEIT, verfuegbarkeitUrteil } from '../assessments/DatenverfuegbarkeitCheck'
+import type { VerfuegbarkeitState } from '../assessments/DatenverfuegbarkeitCheck'
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import type { EthicsState } from '../assessments/EthicsCheck'
 import { ProjectPlanContent } from '../../pages/ProjectPlanPage'
@@ -28,6 +30,7 @@ interface AvvState {
 }
 
 export interface CaseChecks {
+  verfuegbarkeit: VerfuegbarkeitState
   dsfa: Record<string, boolean>
   avv: AvvState
   art22: Record<number, boolean>
@@ -38,6 +41,7 @@ export interface CaseChecks {
 }
 
 export const EMPTY_CHECKS: CaseChecks = {
+  verfuegbarkeit: EMPTY_VERFUEGBARKEIT,
   dsfa: {},
   avv: { external: null, personalData: null, avvExists: null },
   art22: {},
@@ -314,9 +318,9 @@ function Art22Checker({ checked, setChecked }: {
 }
 
 /** Alle drei Fall-Checks — einklappbar, Antworten bleiben am Anwendungsfall. */
-export type GroupKey = 'risiko' | 'datenschutz' | 'qualitaet' | 'fair' | 'ethik' | 'plan'
+export type GroupKey = 'verfuegbarkeit' | 'risiko' | 'datenschutz' | 'qualitaet' | 'fair' | 'ethik' | 'plan'
 
-const GROUP_KEYS: GroupKey[] = ['risiko', 'datenschutz', 'qualitaet', 'fair', 'ethik', 'plan']
+const GROUP_KEYS: GroupKey[] = ['verfuegbarkeit', 'risiko', 'datenschutz', 'qualitaet', 'fair', 'ethik', 'plan']
 
 /** Alle Prüfungen zu einem Anwendungsfall — Antworten bleiben am Fall. */
 export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
@@ -356,6 +360,7 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
     Object.values(checks.art22).filter(Boolean).length +
     (checks.avv.external !== null ? 1 : 0)
   const dqCount = Object.values(checks.dataQuality.dims).filter((d) => d.rating !== null).length
+  const vfUrteil = verfuegbarkeitUrteil(checks.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT)
   const fairCount = Object.values(checks.fair).filter(Boolean).length
 
   // Nie direkt in TREE_NODES greifen — gespeicherte Stände können IDs aus
@@ -364,6 +369,10 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
 
   // Reihenfolge wie im KI-Programm: erst Datengrundlage, dann Recht, dann Plan.
   const groups: { key: GroupKey; icon: string; title: string; hint: string; status: string; done: boolean }[] = [
+    { key: 'verfuegbarkeit', icon: '🗄️', title: 'Datenverfügbarkeit',
+      hint: 'Vier Fragen vor dem Business Case — Existenz, Zugang, Qualität, Recht',
+      status: vfUrteil.beantwortet ? `${vfUrteil.beantwortet}/4 beantwortet` : '',
+      done: vfUrteil.vollstaendig },
     { key: 'qualitaet',   icon: '🧪', title: 'Datenqualität prüfen', hint: 'Sechs Dimensionen — zweckbezogen bewertet', status: dqCount ? `${dqCount}/6 bewertet` : '', done: dqCount === 6 },
     { key: 'fair',        icon: '✅', title: 'FAIR-Check',    hint: 'Auffindbar · Zugänglich · Interoperabel · Wiederverwendbar', status: fairCount ? `${fairCount} erfüllt` : '', done: fairCount === 4 },
     { key: 'risiko',      icon: '⚖️', title: 'EU AI Act — Risikoklasse', hint: 'Prüfpfad der Verordnung — meist 3–5 Fragen', status: rcResult, done: checks.riskClass.done },
@@ -462,6 +471,12 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
                         setChecked={(fn) => setChecks((prev) => ({ ...prev, art22: fn(prev.art22) }))}
                       />
                     </>
+                  )}
+                  {g.key === 'verfuegbarkeit' && (
+                    <DatenverfuegbarkeitCheck
+                      value={checks.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT}
+                      onChange={(fn) => setChecks((prev) => ({ ...prev, verfuegbarkeit: fn(prev.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT) }))}
+                    />
                   )}
                   {g.key === 'qualitaet' && (
                     <DataQualityCheck

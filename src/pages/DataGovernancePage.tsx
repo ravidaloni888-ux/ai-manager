@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { VERFUEGBARKEIT_FRAGEN } from '../components/assessments/DatenverfuegbarkeitCheck'
 import TheoryBlock from '../components/ui/TheoryBlock'
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -84,6 +86,7 @@ function DatenintegritaetTab() {
 // ── Page ─────────────────────────────────────────────────────────────────
 
 export default function DataGovernancePage() {
+  const navigate = useNavigate()
   const [tab, setTab] = useState<'integritaet'>('integritaet')
 
   return (
@@ -95,6 +98,41 @@ export default function DataGovernancePage() {
         <p className="text-sm text-slate-500 mt-0.5">
           Integrität, Protokollierung und Versionierung — die organisatorische Grundlage
         </p>
+      </div>
+
+      {/* Der Kern der Datenarbeit — steht bewusst vor allem anderen */}
+      <div className="bg-slate-800 text-white rounded-xl px-6 py-5 space-y-3">
+        <p className="text-[11px] font-mono uppercase tracking-widest text-slate-400">Der kritische Engpass</p>
+        <h2 className="text-xl font-bold">Das Modell ist selten das Problem — die Daten schon</h2>
+        <p className="text-sm text-slate-300 leading-relaxed">
+          In der Mehrzahl gescheiterter KI-Projekte liegt die Ursache nicht in der Technologie, sondern in
+          der Datenverfügbarkeit: Daten existieren zwar, sind aber verteilt, uneinheitlich in der Qualität,
+          rechtlich beschränkt oder nicht in der nötigen Granularität vorhanden.
+        </p>
+
+        <div className="grid sm:grid-cols-2 gap-3 pt-1">
+          {VERFUEGBARKEIT_FRAGEN.map((f, i) => (
+            <div key={f.id} className="bg-white/10 rounded-lg px-4 py-3">
+              <p className="text-sm font-semibold">
+                <span className="text-slate-400 mr-1.5">{i + 1}</span>{f.titel}
+                {f.hart && <span className="ml-2 text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded-full">K.-o.</span>}
+              </p>
+              <p className="text-[12px] text-slate-300 mt-1 leading-snug">{f.frage}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-[12px] text-slate-300 pt-1">
+          Vier Fragen, die <strong className="text-white">vor jedem Business Case</strong> zu beantworten sind —
+          je Anwendungsfall, weil sie zweckbezogen sind.
+        </p>
+        <button
+          type="button"
+          onClick={() => navigate('/guide?step=data-quality')}
+          className="text-xs font-semibold bg-white text-slate-800 px-4 py-2 rounded-lg hover:bg-slate-100 transition-colors"
+        >
+          Fall auswählen und prüfen →
+        </button>
       </div>
 
       {/* Tabs */}
@@ -113,10 +151,12 @@ export default function DataGovernancePage() {
 
       {/* Die fallbezogenen Prüfungen sind an den Anwendungsfall gewandert */}
       <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
-        <p className="text-sm font-semibold text-slate-700">Datenqualität und FAIR prüfen Sie je Anwendungsfall</p>
+        <p className="text-sm font-semibold text-slate-700">Die fallbezogenen Datenprüfungen liegen im Anwendungsfall</p>
         <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-          Beide Prüfungen sind zweckbezogen — sie brauchen ein konkretes Vorhaben. Sie finden sie im
-          Anwendungsfall unter <strong>Prüfungen zu diesem Fall</strong>, zusammen mit Datenschutz und Ethik.
+          Verfügbarkeit, Qualität und FAIR sind zweckbezogen — sie brauchen ein konkretes Vorhaben.
+          Sie finden alle drei im Anwendungsfall unter <strong>Fall-Wizard · Prüfungen &amp; Plan</strong>,
+          in dieser Reihenfolge: erst die vier Verfügbarkeitsfragen als Gate, dann die sechs
+          Qualitätsdimensionen im Detail.
         </p>
       </div>
     </div>
