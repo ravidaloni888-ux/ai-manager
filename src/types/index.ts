@@ -106,19 +106,12 @@ export interface AIRisk {
   residualE: number
 }
 
-export type Motivation =
-  | 'Cost Reduction'
-  | 'Time Saving'
-  | 'Error Reduction'
-  | 'Revenue Growth'
-  | 'Customer Experience'
-  | 'Risk & Compliance'
-  | 'Quality Improvement'
-  | 'Competitive Advantage'
-  | 'Scalability'
-  | 'Data & Insights'
-  | 'Employee Experience'
-  | 'Sustainability'
+/**
+ * Fünf Auslöser, aus denen ein KI-Vorhaben entsteht. Bewusst knapp: Wer
+ * zwölf Kategorien anbietet, bekommt Mehrfachauswahl ohne Aussage. Jeder
+ * Auslöser lässt sich später an einer Kennzahl messen.
+ */
+export type Motivation = 'Zeit' | 'Kosten' | 'Umsatz' | 'Qualität' | 'Risiko'
 
 export interface StrategyFocusArea {
   theme: string
@@ -263,35 +256,59 @@ export const AI_APPROACHES: AIApproach[] = [
 
 export const FEASIBILITIES: TechnicalFeasibility[] = ['Low', 'Medium', 'High']
 
-export const MOTIVATIONS: Motivation[] = [
-  'Cost Reduction',
-  'Time Saving',
-  'Error Reduction',
-  'Revenue Growth',
-  'Customer Experience',
-  'Risk & Compliance',
-  'Quality Improvement',
-  'Competitive Advantage',
-  'Scalability',
-  'Data & Insights',
-  'Employee Experience',
-  'Sustainability',
+export interface MotivationDef {
+  key: Motivation
+  desc: string
+  bg: string
+}
+
+export const MOTIVATION_DEFS: MotivationDef[] = [
+  { key: 'Zeit',     desc: 'Durchlaufzeit senken, Bearbeitung beschleunigen',                 bg: 'bg-blue-100 text-blue-700' },
+  { key: 'Kosten',   desc: 'Manuellen Aufwand oder wiederkehrende Rüstkosten reduzieren',     bg: 'bg-emerald-100 text-emerald-700' },
+  { key: 'Umsatz',   desc: 'Bessere Angebote, höhere Abschlussquote',                         bg: 'bg-green-100 text-green-700' },
+  { key: 'Qualität', desc: 'Weniger Fehler, konstantere Ergebnisse',                          bg: 'bg-violet-100 text-violet-700' },
+  { key: 'Risiko',   desc: 'Betrug, Ausfälle oder Verstöße früher erkennen und verhindern',   bg: 'bg-red-100 text-red-700' },
 ]
 
-export const MOTIVATION_BG: Record<Motivation, string> = {
-  'Cost Reduction':       'bg-emerald-100 text-emerald-700',
-  'Time Saving':          'bg-blue-100 text-blue-700',
-  'Error Reduction':      'bg-orange-100 text-orange-700',
-  'Revenue Growth':       'bg-green-100 text-green-700',
-  'Customer Experience':  'bg-pink-100 text-pink-700',
-  'Risk & Compliance':    'bg-red-100 text-red-700',
-  'Quality Improvement':  'bg-violet-100 text-violet-700',
-  'Competitive Advantage':'bg-indigo-100 text-indigo-700',
-  'Scalability':          'bg-cyan-100 text-cyan-700',
-  'Data & Insights':      'bg-amber-100 text-amber-700',
-  'Employee Experience':  'bg-teal-100 text-teal-700',
-  'Sustainability':       'bg-lime-100 text-lime-700',
+export const MOTIVATIONS: Motivation[] = MOTIVATION_DEFS.map((m) => m.key)
+
+export const MOTIVATION_BG: Record<Motivation, string> = Object.fromEntries(
+  MOTIVATION_DEFS.map((m) => [m.key, m.bg]),
+) as Record<Motivation, string>
+
+/**
+ * Bestehende Fälle tragen noch die alten zwölf Werte. Sie werden beim
+ * Anzeigen auf die fünf abgebildet, statt sie zu verlieren — die Zuordnung
+ * folgt dem, was der alte Wert praktisch gemessen hat.
+ */
+const MOTIVATION_ALT: Record<string, Motivation> = {
+  'Time Saving': 'Zeit',
+  'Employee Experience': 'Zeit',
+  'Cost Reduction': 'Kosten',
+  'Scalability': 'Kosten',
+  'Sustainability': 'Kosten',
+  'Revenue Growth': 'Umsatz',
+  'Customer Experience': 'Umsatz',
+  'Competitive Advantage': 'Umsatz',
+  'Error Reduction': 'Qualität',
+  'Quality Improvement': 'Qualität',
+  'Data & Insights': 'Qualität',
+  'Risk & Compliance': 'Risiko',
 }
+
+/**
+ * Kommagetrennte Auslöser auf die fünf Kategorien bringen — ohne Dubletten,
+ * in der Reihenfolge der Liste. Unbekanntes bleibt unverändert stehen.
+ */
+export function motivationenLesen(wert: string | undefined): string[] {
+  if (!wert) return []
+  const roh = wert.split(',').map((s) => s.trim()).filter(Boolean)
+  const gemappt = roh.map((r) => MOTIVATION_ALT[r] ?? r)
+  const bekannt = MOTIVATIONS.filter((m) => gemappt.includes(m))
+  const fremd = [...new Set(gemappt.filter((g) => !(MOTIVATIONS as string[]).includes(g)))]
+  return [...bekannt, ...fremd]
+}
+
 
 export const PROJECT_HEALTH_OPTIONS: { value: ProjectHealth; label: string; activeCls: string; dotCls: string }[] = [
   { value: 'On Track', label: 'On Track', activeCls: 'bg-green-500 text-white', dotCls: 'bg-green-500' },

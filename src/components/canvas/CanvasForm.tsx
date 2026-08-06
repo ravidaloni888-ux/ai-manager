@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid'
 import {
   AIUseCase, DEPARTMENTS, STATUSES, AI_APPROACHES, FEASIBILITIES,
   STATUS_BG, APPROACH_BG, FEASIBILITY_BG, MOTIVATION_BG,
-  PROJECT_HEALTH_OPTIONS, MOTIVATIONS, ProjectHealth,
+  PROJECT_HEALTH_OPTIONS, MOTIVATION_DEFS, motivationenLesen, ProjectHealth,
   EU_AI_ACT_RISKS, EU_AI_ACT_BG, EuAiActRisk,
 } from '../../types'
 import { computePriorityScore, computeROI, scoreColor } from '../../lib/scoring'
@@ -85,7 +85,8 @@ function CompetencySelect({ value, onChange }: { value: string; onChange: (v: st
 
 function MotivationSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false)
-  const selected = value ? value.split(',').map((s) => s.trim()).filter(Boolean) : []
+  // Alte Werte werden beim Lesen auf die fünf Kategorien gebracht
+  const selected = motivationenLesen(value)
 
   const toggle = (m: string) => {
     const next = selected.includes(m) ? selected.filter((s) => s !== m) : [...selected, m]
@@ -108,7 +109,7 @@ function MotivationSelect({ value, onChange }: { value: string; onChange: (v: st
             ))}
           </span>
         ) : (
-          <span className="text-slate-400">Select motivations…</span>
+          <span className="text-slate-400">Auslöser wählen…</span>
         )}
         <svg className="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d={open ? 'M4.5 15.75l7.5-7.5 7.5 7.5' : 'M19.5 8.25l-7.5 7.5-7.5-7.5'} />
@@ -116,15 +117,18 @@ function MotivationSelect({ value, onChange }: { value: string; onChange: (v: st
       </button>
       {open && (
         <div className="absolute z-20 left-0 right-0 top-[calc(100%+4px)] bg-white rounded-xl shadow-xl border border-slate-100 max-h-56 overflow-y-auto">
-          {MOTIVATIONS.map((m) => (
-            <label key={m} className="flex items-center gap-3 px-3 py-2 hover:bg-slate-50 cursor-pointer text-sm">
+          {MOTIVATION_DEFS.map((m) => (
+            <label key={m.key} className="flex items-start gap-3 px-3 py-2.5 hover:bg-slate-50 cursor-pointer">
               <input
                 type="checkbox"
-                checked={selected.includes(m)}
-                onChange={() => toggle(m)}
-                className="accent-blue-600 w-4 h-4 flex-shrink-0"
+                checked={selected.includes(m.key)}
+                onChange={() => toggle(m.key)}
+                className="accent-blue-600 w-4 h-4 flex-shrink-0 mt-0.5"
               />
-              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${MOTIVATION_BG[m]}`}>{m}</span>
+              <span className="min-w-0">
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${m.bg}`}>{m.key}</span>
+                <span className="block text-[11px] text-slate-500 mt-1 leading-snug">{m.desc}</span>
+              </span>
             </label>
           ))}
         </div>

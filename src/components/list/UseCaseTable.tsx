@@ -20,7 +20,7 @@ import {
 import {
   AIUseCase, Status, AIApproach, ProjectHealth,
   STATUS_BG, APPROACH_BG, FEASIBILITY_BG, HEALTH_BG, MOTIVATION_BG,
-  STATUSES, AI_APPROACHES, DEPARTMENTS, PROJECT_HEALTH_OPTIONS, MOTIVATIONS,
+  STATUSES, AI_APPROACHES, DEPARTMENTS, PROJECT_HEALTH_OPTIONS, MOTIVATIONS, motivationenLesen,
 } from '../../types'
 
 const motivationFilterFn: FilterFn<AIUseCase> = (row, columnId, filterValue: string) => {
@@ -129,7 +129,7 @@ export default function UseCaseTable() {
         if (!v) return null
         return (
           <div className="flex flex-wrap gap-1">
-            {v.split(',').map((m) => m.trim()).filter(Boolean).map((m) => (
+            {motivationenLesen(v).map((m) => (
               <span key={m} className={`text-xs font-medium px-2 py-0.5 rounded-full ${MOTIVATION_BG[m as keyof typeof MOTIVATION_BG] ?? 'bg-slate-100 text-slate-600'}`}>
                 {m}
               </span>
