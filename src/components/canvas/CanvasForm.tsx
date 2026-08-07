@@ -5,11 +5,11 @@ import { useNavigate } from 'react-router-dom'
 import { nanoid } from 'nanoid'
 import {
   AIUseCase, DEPARTMENTS, STATUSES, AI_APPROACHES, FEASIBILITIES,
-  STATUS_BG, APPROACH_BG, FEASIBILITY_BG, MOTIVATION_BG,
+  STATUS_BG, APPROACH_BG, FEASIBILITY_BG, FEASIBILITY_LABEL, MOTIVATION_BG,
   PROJECT_HEALTH_OPTIONS, MOTIVATION_DEFS, motivationenLesen, ProjectHealth,
   EU_AI_ACT_RISKS, EU_AI_ACT_BG, EuAiActRisk,
 } from '../../types'
-import { computePriorityScore, computeROI, scoreColor } from '../../lib/scoring'
+import { computePriorityScore, computeROI, scoreColor, feasibilityStufe } from '../../lib/scoring'
 import { useUseCasesStore } from '../../store/useCasesStore'
 import { useRiskStore } from '../../store/riskStore'
 import { deriveAIRisks } from '../../lib/deriveRisks'
@@ -237,6 +237,8 @@ export default function CanvasForm({ existing }: Props) {
       expectedBenefitK: Number(data.expectedBenefitK),
       businessImpact: Number(data.businessImpact),
       feasibility: Number(data.feasibility),
+      // Die Stufe folgt dem Regler — nie getrennt gepflegt
+      technicalFeasibility: feasibilityStufe(Number(data.feasibility)),
       strategicFit: Number(data.strategicFit),
       urgency: Number(data.urgency),
       id: existing?.id ?? nanoid(),
@@ -261,7 +263,8 @@ export default function CanvasForm({ existing }: Props) {
 
   const currentStatus = watched.status ?? 'Idea'
   const currentApproach = watched.aiApproach ?? 'Supervised Learning'
-  const currentFeas = watched.technicalFeasibility ?? 'Medium'
+  // Ein Wert, zwei Darstellungen: der Regler führt, die Stufe folgt daraus
+  const currentFeas = feasibilityStufe(Number(watched.feasibility ?? 7))
 
   if (savedId) {
     return (
@@ -451,7 +454,7 @@ export default function CanvasForm({ existing }: Props) {
         {/* Section 2: AI Use Case Canvas */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-            KI-Anwendungsfall-Canvas <span className="text-slate-400 font-normal normal-case">(9 Elemente)</span>
+            KI-Anwendungsfall-Canvas <span className="text-slate-400 font-normal normal-case">(8 Elemente)</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -497,20 +500,8 @@ export default function CanvasForm({ existing }: Props) {
               </div>
             </div>
 
-            <div>
-              <label className={labelCls}>5 · Technische Machbarkeit</label>
-              <div className="flex items-center gap-2">
-                <select {...register('technicalFeasibility')} className={inputCls}>
-                  {FEASIBILITIES.map((f) => <option key={f}>{f}</option>)}
-                </select>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${FEASIBILITY_BG[currentFeas as keyof typeof FEASIBILITY_BG]}`}>
-                  {currentFeas}
-                </span>
-              </div>
-            </div>
-
             <div className="md:col-span-2">
-              <label className={labelCls}>6 · Benötigte Teamkompetenzen</label>
+              <label className={labelCls}>5 · Benötigte Teamkompetenzen</label>
               <CompetencySelect
                 value={watched.teamCompetencies ?? ''}
                 onChange={(v) => setValue('teamCompetencies', v)}
@@ -518,7 +509,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>7 · Zeitplan</label>
+              <label className={labelCls}>6 · Zeitplan</label>
               <input
                 {...register('timeline')}
                 className={inputCls}
@@ -541,7 +532,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>8 · Geschätzte Kosten (€k)</label>
+              <label className={labelCls}>7 · Geschätzte Kosten (€k)</label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-sm text-slate-400">€</span>
                 <input
@@ -556,7 +547,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>9 · Erwarteter Jahresnutzen (€k/J.)</label>
+              <label className={labelCls}>8 · Erwarteter Jahresnutzen (€k/J.)</label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-sm text-slate-400">€</span>
                 <input
@@ -582,14 +573,21 @@ export default function CanvasForm({ existing }: Props) {
           </p>
           <div className="space-y-3">
             <SliderField label="Geschäftsnutzen"      name="businessImpact" weight="40%" register={register} value={Number(watched.businessImpact ?? 7)} />
-            <SliderField label="Machbarkeit"           name="feasibility"    weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
+            <SliderField label="Technische Machbarkeit" name="feasibility"   weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
             <SliderField label="Strategische Passung"  name="strategicFit"   weight="20%" register={register} value={Number(watched.strategicFit ?? 7)} />
             <SliderField label="Dringlichkeit"         name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
           </div>
+          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-100">
+            <span className="text-[11px] text-slate-500">Einstufung daraus:</span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${FEASIBILITY_BG[currentFeas]}`}>
+              {FEASIBILITY_LABEL[currentFeas]}
+            </span>
+            <span className="text-[11px] text-slate-400">— erscheint so in Liste und Export</span>
+          </div>
           {existing && (
-            <p className="text-[11px] text-slate-400 mt-4 pt-3 border-t border-slate-100">
-              Die Machbarkeit lässt sich erst nach der Datenqualitätsprüfung unten belastbar einschätzen —
-              danach hier gegebenenfalls nachschärfen.
+            <p className="text-[11px] text-slate-400 mt-2">
+              Die technische Machbarkeit lässt sich erst nach den Datenprüfungen unten belastbar
+              einschätzen — fehlt das Nutzungsrecht, trägt kein Wert über 5.
             </p>
           )}
         </section>

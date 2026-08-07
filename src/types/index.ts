@@ -353,6 +353,10 @@ export const APPROACH_BG: Record<AIApproach, string> = {
   'NLP':                    'bg-teal-100 text-teal-700',
 }
 
+export const FEASIBILITY_LABEL: Record<TechnicalFeasibility, string> = {
+  High: 'Hoch', Medium: 'Mittel', Low: 'Gering',
+}
+
 export const FEASIBILITY_BG: Record<TechnicalFeasibility, string> = {
   High:   'bg-green-100 text-green-700',
   Medium: 'bg-amber-100 text-amber-700',

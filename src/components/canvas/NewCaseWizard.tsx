@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { nanoid } from 'nanoid'
 import { AIUseCase, DEPARTMENTS, STATUSES, Department, Status, EuAiActRisk } from '../../types'
-import { computePriorityScore } from '../../lib/scoring'
+import { computePriorityScore, feasibilityStufe } from '../../lib/scoring'
 import { useUseCasesStore } from '../../store/useCasesStore'
 import { useProfil, useProfilStore } from '../../store/mandantProfil'
 import type { Rolle, IsoZiel } from '../../store/mandantProfil'
@@ -142,7 +142,7 @@ export default function NewCaseWizard({ onAngelegt, onAbbrechen }: { onAngelegt?
       successMetrics: '',
       dataRequirements: '',
       aiApproach: 'Generative AI',
-      technicalFeasibility: 'Medium',
+      technicalFeasibility: feasibilityStufe(feasibility),
       teamCompetencies: '',
       timeline: '3–6 Months',
       estimatedCostK: 0,
@@ -312,7 +312,7 @@ export default function NewCaseWizard({ onAngelegt, onAbbrechen }: { onAngelegt?
               <InfoLink to="/use-cases" label="Wie wird der Score berechnet?" />
             </div>
             <Slider label="Geschäftsnutzen" value={businessImpact} onChange={setBusinessImpact} />
-            <Slider label="Machbarkeit" value={feasibility} onChange={setFeasibility} />
+            <Slider label="Technische Machbarkeit" value={feasibility} onChange={setFeasibility} />
             <Slider label="Strategische Passung" value={strategicFit} onChange={setStrategicFit} />
             <Slider label="Dringlichkeit" value={urgency} onChange={setUrgency} />
             <p className="text-sm text-slate-600">

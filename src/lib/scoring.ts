@@ -26,3 +26,14 @@ export function scoreBg(score: number): string {
   if (score >= 4) return 'bg-orange-400'
   return 'bg-red-500'
 }
+
+/**
+ * Die technische Machbarkeit gibt es nur einmal: als Regler von 1 bis 10 in
+ * der Portfolio-Bewertung. Liste, Filter und Export brauchen eine grobe
+ * Stufe — die wird hier abgeleitet, statt sie getrennt pflegen zu lassen.
+ */
+export function feasibilityStufe(wert: number): 'Low' | 'Medium' | 'High' {
+  if (wert <= 3) return 'Low'
+  if (wert <= 7) return 'Medium'
+  return 'High'
+}

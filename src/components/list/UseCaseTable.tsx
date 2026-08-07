@@ -19,7 +19,7 @@ import {
 } from '@tanstack/react-table'
 import {
   AIUseCase, Status, AIApproach, ProjectHealth,
-  STATUS_BG, APPROACH_BG, FEASIBILITY_BG, HEALTH_BG, MOTIVATION_BG,
+  STATUS_BG, APPROACH_BG, FEASIBILITY_BG, FEASIBILITY_LABEL, HEALTH_BG, MOTIVATION_BG,
   STATUSES, AI_APPROACHES, DEPARTMENTS, PROJECT_HEALTH_OPTIONS, MOTIVATIONS, motivationenLesen,
 } from '../../types'
 
@@ -160,15 +160,16 @@ export default function UseCaseTable() {
       ),
     }),
     ch.accessor('technicalFeasibility', {
-      header: 'Machbarkeit',
+      // Abgeleitet aus dem Machbarkeits-Regler — nicht getrennt gepflegt
+      header: 'Machbarkeit · Stufe',
       cell: (i) => (
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${FEASIBILITY_BG[i.getValue()]}`}>
-          {i.getValue()}
+          {FEASIBILITY_LABEL[i.getValue()]}
         </span>
       ),
     }),
     ch.accessor('businessImpact', { header: 'Geschäftsnutzen', cell: (i) => <ScoreCell v={i.getValue()} /> }),
-    ch.accessor('feasibility', { header: 'Machbarkeit', cell: (i) => <ScoreCell v={i.getValue()} /> }),
+    ch.accessor('feasibility', { header: 'Machbarkeit · Wert', cell: (i) => <ScoreCell v={i.getValue()} /> }),
     ch.accessor('strategicFit', { header: 'Strategische Passung', cell: (i) => <ScoreCell v={i.getValue()} /> }),
     ch.accessor('urgency', { header: 'Dringlichkeit', cell: (i) => <ScoreCell v={i.getValue()} /> }),
     ch.accessor('priorityScore', {
