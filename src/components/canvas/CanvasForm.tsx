@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import CaseComplianceChecks from '../compliance/CaseComplianceChecks'
+import KpiFelder from './KpiFelder'
 import { useForm, useWatch } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { nanoid } from 'nanoid'
 import {
   AIUseCase, DEPARTMENTS, STATUSES, AI_APPROACHES, FEASIBILITIES,
@@ -172,6 +173,9 @@ export default function CanvasForm({ existing }: Props) {
   const { add: addRisk } = useRiskStore()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
+  // Kommt der Sprung aus dem geführten Modus auf die Bewertung, muss sie offen sein
+  const [suchParams] = useSearchParams()
+  const [bewertungOffen, setBewertungOffen] = useState(suchParams.get('check') === 'bewertung')
 
   const defaultValues: FormData = existing ?? {
     title: '',
@@ -265,6 +269,10 @@ export default function CanvasForm({ existing }: Props) {
   const currentApproach = watched.aiApproach ?? 'Supervised Learning'
   // Ein Wert, zwei Darstellungen: der Regler führt, die Stufe folgt daraus
   const currentFeas = feasibilityStufe(Number(watched.feasibility ?? 7))
+  const aktuellerScore = computePriorityScore(
+    Number(watched.businessImpact ?? 7), Number(watched.feasibility ?? 7),
+    Number(watched.strategicFit ?? 7), Number(watched.urgency ?? 5),
+  )
 
   if (savedId) {
     return (
@@ -469,12 +477,10 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>2 · Erfolgskennzahlen (KPIs)</label>
-              <textarea
-                {...register('successMetrics')}
-                rows={3}
-                className={textareaCls}
-                placeholder="Wie wird Erfolg gemessen? SMART-Ziele."
+              <KpiFelder
+                ucId={existing?.id}
+                freitext={watched.successMetrics ?? ''}
+                onChange={(t) => setValue('successMetrics', t)}
               />
             </div>
 
@@ -563,14 +569,36 @@ export default function CanvasForm({ existing }: Props) {
           </div>
         </section>
 
-        {/* Section 3: Portfolio Scoring */}
-        <section id="bewertung" className="bg-white rounded-xl shadow-md p-5">
-          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">
-            Portfolio-Bewertung
-          </h2>
-          <p className="text-xs text-slate-400 mb-5">
-            Gewichtetes Modell (Kap. 2.5): Nutzen 40% · Machbarkeit 30% · Strategische Passung 20% · Dringlichkeit 10%
-          </p>
+        {/* Section 3: Portfolio Scoring — zuklappbar, der Score steht im Kopf */}
+        <section id="bewertung" className="bg-white rounded-xl shadow-md overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setBewertungOffen((v) => !v)}
+            className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-slate-50 transition-colors"
+          >
+            <div className="min-w-0 flex-1">
+              <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
+                Portfolio-Bewertung
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Nutzen 40% · Machbarkeit 30% · Passung 20% · Dringlichkeit 10%
+              </p>
+            </div>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"
+                  style={{ background: `${scoreColor(aktuellerScore)}22`, color: scoreColor(aktuellerScore) }}>
+              {aktuellerScore}
+            </span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${FEASIBILITY_BG[currentFeas]}`}>
+              {FEASIBILITY_LABEL[currentFeas]}
+            </span>
+            <svg className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${bewertungOffen ? 'rotate-180' : ''}`}
+                 fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+
+          {bewertungOffen && (
+          <div className="px-5 pb-5">
           <div className="space-y-3">
             <SliderField label="Geschäftsnutzen"      name="businessImpact" weight="40%" register={register} value={Number(watched.businessImpact ?? 7)} />
             <SliderField label="Technische Machbarkeit" name="feasibility"   weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
@@ -589,6 +617,8 @@ export default function CanvasForm({ existing }: Props) {
               Die technische Machbarkeit lässt sich erst nach den Datenprüfungen unten belastbar
               einschätzen — fehlt das Nutzungsrecht, trägt kein Wert über 5.
             </p>
+          )}
+          </div>
           )}
         </section>
 
