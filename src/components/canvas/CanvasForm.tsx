@@ -476,7 +476,8 @@ export default function CanvasForm({ existing }: Props) {
               />
             </div>
 
-            <div>
+            {/* Drei Eingaben je Kennzahl brauchen die volle Breite */}
+            <div className="col-span-2">
               <KpiFelder
                 ucId={existing?.id}
                 freitext={watched.successMetrics ?? ''}
