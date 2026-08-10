@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import CaseComplianceChecks from '../compliance/CaseComplianceChecks'
 import KpiFelder from './KpiFelder'
+import { StakeholderFeld, AbhaengigkeitenFeld } from './CanvasZusatz'
 import type { CaseChecks } from '../compliance/CaseComplianceChecks'
 import { machbarkeitAusDaten } from '../../lib/machbarkeit'
 import { useForm, useWatch } from 'react-hook-form'
@@ -467,7 +468,7 @@ export default function CanvasForm({ existing }: Props) {
         {/* Section 2: AI Use Case Canvas */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
           <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-            KI-Anwendungsfall-Canvas <span className="text-slate-400 font-normal normal-case">(8 Elemente)</span>
+            KI-Anwendungsfall-Canvas <span className="text-slate-400 font-normal normal-case">(10 Elemente)</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -512,8 +513,12 @@ export default function CanvasForm({ existing }: Props) {
               </div>
             </div>
 
+            <div className="col-span-2">
+              <StakeholderFeld ucId={existing?.id} nummer={5} />
+            </div>
+
             <div className="md:col-span-2">
-              <label className={labelCls}>5 · Benötigte Teamkompetenzen</label>
+              <label className={labelCls}>6 · Benötigte Teamkompetenzen</label>
               <CompetencySelect
                 value={watched.teamCompetencies ?? ''}
                 onChange={(v) => setValue('teamCompetencies', v)}
@@ -521,7 +526,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>6 · Zeitplan</label>
+              <label className={labelCls}>7 · Zeitplan</label>
               <input
                 {...register('timeline')}
                 className={inputCls}
@@ -543,8 +548,12 @@ export default function CanvasForm({ existing }: Props) {
               />
             </div>
 
+            <div className="col-span-2">
+              <AbhaengigkeitenFeld ucId={existing?.id} nummer={8} />
+            </div>
+
             <div>
-              <label className={labelCls}>7 · Geschätzte Kosten (€k)</label>
+              <label className={labelCls}>9 · Geschätzte Kosten (€k)</label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-sm text-slate-400">€</span>
                 <input
@@ -559,7 +568,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div>
-              <label className={labelCls}>8 · Erwarteter Jahresnutzen (€k/J.)</label>
+              <label className={labelCls}>10 · Erwarteter Jahresnutzen (€k/J.)</label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-sm text-slate-400">€</span>
                 <input
