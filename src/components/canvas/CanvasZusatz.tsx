@@ -86,18 +86,23 @@ const ROLLEN: { wert: StakeholderRolle; label: string; frage: string; bg: string
 const inputCls = 'w-full border border-slate-200 rounded-lg px-2.5 py-1.5 text-[13px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
 
 /** Beide Blöcke teilen sich einen Speicher je Fall. */
-function useZusatz(ucId?: string) {
+function useZusatz(ucId?: string, melden?: (d: CanvasZusatzDaten) => void) {
   const [daten, setDaten] = useState<CanvasZusatzDaten>(LEER)
   const speicherbar = !!ucId && getMandantType() !== 'demo'
 
   useEffect(() => {
     if (!ucId) { setDaten(LEER); return }
     const alle = scopedGet<Record<string, CanvasZusatzDaten>>(BUCKET, {})
-    setDaten({ ...LEER, ...(alle[ucId] ?? {}) })
+    const geladen = { ...LEER, ...(alle[ucId] ?? {}) }
+    setDaten(geladen)
+    melden?.(geladen)
+    // melden bewusst nicht in den Abhängigkeiten — sonst lädt es bei jedem Render neu
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ucId])
 
   const sichern = (next: CanvasZusatzDaten) => {
     setDaten(next)
+    melden?.(next)
     if (speicherbar && ucId) {
       const alle = scopedGet<Record<string, CanvasZusatzDaten>>(BUCKET, {})
       scopedSet(BUCKET, { ...alle, [ucId]: next })
@@ -109,8 +114,8 @@ function useZusatz(ucId?: string) {
 
 // ── ⑤ Stakeholder & RACI ─────────────────────────────────────────────────
 
-export function StakeholderFeld({ ucId, nummer }: { ucId?: string; nummer: number }) {
-  const { daten, sichern } = useZusatz(ucId)
+export function StakeholderFeld({ ucId, nummer, onStand }: { ucId?: string; nummer: number; onStand?: (d: CanvasZusatzDaten) => void }) {
+  const { daten, sichern } = useZusatz(ucId, onStand)
   const [entwurf, setEntwurf] = useState('')
   const [rolle, setRolle] = useState<StakeholderRolle>('profitiert')
 

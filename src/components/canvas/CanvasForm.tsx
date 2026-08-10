@@ -3,6 +3,9 @@ import CaseComplianceChecks from '../compliance/CaseComplianceChecks'
 import KpiFelder from './KpiFelder'
 import { Sektion, StandZahl } from '../ui/Sektion'
 import { StakeholderFeld, AbhaengigkeitenFeld } from './CanvasZusatz'
+import type { CanvasZusatzDaten } from './CanvasZusatz'
+import { nachweiseAusPruefungen } from '../../lib/nachweise'
+import { dokuVorschlag } from '../../lib/dokuText'
 import type { CaseChecks } from '../compliance/CaseComplianceChecks'
 import { machbarkeitAusDaten } from '../../lib/machbarkeit'
 import { useForm, useWatch } from 'react-hook-form'
@@ -172,6 +175,36 @@ function SliderField({
 }
 
 
+/**
+ * Anhang IV verlangt sieben Abschnitte. Vier davon stehen inhaltlich schon
+ * im Fall und werden von dort vorgeschlagen; drei gibt es nur hier.
+ */
+const DOKU_FELDER: {
+  key: string; nr: number; titel: string; frage: string; platzhalter: string; abgeleitet: boolean
+}[] = [
+  { key: 'docGoal', nr: 1, titel: 'Ziel & Umfang', abgeleitet: true,
+    frage: 'Wofür wird dieses KI-System eingesetzt? — aus Geschäftsproblem und technischem Ansatz',
+    platzhalter: 'Beschreibung des KI-Systems, unterstützte Prozesse und Entscheidungen…' },
+  { key: 'docDataBasis', nr: 2, titel: 'Datenbasis & Datenflüsse', abgeleitet: true,
+    frage: 'Welche Daten, woher, wie verarbeitet? — aus Datenbedarf, Verfügbarkeit und Qualität',
+    platzhalter: 'Datenquellen, Verarbeitungsschritte, Qualitätssicherung…' },
+  { key: 'docRiskMitigation', nr: 3, titel: 'Risikobewertung & Maßnahmen', abgeleitet: true,
+    frage: 'Welche Risiken, wie reduziert? — aus dem Risikoklassen-Check',
+    platzhalter: 'Identifizierte Risiken, Gegenmaßnahmen, Restrisiko…' },
+  { key: 'docRegulatory', nr: 4, titel: 'Compliance & Regulatorischer Nachweis', abgeleitet: true,
+    frage: 'Welche Vorschriften greifen? — aus Risikoklasse und Datenschutz-Prüfung',
+    platzhalter: 'Audit-Trail, Nachweisdokumente, verantwortliche Person…' },
+  { key: 'docExplainability', nr: 5, titel: 'Erklärbarkeit & Entscheidungslogik', abgeleitet: false,
+    frage: 'Wie können Ergebnisse von Endnutzenden verstanden und interpretiert werden?',
+    platzhalter: 'Erklärbarkeitsstrategie, Interpretierbarkeit für Nutzende…' },
+  { key: 'docOperations', nr: 6, titel: 'Betrieb & Monitoring', abgeleitet: false,
+    frage: 'Wie wird die KI im Betrieb überwacht, gewartet und verbessert?',
+    platzhalter: 'Monitoring, Wartungsintervalle, Verbesserungszyklus…' },
+  { key: 'docVersioning', nr: 7, titel: 'Änderungs- & Versionsmanagement', abgeleitet: false,
+    frage: 'Wie werden Änderungen am System dokumentiert und freigegeben?',
+    platzhalter: 'Versionierung, Änderungsprotokoll, Release-Prozess…' },
+]
+
 export default function CanvasForm({ existing }: Props) {
   const navigate = useNavigate()
   const { addUseCase, updateUseCase, deleteUseCase } = useUseCasesStore()
@@ -179,7 +212,7 @@ export default function CanvasForm({ existing }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
   // Kommt der Sprung aus dem geführten Modus auf die Bewertung, muss sie offen sein
-  const [suchParams] = useSearchParams()
+  const [suchParams, setSuchParams] = useSearchParams()
   // Offen ist, was man beim Öffnen eines Falls zuerst braucht; ein Sprung aus
   // dem geführten Modus öffnet zusätzlich seine Zielsektion.
   const check = suchParams.get('check')
@@ -192,8 +225,18 @@ export default function CanvasForm({ existing }: Props) {
     doku: false,
   })
   const klapp = (k: string) => setOffen((p) => ({ ...p, [k]: !p[k] }))
+
+  /** Aus den Nachweisen zurück zu der Prüfung, die den Nachweis liefert. */
+  const sprungZu = (gruppe: string) => {
+    const n = new URLSearchParams(suchParams)
+    n.set('check', gruppe)
+    setSuchParams(n, { replace: true })
+    setOffen((p) => ({ ...p, pruefungen: true }))
+    setTimeout(() => document.getElementById('fall-wizard')?.scrollIntoView({ block: 'start' }), 60)
+  }
   // Stand der Datenprüfungen — meldet der Fall-Wizard weiter unten hoch
   const [fallChecks, setFallChecks] = useState<CaseChecks | null>(null)
+  const [zusatzStand, setZusatzStand] = useState<CanvasZusatzDaten | null>(null)
 
   const defaultValues: FormData = existing ?? {
     title: '',
@@ -295,15 +338,25 @@ export default function CanvasForm({ existing }: Props) {
     watched.teamCompetencies, watched.timeline, watched.estimatedCostK, watched.expectedBenefitK,
   ].filter((v) => (typeof v === 'number' ? v > 0 : !!String(v ?? '').trim())).length
 
-  const nachweisCount = [
-    watched.complianceLegal, watched.compliancePersonalData, watched.complianceDataMin,
-    watched.complianceDocumentation, watched.complianceLiability,
-  ].filter(Boolean).length
-
   const dokuCount = [
     watched.docGoal, watched.docDataBasis, watched.docRiskMitigation, watched.docExplainability,
     watched.docOperations, watched.docRegulatory, watched.docVersioning,
   ].filter((v) => !!String(v ?? '').trim()).length
+
+  // Die Nachweise werden nicht abgehakt, sondern aus den Prüfungen belegt
+  const nachweise = nachweiseAusPruefungen(fallChecks, zusatzStand, dokuCount)
+  const nachweisCount = nachweise.filter((n) => n.erfuellt).length
+
+  // Was belegt ist, gehört auch in den Datensatz — sonst zeigt die
+  // Governance-Checkliste etwas anderes als der Fall selbst.
+  useEffect(() => {
+    for (const n of nachweise) {
+      if (!!watched[n.def.key] !== n.erfuellt) {
+        setValue(n.def.key, n.erfuellt, { shouldDirty: false })
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nachweisCount, fallChecks, zusatzStand, dokuCount])
 
   const vorschlag = machbarkeitAusDaten(fallChecks?.verfuegbarkeit, fallChecks?.dataQuality)
   const aktuellerScore = computePriorityScore(
@@ -550,7 +603,7 @@ export default function CanvasForm({ existing }: Props) {
             </div>
 
             <div className="col-span-2">
-              <StakeholderFeld ucId={existing?.id} nummer={5} />
+              <StakeholderFeld ucId={existing?.id} nummer={5} onStand={setZusatzStand} />
             </div>
 
             <div className="md:col-span-2">
@@ -732,30 +785,49 @@ export default function CanvasForm({ existing }: Props) {
           offen={offen.nachweise} onToggle={() => klapp('nachweise')}
           stand={<StandZahl ist={nachweisCount} soll={5} />}
         >
-          <p className="text-xs text-slate-400 -mt-2">Haken setzen, sobald geprüft. Ergebnisse erscheinen unter Governance → Datenschutz-Checkliste.</p>
-          <div className="space-y-3">
-            {([
-              { key: 'complianceLegal',         label: 'Rechtsgrundlage bestätigt', desc: 'DSGVO-Rechtsgrundlage (Art. 6 / Art. 9) und EU AI Act-Klassifizierung dokumentiert' },
-              { key: 'compliancePersonalData',  label: 'Personendaten & Rechtsgrundlage dokumentiert', desc: 'Alle Personendatenflüsse identifiziert, DSFA durchgeführt wenn erforderlich' },
-              { key: 'complianceDataMin',       label: 'Datensparsamkeit & Zweckbindung sichergestellt', desc: 'Nur für den angegebenen Zweck unbedingt notwendige Daten werden verarbeitet' },
-              { key: 'complianceDocumentation', label: 'Dokumentations- & Nachweispflichten erfüllt', desc: 'Technische Dokumentation, Audit-Trail und Verarbeitungsverzeichnis vorhanden' },
-              { key: 'complianceLiability',     label: 'Haftung & Verantwortung definiert', desc: 'Rollen für KI-Owner, DSB und Business-Sponsor dokumentiert und abgezeichnet' },
-            ] as { key: string; label: string; desc: string }[]).map(({ key, label, desc }) => {
-              const checked = !!(watched[key as keyof typeof watched])
-              return (
-                <label key={key} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${checked ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'}`}>
-                  <input
-                    type="checkbox"
-                    {...register(key as keyof FormData)}
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-400 cursor-pointer"
-                  />
-                  <div>
-                    <p className={`text-sm font-medium ${checked ? 'text-emerald-700' : 'text-slate-700'}`}>{label}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{desc}</p>
-                  </div>
-                </label>
-              )
-            })}
+          <p className="text-xs text-slate-400 -mt-2">
+            Ergibt sich aus den Prüfungen darüber — hier wird nicht doppelt erfasst, sondern gezeigt,
+            was bereits belegt ist. Erscheint unter Governance → Datenschutz-Checkliste.
+          </p>
+          <div className="space-y-2">
+            {nachweise.map(({ def, erfuellt, offen: fehlt }) => (
+              <div
+                key={def.key}
+                className={`flex items-start gap-3 p-3 rounded-lg border ${
+                  erfuellt ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-slate-50'
+                }`}
+              >
+                <span className={`mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-[10px] font-bold ${
+                  erfuellt ? 'bg-emerald-500 text-white' : 'border border-slate-300 bg-white text-transparent'
+                }`}>
+                  ✓
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-sm font-medium ${erfuellt ? 'text-emerald-700' : 'text-slate-700'}`}>{def.label}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{def.desc}</p>
+                  <p className="text-[11px] mt-1">
+                    {erfuellt ? (
+                      <span className="text-emerald-600">
+                        belegt durch {def.quelle ?? 'die Dokumentation unten'}
+                      </span>
+                    ) : (
+                      <span className="text-amber-700">
+                        {fehlt}
+                        {def.ziel && (
+                          <button
+                            type="button"
+                            onClick={() => sprungZu(def.ziel!)}
+                            className="ml-1.5 font-semibold underline hover:text-amber-900"
+                          >
+                            hin →
+                          </button>
+                        )}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </Sektion>
 
@@ -765,50 +837,45 @@ export default function CanvasForm({ existing }: Props) {
           offen={offen.doku} onToggle={() => klapp('doku')}
           stand={<StandZahl ist={dokuCount} soll={7} />}
         >
-          <p className="text-xs text-slate-400 -mt-2">Formelle Compliance- und Audit-Dokumentation. Alle Felder optional.</p>
+          <p className="text-xs text-slate-400 -mt-2">
+            Für Audit und Anhang IV. Vier Abschnitte stehen inhaltlich schon im Fall — sie lassen
+            sich übernehmen und danach frei überarbeiten. Alle Felder optional.
+          </p>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className={labelCls}>1 · Ziel & Umfang</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wofür wird dieses KI-System eingesetzt? Welche Modelle, Datenquellen und Technologien sind beteiligt?</p>
-              <textarea {...register('docGoal')} rows={3} className={textareaCls} placeholder="Beschreibung des KI-Systems, unterstützte Prozesse und Entscheidungen…" />
-            </div>
-
-            <div>
-              <label className={labelCls}>2 · Datenbasis & Datenflüsse</label>
-              <p className="text-xs text-slate-400 mb-1.5">Welche Daten werden verwendet, woher stammen sie und wie werden sie verarbeitet?</p>
-              <textarea {...register('docDataBasis')} rows={3} className={textareaCls} placeholder="Datenquellen, Verarbeitungsschritte, Qualitätssicherung…" />
-            </div>
-
-            <div>
-              <label className={labelCls}>3 · Risikobewertung & Maßnahmen</label>
-              <p className="text-xs text-slate-400 mb-1.5">Welche Risiken wurden identifiziert und wie werden sie reduziert oder kontrolliert?</p>
-              <textarea {...register('docRiskMitigation')} rows={3} className={textareaCls} placeholder="Identifizierte Risiken, Gegenmaßnahmen, Restrisiko…" />
-            </div>
-
-            <div>
-              <label className={labelCls}>4 · Erklärbarkeit & Entscheidungslogik</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wie können KI-Ergebnisse von Endnutzenden verstanden und interpretiert werden?</p>
-              <textarea {...register('docExplainability')} rows={3} className={textareaCls} placeholder="Erklärbarkeitsstrategie, Interpretierbarkeit für Nutzende…" />
-            </div>
-
-            <div>
-              <label className={labelCls}>5 · Betrieb & Monitoring</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wie wird die KI im Betrieb überwacht, gewartet und verbessert?</p>
-              <textarea {...register('docOperations')} rows={3} className={textareaCls} placeholder="Monitoring, Wartungsintervalle, Verbesserungszyklus…" />
-            </div>
-
-            <div>
-              <label className={labelCls}>6 · Compliance & Regulatorischer Nachweis</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wie wird die Einhaltung von Gesetzen und internen Richtlinien dokumentiert?</p>
-              <textarea {...register('docRegulatory')} rows={3} className={textareaCls} placeholder="Audit-Trail, Nachweisdokumente, verantwortliche Person…" />
-            </div>
-
-            <div>
-              <label className={labelCls}>7 · Änderungs- & Versionsmanagement</label>
-              <p className="text-xs text-slate-400 mb-1.5">Wie werden Änderungen am Modell oder an Daten nachvollziehbar erfasst?</p>
-              <textarea {...register('docVersioning')} rows={3} className={textareaCls} placeholder="Versionierung, Änderungsprotokoll, Release-Prozess…" />
-            </div>
+          <div className="space-y-4">
+            {DOKU_FELDER.map(({ key, nr, titel, frage, platzhalter, abgeleitet }) => {
+              const vorschlag = abgeleitet
+                ? dokuVorschlag(key, {
+                    businessProblem: watched.businessProblem,
+                    aiApproach: watched.aiApproach,
+                    dataRequirements: watched.dataRequirements,
+                  }, fallChecks)
+                : null
+              const inhalt = String(watched[key as keyof typeof watched] ?? '')
+              return (
+                <div key={key}>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <label className={labelCls}>{nr} · {titel}</label>
+                    {vorschlag && vorschlag !== inhalt && (
+                      <button
+                        type="button"
+                        onClick={() => setValue(key as keyof FormData, vorschlag, { shouldDirty: true })}
+                        className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 whitespace-nowrap"
+                      >
+                        {inhalt.trim() ? 'Neu übernehmen' : 'Aus den Angaben übernehmen'} →
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-400 mb-1.5">{frage}</p>
+                  <textarea
+                    {...register(key as keyof FormData)}
+                    rows={inhalt.length > 220 ? 6 : 3}
+                    className={textareaCls}
+                    placeholder={platzhalter}
+                  />
+                </div>
+              )
+            })}
           </div>
         </Sektion>
 

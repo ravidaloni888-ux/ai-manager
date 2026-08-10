@@ -339,6 +339,13 @@ export default function CaseComplianceChecks(
   const [checks, setChecks] = useState<CaseChecks>(EMPTY_CHECKS)
   const [loaded, setLoaded] = useState(false)
 
+  // Der Param kann sich ändern, ohne dass die Komponente neu aufgebaut wird —
+  // etwa beim Sprung aus den Nachweisen darunter. Der Startwert allein genügt
+  // deshalb nicht.
+  useEffect(() => {
+    if (vorgewaehlt) { setOpenGroup(vorgewaehlt); setAutoOpened(true) }
+  }, [vorgewaehlt])
+
   // Im Demo-Mandanten wird nichts geschrieben, sonst je Mandant + Fall
   const persistent = !!ucId && getMandantType() !== 'demo'
 
