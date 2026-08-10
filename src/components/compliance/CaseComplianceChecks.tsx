@@ -14,6 +14,7 @@ import type { VerfuegbarkeitState } from '../assessments/DatenverfuegbarkeitChec
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import type { EthicsState } from '../assessments/EthicsCheck'
 import { ProjectPlanContent } from '../../pages/ProjectPlanPage'
+import { Sektion, StandZahl } from '../ui/Sektion'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Datenschutz-Checks je Anwendungsfall.
@@ -324,7 +325,8 @@ const GROUP_KEYS: GroupKey[] = ['verfuegbarkeit', 'risiko', 'datenschutz', 'qual
 
 /** Alle Prüfungen zu einem Anwendungsfall — Antworten bleiben am Fall. */
 export default function CaseComplianceChecks(
-  { ucId, onChecks }: { ucId?: string; onChecks?: (c: CaseChecks) => void },
+  { ucId, onChecks, offen = true, onToggle }:
+  { ucId?: string; onChecks?: (c: CaseChecks) => void; offen?: boolean; onToggle?: () => void },
 ) {
   const [params] = useSearchParams()
   const gewuenscht = params.get('check') as GroupKey | null
@@ -406,25 +408,28 @@ export default function CaseComplianceChecks(
   }
 
   return (
-    <section id="fall-wizard" className="bg-white rounded-xl shadow-md overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Fall-Wizard · Prüfungen &amp; Plan</h2>
-          <span className="text-[11px] font-semibold text-blue-600 flex-shrink-0">{doneCount}/{groups.length} erledigt</span>
+    <Sektion
+      id="fall-wizard"
+      titel="Prüfungen & Plan"
+      offen={offen}
+      onToggle={onToggle ?? (() => {})}
+      stand={<StandZahl ist={doneCount} soll={groups.length} />}
+    >
+      <div className="-mx-5 -mt-4">
+        <div className="px-5 pb-3">
+          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-full rounded-full bg-blue-500 transition-all duration-500"
+                 style={{ width: `${Math.round((doneCount / groups.length) * 100)}%` }} />
+          </div>
+          <p className="text-[11px] text-slate-400 mt-2">
+            {persistent
+              ? 'Antworten werden automatisch zu diesem Anwendungsfall gespeichert.'
+              : 'Im Demo-Mandanten werden Antworten nicht gespeichert.'}
+            {' '}Orientierungshilfe, kein Ersatz für rechtliche Beratung.
+          </p>
         </div>
-        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mt-2">
-          <div className="h-full rounded-full bg-blue-500 transition-all duration-500"
-               style={{ width: `${Math.round((doneCount / groups.length) * 100)}%` }} />
-        </div>
-        <p className="text-[11px] text-slate-400 mt-2">
-          {persistent
-            ? 'Antworten werden automatisch zu diesem Anwendungsfall gespeichert.'
-            : 'Im Demo-Mandanten werden Antworten nicht gespeichert.'}
-          {' '}Orientierungshilfe, kein Ersatz für rechtliche Beratung.
-        </p>
-      </div>
 
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-slate-100 border-t border-slate-100">
         {groups.map((g, gi) => {
           const isOpen = openGroup === g.key
           return (
@@ -522,6 +527,7 @@ export default function CaseComplianceChecks(
           )
         })}
       </div>
-    </section>
+      </div>
+    </Sektion>
   )
 }
