@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import BetriebsKpis from '../components/qa/BetriebsKpis'
 
 interface Requirement { id: string; anforderung: string; messgroesse: string; warumSchwelle: string; pruefmethode: string }
 interface RequirementsResult {
@@ -101,7 +102,7 @@ function AnforderungsGenerator() {
 }
 
 export default function QAPage() {
-  const [tab, setTab] = useState<'generator' | 'tests' | 'ki' | 'abnahme' | 'case'>('generator')
+  const [tab, setTab] = useState<'generator' | 'tests' | 'ki' | 'abnahme' | 'betrieb'>('generator')
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -110,7 +111,7 @@ export default function QAPage() {
         <p className="text-xs font-mono tracking-widest text-slate-400 uppercase mb-1">KI-Beauftragte:r · Tag 12</p>
         <h1 className="text-2xl font-bold text-slate-800">KI-Qualitätssicherung</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          QS &amp; Abnahmeprozesse — Test-Typen, KI-Besonderheiten, Abnahmestrategien, Fallstudie
+          QS &amp; Abnahmeprozesse — Test-Typen, KI-Besonderheiten, Abnahmestrategien, Betriebs-KPI
         </p>
       </div>
 
@@ -121,7 +122,7 @@ export default function QAPage() {
           { id: 'tests',  label: 'Test-Typen & Methoden' },
           { id: 'ki',     label: 'KI-Besonderheiten' },
           { id: 'abnahme',label: 'Abnahmestrategien' },
-          { id: 'case',      label: 'Fallstudie: Vibe Citing' },
+          { id: 'betrieb',   label: '📈 Betriebs-KPI' },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
@@ -414,82 +415,8 @@ export default function QAPage() {
       )}
 
       {/* ── Tab: Fallstudie ── */}
-      {tab === 'case' && (
-      <div className="space-y-5">
+      {tab === 'betrieb' && <BetriebsKpis />}
 
-        <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-          <div className="bg-slate-800 px-6 py-4">
-            <p className="text-xs font-mono tracking-widest text-slate-400 uppercase mb-1">Mini-Case · KPMG International · Okt 2025 / Juni 2026</p>
-            <h3 className="text-white font-bold text-base">„Der Bericht, der nie hätte raus dürfen"</h3>
-          </div>
-          <div className="p-5 space-y-4">
-            <p className="text-sm text-slate-700 leading-relaxed">
-              Im Oktober 2025 veröffentlichte KPMG International den Bericht <em>„Total Experience: Redefining Excellence in the Age of Agentic AI"</em>. Nur wenige Monate später, im Juni 2026, entlarvte das Forschungsunternehmen GPTZero den Bericht forensisch als Desaster.
-            </p>
-            <div className="grid grid-cols-4 gap-3">
-              {[
-                { zahl: '45', label: 'Quellen', sub: 'im Bericht angegeben', color: 'bg-slate-50 border-slate-200' },
-                { zahl: '5',  label: 'davon korrekt', sub: 'laut GPTZero', color: 'bg-red-50 border-red-200' },
-                { zahl: '~50 %', label: 'Fakten falsch', sub: 'unbelegt oder falsch zugeordnet', color: 'bg-red-50 border-red-200' },
-                { zahl: '0', label: 'interne Prüfung', sub: 'vor Veröffentlichung', color: 'bg-red-50 border-red-200' },
-              ].map(s => (
-                <div key={s.label} className={`border rounded-xl p-4 text-center ${s.color}`}>
-                  <p className="text-2xl font-black text-slate-800">{s.zahl}</p>
-                  <p className="text-xs font-bold text-slate-700 mt-1">{s.label}</p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">{s.sub}</p>
-                </div>
-              ))}
-            </div>
-            <div className="bg-slate-50 border-l-4 border-l-slate-800 px-4 py-3 text-sm text-slate-700 italic leading-relaxed">
-              „Vibe Citing" ist der von GPTZero geprägte Begriff für dieses Phänomen: KI generiert Quellenangaben, die professionell aussehen, aber bei Prüfung ins Leere führen oder Inhalte verdrehen.
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 space-y-4">
-          <h3 className="text-base font-bold text-slate-800">Die konkreten Fehlertypen</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b-2 border-slate-800">
-                  <th className="text-left py-2 pr-6 text-xs font-mono text-slate-500 uppercase tracking-wide">Fehlertyp</th>
-                  <th className="text-left py-2 text-xs font-mono text-slate-500 uppercase tracking-wide">Konkretes Beispiel</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {KPMG_FEHLER.map(f => (
-                  <tr key={f.typ}>
-                    <td className="py-3 pr-6 font-semibold text-slate-800 whitespace-nowrap">{f.typ}</td>
-                    <td className="py-3 text-xs text-slate-600 leading-relaxed">{f.beispiel}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 space-y-3">
-          <h3 className="text-base font-bold text-slate-800">KIB-Lektion: Was hätte verhindert werden können?</h3>
-          {[
-            { nr: '①', title: 'Quellenprüfung vor Veröffentlichung', body: 'Jede zitierte Quelle manuell verifizieren — Existenz, Seitenangabe, inhaltliche Übereinstimmung.' },
-            { nr: '②', title: 'RAG statt Freitextgenerierung', body: 'Wenn das System ausschließlich auf eigenen, verifizierten Dokumenten antwortet, können keine erfundenen Quellen entstehen.' },
-            { nr: '③', title: 'Compliance-Anforderung: Quellennachweis', body: 'Jede KI-generierte Aussage mit Faktenanspruch muss eine verifizierbare Quelle tragen (Dokument-ID + Seite).' },
-            { nr: '④', title: 'Vier-Augen-Prinzip als Abnahmekriterium', body: 'Vor Veröffentlichung: mindestens eine Person prüft Stichprobe von 10 % aller Quellenangaben — dokumentiert und signiert.' },
-          ].map(l => (
-            <div key={l.nr} className="flex gap-3 items-start border-b border-slate-100 pb-3 last:border-0 last:pb-0">
-              <span className="font-mono text-sm font-bold text-teal-600 flex-shrink-0 w-6 mt-0.5">{l.nr}</span>
-              <div>
-                <p className="text-sm font-semibold text-slate-700">{l.title}</p>
-                <p className="text-xs text-slate-500 leading-relaxed mt-0.5">{l.body}</p>
-              </div>
-            </div>
-          ))}
-        </section>
-
-      </div>
-      )}
-
-      {/* ── Tab: Anforderungs-Generator ── */}
       {tab === 'generator' && <AnforderungsGenerator />}
 
     </div>
