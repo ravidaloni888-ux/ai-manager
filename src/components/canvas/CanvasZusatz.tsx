@@ -28,49 +28,43 @@ export interface Abhaengigkeit {
   was: string
   entscheider: string
   status: 'offen' | 'geklaert'
-  /** IDs der Vorfragen, die vorher geklärt sein müssen */
-  haengtVon?: string[]
+  /**
+   * Einrücktiefe. Ein eingerückter Eintrag hängt von dem darüberliegenden
+   * mit kleinerer Tiefe ab — die Liste ist damit selbst die Reihenfolge.
+   */
+  ebene?: number
 }
 
-export interface Stufen {
-  /** Vorfragen nach Ebenen — Ebene 0 hat keine Vorbedingung */
-  ebenen: Abhaengigkeit[][]
-  /** Einträge, die in einem Ringschluss hängen und keiner Ebene zuzuordnen sind */
-  ringschluss: Abhaengigkeit[]
-}
-
-/**
- * Reihenfolge aus den Abhängigkeiten ableiten (topologische Sortierung).
- *
- * Die Zahl der Ebenen sagt, wie viele Runden mindestens nötig sind, bis
- * alles geklärt ist — das ist die eigentliche Aussage. Ein Ringschluss
- * (A wartet auf B, B auf A) wird nicht stillschweigend aufgelöst, sondern
- * gemeldet: Er bedeutet, dass niemand anfangen kann.
- */
-export function stufenBerechnen(items: Abhaengigkeit[]): Stufen {
-  const offen = new Map(items.map((a) => [a.id, a]))
-  const erledigt = new Set<string>()
-  const ebenen: Abhaengigkeit[][] = []
-
-  while (offen.size > 0) {
-    const bereit = [...offen.values()].filter((a) =>
-      (a.haengtVon ?? []).filter((id) => offen.has(id)).length === 0,
-    )
-    if (bereit.length === 0) break   // nur noch Ringschlüsse übrig
-    bereit.forEach((a) => { offen.delete(a.id); erledigt.add(a.id) })
-    ebenen.push(bereit)
+/** Der übergeordnete Eintrag: der nächste darüber mit kleinerer Tiefe. */
+export function elternteil(items: Abhaengigkeit[], i: number): Abhaengigkeit | null {
+  const meine = items[i]?.ebene ?? 0
+  for (let j = i - 1; j >= 0; j--) {
+    if ((items[j].ebene ?? 0) < meine) return items[j]
   }
-
-  return { ebenen, ringschluss: [...offen.values()] }
+  return null
 }
 
-/** Blockiert = mindestens eine Vorbedingung ist noch offen. */
-export function istBlockiert(a: Abhaengigkeit, alle: Abhaengigkeit[]): boolean {
-  return (a.haengtVon ?? []).some((id) => {
-    const v = alle.find((x) => x.id === id)
-    return v && v.status === 'offen'
-  })
+/** Blockiert = ein Eintrag weiter oben in der Kette ist noch offen. */
+export function istBlockiert(items: Abhaengigkeit[], i: number): boolean {
+  let tiefe = items[i]?.ebene ?? 0
+  for (let j = i - 1; j >= 0 && tiefe > 0; j--) {
+    const e = items[j].ebene ?? 0
+    if (e < tiefe) {
+      if (items[j].status === 'offen') return true
+      tiefe = e
+    }
+  }
+  return false
 }
+
+/** Wie viele Einträge direkt darunter gehören zu diesem (seine Kinder samt Enkeln)? */
+export function bereichLaenge(items: Abhaengigkeit[], i: number): number {
+  const meine = items[i]?.ebene ?? 0
+  let n = 1
+  while (i + n < items.length && (items[i + n].ebene ?? 0) > meine) n++
+  return n
+}
+
 
 export interface CanvasZusatzDaten {
   stakeholder: Stakeholder[]
@@ -230,52 +224,73 @@ export function AbhaengigkeitenFeld({ ucId, nummer }: { ucId?: string; nummer: n
   const { daten, sichern } = useZusatz(ucId)
   const [was, setWas] = useState('')
   const [wer, setWer] = useState('')
+  const [ziehtIdx, setZiehtIdx] = useState<number | null>(null)
+  const [ueberIdx, setUeberIdx] = useState<number | null>(null)
+
+  const items = daten.abhaengigkeiten
+  const setItems = (next: Abhaengigkeit[]) => sichern({ ...daten, abhaengigkeiten: next })
 
   const hinzu = () => {
     if (!was.trim()) return
-    sichern({
-      ...daten,
-      abhaengigkeiten: [...daten.abhaengigkeiten,
-        { id: nanoid(), was: was.trim(), entscheider: wer.trim(), status: 'offen' }],
-    })
+    setItems([...items, {
+      id: nanoid(), was: was.trim(), entscheider: wer.trim(), status: 'offen',
+      ebene: items.length > 0 ? (items[items.length - 1].ebene ?? 0) : 0,
+    }])
     setWas(''); setWer('')
   }
 
   const umschalten = (id: string) =>
-    sichern({
-      ...daten,
-      abhaengigkeiten: daten.abhaengigkeiten.map((a) =>
-        a.id === id ? { ...a, status: a.status === 'offen' ? 'geklaert' : 'offen' } : a),
-    })
+    setItems(items.map((a) => (a.id === id
+      ? { ...a, status: a.status === 'offen' ? 'geklaert' : 'offen' } : a)))
 
   const setzeEntscheider = (id: string, entscheider: string) =>
-    sichern({
-      ...daten,
-      abhaengigkeiten: daten.abhaengigkeiten.map((a) => (a.id === id ? { ...a, entscheider } : a)),
-    })
+    setItems(items.map((a) => (a.id === id ? { ...a, entscheider } : a)))
 
-  const weg = (id: string) =>
-    sichern({
-      ...daten,
-      abhaengigkeiten: daten.abhaengigkeiten
-        .filter((a) => a.id !== id)
-        // Verweise auf den entfernten Eintrag mitnehmen, sonst zeigen sie ins Leere
-        .map((a) => ({ ...a, haengtVon: (a.haengtVon ?? []).filter((v) => v !== id) })),
-    })
+  /** Einen Eintrag samt allem, was unter ihm eingerückt ist, entfernen. */
+  const weg = (i: number) => {
+    const n = bereichLaenge(items, i)
+    setItems([...items.slice(0, i), ...items.slice(i + n)])
+  }
 
-  const toggleVorbedingung = (id: string, vorId: string) =>
-    sichern({
-      ...daten,
-      abhaengigkeiten: daten.abhaengigkeiten.map((a) => {
-        if (a.id !== id) return a
-        const bisher = a.haengtVon ?? []
-        return { ...a, haengtVon: bisher.includes(vorId) ? bisher.filter((v) => v !== vorId) : [...bisher, vorId] }
-      }),
-    })
+  /**
+   * Einrücken geht nur, wenn darüber ein Eintrag steht, an den man sich
+   * hängen kann — höchstens eine Ebene tiefer als der Vorgänger.
+   */
+  const einruecken = (i: number, richtung: 1 | -1) => {
+    const meine = items[i].ebene ?? 0
+    const vorher = i > 0 ? (items[i - 1].ebene ?? 0) : -1
+    const ziel = meine + richtung
+    if (ziel < 0 || ziel > vorher + 1) return
+    // Untergeordnete wandern mit, sonst reißt die Kette
+    const n = bereichLaenge(items, i)
+    const next = items.map((a, j) =>
+      j >= i && j < i + n ? { ...a, ebene: (a.ebene ?? 0) + richtung } : a)
+    setItems(next)
+  }
 
-  const stufen = stufenBerechnen(daten.abhaengigkeiten)
-  const offen = daten.abhaengigkeiten.filter((a) => a.status === 'offen')
+  /** Ziehen verschiebt den Eintrag mit allem, was unter ihm hängt. */
+  const ablegen = (zielIdx: number) => {
+    if (ziehtIdx === null || ziehtIdx === zielIdx) { setZiehtIdx(null); setUeberIdx(null); return }
+    const n = bereichLaenge(items, ziehtIdx)
+    // Nicht in den eigenen Unterbaum fallen lassen
+    if (zielIdx > ziehtIdx && zielIdx < ziehtIdx + n) { setZiehtIdx(null); setUeberIdx(null); return }
+
+    const block = items.slice(ziehtIdx, ziehtIdx + n)
+    const ohne = [...items.slice(0, ziehtIdx), ...items.slice(ziehtIdx + n)]
+    const einfuegeIdx = zielIdx > ziehtIdx ? zielIdx - n : zielIdx
+
+    // Tiefe an die neue Umgebung anpassen, damit nichts in der Luft hängt
+    const vorher = einfuegeIdx > 0 ? (ohne[einfuegeIdx - 1].ebene ?? 0) : -1
+    const versatz = Math.min(0, vorher + 1 - (block[0].ebene ?? 0))
+    const angepasst = block.map((a) => ({ ...a, ebene: Math.max(0, (a.ebene ?? 0) + versatz) }))
+
+    setItems([...ohne.slice(0, einfuegeIdx), ...angepasst, ...ohne.slice(einfuegeIdx)])
+    setZiehtIdx(null); setUeberIdx(null)
+  }
+
+  const offen = items.filter((a) => a.status === 'offen')
   const ohneEntscheider = offen.filter((a) => !a.entscheider.trim())
+  const tiefe = items.reduce((m, a) => Math.max(m, (a.ebene ?? 0) + 1), 0)
 
   return (
     <div className="space-y-2">
@@ -288,138 +303,113 @@ export function AbhaengigkeitenFeld({ ucId, nummer }: { ucId?: string; nummer: n
         </span>
       </div>
 
-      {/* Reihenfolge aus den Vorbedingungen — zeigt, was parallel laufen kann */}
-      {daten.abhaengigkeiten.length > 1 && (
-        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 space-y-2">
-          <div className="flex items-baseline justify-between gap-2">
-            <p className="text-[11px] font-bold text-slate-700">Reihenfolge</p>
-            <span className="text-[10px] text-slate-400">
-              {stufen.ebenen.length > 0
-                ? `${stufen.ebenen.length} ${stufen.ebenen.length === 1 ? 'Runde' : 'Runden'} nacheinander`
-                : ''}
-            </span>
-          </div>
-
-          {stufen.ebenen.map((ebene, i) => (
-            <div key={i}>
-              {i > 0 && (
-                <div className="flex justify-center py-0.5">
-                  <span className="text-slate-300 text-xs leading-none">↓</span>
-                </div>
-              )}
-              <div className="flex items-start gap-2">
-                <span className="text-[10px] font-bold text-slate-400 w-10 flex-shrink-0 pt-1">
-                  {i + 1}.
-                </span>
-                <div className="flex flex-wrap gap-1.5 min-w-0">
-                  {ebene.map((a) => {
-                    const blockiert = istBlockiert(a, daten.abhaengigkeiten)
-                    return (
-                      <span
-                        key={a.id}
-                        className={`text-[11px] px-2 py-1 rounded-md max-w-[220px] truncate ${
-                          a.status === 'geklaert' ? 'bg-green-100 text-green-700 line-through'
-                          : blockiert ? 'bg-amber-100 text-amber-800'
-                          : 'bg-white border border-slate-200 text-slate-700'
-                        }`}
-                        title={a.entscheider ? `${a.was} — entscheidet: ${a.entscheider}` : a.was}
-                      >
-                        {a.status === 'geklaert' ? '✓ ' : blockiert ? '⏳ ' : ''}{a.was}
-                      </span>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {stufen.ringschluss.length > 0 && (
-            <p className="text-[11px] text-red-800 bg-red-50 border border-red-200 rounded px-2 py-1.5">
-              <strong>Ringschluss:</strong> {stufen.ringschluss.map((a) => a.was).join(' ↔ ')} warten
-              gegenseitig aufeinander. So kann niemand anfangen — eine der Abhängigkeiten muss weg.
-            </p>
-          )}
-
-          {stufen.ebenen.length > 1 && stufen.ringschluss.length === 0 && (
-            <p className="text-[10px] text-slate-400 pt-0.5">
-              Was in derselben Zeile steht, lässt sich parallel klären. Die Zahl der Zeilen ist die
-              Mindestzahl an Runden — sie bestimmt die Vorlaufzeit stärker als die Entwicklungsdauer.
-            </p>
-          )}
-        </div>
+      {items.length > 1 && (
+        <p className="text-[11px] text-slate-400">
+          Ziehen ordnet um, <span className="font-mono">→</span> rückt ein.
+          Eingerückt heißt: hängt vom Eintrag darüber ab.
+          {tiefe > 1 && <> · {tiefe} Ebenen tief</>}
+        </p>
       )}
 
-      {daten.abhaengigkeiten.length > 0 && (
-        <div className="space-y-1.5">
-          {daten.abhaengigkeiten.map((a) => (
-            <div key={a.id} className={`group rounded-lg border px-3 py-2 ${
-              a.status === 'geklaert' ? 'border-green-200 bg-green-50/50' : 'border-slate-200'
-            }`}>
-              <div className="flex items-start gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => umschalten(a.id)}
-                  className={`w-4 h-4 rounded flex-shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5 transition-colors ${
-                    a.status === 'geklaert' ? 'bg-green-500 text-white' : 'border border-slate-300 text-transparent hover:border-slate-400'
-                  }`}
-                  title={a.status === 'geklaert' ? 'Wieder öffnen' : 'Als geklärt markieren'}
-                >
-                  ✓
-                </button>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-[13px] leading-snug ${
-                    a.status === 'geklaert' ? 'text-slate-400 line-through' : 'text-slate-800'
-                  }`}>
-                    {a.was}
-                  </p>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <span className="text-[10px] text-slate-400 flex-shrink-0">entscheidet:</span>
-                    <input
-                      className="border-0 border-b border-transparent focus:border-slate-200 px-0 py-0 text-[11px] text-slate-600 focus:outline-none bg-transparent flex-1 min-w-0"
-                      value={a.entscheider}
-                      onChange={(e) => setzeEntscheider(a.id, e.target.value)}
-                      placeholder="noch offen — wer?"
-                    />
+      {items.length > 0 && (
+        <div className="space-y-1">
+          {items.map((a, i) => {
+            const ebene = a.ebene ?? 0
+            const blockiert = istBlockiert(items, i)
+            const eltern = elternteil(items, i)
+            const kannRein = i > 0 && ebene <= (items[i - 1].ebene ?? 0)
+            return (
+              <div
+                key={a.id}
+                style={{ marginLeft: ebene * 24 }}
+                draggable
+                onDragStart={() => setZiehtIdx(i)}
+                onDragEnd={() => { setZiehtIdx(null); setUeberIdx(null) }}
+                onDragOver={(e) => { e.preventDefault(); setUeberIdx(i) }}
+                onDrop={(e) => { e.preventDefault(); ablegen(i) }}
+                className={`group rounded-lg border px-2.5 py-2 transition-colors ${
+                  ziehtIdx === i ? 'opacity-40'
+                  : ueberIdx === i ? 'border-blue-400 bg-blue-50'
+                  : a.status === 'geklaert' ? 'border-green-200 bg-green-50/50'
+                  : blockiert ? 'border-amber-200 bg-amber-50/40'
+                  : 'border-slate-200 bg-white'
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  <span
+                    className="text-slate-300 group-hover:text-slate-500 cursor-grab active:cursor-grabbing text-xs leading-none pt-1 flex-shrink-0 select-none"
+                    title="Ziehen zum Umsortieren"
+                  >
+                    ⠿
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => umschalten(a.id)}
+                    className={`w-4 h-4 rounded flex-shrink-0 flex items-center justify-center text-[9px] font-bold mt-0.5 transition-colors ${
+                      a.status === 'geklaert' ? 'bg-green-500 text-white'
+                      : 'border border-slate-300 text-transparent hover:border-slate-400'
+                    }`}
+                    title={a.status === 'geklaert' ? 'Wieder öffnen' : 'Als geklärt markieren'}
+                  >
+                    ✓
+                  </button>
+
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-[13px] leading-snug ${
+                      a.status === 'geklaert' ? 'text-slate-400 line-through' : 'text-slate-800'
+                    }`}>
+                      {blockiert && <span title="wartet auf einen offenen Eintrag darüber">⏳ </span>}
+                      {a.was}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-[10px] text-slate-400 flex-shrink-0">entscheidet:</span>
+                      <input
+                        className="border-0 border-b border-transparent focus:border-slate-200 px-0 py-0 text-[11px] text-slate-600 focus:outline-none bg-transparent flex-1 min-w-0"
+                        value={a.entscheider}
+                        onChange={(e) => setzeEntscheider(a.id, e.target.value)}
+                        placeholder="noch offen — wer?"
+                      />
+                    </div>
+                    {eltern && (
+                      <p className="text-[10px] text-slate-400 mt-0.5 truncate">
+                        erst nach: {eltern.was}
+                      </p>
+                    )}
                   </div>
 
-                  {/* Vorbedingungen wählen — daraus entsteht die Reihenfolge oben */}
-                  {daten.abhaengigkeiten.length > 1 && (
-                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                      <span className="text-[10px] text-slate-400 flex-shrink-0">erst nach:</span>
-                      {daten.abhaengigkeiten
-                        .filter((v) => v.id !== a.id)
-                        .map((v) => {
-                          const an = (a.haengtVon ?? []).includes(v.id)
-                          return (
-                            <button
-                              key={v.id}
-                              type="button"
-                              onClick={() => toggleVorbedingung(a.id, v.id)}
-                              className={`text-[10px] px-1.5 py-0.5 rounded max-w-[150px] truncate transition-colors ${
-                                an ? 'bg-slate-700 text-white' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
-                              }`}
-                              title={an ? `Nicht mehr von „${v.was}" abhängig` : `Erst nach „${v.was}"`}
-                            >
-                              {v.was}
-                            </button>
-                          )
-                        })}
-                      {(a.haengtVon ?? []).length === 0 && (
-                        <span className="text-[10px] text-slate-300">— kann sofort beginnen</span>
-                      )}
-                    </div>
-                  )}
+                  <div className="flex gap-0.5 flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => einruecken(i, -1)}
+                      disabled={ebene === 0}
+                      className="text-slate-300 hover:text-slate-600 disabled:opacity-20 disabled:hover:text-slate-300 text-xs px-1"
+                      title="Ausrücken"
+                    >
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => einruecken(i, 1)}
+                      disabled={!kannRein}
+                      className="text-slate-300 hover:text-slate-600 disabled:opacity-20 disabled:hover:text-slate-300 text-xs px-1"
+                      title="Einrücken — hängt dann vom Eintrag darüber ab"
+                    >
+                      →
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => weg(i)}
+                      className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 text-xs px-1 transition-opacity"
+                      title="Entfernen — samt allem, was darunter hängt"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => weg(a.id)}
-                  className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 text-xs flex-shrink-0 transition-opacity"
-                >
-                  ✕
-                </button>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
@@ -456,7 +446,7 @@ export function AbhaengigkeitenFeld({ ucId, nummer }: { ucId?: string; nummer: n
       )}
       {offen.length > 0 && ohneEntscheider.length === 0 && (
         <p className="text-[11px] text-slate-400">
-          {offen.length} offen — der Zeitplan beginnt erst, wenn diese geklärt sind.
+          {offen.length} offen{tiefe > 1 && ` · ${tiefe} Ebenen — was nicht eingerückt ist, kann parallel laufen`}.
         </p>
       )}
     </div>
