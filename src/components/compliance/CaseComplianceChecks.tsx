@@ -323,7 +323,9 @@ export type GroupKey = 'verfuegbarkeit' | 'risiko' | 'datenschutz' | 'qualitaet'
 const GROUP_KEYS: GroupKey[] = ['verfuegbarkeit', 'risiko', 'datenschutz', 'qualitaet', 'fair', 'ethik', 'plan']
 
 /** Alle Prüfungen zu einem Anwendungsfall — Antworten bleiben am Fall. */
-export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
+export default function CaseComplianceChecks(
+  { ucId, onChecks }: { ucId?: string; onChecks?: (c: CaseChecks) => void },
+) {
   const [params] = useSearchParams()
   const gewuenscht = params.get('check') as GroupKey | null
   const vorgewaehlt = gewuenscht && GROUP_KEYS.includes(gewuenscht) ? gewuenscht : null
@@ -354,6 +356,11 @@ export default function CaseComplianceChecks({ ucId }: { ucId?: string }) {
   useEffect(() => {
     if (loaded && persistent && ucId) void saveChecks(ucId, checks)
   }, [checks, loaded, persistent, ucId])
+
+  // Die Bewertung oben leitet ihre Machbarkeit aus diesen Antworten ab
+  useEffect(() => {
+    if (loaded) onChecks?.(checks)
+  }, [checks, loaded, onChecks])
 
   const dsCount =
     Object.values(checks.dsfa).filter(Boolean).length +

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import CaseComplianceChecks from '../compliance/CaseComplianceChecks'
 import KpiFelder from './KpiFelder'
+import type { CaseChecks } from '../compliance/CaseComplianceChecks'
+import { machbarkeitAusDaten } from '../../lib/machbarkeit'
 import { useForm, useWatch } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { nanoid } from 'nanoid'
@@ -176,6 +178,8 @@ export default function CanvasForm({ existing }: Props) {
   // Kommt der Sprung aus dem geführten Modus auf die Bewertung, muss sie offen sein
   const [suchParams] = useSearchParams()
   const [bewertungOffen, setBewertungOffen] = useState(suchParams.get('check') === 'bewertung')
+  // Stand der Datenprüfungen — meldet der Fall-Wizard weiter unten hoch
+  const [fallChecks, setFallChecks] = useState<CaseChecks | null>(null)
 
   const defaultValues: FormData = existing ?? {
     title: '',
@@ -269,6 +273,7 @@ export default function CanvasForm({ existing }: Props) {
   const currentApproach = watched.aiApproach ?? 'Supervised Learning'
   // Ein Wert, zwei Darstellungen: der Regler führt, die Stufe folgt daraus
   const currentFeas = feasibilityStufe(Number(watched.feasibility ?? 7))
+  const vorschlag = machbarkeitAusDaten(fallChecks?.verfuegbarkeit, fallChecks?.dataQuality)
   const aktuellerScore = computePriorityScore(
     Number(watched.businessImpact ?? 7), Number(watched.feasibility ?? 7),
     Number(watched.strategicFit ?? 7), Number(watched.urgency ?? 5),
@@ -613,10 +618,53 @@ export default function CanvasForm({ existing }: Props) {
             </span>
             <span className="text-[11px] text-slate-400">— erscheint so in Liste und Export</span>
           </div>
-          {existing && (
+
+          {/* Aus den Datenprüfungen hergeleitet — Vorschlag, keine Vorbelegung */}
+          {existing && vorschlag.wert !== null && (
+            <div className={`mt-3 rounded-lg border px-3 py-2.5 ${
+              vorschlag.wert < Number(watched.feasibility ?? 7)
+                ? 'border-amber-200 bg-amber-50'
+                : 'border-slate-200 bg-slate-50'
+            }`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold text-slate-700">
+                    Aus den Datenprüfungen ergibt sich {vorschlag.wert}
+                    {vorschlag.wert < Number(watched.feasibility ?? 7) && (
+                      <span className="text-amber-700"> — Sie haben {watched.feasibility} gesetzt</span>
+                    )}
+                  </p>
+                  <ul className="mt-1 space-y-0.5">
+                    {vorschlag.gruende.map((g) => (
+                      <li key={g} className="text-[11px] text-slate-600 flex items-start gap-1.5">
+                        <span className="mt-1.5 w-1 h-1 rounded-full bg-slate-400 flex-shrink-0" />
+                        <span>{g}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {vorschlag.wert !== Number(watched.feasibility ?? 7) && (
+                  <button
+                    type="button"
+                    onClick={() => setValue('feasibility', vorschlag.wert as number)}
+                    className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-slate-800 text-white hover:bg-slate-700 flex-shrink-0"
+                  >
+                    Übernehmen
+                  </button>
+                )}
+              </div>
+              <p className="text-[10px] text-slate-400 mt-2">
+                Basis: {vorschlag.basis.beantwortet} von {vorschlag.basis.gesamt} Fragen aus Verfügbarkeit
+                und Qualität. Abweichen ist zulässig — etwa wenn Daten zugekauft werden.
+              </p>
+            </div>
+          )}
+          {existing && vorschlag.wert === null && (
             <p className="text-[11px] text-slate-400 mt-2">
-              Die technische Machbarkeit lässt sich erst nach den Datenprüfungen unten belastbar
-              einschätzen — fehlt das Nutzungsrecht, trägt kein Wert über 5.
+              Die technische Machbarkeit lässt sich aus den Datenprüfungen unten herleiten —
+              dafür müssen dort die vier Verfügbarkeitsfragen oder mindestens drei
+              Qualitätsdimensionen beantwortet sein ({vorschlag.basis.beantwortet} von
+              {vorschlag.basis.gesamt} bisher).
             </p>
           )}
           </div>
@@ -624,7 +672,7 @@ export default function CanvasForm({ existing }: Props) {
         </section>
 
         {/* Erst nach Beschreibung und Bewertung: die geführten Prüfungen bis zum To-do-Plan */}
-        {existing && <CaseComplianceChecks ucId={existing.id} />}
+        {existing && <CaseComplianceChecks ucId={existing.id} onChecks={setFallChecks} />}
 
         {/* Section 5: Privacy & Compliance Checklist */}
         <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
