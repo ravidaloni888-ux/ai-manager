@@ -170,6 +170,57 @@ function SliderField({
   )
 }
 
+
+/**
+ * Ein Abschnitt des Canvas. Zugeklappt bleibt der Stand im Kopf ablesbar —
+ * sonst müsste man zum Nachsehen jedes Mal aufklappen.
+ */
+function Sektion({
+  id, titel, zusatz, stand, offen, onToggle, children,
+}: {
+  id?: string
+  titel: string
+  zusatz?: string
+  stand?: React.ReactNode
+  offen: boolean
+  onToggle: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <section id={id} className="bg-white rounded-xl shadow-md overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-slate-50 transition-colors"
+      >
+        <div className="min-w-0 flex-1">
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
+            {titel}
+            {zusatz && <span className="text-slate-400 font-normal normal-case ml-1.5">{zusatz}</span>}
+          </h2>
+        </div>
+        {stand}
+        <svg className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${offen ? 'rotate-180' : ''}`}
+             fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      {offen && <div className="px-5 pb-5 space-y-4">{children}</div>}
+    </section>
+  )
+}
+
+/** Kleine Zahl im Sektionskopf — grün, sobald vollständig. */
+function StandZahl({ ist, soll }: { ist: number; soll: number }) {
+  return (
+    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
+      ist >= soll ? 'bg-green-100 text-green-700' : ist > 0 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'
+    }`}>
+      {ist}/{soll}
+    </span>
+  )
+}
+
 export default function CanvasForm({ existing }: Props) {
   const navigate = useNavigate()
   const { addUseCase, updateUseCase, deleteUseCase } = useUseCasesStore()
@@ -178,7 +229,17 @@ export default function CanvasForm({ existing }: Props) {
   const [savedId, setSavedId] = useState<string | null>(null)
   // Kommt der Sprung aus dem geführten Modus auf die Bewertung, muss sie offen sein
   const [suchParams] = useSearchParams()
-  const [bewertungOffen, setBewertungOffen] = useState(suchParams.get('check') === 'bewertung')
+  // Offen ist, was man beim Öffnen eines Falls zuerst braucht; ein Sprung aus
+  // dem geführten Modus öffnet zusätzlich seine Zielsektion.
+  const check = suchParams.get('check')
+  const [offen, setOffen] = useState<Record<string, boolean>>({
+    grund: true,
+    beschreiben: !existing,
+    bewertung: check === 'bewertung',
+    nachweise: false,
+    doku: false,
+  })
+  const klapp = (k: string) => setOffen((p) => ({ ...p, [k]: !p[k] }))
   // Stand der Datenprüfungen — meldet der Fall-Wizard weiter unten hoch
   const [fallChecks, setFallChecks] = useState<CaseChecks | null>(null)
 
@@ -274,6 +335,24 @@ export default function CanvasForm({ existing }: Props) {
   const currentApproach = watched.aiApproach ?? 'Supervised Learning'
   // Ein Wert, zwei Darstellungen: der Regler führt, die Stufe folgt daraus
   const currentFeas = feasibilityStufe(Number(watched.feasibility ?? 7))
+  // Stand je Sektion — im Kopf ablesbar, ohne aufzuklappen
+  // Nur die Formularfelder — Stakeholder und Abhängigkeiten führen ihren
+  // eigenen Stand im Block, weil sie in einem anderen Speicher liegen.
+  const beschriebenCount = [
+    watched.businessProblem, watched.successMetrics, watched.dataRequirements, watched.aiApproach,
+    watched.teamCompetencies, watched.timeline, watched.estimatedCostK, watched.expectedBenefitK,
+  ].filter((v) => (typeof v === 'number' ? v > 0 : !!String(v ?? '').trim())).length
+
+  const nachweisCount = [
+    watched.complianceLegal, watched.compliancePersonalData, watched.complianceDataMin,
+    watched.complianceDocumentation, watched.complianceLiability,
+  ].filter(Boolean).length
+
+  const dokuCount = [
+    watched.docGoal, watched.docDataBasis, watched.docRiskMitigation, watched.docExplainability,
+    watched.docOperations, watched.docRegulatory, watched.docVersioning,
+  ].filter((v) => !!String(v ?? '').trim()).length
+
   const vorschlag = machbarkeitAusDaten(fallChecks?.verfuegbarkeit, fallChecks?.dataQuality)
   const aktuellerScore = computePriorityScore(
     Number(watched.businessImpact ?? 7), Number(watched.feasibility ?? 7),
@@ -386,9 +465,13 @@ export default function CanvasForm({ existing }: Props) {
           </div>
         </div>
 
-        {/* Section 1: Basic Info */}
-        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
-          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Basic Information</h2>
+        {/* ① Grunddaten — wer, was, welche Phase */}
+        <Sektion
+          titel="Grunddaten" offen={offen.grund} onToggle={() => klapp('grund')}
+          stand={<span className="text-[11px] text-slate-400 truncate max-w-[220px]">
+            {watched.title || 'ohne Titel'} · {watched.status}
+          </span>}
+        >
           <div className="grid grid-cols-3 gap-4">
             {/* Row 1: Title + Department */}
             <div className="col-span-2">
@@ -463,13 +546,14 @@ export default function CanvasForm({ existing }: Props) {
               </div>
             )}
           </div>
-        </section>
+        </Sektion>
 
-        {/* Section 2: AI Use Case Canvas */}
-        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
-          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-            KI-Anwendungsfall-Canvas <span className="text-slate-400 font-normal normal-case">(10 Elemente)</span>
-          </h2>
+        {/* ② Das Vorhaben beschreiben */}
+        <Sektion
+          titel="Vorhaben beschreiben" zusatz="· 10 Elemente"
+          offen={offen.beschreiben} onToggle={() => klapp('beschreiben')}
+          stand={<StandZahl ist={beschriebenCount} soll={8} />}
+        >
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
@@ -582,13 +666,13 @@ export default function CanvasForm({ existing }: Props) {
               </div>
             </div>
           </div>
-        </section>
+        </Sektion>
 
         {/* Section 3: Portfolio Scoring — zuklappbar, der Score steht im Kopf */}
         <section id="bewertung" className="bg-white rounded-xl shadow-md overflow-hidden">
           <button
             type="button"
-            onClick={() => setBewertungOffen((v) => !v)}
+            onClick={() => klapp('bewertung')}
             className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-slate-50 transition-colors"
           >
             <div className="min-w-0 flex-1">
@@ -606,13 +690,13 @@ export default function CanvasForm({ existing }: Props) {
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${FEASIBILITY_BG[currentFeas]}`}>
               {FEASIBILITY_LABEL[currentFeas]}
             </span>
-            <svg className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${bewertungOffen ? 'rotate-180' : ''}`}
+            <svg className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${offen.bewertung ? 'rotate-180' : ''}`}
                  fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
             </svg>
           </button>
 
-          {bewertungOffen && (
+          {offen.bewertung && (
           <div className="px-5 pb-5">
           <div className="space-y-3">
             <SliderField label="Geschäftsnutzen"      name="businessImpact" weight="40%" register={register} value={Number(watched.businessImpact ?? 7)} />
@@ -683,12 +767,12 @@ export default function CanvasForm({ existing }: Props) {
         {/* Erst nach Beschreibung und Bewertung: die geführten Prüfungen bis zum To-do-Plan */}
         {existing && <CaseComplianceChecks ucId={existing.id} onChecks={setFallChecks} />}
 
-        {/* Section 5: Privacy & Compliance Checklist */}
-        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
-          <div className="flex items-center gap-3">
-            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Datenschutz &amp; Compliance-Checkliste</h2>
-            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Governance</span>
-          </div>
+        {/* ⑤ Nachweise — bestätigt, was in den Prüfungen erarbeitet wurde */}
+        <Sektion
+          titel="Compliance-Nachweise" zusatz="· Governance"
+          offen={offen.nachweise} onToggle={() => klapp('nachweise')}
+          stand={<StandZahl ist={nachweisCount} soll={5} />}
+        >
           <p className="text-xs text-slate-400 -mt-2">Haken setzen, sobald geprüft. Ergebnisse erscheinen unter Governance → Datenschutz-Checkliste.</p>
           <div className="space-y-3">
             {([
@@ -714,14 +798,14 @@ export default function CanvasForm({ existing }: Props) {
               )
             })}
           </div>
-        </section>
+        </Sektion>
 
-        {/* Section 6: Documentation (Step 9) */}
-        <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
-          <div className="flex items-center gap-3">
-            <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Dokumentation</h2>
-            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-medium">Schritt 9 · 9-Schritte-Framework</span>
-          </div>
+        {/* ⑥ Dokumentation — der formale Nachweis, meist zuletzt */}
+        <Sektion
+          titel="Dokumentation" zusatz="· für Audit und Anhang IV"
+          offen={offen.doku} onToggle={() => klapp('doku')}
+          stand={<StandZahl ist={dokuCount} soll={7} />}
+        >
           <p className="text-xs text-slate-400 -mt-2">Formelle Compliance- und Audit-Dokumentation. Alle Felder optional.</p>
 
           <div className="grid grid-cols-2 gap-4">
@@ -767,7 +851,7 @@ export default function CanvasForm({ existing }: Props) {
               <textarea {...register('docVersioning')} rows={3} className={textareaCls} placeholder="Versionierung, Änderungsprotokoll, Release-Prozess…" />
             </div>
           </div>
-        </section>
+        </Sektion>
 
         {/* Priority Score — below portfolio scoring */}
         <div className="bg-[#1a2538] rounded-xl p-5 flex items-center gap-6 text-white">
