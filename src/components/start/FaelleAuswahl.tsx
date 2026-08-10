@@ -17,7 +17,7 @@ import type { StepId } from '../../store/wizardStore'
 /** Welcher Wizard-Schritt prüft was, und wo im Canvas liegt das? */
 const ZIEL: Record<string, { check: string; label: string }> = {
   'usecases':     { check: '',           label: 'Anwendungsfälle' },
-  'data-quality': { check: 'qualitaet',  label: 'Datenqualität' },
+  'data-quality': { check: 'datengrundlage',  label: 'Datengrundlage' },
   'score':        { check: 'bewertung',  label: 'Bewertung' },
   'eu-act':       { check: 'risiko',     label: 'Risikoklasse' },
   'project-plan': { check: 'plan',       label: 'To-do-Plan' },

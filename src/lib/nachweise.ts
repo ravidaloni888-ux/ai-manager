@@ -51,8 +51,8 @@ export const NACHWEISE: NachweisDef[] = [
     key: 'complianceDataMin',
     label: 'Datensparsamkeit & Zweckbindung sichergestellt',
     desc: 'Nur für den angegebenen Zweck notwendige Daten werden verarbeitet',
-    quelle: 'Datenverfügbarkeit — Nutzungsrecht',
-    ziel: 'verfuegbarkeit',
+    quelle: 'Datengrundlage — Nutzungsrecht',
+    ziel: 'datengrundlage',
   },
   {
     key: 'complianceDocumentation',

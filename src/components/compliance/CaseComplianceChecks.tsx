@@ -5,11 +5,12 @@ import { getMandantType } from '../../store/mandantStore'
 import { loadCaseChecks, saveCaseChecks } from '../../lib/supabase'
 import DataQualityCheck, { EMPTY_DATA_QUALITY } from '../assessments/DataQualityCheck'
 import type { DataQualityState } from '../assessments/DataQualityCheck'
-import FairCheck, { EMPTY_FAIR } from '../assessments/FairCheck'
+import { EMPTY_FAIR } from '../assessments/FairCheck'
 import type { FairState } from '../assessments/FairCheck'
 import EthicsCheck, { EMPTY_ETHICS } from '../assessments/EthicsCheck'
 import RiskClassCheck, { EMPTY_RISK_CLASS, resultName } from '../assessments/RiskClassCheck'
-import DatenverfuegbarkeitCheck, { EMPTY_VERFUEGBARKEIT, verfuegbarkeitUrteil } from '../assessments/DatenverfuegbarkeitCheck'
+import FairAnsicht from '../assessments/FairAnsicht'
+import DatenverfuegbarkeitCheck, { EMPTY_VERFUEGBARKEIT, verfuegbarkeitUrteil, VERFUEGBARKEIT_FRAGEN } from '../assessments/DatenverfuegbarkeitCheck'
 import type { VerfuegbarkeitState } from '../assessments/DatenverfuegbarkeitCheck'
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import type { EthicsState } from '../assessments/EthicsCheck'
@@ -319,9 +320,14 @@ function Art22Checker({ checked, setChecked }: {
 }
 
 /** Alle drei Fall-Checks — einklappbar, Antworten bleiben am Anwendungsfall. */
-export type GroupKey = 'verfuegbarkeit' | 'risiko' | 'datenschutz' | 'qualitaet' | 'fair' | 'ethik' | 'plan'
+export type GroupKey = 'datengrundlage' | 'risiko' | 'datenschutz' | 'ethik' | 'plan'
 
-const GROUP_KEYS: GroupKey[] = ['verfuegbarkeit', 'risiko', 'datenschutz', 'qualitaet', 'fair', 'ethik', 'plan']
+const GROUP_KEYS: GroupKey[] = ['datengrundlage', 'risiko', 'datenschutz', 'ethik', 'plan']
+
+/** Alte Deep-Links zeigten auf die drei getrennten Datenprüfungen. */
+const ALTE_KEYS: Record<string, GroupKey> = {
+  verfuegbarkeit: 'datengrundlage', qualitaet: 'datengrundlage', fair: 'datengrundlage',
+}
 
 /** Alle Prüfungen zu einem Anwendungsfall — Antworten bleiben am Fall. */
 export default function CaseComplianceChecks(
@@ -330,7 +336,8 @@ export default function CaseComplianceChecks(
 ) {
   const [params] = useSearchParams()
   const gewuenscht = params.get('check') as GroupKey | null
-  const vorgewaehlt = gewuenscht && GROUP_KEYS.includes(gewuenscht) ? gewuenscht : null
+  const aufgeloest = gewuenscht ? ALTE_KEYS[gewuenscht] ?? gewuenscht : null
+  const vorgewaehlt = aufgeloest && GROUP_KEYS.includes(aufgeloest) ? aufgeloest : null
 
   const [openGroup, setOpenGroup] = useState<GroupKey | null>(vorgewaehlt)
   // Kommt der Nutzer aus dem geführten Modus, ist die Gruppe schon gesetzt —
@@ -376,6 +383,12 @@ export default function CaseComplianceChecks(
     Object.values(checks.art22).filter(Boolean).length +
     (checks.avv.external !== null ? 1 : 0)
   const dqCount = Object.values(checks.dataQuality.dims).filter((d) => d.rating !== null).length
+  // Das Gate entscheidet, ob die Detailprüfung überhaupt Sinn hat
+  const gateAntworten = checks.verfuegbarkeit?.antworten ?? {}
+  const dgCount = VERFUEGBARKEIT_FRAGEN.filter((f) => gateAntworten[f.id]).length
+  const gateOffen: boolean | null =
+    dgCount < VERFUEGBARKEIT_FRAGEN.length ? null
+      : !VERFUEGBARKEIT_FRAGEN.some((f) => f.hart && gateAntworten[f.id] === 'nein')
   const vfUrteil = verfuegbarkeitUrteil(checks.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT)
   const fairCount = Object.values(checks.fair).filter(Boolean).length
 
@@ -385,12 +398,12 @@ export default function CaseComplianceChecks(
 
   // Reihenfolge wie im KI-Programm: erst Datengrundlage, dann Recht, dann Plan.
   const groups: { key: GroupKey; icon: string; title: string; hint: string; status: string; done: boolean }[] = [
-    { key: 'verfuegbarkeit', icon: '🗄️', title: 'Datenverfügbarkeit',
-      hint: 'Vier Fragen vor dem Business Case — Existenz, Zugang, Qualität, Recht',
-      status: vfUrteil.beantwortet ? `${vfUrteil.beantwortet}/4 beantwortet` : '',
-      done: vfUrteil.vollstaendig },
-    { key: 'qualitaet',   icon: '🧪', title: 'Datenqualität prüfen', hint: 'Sechs Dimensionen — zweckbezogen bewertet', status: dqCount ? `${dqCount}/6 bewertet` : '', done: dqCount === 6 },
-    { key: 'fair',        icon: '✅', title: 'FAIR-Check',    hint: 'Auffindbar · Zugänglich · Interoperabel · Wiederverwendbar', status: fairCount ? `${fairCount} erfüllt` : '', done: fairCount === 4 },
+    { key: 'datengrundlage', icon: '🗄️', title: 'Datengrundlage',
+      hint: 'Erst das Gate, dann die sieben Qualitätsdimensionen',
+      status: gateOffen === null ? (dgCount ? `${dgCount} beantwortet` : '')
+        : gateOffen === false ? 'K.-o. — gestoppt'
+        : dqCount ? `${dqCount}/7 bewertet` : 'Gate offen',
+      done: gateOffen === false || (gateOffen === true && dqCount === 7) },
     { key: 'risiko',      icon: '⚖️', title: 'EU AI Act — Risikoklasse', hint: 'Prüfpfad der Verordnung — meist 3–5 Fragen', status: rcResult, done: checks.riskClass.done },
     { key: 'datenschutz', icon: '🛡️', title: 'Datenschutz',   hint: 'DSFA-Pflicht · AVV · Art. 22',              status: dsCount ? `${dsCount} beantwortet` : '', done: checks.avv.external !== null && checks.avv.personalData !== null },
     { key: 'ethik',       icon: '🧭', title: 'Ethik',         hint: 'FAST-Bewertung des Vorhabens',              status: checks.ethics.result ? checks.ethics.result.verdict : '', done: !!checks.ethics.result },
@@ -491,23 +504,32 @@ export default function CaseComplianceChecks(
                       />
                     </>
                   )}
-                  {g.key === 'verfuegbarkeit' && (
-                    <DatenverfuegbarkeitCheck
-                      value={checks.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT}
-                      onChange={(fn) => setChecks((prev) => ({ ...prev, verfuegbarkeit: fn(prev.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT) }))}
-                    />
-                  )}
-                  {g.key === 'qualitaet' && (
-                    <DataQualityCheck
-                      value={checks.dataQuality}
-                      onChange={(fn) => setChecks((prev) => ({ ...prev, dataQuality: fn(prev.dataQuality) }))}
-                    />
-                  )}
-                  {g.key === 'fair' && (
-                    <FairCheck
-                      value={checks.fair}
-                      onChange={(fn) => setChecks((prev) => ({ ...prev, fair: fn(prev.fair) }))}
-                    />
+                  {g.key === 'datengrundlage' && (
+                    <>
+                      <DatenverfuegbarkeitCheck
+                        value={checks.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT}
+                        onChange={(fn) => setChecks((prev) => ({ ...prev, verfuegbarkeit: fn(prev.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT) }))}
+                      />
+
+                      {gateOffen === false ? (
+                        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                          <p className="text-sm font-semibold text-red-900">Die Detailprüfung erübrigt sich</p>
+                          <p className="text-[12px] text-red-900 leading-relaxed mt-1">
+                            Eine K.-o.-Frage ist mit Nein beantwortet. Ob die vorhandenen Daten sauber sind,
+                            ändert daran nichts — erst muss die Grundlage geklärt werden.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="border-t border-slate-200 pt-4">
+                          <DataQualityCheck
+                            value={checks.dataQuality}
+                            onChange={(fn) => setChecks((prev) => ({ ...prev, dataQuality: fn(prev.dataQuality) }))}
+                          />
+                        </div>
+                      )}
+
+                      <FairAnsicht v={checks.verfuegbarkeit} q={checks.dataQuality} />
+                    </>
                   )}
                   {g.key === 'ethik' && (
                     <EthicsCheck

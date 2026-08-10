@@ -46,6 +46,14 @@ const QUALITY_DIMENSIONS = [
     check: 'Sind die Daten für die konkrete Zielgruppe und deren Kontext verständlich und nützlich?',
   },
   {
+    key: 'interoperabilitaet',
+    icon: '🔌',
+    title: 'Interoperabilität',
+    frage: 'Passen die Daten mit den Nachbarsystemen zusammen?',
+    beispiel: 'Projektbezeichnungen im Dienstbuch weichen von denen in SAP ab.',
+    check: 'Sind Formate, Schlüssel und Terminologie so, dass andere Systeme die Daten ohne Übersetzung verwenden können?',
+  },
+  {
     key: 'eindeutigkeit',
     icon: '🔍',
     title: 'Eindeutigkeit',
@@ -132,7 +140,7 @@ export default function DataQualityCheck({ value, onChange }: {
       {/* Info block */}
       <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-slate-800 rounded-r-xl px-5 py-4 text-sm text-slate-700 leading-relaxed">
         <strong>Datenqualität ist immer zweckbezogen.</strong> „Gut genug für ein Brainstorming" ist nicht automatisch „gut genug für ein RAG-System, das in 30 Sekunden eine Servicefrage beantwortet." Dieselben SAP-Daten: für das Controlling ausreichend — für das RAG-System unvollständig.
-        <span className="block mt-1 text-xs text-slate-400">Quelle: DAMA DMBOK2 Revised Edition (März 2024)</span>
+        <span className="block mt-1 text-xs text-slate-400">Sechs Dimensionen nach DAMA DMBOK2 Revised Edition (März 2024), ergänzt um Interoperabilität aus den FAIR-Prinzipien</span>
       </div>
 
       {/* Assessment tool */}
@@ -219,7 +227,7 @@ export default function DataQualityCheck({ value, onChange }: {
       </div>
 
       {/* Theorie — bei Bedarf */}
-      <TheoryBlock title="Die sechs Dimensionen der Datenqualität" hint="Was jede Dimension bedeutet, mit Beispielen">
+      <TheoryBlock title="Die sieben Dimensionen der Datenqualität" hint="Sechs nach DAMA, plus Interoperabilität aus FAIR">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {QUALITY_DIMENSIONS.map(d => (
             <div key={d.key} className="bg-white rounded-xl border border-slate-200 p-4 space-y-1.5">

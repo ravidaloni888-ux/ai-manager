@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────
-// Datenverfügbarkeit — vier Fragen vor jedem Business Case.
+// Datenverfügbarkeit — drei Fragen vor jedem Business Case.
 //
 // Das Modell ist selten das Problem, die Daten schon. In den meisten
 // gescheiterten KI-Projekten liegt die Ursache nicht in der Technologie,
@@ -49,14 +49,6 @@ export const VERFUEGBARKEIT_FRAGEN: FrageDef[] = [
     hart: false,
   },
   {
-    id: 'qualitaet',
-    titel: 'Qualität',
-    frage: 'Sind sie vollständig, aktuell und korrekt genug für ein belastbares Modell?',
-    hinweis: 'Grobe Einschätzung — die sechs Dimensionen prüfen Sie gleich darunter im Detail.',
-    beiNein: 'Vor dem Training steht die Bereinigung. Wichtig: Lücken sind selten zufällig verteilt — fehlen ausgerechnet die kritischen Fälle, wird das Modell dort schwach, wo es gebraucht wird.',
-    hart: false,
-  },
-  {
     id: 'recht',
     titel: 'Nutzungsrecht',
     frage: 'Dürfen sie für genau diesen Zweck genutzt werden?',
@@ -103,9 +95,9 @@ export default function DatenverfuegbarkeitCheck({ value, onChange }: {
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-slate-100">
-        <p className="text-sm font-semibold text-slate-800">Datenverfügbarkeit — vier Fragen vor dem Business Case</p>
+        <p className="text-sm font-semibold text-slate-800">Datenverfügbarkeit — drei Fragen vor dem Business Case</p>
         <p className="text-xs text-slate-500 mt-0.5">
-          Das Modell ist selten das Problem, die Daten schon. Erst wenn diese vier stehen,
+          Das Modell ist selten das Problem, die Daten schon. Erst wenn diese drei stehen,
           lohnt die Detailbewertung darunter.
         </p>
       </div>
@@ -179,7 +171,7 @@ export default function DatenverfuegbarkeitCheck({ value, onChange }: {
             <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
               <p className="text-sm font-semibold text-green-800">Datengrundlage trägt</p>
               <p className="text-[12px] text-green-900 mt-1 leading-relaxed">
-                Alle vier Fragen sind bejaht. Jetzt lohnt die Detailbewertung der sechs Qualitätsdimensionen.
+                Alle drei Fragen sind bejaht. Jetzt lohnt die Detailbewertung der sieben Qualitätsdimensionen.
               </p>
             </div>
           ) : (
