@@ -17,6 +17,13 @@ import type { DataQualityState } from '../components/assessments/DataQualityChec
 // zeigt jeweils, worauf es sich stützt. Die Theorie steht unter /data.
 // ─────────────────────────────────────────────────────────────────────────
 
+/**
+ * Alter Stand des FAIR-Fragebogens. Wird nicht mehr erhoben, bleibt aber
+ * im Datensatz, damit gespeicherte Antworten nicht verlorengehen.
+ */
+export type FairState = Record<string, boolean>
+export const EMPTY_FAIR: FairState = {}
+
 export type FairStand = 'erfuellt' | 'teilweise' | 'kritisch' | 'offen'
 
 export interface FairZeile {

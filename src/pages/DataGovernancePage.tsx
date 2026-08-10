@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { VERFUEGBARKEIT_FRAGEN } from '../components/assessments/DatenverfuegbarkeitCheck'
+import FairPrinzipien from '../components/data/FairPrinzipien'
 import TheoryBlock from '../components/ui/TheoryBlock'
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -80,14 +81,11 @@ function DatenintegritaetTab() {
   )
 }
 
-// ── Seite 12: FAIR-Prinzipien (Info + Check-Tool) ────────────────────────
-
-
 // ── Page ─────────────────────────────────────────────────────────────────
 
 export default function DataGovernancePage() {
   const navigate = useNavigate()
-  const [tab, setTab] = useState<'integritaet'>('integritaet')
+  const [tab, setTab] = useState<'integritaet' | 'fair'>('integritaet')
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -123,7 +121,7 @@ export default function DataGovernancePage() {
         </div>
 
         <p className="text-[12px] text-slate-300 pt-1">
-          Vier Fragen, die <strong className="text-white">vor jedem Business Case</strong> zu beantworten sind —
+          {VERFUEGBARKEIT_FRAGEN.length} Fragen, die <strong className="text-white">vor jedem Business Case</strong> zu beantworten sind —
           je Anwendungsfall, weil sie zweckbezogen sind.
         </p>
         <button
@@ -139,6 +137,7 @@ export default function DataGovernancePage() {
       <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
         {([
           { id: 'integritaet', label: '🔒 Datenintegrität' },
+          { id: 'fair', label: '🔗 FAIR-Prinzipien' },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
@@ -148,15 +147,16 @@ export default function DataGovernancePage() {
       </div>
 
       {tab === 'integritaet' && <DatenintegritaetTab />}
+      {tab === 'fair' && <FairPrinzipien />}
 
       {/* Die fallbezogenen Prüfungen sind an den Anwendungsfall gewandert */}
       <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
         <p className="text-sm font-semibold text-slate-700">Die fallbezogenen Datenprüfungen liegen im Anwendungsfall</p>
         <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-          Verfügbarkeit, Qualität und FAIR sind zweckbezogen — sie brauchen ein konkretes Vorhaben.
-          Sie finden alle drei im Anwendungsfall unter <strong>Fall-Wizard · Prüfungen &amp; Plan</strong>,
-          in dieser Reihenfolge: erst die vier Verfügbarkeitsfragen als Gate, dann die sechs
-          Qualitätsdimensionen im Detail.
+          Die Datengrundlage ist zweckbezogen — sie braucht ein konkretes Vorhaben. Sie finden sie im
+          Anwendungsfall unter <strong>Fall-Wizard · Prüfungen &amp; Plan</strong>: erst das Gate aus
+          {' '}{VERFUEGBARKEIT_FRAGEN.length} Fragen, dann die sieben Qualitätsdimensionen im Detail.
+          FAIR ergibt sich daraus, ohne zweite Erhebung.
         </p>
       </div>
     </div>
