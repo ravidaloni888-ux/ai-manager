@@ -406,7 +406,7 @@ export default function CanvasForm({ existing }: Props) {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-xl font-bold text-slate-800">
-              {existing ? 'Edit Use Case' : 'New AI Use Case'}
+              {existing ? 'Anwendungsfall bearbeiten' : 'Neuer Anwendungsfall'}
             </h1>
             <p className="text-sm text-slate-500 mt-0.5">
               KI Use Case Canvas — basierend auf der K7.0069 KI-Management-Methodik
@@ -459,19 +459,20 @@ export default function CanvasForm({ existing }: Props) {
               onClick={() => navigate(-1)}
               className="text-sm border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 px-3 py-2 rounded-lg"
             >
-              Cancel
+              Abbrechen
             </button>
             <button
               type="submit"
               className="text-sm bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg transition-colors"
             >
-              {existing ? 'Save Changes' : 'Create Use Case'}
+              {existing ? 'Änderungen speichern' : 'Anwendungsfall erstellen'}
             </button>
           </div>
         </div>
 
         {/* ① Grunddaten — wer, was, welche Phase */}
         <Sektion
+          nummer={1}
           titel="Grunddaten" offen={offen.grund} onToggle={() => klapp('grund')}
           stand={<span className="text-[11px] text-slate-400 truncate max-w-[220px]">
             {watched.title || 'ohne Titel'} · {watched.status}
@@ -555,6 +556,7 @@ export default function CanvasForm({ existing }: Props) {
 
         {/* ② Das Vorhaben beschreiben */}
         <Sektion
+          nummer={2}
           titel="Vorhaben beschreiben" zusatz="· 10 Elemente"
           offen={offen.beschreiben} onToggle={() => klapp('beschreiben')}
           stand={<StandZahl ist={beschriebenCount} soll={8} />}
@@ -673,43 +675,31 @@ export default function CanvasForm({ existing }: Props) {
           </div>
         </Sektion>
 
-        {/* Section 3: Portfolio Scoring — zuklappbar, der Score steht im Kopf */}
-        <section id="bewertung" className="bg-white rounded-xl shadow-md overflow-hidden">
-          <button
-            type="button"
-            onClick={() => klapp('bewertung')}
-            className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-slate-50 transition-colors"
-          >
-            <div className="min-w-0 flex-1">
-              <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">
-                Portfolio-Bewertung
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Nutzen 40% · Machbarkeit 30% · Passung 20% · Dringlichkeit 10%
-              </p>
-            </div>
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"
-                  style={{ background: `${scoreColor(aktuellerScore)}22`, color: scoreColor(aktuellerScore) }}>
-              {aktuellerScore}
-            </span>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${FEASIBILITY_BG[currentFeas]}`}>
-              {FEASIBILITY_LABEL[currentFeas]}
-            </span>
-            <svg className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${offen.bewertung ? 'rotate-180' : ''}`}
-                 fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-            </svg>
-          </button>
-
-          {offen.bewertung && (
-          <div className="px-5 pb-5">
+        {/* ③ Portfolio-Bewertung — der Score steht im Kopf */}
+        <Sektion
+          id="bewertung"
+          nummer={3}
+          titel="Portfolio-Bewertung" zusatz="· 4 Kriterien"
+          offen={offen.bewertung} onToggle={() => klapp('bewertung')}
+          stand={
+            <>
+              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full flex-shrink-0"
+                    style={{ background: `${scoreColor(aktuellerScore)}22`, color: scoreColor(aktuellerScore) }}>
+                {aktuellerScore}
+              </span>
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${FEASIBILITY_BG[currentFeas]}`}>
+                {FEASIBILITY_LABEL[currentFeas]}
+              </span>
+            </>
+          }
+        >
           <div className="space-y-3">
             <SliderField label="Geschäftsnutzen"      name="businessImpact" weight="40%" register={register} value={Number(watched.businessImpact ?? 7)} />
             <SliderField label="Technische Machbarkeit" name="feasibility"   weight="30%" register={register} value={Number(watched.feasibility ?? 7)} />
             <SliderField label="Strategische Passung"  name="strategicFit"   weight="20%" register={register} value={Number(watched.strategicFit ?? 7)} />
             <SliderField label="Dringlichkeit"         name="urgency"        weight="10%" register={register} value={Number(watched.urgency ?? 5)} />
           </div>
-          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-100">
+          <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
             <span className="text-[11px] text-slate-500">Einstufung daraus:</span>
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${FEASIBILITY_BG[currentFeas]}`}>
               {FEASIBILITY_LABEL[currentFeas]}
@@ -719,7 +709,7 @@ export default function CanvasForm({ existing }: Props) {
 
           {/* Aus den Datenprüfungen hergeleitet — Vorschlag, keine Vorbelegung */}
           {existing && vorschlag.wert !== null && (
-            <div className={`mt-3 rounded-lg border px-3 py-2.5 ${
+            <div className={`rounded-lg border px-3 py-2.5 ${
               vorschlag.wert < Number(watched.feasibility ?? 7)
                 ? 'border-amber-200 bg-amber-50'
                 : 'border-slate-200 bg-slate-50'
@@ -758,16 +748,13 @@ export default function CanvasForm({ existing }: Props) {
             </div>
           )}
           {existing && vorschlag.wert === null && (
-            <p className="text-[11px] text-slate-400 mt-2">
-              Die technische Machbarkeit lässt sich aus den Datenprüfungen unten herleiten —
-              dafür müssen dort die vier Verfügbarkeitsfragen oder mindestens drei
-              Qualitätsdimensionen beantwortet sein ({vorschlag.basis.beantwortet} von
-              {vorschlag.basis.gesamt} bisher).
+            <p className="text-[11px] text-slate-400">
+              Die technische Machbarkeit lässt sich aus der Datengrundlage in Schritt 4 herleiten —
+              dafür müssen dort das Gate oder mindestens drei Qualitätsdimensionen beantwortet sein
+              ({vorschlag.basis.beantwortet} von {vorschlag.basis.gesamt} bisher).
             </p>
           )}
-          </div>
-          )}
-        </section>
+        </Sektion>
 
         {/* Erst nach Beschreibung und Bewertung: die geführten Prüfungen bis zum To-do-Plan */}
         {existing && (
@@ -781,43 +768,41 @@ export default function CanvasForm({ existing }: Props) {
 
         {/* ⑤ Nachweise — bestätigt, was in den Prüfungen erarbeitet wurde */}
         <Sektion
-          titel="Compliance-Nachweise" zusatz="· Governance"
+          nummer={5}
+          titel="Compliance-Nachweise" zusatz="· abgeleitet"
           offen={offen.nachweise} onToggle={() => klapp('nachweise')}
           stand={<StandZahl ist={nachweisCount} soll={5} />}
         >
           <p className="text-xs text-slate-400 -mt-2">
-            Ergibt sich aus den Prüfungen darüber — hier wird nicht doppelt erfasst, sondern gezeigt,
-            was bereits belegt ist. Erscheint unter Governance → Datenschutz-Checkliste.
+            Ergibt sich aus Schritt 4 — hier wird nichts angehakt, sondern gezeigt, was belegt ist.
+            Erscheint unter Governance → Datenschutz-Checkliste.
           </p>
           <div className="space-y-2">
             {nachweise.map(({ def, erfuellt, offen: fehlt }) => (
               <div
                 key={def.key}
                 className={`flex items-start gap-3 p-3 rounded-lg border ${
-                  erfuellt ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-slate-50'
+                  erfuellt ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white'
                 }`}
               >
-                <span className={`mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded text-[10px] font-bold ${
-                  erfuellt ? 'bg-emerald-500 text-white' : 'border border-slate-300 bg-white text-transparent'
-                }`}>
-                  ✓
-                </span>
+                {/* Statuspunkt, kein Kästchen — hier lässt sich nichts anklicken */}
+                <span className={`mt-1.5 h-2 w-2 flex-shrink-0 rounded-full ${erfuellt ? 'bg-emerald-500' : 'bg-slate-300'}`} />
                 <div className="min-w-0 flex-1">
-                  <p className={`text-sm font-medium ${erfuellt ? 'text-emerald-700' : 'text-slate-700'}`}>{def.label}</p>
+                  <p className={`text-sm font-medium ${erfuellt ? 'text-emerald-800' : 'text-slate-700'}`}>{def.label}</p>
                   <p className="text-xs text-slate-400 mt-0.5">{def.desc}</p>
                   <p className="text-[11px] mt-1">
                     {erfuellt ? (
-                      <span className="text-emerald-600">
+                      <span className="text-emerald-700">
                         belegt durch {def.quelle ?? 'die Dokumentation unten'}
                       </span>
                     ) : (
-                      <span className="text-amber-700">
+                      <span className="text-slate-500">
                         {fehlt}
                         {def.ziel && (
                           <button
                             type="button"
                             onClick={() => sprungZu(def.ziel!)}
-                            className="ml-1.5 font-semibold underline hover:text-amber-900"
+                            className="ml-1.5 font-semibold text-blue-600 hover:text-blue-700"
                           >
                             hin →
                           </button>
@@ -833,6 +818,7 @@ export default function CanvasForm({ existing }: Props) {
 
         {/* ⑥ Dokumentation — der formale Nachweis, meist zuletzt */}
         <Sektion
+          nummer={6}
           titel="Dokumentation" zusatz="· für Audit und Anhang IV"
           offen={offen.doku} onToggle={() => klapp('doku')}
           stand={<StandZahl ist={dokuCount} soll={7} />}

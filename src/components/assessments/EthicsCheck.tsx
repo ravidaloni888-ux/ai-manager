@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Pruefblock, Fazit } from '../ui/Pruefung'
 
 // Die ethische Bewertung braucht eine konkrete Fallbeschreibung — gehört an den Fall.
 
@@ -112,101 +113,87 @@ export default function EthicsCheck({ value, onChange }: {
     : null
 
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
-      {/* Wizard header */}
-      <div className="bg-slate-800 px-6 py-4 flex items-center justify-between">
-        <div>
-          <p className="text-xs font-mono tracking-widest text-slate-400 uppercase mb-0.5">KI-Ethik · Zweistufige Bewertung</p>
-          <h2 className="text-white font-semibold text-base">Fall analysieren</h2>
-        </div>
-        <span className="text-2xl">⚖️</span>
+    <Pruefblock
+      titel="Ethik — FAST-Bewertung"
+      hinweis="Fairness · Accountability · Sustainability · Transparency. Die Analyse liest die Fallbeschreibung und benennt die betroffenen Dimensionen."
+      stand={result
+        ? <span className="text-[11px] text-slate-400 flex-shrink-0">bewertet</span>
+        : undefined}
+    >
+      <div>
+        <label className="block text-xs font-semibold text-slate-600 mb-1">Fall beschreiben</label>
+        <textarea
+          value={text}
+          onChange={e => setText(e.target.value)}
+          rows={5}
+          placeholder="Was macht das System? Welche Daten nutzt es? Wer ist betroffen? Welche Entscheidungen trifft es automatisch?&#10;&#10;Oder eine vorhandene Fallbeschreibung hineinkopieren — etwa aus einem Projektdokument."
+          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none placeholder:text-slate-400 leading-relaxed"
+        />
+        <p className="text-[11px] text-slate-400 mt-1">Je mehr Kontext, desto präziser — Datenquellen, Entscheidungslogik, Zielgruppe.</p>
       </div>
 
-      <div className="p-5 space-y-4">
-        {/* Input */}
-        <div>
-          <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">
-            Fall beschreiben
-          </label>
-          <textarea
-            value={text}
-            onChange={e => setText(e.target.value)}
-            rows={5}
-            placeholder="Beschreibe den KI-Anwendungsfall: Was macht das System? Welche Daten nutzt es? Wer ist betroffen? Welche Entscheidungen trifft es automatisch?&#10;&#10;Oder kopiere einfach eine Fallbeschreibung rein — z.B. aus einem Projektdokument oder Pressebericht."
-            className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 resize-none placeholder:text-slate-400 leading-relaxed"
-          />
-          <p className="text-xs text-slate-400 mt-1">Je mehr Kontext, desto präziser die Analyse — Datenquellen, Entscheidungslogik, Zielgruppe.</p>
+      <button type="button"
+        onClick={analyze}
+        disabled={loading || !text.trim()}
+        className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-200 disabled:text-slate-400 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+      >
+        {loading ? (
+          <>
+            <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            Analysiere…
+          </>
+        ) : 'Ethisch bewerten'}
+      </button>
+
+      {error && (
+        <Fazit ton="stopp" titel="Die Analyse ist fehlgeschlagen">{error}</Fazit>
+      )}
+
+      {/* Ergebnis */}
+      {result && verdictStyle && (
+        <div className={`rounded-lg border ${verdictStyle.border} ${verdictStyle.bg} overflow-hidden divide-y divide-inherit`}>
+          <div className="px-4 py-3 flex items-start gap-3">
+            <span className={`text-[10px] font-black tracking-widest px-2.5 py-1 rounded flex-shrink-0 mt-0.5 ${verdictStyle.badge}`}>
+              {result.verdict}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-semibold ${verdictStyle.text} leading-snug`}>{result.verdictReason}</p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <SeverityBadge s={result.severity} />
+                <span className="text-[11px] text-slate-500 font-mono">Zone: <strong>{result.zone}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          {result.fastDimensions.length > 0 && (
+            <div className="px-4 py-3 space-y-2">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Betroffene FAST-Dimensionen</p>
+              <div className="flex flex-wrap gap-2">
+                {result.fastDimensions.map(d => <FastBadge key={d} dim={d} />)}
+              </div>
+              <div className="space-y-1.5 pt-1">
+                {result.fastDimensions.map(d => result.fastExplanations[d] && (
+                  <div key={d} className="flex gap-2 text-[12px]">
+                    <span className="font-bold text-slate-600 flex-shrink-0 w-4">{d}</span>
+                    <span className="text-slate-700 leading-relaxed">{result.fastExplanations[d]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="px-4 py-3 space-y-1">
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Zentrale Schwachstelle</p>
+            <p className="text-[12px] text-slate-800 leading-relaxed">{result.mainRisk}</p>
+            <p className="text-[11px] text-slate-500 leading-relaxed">{result.zoneExplanation}</p>
+          </div>
+
+          <div className="px-4 py-3 space-y-1">
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Empfehlung für den KIB</p>
+            <p className="text-[12px] text-slate-800 leading-relaxed">{result.recommendation}</p>
+          </div>
         </div>
-
-        <button type="button"
-          onClick={analyze}
-          disabled={loading || !text.trim()}
-          className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white text-sm font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <>
-              <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              Analysiere…
-            </>
-          ) : '⚖️ Ethisch bewerten'}
-        </button>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
-            <strong>Fehler:</strong> {error}
-          </div>
-        )}
-
-        {/* Result */}
-        {result && verdictStyle && (
-          <div className={`rounded-xl border ${verdictStyle.border} ${verdictStyle.bg} overflow-hidden`}>
-            {/* Verdict strip */}
-            <div className="px-5 py-4 flex items-start gap-4 border-b border-inherit">
-              <span className={`text-xs font-black tracking-widest px-3 py-1.5 rounded-lg flex-shrink-0 mt-0.5 ${verdictStyle.badge}`}>
-                {result.verdict}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className={`text-sm font-semibold ${verdictStyle.text} leading-snug`}>{result.verdictReason}</p>
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  <SeverityBadge s={result.severity} />
-                  <span className="text-xs text-slate-500 font-mono">Zone: <strong>{result.zone}</strong></span>
-                </div>
-              </div>
-            </div>
-
-            {/* FAST dimensions */}
-            {result.fastDimensions.length > 0 && (
-              <div className="px-5 py-4 border-b border-inherit space-y-3">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Betroffene FAST-Dimensionen</p>
-                <div className="flex flex-wrap gap-2">
-                  {result.fastDimensions.map(d => <FastBadge key={d} dim={d} />)}
-                </div>
-                <div className="space-y-2 mt-2">
-                  {result.fastDimensions.map(d => result.fastExplanations[d] && (
-                    <div key={d} className="flex gap-2 text-sm">
-                      <span className="font-bold text-slate-600 flex-shrink-0 w-4">{d}</span>
-                      <span className="text-slate-700">{result.fastExplanations[d]}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Main risk + zone */}
-            <div className="px-5 py-4 border-b border-inherit space-y-2">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Zentrale Schwachstelle</p>
-              <p className="text-sm text-slate-800">{result.mainRisk}</p>
-              <p className="text-xs text-slate-500 mt-1">{result.zoneExplanation}</p>
-            </div>
-
-            {/* Recommendation */}
-            <div className="px-5 py-4">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Empfehlung für den KIB</p>
-              <p className="text-sm text-slate-800 leading-relaxed">{result.recommendation}</p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+      )}
+    </Pruefblock>
   )
 }

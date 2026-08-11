@@ -10,6 +10,7 @@
 //   7 Transparenzpflicht?                   Art. 50
 
 import type { EuAiActRisk } from '../../types'
+import { Pruefblock, Frage, Wahl, JA_NEIN } from '../ui/Pruefung'
 
 export type NodeId =
   | 's1' | 's2' | 's3' | 's4' | 's5' | 's6' | 's7'
@@ -295,147 +296,135 @@ export default function RiskClassCheck({ value, onChange }: {
   const result = resultId ? TREE_NODES[resultId].result! : null
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold text-slate-800">Risikoklassen-Check — Wo fällt mein KI-System rein?</p>
-          <p className="text-xs text-slate-500 mt-0.5">In der Prüfreihenfolge der Verordnung — meist sind 3–5 Fragen nötig</p>
-        </div>
-        {(beantwortet.length > 0 || done) && (
-          <button type="button" onClick={reset} className="text-xs text-slate-400 hover:text-slate-600 underline flex-shrink-0">
-            Neu starten
-          </button>
-        )}
-      </div>
-
-      <div className="px-5 py-4 space-y-4">
-        {/* Fortschritt */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {QUESTION_ORDER.map((id, i) => {
-            const ist = answers[id] !== undefined && answers[id] !== null
-            const aktuell = currentNode === id && !done
-            return (
-              <div key={id} className="flex items-center gap-1.5">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors ${
-                  ist ? (answers[id] ? 'bg-green-500 text-white' : 'bg-slate-400 text-white')
-                  : aktuell ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-400'
-                }`}>
-                  {ist ? (answers[id] ? '✓' : '✗') : i + 1}
-                </div>
-                {i < QUESTION_ORDER.length - 1 && (
-                  <div className={`h-px w-3 ${ist ? 'bg-slate-300' : 'bg-slate-100'}`} />
-                )}
-              </div>
-            )
-          })}
-          {done && result && (
-            <>
-              <div className="h-px w-3 bg-slate-300" />
-              <div className={`w-6 h-6 rounded-full ${result.color} flex items-center justify-center text-white text-[10px] font-bold`}>
-                {result.level || '–'}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Bisherige Antworten */}
-        {beantwortet.map((id) => {
-          const node = TREE_NODES[id]
-          const ja = answers[id]
+    <Pruefblock
+      titel="Risikoklasse nach EU AI Act"
+      hinweis="In der Prüfreihenfolge der Verordnung — meist sind 3–5 Fragen nötig."
+      stand={<span className="text-[11px] text-slate-400 flex-shrink-0">
+        {done ? 'Ergebnis steht' : `Frage ${beantwortet.length + 1}`}
+      </span>}
+      aktion={(beantwortet.length > 0 || done)
+        ? <button type="button" onClick={reset} className="text-[11px] text-slate-400 hover:text-slate-600 underline flex-shrink-0">Neu starten</button>
+        : undefined}
+    >
+      {/* Fortschritt */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {QUESTION_ORDER.map((id, i) => {
+          const ist = answers[id] !== undefined && answers[id] !== null
+          const aktuell = currentNode === id && !done
           return (
-            <div key={id} className="flex items-start gap-3 py-2 border-b border-slate-50">
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded flex-shrink-0 mt-0.5 ${ja ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
-                {ja ? 'Ja' : 'Nein'}
-              </span>
-              <p className="text-xs text-slate-500 leading-relaxed">{node.text}</p>
+            <div key={id} className="flex items-center gap-1.5">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors ${
+                ist ? (answers[id] ? 'bg-emerald-500 text-white' : 'bg-slate-400 text-white')
+                : aktuell ? 'bg-blue-600 text-white'
+                : 'bg-slate-100 text-slate-400'
+              }`}>
+                {ist ? (answers[id] ? '✓' : '✗') : i + 1}
+              </div>
+              {i < QUESTION_ORDER.length - 1 && (
+                <div className={`h-px w-3 ${ist ? 'bg-slate-300' : 'bg-slate-100'}`} />
+              )}
             </div>
           )
         })}
-
-        {/* Aktuelle Frage */}
-        {!done && (() => {
-          const node = TREE_NODES[currentNode]
-          return (
-            <div className="space-y-3">
-              <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-4">
-                <p className="text-sm font-semibold text-slate-800 leading-snug">{node.text}</p>
-                {node.sub && <p className="text-xs text-blue-600 mt-1">{node.sub}</p>}
-                {node.hints && (
-                  <ul className="mt-3 space-y-1">
-                    {node.hints.map((h) => (
-                      <li key={h} className="flex items-start gap-2">
-                        <span className="mt-1.5 w-1 h-1 rounded-full bg-blue-400 flex-shrink-0" />
-                        <span className="text-xs text-slate-600">{h}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <div className="flex gap-3">
-                <button type="button" onClick={() => antworte(currentNode, true)}
-                  className="flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors">
-                  {node.jaLabel ?? 'Ja'}
-                </button>
-                <button type="button" onClick={() => antworte(currentNode, false)}
-                  className="flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
-                  {node.neinLabel ?? 'Nein'}
-                </button>
-              </div>
-            </div>
-          )
-        })()}
-
-        {/* Ergebnis */}
         {done && result && (
-          <div className={`rounded-xl border ${result.border} ${result.bg} px-5 py-4 space-y-2`}>
-            <div className="flex items-center gap-3">
-              <span className={`w-9 h-9 rounded-full ${result.color} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}>
-                {result.level || '–'}
-              </span>
-              <p className={`text-base font-bold ${result.text}`}>{result.name}</p>
+          <>
+            <div className="h-px w-3 bg-slate-300" />
+            <div className={`w-6 h-6 rounded-full ${result.color} flex items-center justify-center text-white text-[10px] font-bold`}>
+              {result.level || '–'}
             </div>
-            <p className="text-sm text-slate-700 leading-relaxed">{result.desc}</p>
-            <p className={`text-[10px] font-semibold font-mono ${result.text}`}>{result.law}</p>
-            <p className="text-[10px] text-slate-400 pt-1">Dieser Check dient der Erstorientierung. Für verbindliche Einordnung: Art. 6 und Anhang III lesen oder Fachanwalt hinzuziehen.</p>
-          </div>
-        )}
-
-        {/* GPAI gilt zusätzlich zur Risikoklasse, nicht statt ihrer */}
-        {done && (
-          <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <p className="text-xs font-semibold text-slate-700">Zusätzlich: Entwickeln Sie selbst ein KI-Modell mit allgemeinem Verwendungszweck?</p>
-            <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-              Gemeint ist das Modell, nicht die Anwendung — ein zugekauftes Modell zu nutzen zählt nicht.
-              Diese Pflichten gelten neben der Risikoklasse.
-            </p>
-            <div className="flex gap-2 mt-2.5">
-              <button type="button" onClick={() => setGpai(true)}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                  gpai === true ? 'bg-slate-800 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                }`}>
-                Ja
-              </button>
-              <button type="button" onClick={() => setGpai(false)}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                  gpai === false ? 'bg-slate-800 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                }`}>
-                Nein
-              </button>
-            </div>
-            {gpai === true && (
-              <p className="text-[11px] text-slate-700 bg-white border border-slate-200 rounded-lg px-3 py-2 mt-2.5 leading-relaxed">
-                <strong>GPAI-Pflichten kommen hinzu:</strong> technische Dokumentation des Modells,
-                Informationen für nachgelagerte Anbieter, Urheberrechts-Strategie und eine öffentliche
-                Zusammenfassung der Trainingsdaten. Ab 10<sup>25</sup> FLOPs Trainingsrechenleistung gilt das
-                Modell als systemisch riskant — dann zusätzlich Modellbewertung, Angriffstests,
-                Vorfallmeldung und Cybersicherheitsschutz.
-                <span className="block text-[10px] font-mono text-slate-500 mt-1">Art. 51–55 · gilt seit 2. Aug 2025</span>
-              </p>
-            )}
-          </div>
+          </>
         )}
       </div>
-    </div>
+
+      {/* Bisherige Antworten */}
+      {beantwortet.map((id) => {
+        const node = TREE_NODES[id]
+        const ja = answers[id]
+        return (
+          <div key={id} className="flex items-start gap-3 py-1.5 border-b border-slate-50 last:border-0">
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded flex-shrink-0 mt-0.5 ${
+              ja ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+            }`}>
+              {ja ? 'Ja' : 'Nein'}
+            </span>
+            <p className="text-[11px] text-slate-500 leading-relaxed">{node.text}</p>
+          </div>
+        )
+      })}
+
+      {/* Aktuelle Frage — dieselbe Form wie jede andere Frage im Fall */}
+      {!done && (() => {
+        const node = TREE_NODES[currentNode]
+        return (
+          <div className="rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-3 space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-800 leading-snug">
+                <span className="text-slate-400 mr-1.5">{QUESTION_ORDER.indexOf(currentNode) + 1}</span>
+                {node.text}
+              </p>
+              {node.sub && <p className="text-[11px] text-blue-700 mt-1 leading-relaxed">{node.sub}</p>}
+              {node.hints && (
+                <ul className="mt-2 space-y-1">
+                  {node.hints.map((h) => (
+                    <li key={h} className="flex items-start gap-2">
+                      <span className="mt-1.5 w-1 h-1 rounded-full bg-blue-400 flex-shrink-0" />
+                      <span className="text-[11px] text-slate-600 leading-relaxed">{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <Wahl
+              breit alsAktion
+              optionen={[
+                { wert: true,  label: node.jaLabel ?? 'Ja' },
+                { wert: false, label: node.neinLabel ?? 'Nein' },
+              ]}
+              wert={null}
+              onWaehle={(ja) => antworte(currentNode, ja)}
+            />
+          </div>
+        )
+      })()}
+
+      {/* Ergebnis */}
+      {done && result && (
+        <div className={`rounded-lg border ${result.border} ${result.bg} px-4 py-3 space-y-2`}>
+          <div className="flex items-center gap-3">
+            <span className={`w-8 h-8 rounded-full ${result.color} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}>
+              {result.level || '–'}
+            </span>
+            <p className={`text-sm font-bold ${result.text}`}>{result.name}</p>
+          </div>
+          <p className="text-[12px] text-slate-700 leading-relaxed">{result.desc}</p>
+          <p className={`text-[10px] font-semibold font-mono ${result.text}`}>{result.law}</p>
+          <p className="text-[10px] text-slate-400 pt-1">
+            Erstorientierung. Für die verbindliche Einordnung: Art. 6 und Anhang III lesen oder
+            Fachanwalt hinzuziehen.
+          </p>
+        </div>
+      )}
+
+      {/* GPAI gilt zusätzlich zur Risikoklasse, nicht statt ihrer */}
+      {done && (
+        <Frage
+          text="Zusätzlich: Entwickeln Sie selbst ein KI-Modell mit allgemeinem Verwendungszweck?"
+          hinweis="Gemeint ist das Modell, nicht die Anwendung — ein zugekauftes Modell zu nutzen zählt nicht. Diese Pflichten gelten neben der Risikoklasse."
+          ton={gpai === null || gpai === undefined ? null : gpai ? 'warn' : 'neutral'}
+          folge={gpai === true ? (
+            <>
+              <strong>GPAI-Pflichten kommen hinzu:</strong> technische Dokumentation des Modells,
+              Informationen für nachgelagerte Anbieter, Urheberrechts-Strategie und eine öffentliche
+              Zusammenfassung der Trainingsdaten. Ab 10<sup>25</sup> FLOPs Trainingsrechenleistung
+              gilt das Modell als systemisch riskant — dann zusätzlich Modellbewertung, Angriffstests,
+              Vorfallmeldung und Cybersicherheitsschutz.
+              <span className="block text-[10px] font-mono mt-1">Art. 51–55 · gilt seit 2. Aug 2025</span>
+            </>
+          ) : undefined}
+        >
+          <Wahl optionen={JA_NEIN} wert={gpai} onWaehle={setGpai} />
+        </Frage>
+      )}
+    </Pruefblock>
   )
 }

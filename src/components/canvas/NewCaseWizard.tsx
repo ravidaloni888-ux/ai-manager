@@ -9,6 +9,7 @@ import type { Rolle, IsoZiel } from '../../store/mandantProfil'
 import RiskClassCheck, { EMPTY_RISK_CLASS, TREE_NODES, riskFromResult } from '../assessments/RiskClassCheck'
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import { EMPTY_CHECKS, saveChecks } from '../compliance/CaseComplianceChecks'
+import { Wahl, JA_NEIN } from '../ui/Pruefung'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Fall-Anlage-Wizard: fragt beim Anlegen alles ab, was der To-do-Plan
@@ -42,24 +43,7 @@ function InfoLink({ to, label = 'Erklärung' }: { to: string; label?: string }) 
 }
 
 function JaNein({ value, onChange }: { value: boolean | null; onChange: (v: boolean) => void }) {
-  return (
-    <div className="flex gap-2">
-      {[true, false].map((v) => (
-        <button
-          key={String(v)}
-          type="button"
-          onClick={() => onChange(v)}
-          className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${
-            value === v
-              ? 'bg-slate-800 text-white'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          {v ? 'Ja' : 'Nein'}
-        </button>
-      ))}
-    </div>
-  )
+  return <Wahl breit optionen={JA_NEIN} wert={value} onWaehle={onChange} />
 }
 
 function Slider({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
@@ -241,16 +225,15 @@ export default function NewCaseWizard({ onAngelegt, onAbbrechen }: { onAngelegt?
                 <label className={`${labelCls} mb-0`}>Welche Rolle nimmt Ihr Haus bei diesem System ein?</label>
                 <InfoLink to="/eu-ai-act" label="Was ist Anbieter/Betreiber?" />
               </div>
-              <div className="flex gap-2">
-                {([['betreiber', 'Betreiber — wir setzen es ein'], ['anbieter', 'Anbieter — wir entwickeln/vertreiben es']] as [Rolle, string][]).map(([v, l]) => (
-                  <button key={v} type="button" onClick={() => setRolle(v)}
-                    className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-semibold transition-colors ${
-                      rolle === v ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}>
-                    {l}
-                  </button>
-                ))}
-              </div>
+              <Wahl
+                breit
+                optionen={[
+                  { wert: 'betreiber' as Rolle, label: 'Betreiber — wir setzen es ein' },
+                  { wert: 'anbieter' as Rolle,  label: 'Anbieter — wir entwickeln/vertreiben es' },
+                ]}
+                wert={rolle}
+                onWaehle={setRolle}
+              />
               {profil.rolle === undefined && rolle && (
                 <p className="text-[11px] text-slate-400 mt-1.5">Wird als Standard für dieses Mandat gemerkt.</p>
               )}
@@ -287,16 +270,16 @@ export default function NewCaseWizard({ onAngelegt, onAbbrechen }: { onAngelegt?
                 <label className={`${labelCls} mb-0`}>Strebt das Unternehmen eine ISO-42001-Zertifizierung an?</label>
                 <InfoLink to="/governance" label="Was ist ISO 42001?" />
               </div>
-              <div className="flex gap-2">
-                {([['ja', 'Ja'], ['nein', 'Nein'], ['spaeter', 'Später entscheiden']] as [IsoZiel, string][]).map(([v, l]) => (
-                  <button key={v} type="button" onClick={() => setIso(v)}
-                    className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                      iso === v ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}>
-                    {l}
-                  </button>
-                ))}
-              </div>
+              <Wahl
+                breit
+                optionen={[
+                  { wert: 'ja' as IsoZiel,      label: 'Ja' },
+                  { wert: 'nein' as IsoZiel,    label: 'Nein' },
+                  { wert: 'spaeter' as IsoZiel, label: 'Später entscheiden' },
+                ]}
+                wert={iso}
+                onWaehle={setIso}
+              />
               {profil.iso42001 !== undefined && (
                 <p className="text-[11px] text-slate-400 mt-1.5">
                   Aus dem Mandanten-Profil vorbelegt — hier ändern wirkt nur, wenn das Profil noch leer war.

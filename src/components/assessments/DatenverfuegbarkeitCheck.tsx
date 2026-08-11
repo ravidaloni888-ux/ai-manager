@@ -11,6 +11,9 @@
 // werden dürfen, braucht man ihre Vollständigkeit nicht mehr zu bewerten.
 // ─────────────────────────────────────────────────────────────────────────
 
+import { Pruefblock, Frage, Wahl, Marke, Fazit } from '../ui/Pruefung'
+import type { WahlOption } from '../ui/Pruefung'
+
 export type VerfuegbarkeitAntwort = 'ja' | 'teils' | 'nein'
 export type VerfuegbarkeitFrage = 'existenz' | 'zugang' | 'qualitaet' | 'recht'
 
@@ -58,10 +61,10 @@ export const VERFUEGBARKEIT_FRAGEN: FrageDef[] = [
   },
 ]
 
-const ANTWORTEN: { wert: VerfuegbarkeitAntwort; label: string; cls: string }[] = [
-  { wert: 'ja',    label: 'Ja',        cls: 'bg-green-500 text-white' },
-  { wert: 'teils', label: 'Teilweise', cls: 'bg-amber-500 text-white' },
-  { wert: 'nein',  label: 'Nein',      cls: 'bg-red-500 text-white' },
+const ANTWORTEN: WahlOption<VerfuegbarkeitAntwort>[] = [
+  { wert: 'ja',    label: 'Ja',        ton: 'ok' },
+  { wert: 'teils', label: 'Teilweise', ton: 'teils' },
+  { wert: 'nein',  label: 'Nein',      ton: 'stopp' },
 ]
 
 /** Wie steht es insgesamt? */
@@ -93,101 +96,54 @@ export default function DatenverfuegbarkeitCheck({ value, onChange }: {
   const u = verfuegbarkeitUrteil(value)
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <p className="text-sm font-semibold text-slate-800">Datenverfügbarkeit — drei Fragen vor dem Business Case</p>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Das Modell ist selten das Problem, die Daten schon. Erst wenn diese drei stehen,
-          lohnt die Detailbewertung darunter.
-        </p>
-      </div>
-
-      <div className="px-5 py-4 space-y-3">
-        {VERFUEGBARKEIT_FRAGEN.map((f, i) => {
-          const gewaehlt = value.antworten[f.id]
-          const zeigtFolge = gewaehlt === 'nein' || gewaehlt === 'teils'
-          return (
-            <div key={f.id} className={`rounded-lg border px-4 py-3 transition-colors ${
-              gewaehlt === 'nein' ? (f.hart ? 'border-red-300 bg-red-50' : 'border-amber-300 bg-amber-50')
-              : gewaehlt === 'teils' ? 'border-amber-200 bg-amber-50/50'
-              : gewaehlt === 'ja' ? 'border-green-200 bg-green-50/40'
-              : 'border-slate-200'
-            }`}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-800">
-                    <span className="text-slate-400 mr-1.5">{i + 1}</span>
-                    {f.titel}
-                    {f.hart && (
-                      <span className="ml-2 text-[10px] font-bold bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full align-middle">
-                        K.-o.-Frage
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-[12px] text-slate-700 mt-0.5 leading-snug">{f.frage}</p>
-                  <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">{f.hinweis}</p>
-                </div>
-                <div className="flex gap-1 flex-shrink-0">
-                  {ANTWORTEN.map((a) => (
-                    <button
-                      key={a.wert}
-                      type="button"
-                      onClick={() => setAntwort(f.id, a.wert)}
-                      className={`text-[11px] font-semibold px-2.5 py-1 rounded-md transition-colors ${
-                        gewaehlt === a.wert ? a.cls : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                      }`}
-                    >
-                      {a.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {zeigtFolge && (
-                <p className={`text-[11px] mt-2.5 pt-2.5 border-t leading-relaxed ${
-                  gewaehlt === 'nein' && f.hart ? 'border-red-200 text-red-900' : 'border-amber-200 text-amber-900'
-                }`}>
-                  <strong>Was daraus folgt: </strong>{f.beiNein}
-                </p>
-              )}
-            </div>
-          )
-        })}
-      </div>
+    <Pruefblock
+      titel={`Gate — ${VERFUEGBARKEIT_FRAGEN.length} Fragen vor dem Business Case`}
+      hinweis="Das Modell ist selten das Problem, die Daten schon. Erst wenn diese Fragen stehen, lohnt die Detailbewertung darunter."
+      stand={<span className="text-[11px] text-slate-400 flex-shrink-0">{u.beantwortet}/{VERFUEGBARKEIT_FRAGEN.length}</span>}
+    >
+      {VERFUEGBARKEIT_FRAGEN.map((f, i) => {
+        const gewaehlt = value.antworten[f.id]
+        return (
+          <Frage
+            key={f.id}
+            nr={i + 1}
+            titel={f.titel}
+            text={f.frage}
+            hinweis={f.hinweis}
+            marke={f.hart ? <Marke>K.-o.-Frage</Marke> : undefined}
+            ton={gewaehlt === 'ja' ? 'ok' : gewaehlt === 'teils' ? 'teils' : gewaehlt === 'nein' ? (f.hart ? 'stopp' : 'warn') : null}
+            folge={(gewaehlt === 'nein' || gewaehlt === 'teils')
+              ? <><strong>Was daraus folgt: </strong>{f.beiNein}</>
+              : undefined}
+          >
+            <Wahl optionen={ANTWORTEN} wert={gewaehlt} onWaehle={(w) => setAntwort(f.id, w)} />
+          </Frage>
+        )
+      })}
 
       {/* Gesamturteil */}
       {u.beantwortet > 0 && (
-        <div className="px-5 pb-5">
-          {u.harteNeins.length > 0 ? (
-            <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3">
-              <p className="text-sm font-semibold text-red-800">Der Business Case trägt so nicht</p>
-              <p className="text-[12px] text-red-900 mt-1 leading-relaxed">
-                {u.harteNeins.map((f) => f.titel).join(' und ')} {u.harteNeins.length > 1 ? 'sind' : 'ist'} nicht gegeben.
-                Das lässt sich nicht durch ein besseres Modell ausgleichen — hier steht Vorarbeit an,
-                bevor das Vorhaben bewertet werden kann.
-              </p>
-            </div>
-          ) : u.tragfaehig && u.teils.length === 0 && u.weicheNeins.length === 0 ? (
-            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-              <p className="text-sm font-semibold text-green-800">Datengrundlage trägt</p>
-              <p className="text-[12px] text-green-900 mt-1 leading-relaxed">
-                Alle drei Fragen sind bejaht. Jetzt lohnt die Detailbewertung der sieben Qualitätsdimensionen.
-              </p>
-            </div>
-          ) : (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-              <p className="text-sm font-semibold text-amber-900">Machbar, aber mit Vorarbeit</p>
-              <p className="text-[12px] text-amber-900 mt-1 leading-relaxed">
-                {!u.vollstaendig && `Noch ${VERFUEGBARKEIT_FRAGEN.length - u.beantwortet} von ${VERFUEGBARKEIT_FRAGEN.length} Fragen offen. `}
-                {[...u.weicheNeins, ...u.teils].length > 0 && (
-                  <>Einschränkungen bei {[...new Set([...u.weicheNeins, ...u.teils].map((f) => f.titel))].join(', ')} — der
-                  Aufwand dafür gehört in die Schätzung des Vorhabens, nicht in den Betrieb.</>
-                )}
-              </p>
-            </div>
-          )}
-        </div>
+        u.harteNeins.length > 0 ? (
+          <Fazit ton="stopp" titel="Der Business Case trägt so nicht">
+            {u.harteNeins.map((f) => f.titel).join(' und ')} {u.harteNeins.length > 1 ? 'sind' : 'ist'} nicht gegeben.
+            Das lässt sich nicht durch ein besseres Modell ausgleichen — hier steht Vorarbeit an,
+            bevor das Vorhaben bewertet werden kann.
+          </Fazit>
+        ) : u.tragfaehig && u.teils.length === 0 && u.weicheNeins.length === 0 ? (
+          <Fazit ton="ok" titel="Datengrundlage trägt">
+            Alle {VERFUEGBARKEIT_FRAGEN.length} Fragen sind bejaht. Jetzt lohnt die Detailbewertung
+            der sieben Qualitätsdimensionen.
+          </Fazit>
+        ) : (
+          <Fazit ton="teils" titel="Machbar, aber mit Vorarbeit">
+            {!u.vollstaendig && `Noch ${VERFUEGBARKEIT_FRAGEN.length - u.beantwortet} von ${VERFUEGBARKEIT_FRAGEN.length} Fragen offen. `}
+            {[...u.weicheNeins, ...u.teils].length > 0 && (
+              <>Einschränkungen bei {[...new Set([...u.weicheNeins, ...u.teils].map((f) => f.titel))].join(', ')} — der
+              Aufwand dafür gehört in die Schätzung des Vorhabens, nicht in den Betrieb.</>
+            )}
+          </Fazit>
+        )
       )}
-    </div>
+    </Pruefblock>
   )
 }

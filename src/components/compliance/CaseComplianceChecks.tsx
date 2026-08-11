@@ -8,14 +8,16 @@ import type { DataQualityState } from '../assessments/DataQualityCheck'
 import { EMPTY_FAIR } from '../../lib/fair'
 import type { FairState } from '../../lib/fair'
 import EthicsCheck, { EMPTY_ETHICS } from '../assessments/EthicsCheck'
-import RiskClassCheck, { EMPTY_RISK_CLASS, resultName } from '../assessments/RiskClassCheck'
+import RiskClassCheck, { EMPTY_RISK_CLASS, resultName, riskFromResult } from '../assessments/RiskClassCheck'
 import FairAnsicht from '../assessments/FairAnsicht'
-import DatenverfuegbarkeitCheck, { EMPTY_VERFUEGBARKEIT, verfuegbarkeitUrteil, VERFUEGBARKEIT_FRAGEN } from '../assessments/DatenverfuegbarkeitCheck'
+import DatenverfuegbarkeitCheck, { EMPTY_VERFUEGBARKEIT, VERFUEGBARKEIT_FRAGEN } from '../assessments/DatenverfuegbarkeitCheck'
 import type { VerfuegbarkeitState } from '../assessments/DatenverfuegbarkeitCheck'
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import type { EthicsState } from '../assessments/EthicsCheck'
 import { ProjectPlanContent } from '../../pages/ProjectPlanPage'
 import { Sektion, StandZahl } from '../ui/Sektion'
+import { Pruefblock, Frage, Wahl, Fazit, JA_NEIN, TON } from '../ui/Pruefung'
+import type { WahlOption, Ton } from '../ui/Pruefung'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Datenschutz-Checks je Anwendungsfall.
@@ -101,58 +103,53 @@ const ART22_CHECKS = [
   'Die Zeit für die menschliche Prüfung ist ausreichend — kein "Fließband-Nicken"',
 ]
 
+/** Trifft zu / trifft nicht zu — dieselbe Wahl in allen Prüfungen. */
+const ZUTREFFEND: WahlOption<boolean>[] = [
+  { wert: true,  label: 'Trifft zu',       ton: 'warn' },
+  { wert: false, label: 'Trifft nicht zu', ton: 'ok' },
+]
+
 function DsfaChecker({ checked, setChecked }: {
   checked: Record<string, boolean>
   setChecked: (fn: (prev: Record<string, boolean>) => Record<string, boolean>) => void
 }) {
-  const toggle = (id: string) => setChecked((prev) => ({ ...prev, [id]: !prev[id] }))
+  const setzen = (id: string, v: boolean) => setChecked((prev) => ({ ...prev, [id]: v }))
   const triggersActive = DSFA_TRIGGERS.filter((t) => checked[t.id]).length
+  const beantwortet = DSFA_TRIGGERS.filter((t) => checked[t.id] !== undefined).length
   const required = triggersActive >= 1
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </span>
-          <div>
-            <p className="text-sm font-semibold text-slate-800">DSFA-Trigger-Check (Art. 35)</p>
-            <p className="text-xs text-slate-500">Prüfe ob eine Datenschutz-Folgenabschätzung erforderlich ist</p>
-          </div>
-        </div>
-      </div>
-      <div className="px-5 py-4 space-y-3">
-        {DSFA_TRIGGERS.map((trigger) => (
-          <label key={trigger.id} className="flex items-start gap-3 cursor-pointer group">
-            <div className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
-              checked[trigger.id] ? 'bg-purple-600 border-purple-600' : 'border-slate-300 group-hover:border-purple-400'
-            }`} onClick={() => toggle(trigger.id)}>
-              {checked[trigger.id] && (
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-              )}
-            </div>
-            <span className="text-sm text-slate-700 leading-relaxed" onClick={() => toggle(trigger.id)}>{trigger.label}</span>
-          </label>
-        ))}
-      </div>
-      {triggersActive > 0 && (
-        <div className={`mx-5 mb-5 px-4 py-3 rounded-lg ${required ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}`}>
-          <p className={`text-sm font-semibold ${required ? 'text-red-700' : 'text-green-700'}`}>
-            {required ? '⚠ DSFA erforderlich' : '✓ DSFA wahrscheinlich nicht erforderlich'}
-          </p>
-          <p className={`text-xs mt-1 leading-relaxed ${required ? 'text-red-600' : 'text-green-600'}`}>
-            {required
-              ? `${triggersActive} Auslöser aktiv. Die DSFA muss VOR dem Systemeinsatz durchgeführt werden. Einbeziehung des DSB empfohlen (Dreistufenmodell Stufe 2).`
-              : 'Kein Auslöser aktiv. Beachte: Eine DSFA kann auch bei nicht aufgelisteten Szenarien erforderlich sein.'}
-          </p>
-        </div>
+    <Pruefblock
+      titel="DSFA-Pflicht (Art. 35)"
+      hinweis="Ein einziger Auslöser genügt — dann ist die Folgenabschätzung vor dem Einsatz fällig."
+      stand={<span className="text-[11px] text-slate-400 flex-shrink-0">{beantwortet}/{DSFA_TRIGGERS.length}</span>}
+    >
+      {DSFA_TRIGGERS.map((t, i) => (
+        <Frage
+          key={t.id}
+          nr={i + 1}
+          text={t.label}
+          ton={checked[t.id] === undefined ? null : checked[t.id] ? 'warn' : 'ok'}
+        >
+          <Wahl optionen={ZUTREFFEND} wert={checked[t.id]} onWaehle={(v) => setzen(t.id, v)} />
+        </Frage>
+      ))}
+
+      {(triggersActive > 0 || beantwortet === DSFA_TRIGGERS.length) && (
+        required ? (
+          <Fazit ton="stopp" titel="DSFA erforderlich">
+            {triggersActive} Auslöser {triggersActive > 1 ? 'treffen' : 'trifft'} zu. Die DSFA muss vor
+            dem Systemeinsatz durchgeführt werden. Einbeziehung des DSB empfohlen
+            (Dreistufenmodell Stufe 2).
+          </Fazit>
+        ) : (
+          <Fazit ton="ok" titel="DSFA wahrscheinlich nicht erforderlich">
+            Kein Auslöser trifft zu. Beachten Sie: Eine DSFA kann auch bei hier nicht aufgeführten
+            Szenarien erforderlich sein.
+          </Fazit>
+        )
       )}
-    </div>
+    </Pruefblock>
   )
 }
 
@@ -172,150 +169,102 @@ function AvvChecker({ value, onChange }: { value: AvvState; onChange: (next: Avv
       : null
 
   const reset = () => onChange({ external: null, personalData: null, avvExists: null })
+  const beantwortet = [external, personalData, avvExists].filter((v) => v !== null).length
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-            </svg>
-          </span>
-          <div>
-            <p className="text-sm font-semibold text-slate-800">AVV-Pflicht-Check (Art. 28)</p>
-            <p className="text-xs text-slate-500">Prüfe ob ein Auftragsverarbeitungsvertrag erforderlich ist</p>
-          </div>
-        </div>
-      </div>
-      <div className="px-5 py-4 space-y-4">
-        {/* Q1 */}
-        <div>
-          <p className="text-sm font-medium text-slate-700 mb-2">Läuft das KI-System auf Servern eines externen Anbieters?</p>
-          <div className="flex gap-2">
-            {([true, false] as const).map((v) => (
-              <button type="button" key={String(v)} onClick={() => onChange({ external: v, personalData: null, avvExists: null })}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${external === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
-                {v ? 'Ja' : 'Nein'}
-              </button>
-            ))}
-          </div>
-        </div>
+    <Pruefblock
+      titel="AVV-Pflicht (Art. 28)"
+      hinweis="Drei Fragen, die sich nacheinander öffnen — mehr braucht die Entscheidung nicht."
+      aktion={beantwortet > 0
+        ? <button type="button" onClick={reset} className="text-[11px] text-slate-400 hover:text-slate-600 underline flex-shrink-0">Neu prüfen</button>
+        : undefined}
+    >
+      <Frage
+        nr={1}
+        text="Läuft das KI-System auf Servern eines externen Anbieters?"
+        ton={external === null ? null : 'neutral'}
+      >
+        <Wahl optionen={JA_NEIN} wert={external} onWaehle={(v) => onChange({ external: v, personalData: null, avvExists: null })} />
+      </Frage>
 
-        {/* Q2 */}
-        {external === true && (
-          <div>
-            <p className="text-sm font-medium text-slate-700 mb-2">Werden dabei personenbezogene Daten verarbeitet?</p>
-            <div className="flex gap-2">
-              {([true, false] as const).map((v) => (
-                <button type="button" key={String(v)} onClick={() => onChange({ ...value, personalData: v, avvExists: null })}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${personalData === v ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
-                  {v ? 'Ja' : 'Nein'}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+      {external === true && (
+        <Frage
+          nr={2}
+          text="Werden dabei personenbezogene Daten verarbeitet?"
+          ton={personalData === null ? null : 'neutral'}
+        >
+          <Wahl optionen={JA_NEIN} wert={personalData} onWaehle={(v) => onChange({ ...value, personalData: v, avvExists: null })} />
+        </Frage>
+      )}
 
-        {/* Q3 */}
-        {showAvvQuestion && (
-          <div>
-            <p className="text-sm font-medium text-slate-700 mb-2">Ist ein AVV mit dem Anbieter vorhanden?</p>
-            <div className="flex gap-2">
-              {([true, false] as const).map((v) => (
-                <button type="button" key={String(v)} onClick={() => setAvvExists(v)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${avvExists === v ? 'bg-indind-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
-                  {v ? 'Ja' : 'Nein'}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+      {showAvvQuestion && (
+        <Frage
+          nr={3}
+          text="Ist ein AVV mit dem Anbieter vorhanden?"
+          ton={avvExists === null ? null : avvExists ? 'ok' : 'stopp'}
+        >
+          <Wahl optionen={JA_NEIN} wert={avvExists} onWaehle={setAvvExists} />
+        </Frage>
+      )}
 
-        {result && (
-          <div className={`px-4 py-3 rounded-lg ${result.ok ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-            <p className={`text-sm font-semibold ${result.ok ? 'text-green-700' : 'text-red-700'}`}>
-              {result.ok ? '✓' : '✗'} {result.text}
-            </p>
-            {!result.ok && (
-              <p className="text-xs text-red-600 mt-1">→ AVV umgehend mit dem Anbieter abschließen oder System offline nehmen bis AVV vorliegt.</p>
-            )}
-            <button type="button" onClick={reset} className="mt-2 text-xs text-slate-500 underline hover:text-slate-700">Neu prüfen</button>
-          </div>
-        )}
-      </div>
-    </div>
+      {result && (
+        <Fazit ton={result.ok ? 'ok' : 'stopp'} titel={result.text}>
+          {!result.ok && 'AVV umgehend mit dem Anbieter abschließen oder das System offline nehmen, bis er vorliegt.'}
+        </Fazit>
+      )}
+    </Pruefblock>
   )
 }
+
+/** Erfüllt / nicht erfüllt — für Anforderungen, die man nachweisen muss. */
+const ERFUELLT: WahlOption<boolean>[] = [
+  { wert: true,  label: 'Erfüllt',       ton: 'ok' },
+  { wert: false, label: 'Nicht erfüllt', ton: 'stopp' },
+]
 
 function Art22Checker({ checked, setChecked }: {
   checked: Record<number, boolean>
   setChecked: (fn: (prev: Record<number, boolean>) => Record<number, boolean>) => void
 }) {
-  const toggle = (i: number) => setChecked((prev) => ({ ...prev, [i]: !prev[i] }))
+  const setzen = (i: number, v: boolean) => setChecked((prev) => ({ ...prev, [i]: v }))
   const passed = ART22_CHECKS.filter((_, i) => checked[i]).length
+  const beantwortet = ART22_CHECKS.filter((_, i) => checked[i] !== undefined).length
   const all = ART22_CHECKS.length
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-100">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-slate-800">Art. 22 — Human-in-the-Loop-Qualität</p>
-              <p className="text-xs text-slate-500">EuGH C-634/21: Formale Kontrolle reicht nicht — der Mensch muss tatsächlich entscheiden</p>
-            </div>
-          </div>
-          {passed > 0 && (
-            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${
-              passed === all ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-            }`}>
-              {passed}/{all}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="px-5 py-4">
-        <p className="text-xs text-slate-600 mb-4 leading-relaxed">
-          Prüfe ob dein Human-in-the-Loop-Prozess der Art. 22-Anforderung genügt:
-        </p>
-        <div className="space-y-1">
-          {ART22_CHECKS.map((check, i) => (
-            <label key={i} onClick={() => toggle(i)}
-              className="flex items-start gap-3 py-2.5 border-b border-slate-50 last:border-0 cursor-pointer group hover:bg-slate-50 -mx-5 px-5 rounded transition-colors">
-              <div className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
-                checked[i] ? 'bg-rose-600 border-rose-600' : 'border-slate-300 group-hover:border-rose-400'
-              }`}>
-                {checked[i] && (
-                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                )}
-              </div>
-              <p className={`text-xs leading-relaxed transition-colors ${checked[i] ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
-                {check}
-              </p>
-            </label>
-          ))}
-        </div>
-        {passed === all && (
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg px-4 py-3">
-            <p className="text-xs font-semibold text-green-700">✓ Alle Punkte erfüllt — Human-in-the-Loop-Prozess sieht gut aus</p>
-          </div>
-        )}
-        {passed > 0 && passed < all && (
-          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-            <p className="text-xs font-semibold text-amber-700">⚠ {all - passed} Punkt{all - passed > 1 ? 'e' : ''} noch offen — Prozess überprüfen</p>
-          </div>
-        )}
-        <p className="text-[10px] text-slate-400 mt-4">Diese Checkliste dient der Orientierung. Bei tatsächlichen Art. 22-Sachverhalten: Dreistufenmodell Stufe 3 → DSB/Anwalt.</p>
-      </div>
-    </div>
+    <Pruefblock
+      titel="Art. 22 — Qualität der menschlichen Aufsicht"
+      hinweis="EuGH C-634/21: Formale Kontrolle reicht nicht — der Mensch muss tatsächlich entscheiden können."
+      stand={<span className="text-[11px] text-slate-400 flex-shrink-0">{beantwortet}/{all}</span>}
+    >
+      {ART22_CHECKS.map((check, i) => (
+        <Frage
+          key={i}
+          nr={i + 1}
+          text={check}
+          ton={checked[i] === undefined ? null : checked[i] ? 'ok' : 'stopp'}
+        >
+          <Wahl optionen={ERFUELLT} wert={checked[i]} onWaehle={(v) => setzen(i, v)} />
+        </Frage>
+      ))}
+
+      {beantwortet === all && (
+        passed === all ? (
+          <Fazit ton="ok" titel="Alle Punkte erfüllt">
+            Der Human-in-the-Loop-Prozess genügt den Anforderungen aus Art. 22.
+          </Fazit>
+        ) : (
+          <Fazit ton="stopp" titel={`${all - passed} Punkt${all - passed > 1 ? 'e' : ''} nicht erfüllt`}>
+            Der Prozess hält der Art.-22-Anforderung so nicht stand — die offenen Punkte gehören
+            behoben, bevor das System entscheidet.
+          </Fazit>
+        )
+      )}
+
+      <p className="text-[10px] text-slate-400">
+        Orientierungshilfe. Bei tatsächlichen Art.-22-Sachverhalten: Dreistufenmodell Stufe 3 → DSB/Anwalt.
+      </p>
+    </Pruefblock>
   )
 }
 
@@ -378,10 +327,11 @@ export default function CaseComplianceChecks(
     if (loaded) onChecks?.(checks)
   }, [checks, loaded, onChecks])
 
+  // Beantwortet zählt, nicht bejaht — ein „Nein" ist auch eine Antwort
   const dsCount =
-    Object.values(checks.dsfa).filter(Boolean).length +
-    Object.values(checks.art22).filter(Boolean).length +
-    (checks.avv.external !== null ? 1 : 0)
+    Object.keys(checks.dsfa).length +
+    Object.keys(checks.art22).length +
+    [checks.avv.external, checks.avv.personalData, checks.avv.avvExists].filter((v) => v !== null).length
   const dqCount = Object.values(checks.dataQuality.dims).filter((d) => d.rating !== null).length
   // Das Gate entscheidet, ob die Detailprüfung überhaupt Sinn hat
   const gateAntworten = checks.verfuegbarkeit?.antworten ?? {}
@@ -389,25 +339,43 @@ export default function CaseComplianceChecks(
   const gateOffen: boolean | null =
     dgCount < VERFUEGBARKEIT_FRAGEN.length ? null
       : !VERFUEGBARKEIT_FRAGEN.some((f) => f.hart && gateAntworten[f.id] === 'nein')
-  const vfUrteil = verfuegbarkeitUrteil(checks.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT)
-  const fairCount = Object.values(checks.fair).filter(Boolean).length
 
   // Nie direkt in TREE_NODES greifen — gespeicherte Stände können IDs aus
   // einer älteren Baumversion enthalten.
   const rcResult = checks.riskClass.done ? resultName(checks.riskClass.resultId) : ''
 
   // Reihenfolge wie im KI-Programm: erst Datengrundlage, dann Recht, dann Plan.
-  const groups: { key: GroupKey; icon: string; title: string; hint: string; status: string; done: boolean }[] = [
-    { key: 'datengrundlage', icon: '🗄️', title: 'Datengrundlage',
-      hint: 'Erst das Gate, dann die sieben Qualitätsdimensionen',
-      status: gateOffen === null ? (dgCount ? `${dgCount} beantwortet` : '')
+  // Der Ton des Standes sagt, wie es steht — vorher war er immer grün, auch
+  // bei „K.-o. — gestoppt".
+  const rcStufe = riskFromResult(checks.riskClass.resultId)
+  const groups: { key: GroupKey; title: string; hint: string; status: string; ton: Ton; done: boolean }[] = [
+    { key: 'datengrundlage', title: 'Datengrundlage',
+      hint: `Erst das Gate aus ${VERFUEGBARKEIT_FRAGEN.length} Fragen, dann die sieben Qualitätsdimensionen`,
+      status: gateOffen === null ? (dgCount ? `${dgCount}/${VERFUEGBARKEIT_FRAGEN.length} im Gate` : '')
         : gateOffen === false ? 'K.-o. — gestoppt'
-        : dqCount ? `${dqCount}/7 bewertet` : 'Gate offen',
+        : dqCount ? `${dqCount}/7 bewertet` : 'Gate steht',
+      ton: gateOffen === false ? 'stopp' : gateOffen === true && dqCount === 7 ? 'ok' : 'neutral',
       done: gateOffen === false || (gateOffen === true && dqCount === 7) },
-    { key: 'risiko',      icon: '⚖️', title: 'EU AI Act — Risikoklasse', hint: 'Prüfpfad der Verordnung — meist 3–5 Fragen', status: rcResult, done: checks.riskClass.done },
-    { key: 'datenschutz', icon: '🛡️', title: 'Datenschutz',   hint: 'DSFA-Pflicht · AVV · Art. 22',              status: dsCount ? `${dsCount} beantwortet` : '', done: checks.avv.external !== null && checks.avv.personalData !== null },
-    { key: 'ethik',       icon: '🧭', title: 'Ethik',         hint: 'FAST-Bewertung des Vorhabens',              status: checks.ethics.result ? checks.ethics.result.verdict : '', done: !!checks.ethics.result },
-    { key: 'plan',        icon: '📋', title: 'To-do-Plan erstellen', hint: 'Compliance-Projektplan aus Profil und Prüfungen', status: '', done: false },
+    { key: 'risiko', title: 'EU AI Act — Risikoklasse',
+      hint: 'Prüfpfad der Verordnung — meist 3–5 Fragen',
+      status: rcResult,
+      ton: rcStufe === 'Unacceptable Risk' ? 'stopp' : rcStufe === 'High Risk' ? 'warn' : rcStufe ? 'ok' : 'neutral',
+      done: checks.riskClass.done },
+    { key: 'datenschutz', title: 'Datenschutz',
+      hint: 'DSFA-Pflicht · AVV · Art. 22',
+      status: dsCount ? `${dsCount} beantwortet` : '',
+      ton: 'neutral',
+      done: checks.avv.external !== null && checks.avv.personalData !== null },
+    { key: 'ethik', title: 'Ethik',
+      hint: 'FAST-Bewertung des Vorhabens',
+      status: checks.ethics.result ? checks.ethics.result.verdict : '',
+      ton: checks.ethics.result?.verdict === 'JA' ? 'stopp'
+        : checks.ethics.result?.verdict === 'UNKLAR' ? 'teils'
+        : checks.ethics.result ? 'ok' : 'neutral',
+      done: !!checks.ethics.result },
+    { key: 'plan', title: 'To-do-Plan erstellen',
+      hint: 'Compliance-Projektplan aus Profil und Prüfungen',
+      status: '', ton: 'neutral', done: false },
   ]
 
   const doneCount = groups.filter((g) => g.done).length
@@ -430,7 +398,8 @@ export default function CaseComplianceChecks(
   return (
     <Sektion
       id="fall-wizard"
-      titel="Prüfungen & Plan"
+      nummer={4}
+      titel="Prüfungen & Plan" zusatz="· 5 Schritte"
       offen={offen}
       onToggle={onToggle ?? (() => {})}
       stand={<StandZahl ist={doneCount} soll={groups.length} />}
@@ -459,18 +428,21 @@ export default function CaseComplianceChecks(
                 onClick={() => setOpenGroup(isOpen ? null : g.key)}
                 className="w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors text-left"
               >
+                {/* Runde Nummer = Schritt. Die Sektion darüber hat eine eckige.
+                    Abgeschlossen ist nicht dasselbe wie in Ordnung — ein K.-o.
+                    beendet den Schritt, verdient aber kein grünes Häkchen. */}
                 <span className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-bold ${
-                  g.done ? 'bg-green-500 text-white' : isOpen ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'
+                  g.done ? (g.ton === 'stopp' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white')
+                  : isOpen ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'
                 }`}>
                   {g.done ? '✓' : gi + 1}
                 </span>
-                <span className="text-base leading-none flex-shrink-0">{g.icon}</span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-slate-800 leading-tight">{g.title}</p>
                   <p className="text-[11px] text-slate-400 leading-tight mt-0.5">{g.hint}</p>
                 </div>
                 {g.status && (
-                  <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${TON[g.ton].flaeche} ${TON[g.ton].schrift}`}>
                     {g.status}
                   </span>
                 )}
@@ -511,21 +483,18 @@ export default function CaseComplianceChecks(
                         onChange={(fn) => setChecks((prev) => ({ ...prev, verfuegbarkeit: fn(prev.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT) }))}
                       />
 
+                      {/* Das Gate hat oben schon Alarm geschlagen — hier steht
+                          nur noch, warum das Qualitätswerkzeug fehlt. */}
                       {gateOffen === false ? (
-                        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                          <p className="text-sm font-semibold text-red-900">Die Detailprüfung erübrigt sich</p>
-                          <p className="text-[12px] text-red-900 leading-relaxed mt-1">
-                            Eine K.-o.-Frage ist mit Nein beantwortet. Ob die vorhandenen Daten sauber sind,
-                            ändert daran nichts — erst muss die Grundlage geklärt werden.
-                          </p>
-                        </div>
+                        <Fazit ton="neutral" titel="Detailprüfung ausgesetzt">
+                          Ob die vorhandenen Daten sauber sind, ändert am Ergebnis oben nichts —
+                          erst muss die Grundlage geklärt werden.
+                        </Fazit>
                       ) : (
-                        <div className="border-t border-slate-200 pt-4">
-                          <DataQualityCheck
-                            value={checks.dataQuality}
-                            onChange={(fn) => setChecks((prev) => ({ ...prev, dataQuality: fn(prev.dataQuality) }))}
-                          />
-                        </div>
+                        <DataQualityCheck
+                          value={checks.dataQuality}
+                          onChange={(fn) => setChecks((prev) => ({ ...prev, dataQuality: fn(prev.dataQuality) }))}
+                        />
                       )}
 
                       <FairAnsicht v={checks.verfuegbarkeit} q={checks.dataQuality} />

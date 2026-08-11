@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { VERFUEGBARKEIT_FRAGEN } from '../components/assessments/DatenverfuegbarkeitCheck'
 import FairPrinzipien from '../components/data/FairPrinzipien'
+import QualitaetsDimensionen from '../components/data/QualitaetsDimensionen'
 import TheoryBlock from '../components/ui/TheoryBlock'
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -85,7 +86,7 @@ function DatenintegritaetTab() {
 
 export default function DataGovernancePage() {
   const navigate = useNavigate()
-  const [tab, setTab] = useState<'integritaet' | 'fair'>('integritaet')
+  const [tab, setTab] = useState<'integritaet' | 'qualitaet' | 'fair'>('integritaet')
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -137,6 +138,7 @@ export default function DataGovernancePage() {
       <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
         {([
           { id: 'integritaet', label: '🔒 Datenintegrität' },
+          { id: 'qualitaet', label: '📐 Qualitätsdimensionen' },
           { id: 'fair', label: '🔗 FAIR-Prinzipien' },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
@@ -147,6 +149,7 @@ export default function DataGovernancePage() {
       </div>
 
       {tab === 'integritaet' && <DatenintegritaetTab />}
+      {tab === 'qualitaet' && <QualitaetsDimensionen />}
       {tab === 'fair' && <FairPrinzipien />}
 
       {/* Die fallbezogenen Prüfungen sind an den Anwendungsfall gewandert */}
