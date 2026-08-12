@@ -35,6 +35,8 @@ interface Option {
 
 interface Frage {
   id: string
+  /** Kurzname für die Sprungleiste — die ganze Frage passt dort nicht */
+  kurz: string
   frage: string
   hinweis?: string
   optionen: Option[]
@@ -48,6 +50,7 @@ const FRAGEN: Frage[] = [
   // ── Lage ──
   {
     id: 'bestand',
+    kurz: 'KI im Einsatz',
     frage: 'Setzt die Firma heute schon KI ein?',
     hinweis: 'Auch eingekaufte Werkzeuge zählen — Copilot, Chatbots, KI-Funktionen in bestehender Software.',
     optionen: [
@@ -58,6 +61,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'geplant',
+    kurz: 'Vorhaben geplant',
     frage: 'Sind neue KI-Vorhaben geplant oder in Prüfung?',
     optionen: [
       { wert: 'ja',   label: 'Ja', steps: ['usecases', 'data-quality', 'score'] },
@@ -66,6 +70,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'hochrisiko',
+    kurz: 'Sensibler Bereich',
     frage: 'Betrifft eines der Systeme einen sensiblen Bereich?',
     hinweis: 'Personalauswahl, Kreditvergabe, Medizin, Bildung, kritische Infrastruktur, Strafverfolgung.',
     wenn: hatFaelle,
@@ -79,6 +84,7 @@ const FRAGEN: Frage[] = [
   // ── Rahmen ──
   {
     id: 'rolle',
+    kurz: 'Rolle nach AI Act',
     frage: 'Welche Rolle nimmt die Firma nach EU AI Act ein?',
     hinweis: 'Anbieter entwickeln oder vertreiben KI unter eigenem Namen, Betreiber setzen sie nur ein.',
     optionen: [
@@ -88,6 +94,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'iso',
+    kurz: 'ISO 42001',
     frage: 'Wird eine ISO-42001-Zertifizierung angestrebt?',
     optionen: [
       { wert: 'ja',      label: 'Ja',                 profil: { iso42001: 'ja' },      steps: ['governance', 'roles'] },
@@ -97,6 +104,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'betriebsrat',
+    kurz: 'Betriebsrat',
     frage: 'Gibt es einen Betriebsrat?',
     hinweis: 'Bei KI am Arbeitsplatz ist er nach §87 BetrVG mitbestimmungspflichtig.',
     optionen: [
@@ -106,6 +114,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'branche',
+    kurz: 'Branche',
     frage: 'In welcher Branche ist die Firma tätig?',
     optionen: [
       { wert: 'sonstige',    label: 'Sonstige',         profil: { branche: 'sonstige' } },
@@ -118,6 +127,7 @@ const FRAGEN: Frage[] = [
   // ── Was existiert schon ──
   {
     id: 'strategie',
+    kurz: 'Strategie / Vision',
     frage: 'Gibt es eine schriftliche KI-Strategie oder Vision?',
     hinweis: 'Daran hängt die ganze strategische Grundlage — Standortbestimmung, Zielbild, Lücke und Schwerpunkte.',
     optionen: [
@@ -130,6 +140,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'reifegrad',
+    kurz: 'Reifegrad',
     frage: 'Ist bekannt, wo die Firma bei Daten, Kompetenzen und Werkzeugen steht?',
     optionen: [
       { wert: 'ja',      label: 'Ja, eingeschätzt',     steps: ['maturity'], erledigt: ['maturity'] },
@@ -139,6 +150,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'richtlinie',
+    kurz: 'KI-Richtlinie',
     frage: 'Gibt es eine verbindliche KI-Richtlinie im Haus?',
     optionen: [
       { wert: 'ja',      label: 'Ja, liegt vor',        steps: ['governance'], erledigt: ['governance'] },
@@ -148,6 +160,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'rollen',
+    kurz: 'Verantwortliche',
     frage: 'Ist benannt, wer für KI verantwortlich ist?',
     hinweis: 'KI-Beauftragte:r, Datenschutzbeauftragte:r, Data Owner in den Fachbereichen.',
     optionen: [
@@ -160,6 +173,7 @@ const FRAGEN: Frage[] = [
   // ── Was ansteht ──
   {
     id: 'abnahme',
+    kurz: 'Abnahmekriterien',
     frage: 'Sind für die Vorhaben Abnahmekriterien festgelegt?',
     hinweis: 'Messbare Schwellenwerte, ab denen ein System als gut genug gilt.',
     wenn: (a) => a.geplant === 'ja',
@@ -170,6 +184,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'budget',
+    kurz: 'Budget',
     frage: 'Steht eine Budget- oder Investitionsentscheidung an?',
     wenn: hatFaelle,
     optionen: [
@@ -179,6 +194,7 @@ const FRAGEN: Frage[] = [
   },
   {
     id: 'einfuehrung',
+    kurz: 'Einführung',
     frage: 'Steht die Einführung bei den Mitarbeitenden bevor?',
     hinweis: 'Rollout, Schulungsbedarf oder spürbare Vorbehalte im Team.',
     wenn: hatFaelle,
@@ -234,6 +250,46 @@ function ableiten(a: Antworten) {
 
 const titelVon = (id: StepId) => STEPS.find((s) => s.id === id)?.title ?? id
 
+/**
+ * Eine Zeile der Sprungleiste. Gleiche Form wie im Fall-Wizard: runde
+ * Nummer, grün sobald beantwortet, blau für die Stelle, an der man steht.
+ */
+function SprungZeile({ nr, label, titel, erledigt, aktuell, gesperrt = false, onClick }: {
+  nr: number | string
+  label: string
+  /** Volltext als Kurzhinweis — der Kurzname allein ist manchmal knapp */
+  titel?: string
+  erledigt: boolean
+  aktuell: boolean
+  /** Noch nicht erreichbar — etwa die Zusammenfassung vor der letzten Antwort */
+  gesperrt?: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      title={titel ?? label}
+      disabled={gesperrt}
+      aria-current={aktuell ? 'step' : undefined}
+      onClick={onClick}
+      className={`w-full flex items-center gap-2 text-left px-2 py-1.5 rounded-md transition-colors ${
+        gesperrt ? 'opacity-40 cursor-not-allowed' : aktuell ? 'bg-blue-50' : 'hover:bg-slate-100'
+      }`}
+    >
+      <span className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-bold ${
+        erledigt ? 'bg-emerald-500 text-white'
+        : aktuell ? 'bg-blue-600 text-white'
+        : 'bg-slate-100 text-slate-500'
+      }`}>
+        {erledigt ? '✓' : nr}
+      </span>
+      <span className={`text-[11px] truncate ${aktuell ? 'font-semibold text-blue-700' : erledigt ? 'text-slate-500' : 'text-slate-600'}`}>
+        {label}
+      </span>
+    </button>
+  )
+}
+
 export default function MandantInterviewPage() {
   const navigate = useNavigate()
   const addClient = useMandantStore((s) => s.addClient)
@@ -253,6 +309,9 @@ export default function MandantInterviewPage() {
   const frage = pos >= 0 && pos < sichtbar.length ? sichtbar[pos] : null
   const { scope, erledigt, profil } = ableiten(antworten)
   const offen = scope.filter((s) => !erledigt.includes(s))
+  // Stand für die Sprungleiste
+  const beantwortet = sichtbar.filter((f) => antworten[f.id] !== undefined).length
+  const alleBeantwortet = sichtbar.length > 0 && beantwortet === sichtbar.length
 
   const antworte = (opt: Option) => {
     const next = { ...antworten, [frage!.id]: opt.wert }
@@ -383,8 +442,39 @@ export default function MandantInterviewPage() {
           </div>
         </div>
 
-        {/* ── Liste, die mitwächst ───────────────────────────────── */}
-        <aside className="bg-white rounded-xl shadow-sm p-4 md:sticky md:top-4">
+        {/* ── Sprungleiste + Liste, die mitwächst ────────────────── */}
+        <aside className="space-y-4 md:sticky md:top-4">
+        <nav className="bg-white rounded-xl shadow-sm p-4">
+          <div className="flex items-baseline justify-between gap-2 mb-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Fragen</p>
+            <span className="text-xs font-bold text-blue-600">{beantwortet}/{sichtbar.length}</span>
+          </div>
+
+          <div className="flex flex-col gap-0.5">
+            <SprungZeile
+              nr="•" label="Firma" erledigt={!!name.trim()} aktuell={pos === -1}
+              onClick={() => { setFertig(false); setPos(-1) }}
+            />
+            {sichtbar.map((f, i) => (
+              <SprungZeile
+                key={f.id}
+                nr={i + 1}
+                label={f.kurz}
+                titel={f.frage}
+                erledigt={antworten[f.id] !== undefined}
+                aktuell={!fertig && pos === i}
+                onClick={() => { setFertig(false); setPos(i) }}
+              />
+            ))}
+            <SprungZeile
+              nr="✓" label="Zusammenfassung" erledigt={fertig} aktuell={fertig}
+              gesperrt={!alleBeantwortet}
+              onClick={() => alleBeantwortet && setFertig(true)}
+            />
+          </div>
+        </nav>
+
+        <div className="bg-white rounded-xl shadow-sm p-4">
           <div className="flex items-baseline justify-between gap-2">
             <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Arbeitsliste</p>
             <span className="text-xs font-bold text-blue-600">{scope.length}</span>
@@ -419,6 +509,7 @@ export default function MandantInterviewPage() {
               ISO 42001 angestrebt — Richtlinie und Rollen sind dafür Voraussetzung und wurden aufgenommen.
             </p>
           )}
+        </div>
         </aside>
       </div>
     </div>
