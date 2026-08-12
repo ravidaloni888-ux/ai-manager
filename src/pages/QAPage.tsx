@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import BetriebsKpis from '../components/qa/BetriebsKpis'
 
 interface Requirement { id: string; anforderung: string; messgroesse: string; warumSchwelle: string; pruefmethode: string }
@@ -101,8 +102,22 @@ function AnforderungsGenerator() {
   )
 }
 
+const TAB_IDS = ['generator', 'tests', 'ki', 'abnahme', 'betrieb'] as const
+type TabId = typeof TAB_IDS[number]
+
 export default function QAPage() {
-  const [tab, setTab] = useState<'generator' | 'tests' | 'ki' | 'abnahme' | 'betrieb'>('generator')
+  // Der Reiter steht in der URL, nicht nur im Zustand — sonst lässt sich
+  // nicht auf einen bestimmten verlinken, und im geführten Modus landet
+  // man immer auf dem ersten. Aus der URL gelesen, nicht als Startwert
+  // kopiert: ein Wechsel des Parameters muss durchschlagen.
+  const [params, setParams] = useSearchParams()
+  const ausUrl = params.get('tab') as TabId | null
+  const tab: TabId = ausUrl && TAB_IDS.includes(ausUrl) ? ausUrl : 'generator'
+  const setTab = (t: TabId) => {
+    const n = new URLSearchParams(params)
+    n.set('tab', t)
+    setParams(n, { replace: true })
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
