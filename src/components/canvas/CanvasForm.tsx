@@ -224,7 +224,18 @@ export default function CanvasForm({ existing }: Props) {
     nachweise: false,
     doku: false,
   })
-  const klapp = (k: string) => setOffen((p) => ({ ...p, [k]: !p[k] }))
+  const klapp = (k: string) => {
+    const klapptAuf = !offen[k]
+    setOffen((p) => ({ ...p, [k]: !p[k] }))
+    // Die Prüfungen tragen rechts eine Sprungleiste. Klappt der Abschnitt
+    // irgendwo mitten im Fenster auf, beginnt sie weit unten und ihre
+    // unteren Einträge liegen jenseits des Fensterrands — unerreichbar,
+    // weil position:sticky ein Element nie über seine eigene Position
+    // hinaufziehen kann. Deshalb den Abschnitt nach oben holen.
+    if (k === 'pruefungen' && klapptAuf) {
+      setTimeout(() => document.getElementById('fall-wizard')?.scrollIntoView({ block: 'start' }), 60)
+    }
+  }
 
   /** Aus den Nachweisen zurück zu der Prüfung, die den Nachweis liefert. */
   const sprungZu = (gruppe: string) => {
