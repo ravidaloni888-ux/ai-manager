@@ -206,35 +206,77 @@ export interface SprungPunkt {
   erledigt: boolean
 }
 
+export interface SprungSchritt {
+  key: string
+  nr: number
+  label: string
+  /** Abgeschlossen — nicht zwangsläufig „in Ordnung", dafür steht der Ton */
+  erledigt: boolean
+  ton: Ton
+  offen: boolean
+  /** Fragen des Schritts — ausgeklappt nur beim offenen */
+  punkte: SprungPunkt[]
+}
+
 /**
- * Sprung zu einzelnen Fragen innerhalb eines Schritts — rechts daneben,
- * untereinander, mit Stand. Für Schritte mit vielen unabhängigen Fragen,
- * durch die man sonst erst scrollen müsste. Ein Prüfbaum wie die Risikoklasse
- * braucht das nicht: dort ergibt sich die nächste Frage erst aus der
- * vorigen, es gibt also nichts, zu dem man vorgreifen könnte.
+ * Eine Navigation für beide Ebenen: die Schritte untereinander, darunter
+ * die Fragen des gerade offenen Schritts. Bleibt beim Scrollen stehen,
+ * damit man auch aus einem langen Schritt heraus überall hinkommt.
+ *
+ * Bewusst eine Leiste statt zwei: eine waagerechte Schritt-Leiste über den
+ * Schritt-Köpfen hätte dieselben Titel unmittelbar über sich selbst
+ * wiederholt.
  */
-export function Sprungleiste({ punkte }: { punkte: SprungPunkt[] }) {
-  const springe = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ block: 'center' })
-  }
+export function Sprungleiste({ schritte, aufSchritt }: {
+  schritte: SprungSchritt[]
+  aufSchritt: (key: string) => void
+}) {
+  const zurFrage = (id: string) => document.getElementById(id)?.scrollIntoView({ block: 'center' })
+
   return (
-    <div className="hidden lg:block w-40 flex-shrink-0">
-      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide px-2.5 mb-1">Direkt zu</p>
+    <nav className="hidden lg:block w-44 flex-shrink-0 sticky top-2 self-start mt-3 max-h-[calc(100vh-8rem)] overflow-y-auto">
+      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide px-2 mb-1">Direkt zu</p>
       <div className="flex flex-col gap-0.5">
-        {punkte.map((p) => (
-          <button
-            key={p.id}
-            type="button"
-            title={p.label}
-            onClick={() => springe(p.id)}
-            className="flex items-center gap-2 text-left px-2.5 py-1 rounded-md hover:bg-slate-100 transition-colors"
-          >
-            <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${p.erledigt ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-            <span className={`text-[11px] truncate ${p.erledigt ? 'text-slate-500' : 'text-slate-600'}`}>{p.label}</span>
-          </button>
+        {schritte.map((s) => (
+          <div key={s.key}>
+            <button
+              type="button"
+              onClick={() => aufSchritt(s.key)}
+              className={`w-full flex items-center gap-2 text-left px-2 py-1.5 rounded-md transition-colors ${
+                s.offen ? 'bg-blue-50' : 'hover:bg-slate-100'
+              }`}
+            >
+              <span className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[9px] font-bold ${
+                s.erledigt ? (s.ton === 'stopp' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white')
+                : s.offen ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'
+              }`}>
+                {s.erledigt ? (s.ton === 'stopp' ? '✕' : '✓') : s.nr}
+              </span>
+              <span className={`text-[11px] truncate ${s.offen ? 'font-semibold text-blue-700' : 'text-slate-600'}`}>
+                {s.label}
+              </span>
+            </button>
+
+            {s.offen && s.punkte.length > 0 && (
+              <div className="flex flex-col gap-0.5 ml-4 pl-2 border-l border-slate-200 py-0.5">
+                {s.punkte.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    title={p.label}
+                    onClick={() => zurFrage(p.id)}
+                    className="flex items-center gap-2 text-left px-1.5 py-0.5 rounded hover:bg-slate-100 transition-colors"
+                  >
+                    <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${p.erledigt ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                    <span className={`text-[11px] truncate ${p.erledigt ? 'text-slate-500' : 'text-slate-600'}`}>{p.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
       </div>
-    </div>
+    </nav>
   )
 }
 
