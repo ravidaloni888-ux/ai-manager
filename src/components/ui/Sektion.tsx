@@ -22,11 +22,15 @@ export function Sektion({
   children: React.ReactNode
 }) {
   return (
-    <section id={id} className="bg-white rounded-xl shadow-md overflow-hidden">
+    // Kein overflow-hidden hier: das bricht position:sticky für alles darin
+    // (der Fall-Wizard braucht das für seine Schritt-Leiste). Die Ecken
+    // rundet stattdessen der Kopf-Knopf selbst — er ist das einzige Kind,
+    // dessen eigener Hintergrund die Sektionskante erreicht.
+    <section id={id} className="bg-white rounded-xl shadow-md">
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-slate-50 transition-colors"
+        className={`w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-slate-50 transition-colors rounded-t-xl ${offen ? '' : 'rounded-b-xl'}`}
       >
         {nummer !== undefined && (
           <span className="w-6 h-6 rounded-md bg-slate-800 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">

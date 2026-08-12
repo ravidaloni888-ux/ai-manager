@@ -106,6 +106,7 @@ export default function DatenverfuegbarkeitCheck({ value, onChange }: {
         return (
           <Frage
             key={f.id}
+            id={`gate-${f.id}`}
             nr={i + 1}
             titel={f.titel}
             text={f.frage}

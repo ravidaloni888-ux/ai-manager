@@ -164,6 +164,7 @@ export default function DataQualityCheck({ value, onChange }: {
         return (
           <Frage
             key={d.key}
+            id={`dim-${d.key}`}
             nr={i + 1}
             titel={d.title}
             text={d.check}

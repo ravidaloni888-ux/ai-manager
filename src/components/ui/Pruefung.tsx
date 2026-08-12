@@ -136,7 +136,9 @@ export function Marke({ ton = 'neutral', children }: { ton?: Ton; children: Reac
  * Kasten färbt sich nach der Antwort, damit der Stand ohne Lesen erkennbar
  * ist. Ohne Antwort bleibt er weiss.
  */
-export function Frage({ nr, titel, text, hinweis, marke, ton, folge, children }: {
+export function Frage({ id, nr, titel, text, hinweis, marke, ton, folge, children }: {
+  /** Sprungziel für die Sprungleiste — ohne id ist die Frage nicht anspringbar */
+  id?: string
   nr?: number
   /** Kurzer Name der Frage — ohne ihn steht die Frage selbst fett */
   titel?: string
@@ -151,7 +153,7 @@ export function Frage({ nr, titel, text, hinweis, marke, ton, folge, children }:
 }) {
   const t = ton ? TON[ton] : null
   return (
-    <div className={`rounded-lg border px-3.5 py-3 transition-colors ${t ? `${t.rand} ${t.flaeche}` : 'border-slate-200 bg-white'}`}>
+    <div id={id} className={`rounded-lg border px-3.5 py-3 transition-colors scroll-mt-4 ${t ? `${t.rand} ${t.flaeche}` : 'border-slate-200 bg-white'}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           {titel ? (
@@ -193,6 +195,45 @@ export function Fazit({ ton, titel, children }: { ton: Ton; titel: string; child
         <span>{titel}</span>
       </p>
       {children && <div className={`text-[12px] mt-1.5 leading-relaxed ${t.schrift} pl-4`}>{children}</div>}
+    </div>
+  )
+}
+
+export interface SprungPunkt {
+  /** Muss zur id einer Frage passen — sonst läuft der Sprung ins Leere */
+  id: string
+  label: string
+  erledigt: boolean
+}
+
+/**
+ * Sprung zu einzelnen Fragen innerhalb eines Schritts — rechts daneben,
+ * untereinander, mit Stand. Für Schritte mit vielen unabhängigen Fragen,
+ * durch die man sonst erst scrollen müsste. Ein Prüfbaum wie die Risikoklasse
+ * braucht das nicht: dort ergibt sich die nächste Frage erst aus der
+ * vorigen, es gibt also nichts, zu dem man vorgreifen könnte.
+ */
+export function Sprungleiste({ punkte }: { punkte: SprungPunkt[] }) {
+  const springe = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ block: 'center' })
+  }
+  return (
+    <div className="hidden lg:block w-40 flex-shrink-0">
+      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide px-2.5 mb-1">Direkt zu</p>
+      <div className="flex flex-col gap-0.5">
+        {punkte.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            title={p.label}
+            onClick={() => springe(p.id)}
+            className="flex items-center gap-2 text-left px-2.5 py-1 rounded-md hover:bg-slate-100 transition-colors"
+          >
+            <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${p.erledigt ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+            <span className={`text-[11px] truncate ${p.erledigt ? 'text-slate-500' : 'text-slate-600'}`}>{p.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

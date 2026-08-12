@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { scopedGet, scopedSet } from '../../lib/mandantData'
 import { getMandantType } from '../../store/mandantStore'
 import { loadCaseChecks, saveCaseChecks } from '../../lib/supabase'
-import DataQualityCheck, { EMPTY_DATA_QUALITY } from '../assessments/DataQualityCheck'
+import DataQualityCheck, { EMPTY_DATA_QUALITY, QUALITY_DIMENSIONS } from '../assessments/DataQualityCheck'
 import type { DataQualityState } from '../assessments/DataQualityCheck'
 import { EMPTY_FAIR } from '../../lib/fair'
 import type { FairState } from '../../lib/fair'
@@ -16,8 +16,8 @@ import type { RiskClassState } from '../assessments/RiskClassCheck'
 import type { EthicsState } from '../assessments/EthicsCheck'
 import { ProjectPlanContent } from '../../pages/ProjectPlanPage'
 import { Sektion, StandZahl } from '../ui/Sektion'
-import { Pruefblock, Frage, Wahl, Fazit, JA_NEIN, TON } from '../ui/Pruefung'
-import type { WahlOption, Ton } from '../ui/Pruefung'
+import { Pruefblock, Frage, Wahl, Fazit, JA_NEIN, TON, Sprungleiste } from '../ui/Pruefung'
+import type { WahlOption, Ton, SprungPunkt } from '../ui/Pruefung'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Datenschutz-Checks je Anwendungsfall.
@@ -127,6 +127,7 @@ function DsfaChecker({ checked, setChecked }: {
       {DSFA_TRIGGERS.map((t, i) => (
         <Frage
           key={t.id}
+          id={`dsfa-${t.id}`}
           nr={i + 1}
           text={t.label}
           ton={checked[t.id] === undefined ? null : checked[t.id] ? 'warn' : 'ok'}
@@ -180,6 +181,7 @@ function AvvChecker({ value, onChange }: { value: AvvState; onChange: (next: Avv
         : undefined}
     >
       <Frage
+        id="avv-external"
         nr={1}
         text="Läuft das KI-System auf Servern eines externen Anbieters?"
         ton={external === null ? null : 'neutral'}
@@ -189,6 +191,7 @@ function AvvChecker({ value, onChange }: { value: AvvState; onChange: (next: Avv
 
       {external === true && (
         <Frage
+          id="avv-personalData"
           nr={2}
           text="Werden dabei personenbezogene Daten verarbeitet?"
           ton={personalData === null ? null : 'neutral'}
@@ -199,6 +202,7 @@ function AvvChecker({ value, onChange }: { value: AvvState; onChange: (next: Avv
 
       {showAvvQuestion && (
         <Frage
+          id="avv-avvExists"
           nr={3}
           text="Ist ein AVV mit dem Anbieter vorhanden?"
           ton={avvExists === null ? null : avvExists ? 'ok' : 'stopp'}
@@ -240,6 +244,7 @@ function Art22Checker({ checked, setChecked }: {
       {ART22_CHECKS.map((check, i) => (
         <Frage
           key={i}
+          id={`art22-${i}`}
           nr={i + 1}
           text={check}
           ton={checked[i] === undefined ? null : checked[i] ? 'ok' : 'stopp'}
@@ -380,6 +385,33 @@ export default function CaseComplianceChecks(
 
   const doneCount = groups.filter((g) => g.done).length
 
+  // Sprungziele je Schritt — nur dort, wo die Fragen unabhängig voneinander
+  // sind. Die Risikoklasse ist ein Baum: die nächste Frage ergibt sich erst
+  // aus der vorigen, es gibt also nichts, zu dem man vorgreifen könnte.
+  const punkteDatengrundlage: SprungPunkt[] = [
+    ...VERFUEGBARKEIT_FRAGEN.map((f) => ({
+      id: `gate-${f.id}`, label: f.titel, erledigt: !!gateAntworten[f.id],
+    })),
+    ...(gateOffen !== false ? QUALITY_DIMENSIONS.map((d) => ({
+      id: `dim-${d.key}`, label: d.title, erledigt: checks.dataQuality.dims[d.key]?.rating !== null,
+    })) : []),
+  ]
+
+  const punkteDatenschutz: SprungPunkt[] = [
+    ...DSFA_TRIGGERS.map((t) => ({ id: `dsfa-${t.id}`, label: t.label, erledigt: checks.dsfa[t.id] !== undefined })),
+    { id: 'avv-external', label: 'AVV — externer Anbieter?', erledigt: checks.avv.external !== null },
+    ...(checks.avv.external === true
+      ? [{ id: 'avv-personalData', label: 'AVV — Personendaten?', erledigt: checks.avv.personalData !== null }]
+      : []),
+    ...(checks.avv.external === true && checks.avv.personalData === true
+      ? [{ id: 'avv-avvExists', label: 'AVV vorhanden?', erledigt: checks.avv.avvExists !== null }]
+      : []),
+    ...ART22_CHECKS.map((_, i) => ({ id: `art22-${i}`, label: `Art. 22 · Punkt ${i + 1}`, erledigt: checks.art22[i] !== undefined })),
+  ]
+
+  const punkteFuer = (key: GroupKey): SprungPunkt[] =>
+    key === 'datengrundlage' ? punkteDatengrundlage : key === 'datenschutz' ? punkteDatenschutz : []
+
   // Beim Laden den ersten offenen Schritt aufklappen — der Wizard führt.
   useEffect(() => {
     if (!loaded || autoOpened) return
@@ -393,6 +425,13 @@ export default function CaseComplianceChecks(
     const i = groups.findIndex((g) => g.key === key)
     const next = groups.slice(i + 1).find((g) => !g.done) ?? groups[i + 1]
     setOpenGroup(next ? next.key : null)
+  }
+
+  /** Schritt öffnen und dorthin scrollen — auch wenn ein anderer, langer
+   *  Schritt gerade offen ist und den Rest der Liste nach unten schiebt. */
+  const springeZuSchritt = (key: GroupKey) => {
+    setOpenGroup(key)
+    setTimeout(() => document.getElementById(`schritt-${key}`)?.scrollIntoView({ block: 'start' }), 60)
   }
 
   return (
@@ -418,11 +457,34 @@ export default function CaseComplianceChecks(
           </p>
         </div>
 
+        {/* Direkt zu einem Schritt springen — bleibt oben stehen, während ein
+            langer offener Schritt die anderen Köpfe nach unten schiebt. */}
+        <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm px-5 py-2 flex items-center gap-1.5 flex-wrap border-y border-slate-100">
+          {groups.map((g, gi) => {
+            const aktiv = openGroup === g.key
+            return (
+              <button
+                key={g.key}
+                type="button"
+                onClick={() => springeZuSchritt(g.key)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors ${
+                  aktiv ? 'bg-blue-600 text-white'
+                  : g.done ? (g.ton === 'stopp' ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100')
+                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                }`}
+              >
+                <span>{g.done ? (g.ton === 'stopp' ? '✕' : '✓') : gi + 1}</span>
+                {g.title}
+              </button>
+            )
+          })}
+        </div>
+
       <div className="divide-y divide-slate-100 border-t border-slate-100">
         {groups.map((g, gi) => {
           const isOpen = openGroup === g.key
           return (
-            <div key={g.key}>
+            <div key={g.key} id={`schritt-${g.key}`} className="scroll-mt-11">
               <button
                 type="button"
                 onClick={() => setOpenGroup(isOpen ? null : g.key)}
@@ -453,63 +515,69 @@ export default function CaseComplianceChecks(
               </button>
 
               {isOpen && (
-                <div className="px-5 pb-5 space-y-4 bg-slate-50/50">
-                  {g.key === 'risiko' && (
-                    <RiskClassCheck
-                      value={checks.riskClass}
-                      onChange={(fn) => setChecks((prev) => ({ ...prev, riskClass: fn(prev.riskClass) }))}
-                    />
-                  )}
-                  {g.key === 'datenschutz' && (
-                    <>
-                      <DsfaChecker
-                        checked={checks.dsfa}
-                        setChecked={(fn) => setChecks((prev) => ({ ...prev, dsfa: fn(prev.dsfa) }))}
-                      />
-                      <AvvChecker
-                        value={checks.avv}
-                        onChange={(avv) => setChecks((prev) => ({ ...prev, avv }))}
-                      />
-                      <Art22Checker
-                        checked={checks.art22}
-                        setChecked={(fn) => setChecks((prev) => ({ ...prev, art22: fn(prev.art22) }))}
-                      />
-                    </>
-                  )}
-                  {g.key === 'datengrundlage' && (
-                    <>
-                      <DatenverfuegbarkeitCheck
-                        value={checks.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT}
-                        onChange={(fn) => setChecks((prev) => ({ ...prev, verfuegbarkeit: fn(prev.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT) }))}
-                      />
-
-                      {/* Das Gate hat oben schon Alarm geschlagen — hier steht
-                          nur noch, warum das Qualitätswerkzeug fehlt. */}
-                      {gateOffen === false ? (
-                        <Fazit ton="neutral" titel="Detailprüfung ausgesetzt">
-                          Ob die vorhandenen Daten sauber sind, ändert am Ergebnis oben nichts —
-                          erst muss die Grundlage geklärt werden.
-                        </Fazit>
-                      ) : (
-                        <DataQualityCheck
-                          value={checks.dataQuality}
-                          onChange={(fn) => setChecks((prev) => ({ ...prev, dataQuality: fn(prev.dataQuality) }))}
+                <div className="px-5 pb-5 bg-slate-50/50">
+                  <div className="flex items-start gap-4">
+                    <div className="min-w-0 flex-1 space-y-4">
+                      {g.key === 'risiko' && (
+                        <RiskClassCheck
+                          value={checks.riskClass}
+                          onChange={(fn) => setChecks((prev) => ({ ...prev, riskClass: fn(prev.riskClass) }))}
                         />
                       )}
+                      {g.key === 'datenschutz' && (
+                        <>
+                          <DsfaChecker
+                            checked={checks.dsfa}
+                            setChecked={(fn) => setChecks((prev) => ({ ...prev, dsfa: fn(prev.dsfa) }))}
+                          />
+                          <AvvChecker
+                            value={checks.avv}
+                            onChange={(avv) => setChecks((prev) => ({ ...prev, avv }))}
+                          />
+                          <Art22Checker
+                            checked={checks.art22}
+                            setChecked={(fn) => setChecks((prev) => ({ ...prev, art22: fn(prev.art22) }))}
+                          />
+                        </>
+                      )}
+                      {g.key === 'datengrundlage' && (
+                        <>
+                          <DatenverfuegbarkeitCheck
+                            value={checks.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT}
+                            onChange={(fn) => setChecks((prev) => ({ ...prev, verfuegbarkeit: fn(prev.verfuegbarkeit ?? EMPTY_VERFUEGBARKEIT) }))}
+                          />
 
-                      <FairAnsicht v={checks.verfuegbarkeit} q={checks.dataQuality} />
-                    </>
-                  )}
-                  {g.key === 'ethik' && (
-                    <EthicsCheck
-                      value={checks.ethics}
-                      onChange={(fn) => setChecks((prev) => ({ ...prev, ethics: fn(prev.ethics) }))}
-                    />
-                  )}
-                  {g.key === 'plan' && <ProjectPlanContent ucid={ucId ?? null} />}
+                          {/* Das Gate hat oben schon Alarm geschlagen — hier steht
+                              nur noch, warum das Qualitätswerkzeug fehlt. */}
+                          {gateOffen === false ? (
+                            <Fazit ton="neutral" titel="Detailprüfung ausgesetzt">
+                              Ob die vorhandenen Daten sauber sind, ändert am Ergebnis oben nichts —
+                              erst muss die Grundlage geklärt werden.
+                            </Fazit>
+                          ) : (
+                            <DataQualityCheck
+                              value={checks.dataQuality}
+                              onChange={(fn) => setChecks((prev) => ({ ...prev, dataQuality: fn(prev.dataQuality) }))}
+                            />
+                          )}
+
+                          <FairAnsicht v={checks.verfuegbarkeit} q={checks.dataQuality} />
+                        </>
+                      )}
+                      {g.key === 'ethik' && (
+                        <EthicsCheck
+                          value={checks.ethics}
+                          onChange={(fn) => setChecks((prev) => ({ ...prev, ethics: fn(prev.ethics) }))}
+                        />
+                      )}
+                      {g.key === 'plan' && <ProjectPlanContent ucid={ucId ?? null} />}
+                    </div>
+
+                    {punkteFuer(g.key).length > 0 && <Sprungleiste punkte={punkteFuer(g.key)} />}
+                  </div>
 
                   {g.key !== 'plan' && (
-                    <div className="flex justify-end pt-1">
+                    <div className="flex justify-end pt-4">
                       <button
                         type="button"
                         onClick={() => weiter(g.key)}
