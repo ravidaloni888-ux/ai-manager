@@ -111,7 +111,7 @@ export default function QAPage() {
         <p className="text-xs font-mono tracking-widest text-slate-400 uppercase mb-1">KI-Beauftragte:r · Tag 12</p>
         <h1 className="text-2xl font-bold text-slate-800">KI-Qualitätssicherung</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          QS &amp; Abnahmeprozesse — Test-Typen, KI-Besonderheiten, Abnahmestrategien, Betriebs-KPI
+          QS &amp; Abnahmeprozesse — Test-Typen, KI-Besonderheiten, Deployment-Strategien, Betriebs-KPI
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export default function QAPage() {
           { id: 'generator', label: '📋 Anforderungs-Generator' },
           { id: 'tests',  label: 'Test-Typen & Methoden' },
           { id: 'ki',     label: 'KI-Besonderheiten' },
-          { id: 'abnahme',label: 'Abnahmestrategien' },
+          { id: 'abnahme',label: '🚀 Deployment & Abnahme' },
           { id: 'betrieb',   label: '📈 Betriebs-KPI' },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
@@ -362,34 +362,40 @@ export default function QAPage() {
         <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 space-y-4">
           <div>
             <p className="text-xs font-mono tracking-widest text-slate-400 uppercase mb-1">Nicht konkurrierend — sequenziell einsetzbar</p>
-            <h3 className="text-base font-bold text-slate-800">Vier Abnahmestrategien</h3>
+            <h3 className="text-base font-bold text-slate-800">Deployment-Strategien — wie ein neues Modell in Produktion kommt</h3>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b-2 border-slate-800">
-                  <th className="text-left py-2 pr-4 text-xs font-mono text-slate-500 uppercase tracking-wide">Strategie</th>
-                  <th className="text-left py-2 pr-4 text-xs font-mono text-slate-500 uppercase tracking-wide">Kern-Idee</th>
-                  <th className="text-left py-2 text-xs font-mono text-slate-500 uppercase tracking-wide">Wann einsetzen</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {ABNAHME_STRATEGIEN.map(s => (
-                  <tr key={s.name}>
-                    <td className="py-3 pr-4 font-semibold text-slate-800">{s.name}</td>
-                    <td className="py-3 pr-4 text-xs text-slate-600">{s.kern}</td>
-                    <td className="py-3 text-xs text-teal-700 font-mono">{s.wann}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {DEPLOYMENT_STRATEGIEN.map(s => (
+              <div key={s.buchstabe} className="rounded-xl border border-slate-200 p-4 space-y-2">
+                <div className="flex items-start gap-3">
+                  <span className="w-7 h-7 rounded-lg bg-slate-800 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+                    {s.buchstabe}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-slate-800 leading-tight">{s.name}</p>
+                  </div>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${RISIKO_TON[s.risiko]}`}>
+                    Risiko: {s.risiko}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">{s.kern}</p>
+                <p className="text-[11px] text-slate-500 leading-relaxed border-t border-slate-100 pt-2">{s.folge}</p>
+              </div>
+            ))}
           </div>
+
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            Shadow und Canary beantworten die Frage <strong>„läuft es?"</strong> — A/B-Vergleich und
+            verschränkter Test die Frage <strong>„nützt es?"</strong>. Beides braucht man, und zwar
+            in dieser Reihenfolge.
+          </p>
         </section>
 
         {/* Reifepfad */}
         <section className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 space-y-4">
           <div>
-            <p className="text-xs font-mono tracking-widest text-slate-400 uppercase mb-1">Die vier Strategien als Reifepfad</p>
+            <p className="text-xs font-mono tracking-widest text-slate-400 uppercase mb-1">Dieselben Strategien in der Reihenfolge, in der man sie durchläuft</p>
             <h3 className="text-base font-bold text-slate-800">Mögliche Test-Sequenz</h3>
           </div>
           <div className="relative">
@@ -398,17 +404,24 @@ export default function QAPage() {
               {REIFEPFAD.map((p, i) => (
                 <div key={p.phase} className="flex flex-col items-center text-center">
                   <div className="w-10 h-10 rounded-full bg-slate-800 text-white text-sm font-bold flex items-center justify-center mb-3 relative z-10">{i + 1}</div>
-                  <p className="text-xs font-bold text-slate-700 mb-1">{p.phase}</p>
+                  <p className="text-xs font-bold text-slate-700 mb-1">
+                    {p.phase}
+                    <span className="ml-1.5 text-[10px] font-mono text-slate-400">{p.ref}</span>
+                  </p>
                   <p className="text-[11px] text-slate-500 leading-relaxed">{p.body}</p>
                   <p className="text-[11px] font-mono text-teal-600 mt-1">{p.schwelle}</p>
                 </div>
               ))}
             </div>
           </div>
+          <p className="text-[11px] text-slate-400">
+            Blue-Green (B) taucht hier nicht auf: Es ist kein Prüfschritt, sondern die
+            Umschalttechnik — man kann jede der anderen Stufen damit ausrollen.
+          </p>
         </section>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 text-sm text-amber-800">
-          <strong>Merksatz:</strong> „Ich halte da nicht meinen Kopf hin, solange ich nicht weiß, ob es funktioniert." — Alfons Brockmann, Key User. Abnahmestrategien geben Skeptiker:innen im Unternehmen genau diese Sicherheit.
+          <strong>Merksatz:</strong> „Ich halte da nicht meinen Kopf hin, solange ich nicht weiß, ob es funktioniert." — Alfons Brockmann, Key User. Genau diese Sicherheit geben die Strategien oben: Sie erlauben, ein Modell in Produktion zu prüfen, bevor jemand die Verantwortung dafür übernehmen muss.
         </div>
 
       </div>
@@ -447,18 +460,60 @@ const ANF_KATEGORIEN = [
   { kat: 'Compliance', frage: 'Was muss rechtlich gelten?', messung: 'Jede Antwort enthält Quellenverweis (Dokument-ID + Seitenzahl) · Eingabe nicht-complianter Formate technisch unterbunden' },
 ]
 
-const ABNAHME_STRATEGIEN = [
-  { name: 'Shadow Deployment', kern: 'System läuft parallel, Nutzer sehen nichts', wann: 'Erster Live-Test — auch „blinde" Tests möglich' },
-  { name: 'Canary Release', kern: 'Schrittweise öffnen (5 % → 20 % → 100 %)', wann: 'Nach Shadow, bei gutem Ergebnis, Korrekturen im laufenden Betrieb' },
-  { name: 'A/B Testing', kern: 'Alte vs. neue Version parallel', wann: 'Unterschiedliche Nutzergruppen treten „gegeneinander" an' },
-  { name: 'Interleaved Testing', kern: 'Abwechselnd alt/neu in einer Sitzung', wann: 'Für subjektive Bewertungen durch erfahrene Testgruppen geeignet' },
+// ─────────────────────────────────────────────────────────────────────────
+// Deployment-Strategien.
+//
+// Sie stehen nicht in Konkurrenz zueinander — man durchläuft sie nacheinander
+// (siehe Reifepfad darunter). Was sie unterscheidet, ist die Frage, die sie
+// beantworten: Shadow und Canary fragen „läuft es?", A/B und der verschränkte
+// Test fragen „nützt es?".
+// ─────────────────────────────────────────────────────────────────────────
+
+type Risiko = 'keins' | 'niedrig' | 'mittel'
+
+const RISIKO_TON: Record<Risiko, string> = {
+  keins:   'bg-emerald-50 text-emerald-700',
+  niedrig: 'bg-amber-50 text-amber-700',
+  mittel:  'bg-orange-50 text-orange-700',
+}
+
+const DEPLOYMENT_STRATEGIEN: {
+  buchstabe: string; name: string; kern: string; folge: string; risiko: Risiko
+}[] = [
+  {
+    buchstabe: 'A', name: 'Canary Release', risiko: 'niedrig',
+    kern: 'Das neue Modell übernimmt zunächst nur 5–10 % des realen Traffics. Der Rest läuft weiterhin auf dem alten Modell. Nach erfolgreicher Beobachtung wird der Anteil schrittweise erhöht.',
+    folge: 'Treten Fehler auf: sofortiger Rollback ohne große Auswirkungen.',
+  },
+  {
+    buchstabe: 'B', name: 'Blue-Green Deployment', risiko: 'mittel',
+    kern: 'Zwei identische Produktionsumgebungen laufen parallel. „Blau" ist aktiv, „Grün" enthält das neue Modell. Nach Freigabe wird der Traffic-Router umgestellt — sofort und vollständig.',
+    folge: 'Rollback heisst: Router zurückschalten. Sehr schnell, aber teurer in der Infrastruktur.',
+  },
+  {
+    buchstabe: 'C', name: 'Shadow Mode', risiko: 'keins',
+    kern: 'Das neue Modell läuft parallel zum aktiven Modell und sieht denselben realen Traffic — aber seine Ausgaben werden nicht verwendet. Nur Monitoring.',
+    folge: 'Ideal, um ein neues Modell unter produktionsnahen Bedingungen zu prüfen, ohne Folgen für den Betrieb.',
+  },
+  {
+    buchstabe: 'D', name: 'A/B-Vergleich', risiko: 'mittel',
+    kern: 'Zwei Gruppen bekommen unterschiedliche Versionen. Verglichen wird nicht die technische Güte, sondern eine Geschäftskennzahl — Abschlussquote, Bearbeitungsdauer, Zufriedenheit.',
+    folge: 'Die einzige Strategie, die eine Wirkungsfrage beantwortet. Braucht genügend Fälle für Aussagekraft und eine Ausgangsmessung als Vergleichspunkt.',
+  },
+  {
+    buchstabe: 'E', name: 'Verschränkter Test', risiko: 'niedrig',
+    kern: 'Ergebnisse beider Versionen werden derselben Person gemischt vorgelegt; gemessen wird, welche sie tatsächlich wählt.',
+    folge: 'Braucht deutlich weniger Fälle als ein A/B-Vergleich, funktioniert aber nur bei Ranglisten und Vorschlagslisten.',
+  },
 ]
 
+// Dieselben Strategien wie oben, hier in der Reihenfolge, in der man sie
+// durchläuft — deshalb die Buchstaben als Rückverweis.
 const REIFEPFAD = [
-  { phase: 'Shadow Deployment', body: 'System läuft intern · Experte prüft', schwelle: 'Schwelle: ≥ 90 % Genauigkeit' },
-  { phase: 'Canary Release', body: 'Pilot mit freiwilligen Nutzer:innen', schwelle: 'Schwelle: Qualität stabil, kein Rollback-Trigger' },
-  { phase: 'A/B Testing', body: 'Version 1 vs. Version 2 nach erstem Update', schwelle: 'Schwelle: Messbare Verbesserung erforderlich' },
-  { phase: 'Interleaved Testing', body: 'Prompt-Optimierung · Sprachqualität', schwelle: 'Subjektive Bewertung durch Testgruppe' },
+  { phase: 'Shadow Mode', ref: 'C', body: 'System läuft intern · Experte prüft', schwelle: 'Schwelle: ≥ 90 % Genauigkeit' },
+  { phase: 'Canary Release', ref: 'A', body: 'Pilot mit freiwilligen Nutzer:innen', schwelle: 'Schwelle: Qualität stabil, kein Rollback-Trigger' },
+  { phase: 'A/B-Vergleich', ref: 'D', body: 'Version 1 vs. Version 2 nach erstem Update', schwelle: 'Schwelle: Messbare Verbesserung erforderlich' },
+  { phase: 'Verschränkter Test', ref: 'E', body: 'Prompt-Optimierung · Sprachqualität', schwelle: 'Subjektive Bewertung durch Testgruppe' },
 ]
 
 const KPMG_FEHLER = [
