@@ -241,6 +241,8 @@ export function Sprungleiste({ schritte, aufSchritt }: {
           <div key={s.key}>
             <button
               type="button"
+              title={s.label}
+              aria-current={s.offen ? 'step' : undefined}
               onClick={() => aufSchritt(s.key)}
               className={`w-full flex items-center gap-2 text-left px-2 py-1.5 rounded-md transition-colors ${
                 s.offen ? 'bg-blue-50' : 'hover:bg-slate-100'
