@@ -19,6 +19,24 @@ interface Nachricht {
   quellen?: { titel: string; quelle: string; pfad: string }[]
 }
 
+/**
+ * Fettschrift aus **Sternchen**. Das Modell schreibt Markdown, und roh
+ * angezeigt stehen die Sternchen mitten im Satz. Mehr als fett braucht
+ * es hier nicht — Aufzählungen und Absätze trägt schon der Zeilenumbruch.
+ */
+function Formatiert({ text }: { text: string }) {
+  const teile = text.split(/(\*\*[^*]+\*\*)/g)
+  return (
+    <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+      {teile.map((t, i) =>
+        t.startsWith('**') && t.endsWith('**') && t.length > 4
+          ? <strong key={i} className="font-semibold">{t.slice(2, -2)}</strong>
+          : <span key={i}>{t}</span>,
+      )}
+    </p>
+  )
+}
+
 const BEISPIELE = [
   'Wann gilt ein KI-System als Hochrisiko?',
   'Wann brauche ich eine DSFA?',
@@ -121,7 +139,7 @@ export default function ChatPage() {
             </div>
           ) : (
             <div key={i} className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 space-y-3">
-              <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">{n.content}</p>
+              <Formatiert text={n.content} />
               {n.quellen && n.quellen.length > 0 && (
                 <div className="border-t border-slate-100 pt-2.5">
                   <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
