@@ -76,7 +76,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(502).json({ error: `Anthropic API error: ${response.status}`, detail })
     }
 
-    const data = await response.json() as { content: Array<{ text?: string }> }
+    const data = await response.json() as {
+      content: Array<{ text?: string }>
+      usage?: { input_tokens?: number; output_tokens?: number }
+    }
     const antwort = data.content?.map((c) => c.text ?? '').join('').trim()
     if (!antwort) return res.status(502).json({ error: 'Leere Antwort vom Modell' })
 
@@ -89,9 +92,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return antwort.includes(a.quelle) || antwort.includes(kopf)
     })
 
+    // Tokenzahlen durchreichen — ohne sie lässt sich über Kosten nur raten.
     return res.status(200).json({
       antwort,
       quellen: benutzt.map((a) => ({ titel: a.titel, quelle: a.quelle, pfad: a.pfad })),
+      verbrauch: {
+        eingabe: data.usage?.input_tokens ?? null,
+        ausgabe: data.usage?.output_tokens ?? null,
+      },
     })
   } catch (e) {
     return res.status(500).json({ error: String(e) })
