@@ -80,9 +80,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const antwort = data.content?.map((c) => c.text ?? '').join('').trim()
     if (!antwort) return res.status(502).json({ error: 'Leere Antwort vom Modell' })
 
+    // Nur die Quellen zeigen, auf die sich die Antwort auch beruft. Sonst
+    // steht unter einem „dazu steht hier nichts" ein Verweis, der nichts
+    // belegt — genau die Art Behauptung, die diese App vermeiden soll.
+    // Das Modell nennt den Fundort in Klammern; danach wird gefiltert.
+    const benutzt = ausschnitte.filter((a) => {
+      const kopf = a.quelle.split(' · ')[0]
+      return antwort.includes(a.quelle) || antwort.includes(kopf)
+    })
+
     return res.status(200).json({
       antwort,
-      quellen: ausschnitte.map((a) => ({ titel: a.titel, quelle: a.quelle, pfad: a.pfad })),
+      quellen: benutzt.map((a) => ({ titel: a.titel, quelle: a.quelle, pfad: a.pfad })),
     })
   } catch (e) {
     return res.status(500).json({ error: String(e) })
