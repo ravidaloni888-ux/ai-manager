@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react'
 
-interface Term {
+export interface Term {
   term: string
   category: string
   definition: string
   example?: string
 }
 
-const TERMS: Term[] = [
+export const TERMS: Term[] = [
   // ── Foundations ──
   {
     term: 'Artificial Intelligence (AI)',

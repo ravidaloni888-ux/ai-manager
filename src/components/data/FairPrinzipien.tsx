@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom'
 // Vokabular.
 // ─────────────────────────────────────────────────────────────────────────
 
-const FAIR_PRINZIPIEN = [
+export const FAIR_PRINZIPIEN = [
   {
     key: 'findable',
     letter: 'F',

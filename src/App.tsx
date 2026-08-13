@@ -21,6 +21,7 @@ import GuidePage from './pages/GuidePage'
 import MandantInterviewPage from './pages/MandantInterviewPage'
 import QAPage from './pages/QAPage'
 import GlossaryPage from './pages/GlossaryPage'
+import ChatPage from './pages/ChatPage'
 import PromptLibraryPage from './pages/PromptLibraryPage'
 import DsgvoPage from './pages/DsgvoPage'
 import EthikPage from './pages/EthikPage'
@@ -99,6 +100,7 @@ function AppRoutes() {
               <Route path="/mandant/neu" element={<MandantInterviewPage />} />
               <Route path="/qa" element={<QAPage />} />
               <Route path="/glossary" element={<GlossaryPage />} />
+              <Route path="/chat" element={<ChatPage />} />
               <Route path="/prompts" element={<PromptLibraryPage />} />
               <Route path="/dsgvo" element={<DsgvoPage />} />
               <Route path="/ethik" element={<EthikPage />} />

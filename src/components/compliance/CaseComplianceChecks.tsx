@@ -88,7 +88,7 @@ export async function saveChecks(ucId: string, checks: CaseChecks) {
 }
 
 // „kurz" ist der Name in der Sprungleiste — der volle Satz passt dort nicht.
-const DSFA_TRIGGERS = [
+export const DSFA_TRIGGERS = [
   { id: 'employees',  kurz: 'Mitarbeiterdaten',     label: 'Mitarbeiterdaten werden systematisch verarbeitet' },
   { id: 'profiling',  kurz: 'Profiling',            label: 'KI-gestütztes Profiling von Personen findet statt' },
   { id: 'new',        kurz: 'Neueinsatz',           label: 'Das System wird neu eingesetzt (kein geringfügiges Update)' },
@@ -96,7 +96,7 @@ const DSFA_TRIGGERS = [
   { id: 'sensitive',  kurz: 'Besondere Kategorien', label: 'Es werden besondere Kategorien (Gesundheit, Herkunft etc.) verarbeitet' },
 ]
 
-const ART22_CHECKS = [
+export const ART22_CHECKS = [
   { kurz: 'Information',      text: 'Der Mensch erhält alle relevanten Informationen — nicht nur das KI-Ergebnis' },
   { kurz: 'Überstimmbarkeit', text: 'Der Mensch kann die Empfehlung der KI tatsächlich überstimmen (kein sozialer/technischer Druck)' },
   { kurz: 'Dokumentation',    text: 'Die Entscheidung des Menschen wird dokumentiert — nicht nur das KI-Ergebnis' },

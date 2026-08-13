@@ -32,6 +32,7 @@ const MEHR_GROUP: Group = {
     { to: '/vendors', label: 'Anbietervergleich' },
     { to: '/meetings', label: 'Regelmäßige Meetings' },
     { to: '/roles', label: 'Team & Rollen' },
+    { to: '/chat', label: '💬 Frag die App' },
     { to: '/glossary', label: 'KI-Glossar' },
     { to: '/prompts', label: 'Prompt-Bibliothek' },
     { to: '/settings', label: 'Einstellungen' },

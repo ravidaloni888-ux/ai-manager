@@ -492,7 +492,7 @@ const RISIKO_TON: Record<Risiko, string> = {
   mittel:  'bg-orange-50 text-orange-700',
 }
 
-const DEPLOYMENT_STRATEGIEN: {
+export const DEPLOYMENT_STRATEGIEN: {
   buchstabe: string; name: string; kern: string; folge: string; risiko: Risiko
 }[] = [
   {
