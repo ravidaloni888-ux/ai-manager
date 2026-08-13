@@ -1,6 +1,6 @@
 import { TERMS } from '../pages/GlossaryPage'
 import { STEPS } from '../pages/StartPage'
-import { DEPLOYMENT_STRATEGIEN } from '../pages/QAPage'
+import { DEPLOYMENT_STRATEGIEN, TEST_EBENEN } from '../pages/QAPage'
 import { FAIR_PRINZIPIEN } from '../components/data/FairPrinzipien'
 import { VERFUEGBARKEIT_FRAGEN } from '../components/assessments/DatenverfuegbarkeitCheck'
 import { QUALITY_DIMENSIONS } from '../components/assessments/DataQualityCheck'
@@ -98,6 +98,16 @@ function bauen(): WissenStueck[] {
       quelle: 'Daten-Governance · FAIR-Prinzipien',
       pfad: '/data?tab=fair',
       text: `${p.inhalt} Praxisfrage: ${p.praxisfrage} Woran man es erkennt: ${p.merkmale.join(' ')} Im Fall abgeleitet aus: ${p.imFall}.`,
+    })
+  }
+
+  // ── Testebenen ──
+  for (const e of TEST_EBENEN) {
+    stuecke.push({
+      titel: `Testebene: ${e.name} (${e.kurz})`,
+      quelle: 'KI-Qualitätssicherung · Test-Typen',
+      pfad: '/qa?tab=tests',
+      text: `Leitfrage: ${e.leitfrage} Perspektive: ${e.perspektive}. Werkzeuge: ${e.werkzeuge}. Wann: ${e.wann}. Die drei Ebenen sind keine Alternativen — jede sieht etwas, das den anderen verborgen bleibt.`,
     })
   }
 

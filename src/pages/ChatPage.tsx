@@ -181,6 +181,17 @@ export default function ChatPage() {
         <div ref={endeRef} />
       </div>
 
+      {/* Datenschutzhinweis — steht bewusst direkt über dem Eingabefeld und
+          nicht im Kleingedruckten der Seite: Gelesen wird er nur dort, wo
+          man gerade tippt. */}
+      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+        <p className="text-[12px] text-amber-900 leading-relaxed">
+          <strong>Keine echten Kunden- oder Personendaten eingeben.</strong> Die Frage wird zur
+          Beantwortung an Anthropic in die USA übertragen. Formulieren Sie allgemein
+          („ein Bewerbungssystem") statt konkret (Firmen- oder Personennamen).
+        </p>
+      </div>
+
       {/* Eingabe */}
       <form
         onSubmit={(e) => { e.preventDefault(); void fragen(eingabe) }}

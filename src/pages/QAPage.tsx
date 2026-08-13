@@ -149,6 +149,55 @@ export default function QAPage() {
       {tab === 'tests' && (
       <div className="space-y-6">
 
+      {/* Drei Ebenen */}
+      <section className="bg-white rounded-xl shadow-md p-5 space-y-4">
+        <div>
+          <p className="text-xs font-mono tracking-widest text-slate-400 uppercase mb-1">Nicht drei Alternativen — drei Blickwinkel auf dasselbe System</p>
+          <h2 className="text-base font-bold text-slate-800">Drei Ebenen, drei Perspektiven</h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border-separate border-spacing-0">
+            <thead>
+              <tr>
+                <th className="w-28" />
+                {TEST_EBENEN.map((e) => (
+                  <th key={e.name} className="text-left align-bottom p-0 pl-3 min-w-[190px]">
+                    <div className={`rounded-t-lg px-3 py-2 text-white ${e.farbe}`}>
+                      <p className="text-sm font-bold leading-tight">{e.name}</p>
+                      <p className="text-[11px] opacity-70 font-normal">{e.kurz}</p>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {EBENEN_ZEILEN.map((z, zi) => (
+                <tr key={z.feld}>
+                  <td className={`align-top py-2.5 pr-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wide ${zi > 0 ? 'border-t border-slate-100' : ''}`}>
+                    {z.label}
+                  </td>
+                  {TEST_EBENEN.map((e) => (
+                    <td key={e.name} className={`align-top py-2.5 pl-3 text-xs leading-relaxed ${
+                      z.feld === 'leitfrage' ? 'text-slate-800 font-medium' : 'text-slate-600'
+                    } ${zi > 0 ? 'border-t border-slate-100' : ''}`}>
+                      {e[z.feld]}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <p className="text-[11px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2.5">
+          Jede Ebene sieht etwas, das den anderen verborgen bleibt: Ein grüner Unit-Test sagt nichts
+          über Diskriminierung, und ein bestandener Black-Box-Test sagt nicht, <em>warum</em> das
+          System so entschieden hat. Genau das verlangt aber die menschliche Aufsicht nach Art. 14
+          KI-VO — und der Nachweis, dass kein Bias vorliegt, lässt sich ohne die weisse Box nicht führen.
+        </p>
+      </section>
+
       {/* Quick reference */}
       <section className="bg-white rounded-xl shadow-md p-5 space-y-3">
         <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">When to use what — at a glance</h2>
@@ -536,6 +585,53 @@ const KPMG_FEHLER = [
   { typ: 'Falsche Faktenbehauptungen', beispiel: 'Emirates-Chatbot "Sara" existiert nicht als Chatbot und kann keine Flüge umbuchen. Sara ist ein Roboter (seit 2023).' },
   { typ: 'Erfundene Fallstudien', beispiel: 'UBS, SBB und Transport for London sollen "agentic AI" einsetzen. Alle drei Unternehmen dementierten die Behauptungen.' },
   { typ: 'Interne Widersprüchlichkeit', beispiel: 'Bericht behauptet: 55 % der CEOs priorisieren KI. KPMG-eigener CEO (selber Monat): 71 %.' },
+]
+
+// ─────────────────────────────────────────────────────────────────────────
+// Drei Ebenen, drei Perspektiven.
+//
+// Nicht drei Alternativen, unter denen man wählt: Jede Ebene sieht etwas,
+// das den anderen beiden verborgen bleibt. Ein grüner Unit-Test sagt
+// nichts über Diskriminierung, und ein bestandener Black-Box-Test sagt
+// nicht, warum das System so entschieden hat — was Art. 14 KI-VO aber
+// verlangt.
+// ─────────────────────────────────────────────────────────────────────────
+
+export const TEST_EBENEN: {
+  name: string; kurz: string; leitfrage: string; perspektive: string;
+  werkzeuge: string; wann: string; farbe: string;
+}[] = [
+  {
+    name: 'Black-Box-Test', kurz: 'von aussen',
+    leitfrage: 'Verhält sich das Gesamtsystem korrekt?',
+    perspektive: 'Nutzer:in / Betreiber:in',
+    werkzeuge: 'Testfälle, Szenarien, Red-Teaming',
+    wann: 'Vor Go-Live, bei jedem Release',
+    farbe: 'border-slate-800 bg-slate-800',
+  },
+  {
+    name: 'White-Box-Test', kurz: 'von innen',
+    leitfrage: 'Ist der Entscheidungsweg nachvollziehbar?',
+    perspektive: 'Data Scientist / Prüfer:in',
+    werkzeuge: 'SHAP, LIME, Feature Importance',
+    wann: 'Vor Go-Live, bei Bias-Verdacht, für Compliance',
+    farbe: 'border-teal-600 bg-teal-600',
+  },
+  {
+    name: 'Unit-Test', kurz: 'Baustein für Baustein',
+    leitfrage: 'Funktioniert jeder Baustein isoliert?',
+    perspektive: 'Entwickler:in',
+    werkzeuge: 'Automatisierte Test-Suites, CI-Pipeline',
+    wann: 'Kontinuierlich, bei jeder Änderung',
+    farbe: 'border-blue-600 bg-blue-600',
+  },
+]
+
+const EBENEN_ZEILEN: { label: string; feld: 'leitfrage' | 'perspektive' | 'werkzeuge' | 'wann' }[] = [
+  { label: 'Leitfrage',   feld: 'leitfrage' },
+  { label: 'Perspektive', feld: 'perspektive' },
+  { label: 'Werkzeuge',   feld: 'werkzeuge' },
+  { label: 'Wann',        feld: 'wann' },
 ]
 
 const WHEN_TABLE = [
