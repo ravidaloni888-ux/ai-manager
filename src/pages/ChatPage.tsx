@@ -4,7 +4,7 @@ import { findeWissen, WISSEN } from '../lib/wissen'
 import type { WissenStueck } from '../lib/wissen'
 
 // ─────────────────────────────────────────────────────────────────────────
-// Nachschlagen im Bestand der App.
+// Ulli — Nachschlagen im Bestand der App.
 //
 // Kein allgemeiner Assistent: Die Antwort entsteht aus denselben Daten,
 // aus denen die Seiten gerendert werden, und nennt ihren Fundort. Was die
@@ -96,9 +96,9 @@ export default function ChatPage() {
       {/* Kopf */}
       <div className="border-b-2 border-slate-800 pb-4">
         <p className="text-xs font-mono tracking-widest text-slate-400 uppercase mb-1">Nachschlagen</p>
-        <h1 className="text-2xl font-bold text-slate-800">Frag die App</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Ulli</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Antworten ausschliesslich aus dem Bestand dieser App — mit Angabe, wo es steht.
+          Ulli antwortet ausschliesslich aus dem Bestand dieser App — mit Angabe, wo es steht.
           Derzeit {WISSEN.length} Einträge aus Glossar, Prüfbaum, Datengrundlage, Deployment und den Arbeitsschritten.
         </p>
       </div>
@@ -108,9 +108,9 @@ export default function ChatPage() {
         {verlauf.length === 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 space-y-3">
             <p className="text-sm text-slate-700 leading-relaxed">
-              Dieser Chat erfindet nichts. Er durchsucht die Inhalte dieser App und antwortet nur
-              daraus — was hier nicht steht, sagt er auch. Für verbindliche Rechtsauskünfte ist er
-              nicht gedacht.
+              Ulli erfindet nichts: durchsucht wird allein der Inhalt dieser App, und geantwortet
+              wird nur daraus — was hier nicht steht, wird auch so gesagt. Für verbindliche
+              Rechtsauskünfte ist Ulli nicht gedacht.
             </p>
             <div>
               <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2">Zum Anfangen</p>
@@ -167,7 +167,7 @@ export default function ChatPage() {
         {laeuft && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex items-center gap-3">
             <span className="w-4 h-4 border-2 border-slate-300 border-t-slate-700 rounded-full animate-spin flex-shrink-0" />
-            <p className="text-sm text-slate-500">Sucht im Bestand der App…</p>
+            <p className="text-sm text-slate-500">Ulli sucht im Bestand der App…</p>
           </div>
         )}
 
@@ -204,7 +204,7 @@ export default function ChatPage() {
             if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void fragen(eingabe) }
           }}
           rows={1}
-          placeholder="Frage zum Inhalt der App — Enter sendet, Umschalt+Enter für eine neue Zeile"
+          placeholder="Frage an Ulli — Enter sendet, Umschalt+Enter für eine neue Zeile"
           className="flex-1 resize-none border-0 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
         />
         <button
