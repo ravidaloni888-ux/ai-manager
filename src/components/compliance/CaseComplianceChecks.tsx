@@ -14,6 +14,7 @@ import DatenverfuegbarkeitCheck, { EMPTY_VERFUEGBARKEIT, VERFUEGBARKEIT_FRAGEN }
 import type { VerfuegbarkeitState } from '../assessments/DatenverfuegbarkeitCheck'
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import type { EthicsState } from '../assessments/EthicsCheck'
+import { fallStand, gateStand } from '../../lib/fallstand'
 import { ProjectPlanContent } from '../../pages/ProjectPlanPage'
 import { Sektion, StandZahl } from '../ui/Sektion'
 import { Pruefblock, Frage, Wahl, Fazit, JA_NEIN, TON, Sprungleiste } from '../ui/Pruefung'
@@ -333,56 +334,11 @@ export default function CaseComplianceChecks(
     if (loaded) onChecks?.(checks)
   }, [checks, loaded, onChecks])
 
-  // Beantwortet zählt, nicht bejaht — ein „Nein" ist auch eine Antwort
-  const dsCount =
-    Object.keys(checks.dsfa).length +
-    Object.keys(checks.art22).length +
-    [checks.avv.external, checks.avv.personalData, checks.avv.avvExists].filter((v) => v !== null).length
-  const dqCount = Object.values(checks.dataQuality.dims).filter((d) => d.rating !== null).length
-  // Das Gate entscheidet, ob die Detailprüfung überhaupt Sinn hat
+  // Der Stand je Schritt wird in lib/fallstand.ts berechnet — dieselbe
+  // Funktion nutzt die Signalableitung, damit beide dasselbe behaupten.
+  const groups = fallStand(checks)
+  const { offen: gateOffen, beantwortet: dgCount } = gateStand(checks)
   const gateAntworten = checks.verfuegbarkeit?.antworten ?? {}
-  const dgCount = VERFUEGBARKEIT_FRAGEN.filter((f) => gateAntworten[f.id]).length
-  const gateOffen: boolean | null =
-    dgCount < VERFUEGBARKEIT_FRAGEN.length ? null
-      : !VERFUEGBARKEIT_FRAGEN.some((f) => f.hart && gateAntworten[f.id] === 'nein')
-
-  // Nie direkt in TREE_NODES greifen — gespeicherte Stände können IDs aus
-  // einer älteren Baumversion enthalten.
-  const rcResult = checks.riskClass.done ? resultName(checks.riskClass.resultId) : ''
-
-  // Reihenfolge wie im KI-Programm: erst Datengrundlage, dann Recht, dann Plan.
-  // Der Ton des Standes sagt, wie es steht — vorher war er immer grün, auch
-  // bei „K.-o. — gestoppt".
-  const rcStufe = riskFromResult(checks.riskClass.resultId)
-  const groups: { key: GroupKey; title: string; hint: string; status: string; ton: Ton; done: boolean }[] = [
-    { key: 'datengrundlage', title: 'Datengrundlage',
-      hint: `Erst das Gate aus ${VERFUEGBARKEIT_FRAGEN.length} Fragen, dann die sieben Qualitätsdimensionen`,
-      status: gateOffen === null ? (dgCount ? `${dgCount}/${VERFUEGBARKEIT_FRAGEN.length} im Gate` : '')
-        : gateOffen === false ? 'K.-o. — gestoppt'
-        : dqCount ? `${dqCount}/7 bewertet` : 'Gate steht',
-      ton: gateOffen === false ? 'stopp' : gateOffen === true && dqCount === 7 ? 'ok' : 'neutral',
-      done: gateOffen === false || (gateOffen === true && dqCount === 7) },
-    { key: 'risiko', title: 'EU AI Act — Risikoklasse',
-      hint: 'Prüfpfad der Verordnung — meist 3–5 Fragen',
-      status: rcResult,
-      ton: rcStufe === 'Unacceptable Risk' ? 'stopp' : rcStufe === 'High Risk' ? 'warn' : rcStufe ? 'ok' : 'neutral',
-      done: checks.riskClass.done },
-    { key: 'datenschutz', title: 'Datenschutz',
-      hint: 'DSFA-Pflicht · AVV · Art. 22',
-      status: dsCount ? `${dsCount} beantwortet` : '',
-      ton: 'neutral',
-      done: checks.avv.external !== null && checks.avv.personalData !== null },
-    { key: 'ethik', title: 'Ethik',
-      hint: 'FAST-Bewertung des Vorhabens',
-      status: checks.ethics.result ? checks.ethics.result.verdict : '',
-      ton: checks.ethics.result?.verdict === 'JA' ? 'stopp'
-        : checks.ethics.result?.verdict === 'UNKLAR' ? 'teils'
-        : checks.ethics.result ? 'ok' : 'neutral',
-      done: !!checks.ethics.result },
-    { key: 'plan', title: 'To-do-Plan erstellen',
-      hint: 'Compliance-Projektplan aus Profil und Prüfungen',
-      status: '', ton: 'neutral', done: false },
-  ]
 
   const doneCount = groups.filter((g) => g.done).length
 

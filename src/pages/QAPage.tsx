@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import BetriebsKpis from '../components/qa/BetriebsKpis'
+import Signalliste, { useOffeneSignale } from '../components/betrieb/Signalliste'
 
 interface Requirement { id: string; anforderung: string; messgroesse: string; warumSchwelle: string; pruefmethode: string }
 interface RequirementsResult {
@@ -102,7 +103,7 @@ function AnforderungsGenerator() {
   )
 }
 
-const TAB_IDS = ['generator', 'tests', 'ki', 'abnahme', 'betrieb'] as const
+const TAB_IDS = ['generator', 'tests', 'ki', 'abnahme', 'betrieb', 'signale'] as const
 type TabId = typeof TAB_IDS[number]
 
 export default function QAPage() {
@@ -118,6 +119,7 @@ export default function QAPage() {
     n.set('tab', t)
     setParams(n, { replace: true })
   }
+  const offeneSignale = useOffeneSignale()
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -131,13 +133,16 @@ export default function QAPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
+      {/* flex-wrap: ab sechs Reitern reicht die Breite nicht mehr, und ohne
+          Umbruch bricht stattdessen die Beschriftung in den Knöpfen um */}
+      <div className="flex flex-wrap gap-1 bg-slate-100 rounded-xl p-1 w-fit">
         {([
           { id: 'generator', label: '📋 Anforderungs-Generator' },
           { id: 'tests',  label: 'Test-Typen & Methoden' },
           { id: 'ki',     label: 'KI-Besonderheiten' },
           { id: 'abnahme',label: '🚀 Deployment & Abnahme' },
           { id: 'betrieb',   label: '📈 Betriebs-KPI' },
+          { id: 'signale',   label: `🔔 Signale${offeneSignale ? ` · ${offeneSignale}` : ''}` },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
@@ -493,6 +498,8 @@ export default function QAPage() {
 
       {/* ── Tab: Fallstudie ── */}
       {tab === 'betrieb' && <BetriebsKpis />}
+
+      {tab === 'signale' && <Signalliste />}
 
       {tab === 'generator' && <AnforderungsGenerator />}
 

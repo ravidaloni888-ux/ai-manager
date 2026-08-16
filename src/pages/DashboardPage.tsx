@@ -9,13 +9,15 @@ import DeptChart from '../components/dashboard/DeptChart'
 import ImpactMatrix from '../components/dashboard/ImpactMatrix'
 import EuAiActChart from '../components/dashboard/EuAiActChart'
 import StartBanner from '../components/dashboard/StartBanner'
-import { IconClipboard, IconRocket, IconStar, IconMoneybag, IconTrendingUp, IconPlus } from '../components/icons/NavIcons'
+import { IconClipboard, IconRocket, IconStar, IconMoneybag, IconTrendingUp, IconPlus, IconAlert } from '../components/icons/NavIcons'
+import { useOffeneSignale } from '../components/betrieb/Signalliste'
 import { useAuthStore } from '../store/authStore'
 
 export default function DashboardPage() {
   const { useCases } = useUseCasesStore()
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
+  const offeneSignale = useOffeneSignale()
 
   const stats = useMemo(() => {
     const total = useCases.length
@@ -48,7 +50,23 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI row */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+        {/* Steht bewusst vorn und ist anklickbar: die übrigen Kacheln
+            beschreiben das Portfolio, diese verlangt eine Entscheidung.
+            Eine Zahl, die man nur beim Suchen findet, wirkt nicht. */}
+        <button
+          type="button"
+          onClick={() => navigate('/qa?tab=signale')}
+          className="text-left hover:opacity-80 transition-opacity"
+        >
+          <KpiCard
+            label="Offene Signale"
+            value={offeneSignale}
+            sub={offeneSignale ? 'unentschieden oder überfällig' : 'nichts unentschieden'}
+            icon={<IconAlert />}
+            color={offeneSignale ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-400'}
+          />
+        </button>
         <KpiCard
           label="Anwendungsfälle gesamt"
           value={stats.total}
