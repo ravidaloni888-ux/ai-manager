@@ -1,6 +1,7 @@
 import type { CaseChecks, GroupKey } from '../components/compliance/CaseComplianceChecks'
 import { VERFUEGBARKEIT_FRAGEN } from '../components/assessments/DatenverfuegbarkeitCheck'
 import { resultName, riskFromResult } from '../components/assessments/RiskClassCheck'
+import { EMPTY_SCHWELLE } from '../components/assessments/SchwellenwertCheck'
 import type { Ton } from '../components/ui/Pruefung'
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -47,6 +48,12 @@ export function fallStand(checks: CaseChecks): GruppenStand[] {
   const rcResult = checks.riskClass.done ? resultName(checks.riskClass.resultId) : ''
   const rcStufe = riskFromResult(checks.riskClass.resultId)
 
+  const s = checks.schwelle ?? EMPTY_SCHWELLE
+  const schwelleBeantwortet = [
+    s.teurer !== null, !!s.begruendung.trim(), !!s.aendern.trim(), !!s.verwerfen.trim(),
+  ].filter(Boolean).length
+  const aufsichtFehlt = rcStufe === 'High Risk' && !s.verwerfen.trim()
+
   // Reihenfolge wie im KI-Programm: erst Datengrundlage, dann Recht, dann Plan.
   return [
     { key: 'datengrundlage', title: 'Datengrundlage',
@@ -73,6 +80,16 @@ export function fallStand(checks: CaseChecks): GruppenStand[] {
         : checks.ethics.result?.verdict === 'UNKLAR' ? 'teils'
         : checks.ethics.result ? 'ok' : 'neutral',
       done: !!checks.ethics.result },
+    { key: 'schwelle', title: 'Schwellenwert & Aufsicht',
+      hint: 'Welcher Fehler ist teurer — und wer darf ein Ergebnis verwerfen?',
+      // Der Grund gehört in den Status, nicht erst in den aufgeklappten
+      // Schritt: In der Signalliste steht nur diese eine Zeile.
+      status: aufsichtFehlt ? 'Hochrisiko — keine Aufsicht nach Art. 14 benannt'
+        : schwelleBeantwortet ? `${schwelleBeantwortet}/4 entschieden` : '',
+      // Hochrisiko ohne benannte Aufsicht ist keine Lücke, sondern ein
+      // unerfüllter Art. 14. Nur das trägt bis in die Signalliste.
+      ton: aufsichtFehlt ? 'stopp' : schwelleBeantwortet === 4 ? 'ok' : 'neutral',
+      done: schwelleBeantwortet === 4 },
     { key: 'plan', title: 'To-do-Plan erstellen',
       hint: 'Compliance-Projektplan aus Profil und Prüfungen',
       status: '', ton: 'neutral', done: false },

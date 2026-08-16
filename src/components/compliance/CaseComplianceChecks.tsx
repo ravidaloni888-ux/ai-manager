@@ -14,6 +14,8 @@ import DatenverfuegbarkeitCheck, { EMPTY_VERFUEGBARKEIT, VERFUEGBARKEIT_FRAGEN }
 import type { VerfuegbarkeitState } from '../assessments/DatenverfuegbarkeitCheck'
 import type { RiskClassState } from '../assessments/RiskClassCheck'
 import type { EthicsState } from '../assessments/EthicsCheck'
+import SchwellenwertCheck, { EMPTY_SCHWELLE } from '../assessments/SchwellenwertCheck'
+import type { SchwelleState } from '../assessments/SchwellenwertCheck'
 import { fallStand, gateStand } from '../../lib/fallstand'
 import { ProjectPlanContent } from '../../pages/ProjectPlanPage'
 import { Sektion, StandZahl } from '../ui/Sektion'
@@ -43,6 +45,7 @@ export interface CaseChecks {
   fair: FairState
   ethics: EthicsState
   riskClass: RiskClassState
+  schwelle: SchwelleState
 }
 
 export const EMPTY_CHECKS: CaseChecks = {
@@ -54,6 +57,7 @@ export const EMPTY_CHECKS: CaseChecks = {
   fair: EMPTY_FAIR,
   ethics: EMPTY_ETHICS,
   riskClass: EMPTY_RISK_CLASS,
+  schwelle: EMPTY_SCHWELLE,
 }
 
 // Antworten liegen je Mandant unter einem Schlüssel, darin je Anwendungsfall.
@@ -276,7 +280,7 @@ function Art22Checker({ checked, setChecked }: {
 }
 
 /** Alle drei Fall-Checks — einklappbar, Antworten bleiben am Anwendungsfall. */
-export type GroupKey = 'datengrundlage' | 'risiko' | 'datenschutz' | 'ethik' | 'plan'
+export type GroupKey = 'datengrundlage' | 'risiko' | 'datenschutz' | 'ethik' | 'schwelle' | 'plan'
 
 const GROUP_KEYS: GroupKey[] = ['datengrundlage', 'risiko', 'datenschutz', 'ethik', 'plan']
 
@@ -366,8 +370,19 @@ export default function CaseComplianceChecks(
     ...ART22_CHECKS.map((c, i) => ({ id: `art22-${i}`, label: `Art. 22 · ${c.kurz}`, erledigt: checks.art22[i] !== undefined })),
   ]
 
+  const s = checks.schwelle ?? EMPTY_SCHWELLE
+  const punkteSchwelle: SprungPunkt[] = [
+    { id: 'schwelle-teurer',      label: 'Teurerer Fehler',   erledigt: s.teurer !== null },
+    { id: 'schwelle-begruendung', label: 'Einstellung heute', erledigt: !!s.begruendung.trim() },
+    { id: 'schwelle-aendern',     label: 'Wer ändert',        erledigt: !!s.aendern.trim() },
+    { id: 'schwelle-verwerfen',   label: 'Wer verwirft',      erledigt: !!s.verwerfen.trim() },
+  ]
+
   const punkteFuer = (key: GroupKey): SprungPunkt[] =>
-    key === 'datengrundlage' ? punkteDatengrundlage : key === 'datenschutz' ? punkteDatenschutz : []
+    key === 'datengrundlage' ? punkteDatengrundlage
+      : key === 'datenschutz' ? punkteDatenschutz
+      : key === 'schwelle' ? punkteSchwelle
+      : []
 
   const sprungSchritte: SprungSchritt[] = groups.map((g, i) => ({
     key: g.key,
@@ -512,6 +527,13 @@ export default function CaseComplianceChecks(
                       <EthicsCheck
                         value={checks.ethics}
                         onChange={(fn) => setChecks((prev) => ({ ...prev, ethics: fn(prev.ethics) }))}
+                      />
+                    )}
+                    {g.key === 'schwelle' && (
+                      <SchwellenwertCheck
+                        value={checks.schwelle ?? EMPTY_SCHWELLE}
+                        onChange={(fn) => setChecks((prev) => ({ ...prev, schwelle: fn(prev.schwelle ?? EMPTY_SCHWELLE) }))}
+                        hochrisiko={riskFromResult(checks.riskClass.resultId) === 'High Risk'}
                       />
                     )}
                     {g.key === 'plan' && <ProjectPlanContent ucid={ucId ?? null} />}
