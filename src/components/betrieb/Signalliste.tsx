@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useUseCasesStore } from '../../store/useCasesStore'
 import {
   leiteSignaleAb, leseBeschluesse, schreibeBeschluss, stempleNeue,
-  tageSeit, istUeberfaellig, zaehleOffen, ENTSCHEIDUNG_LABEL, SIGNAL_EVENT,
+  tageSeit, istUeberfaellig, istZuEntscheiden, zaehleOffen, ENTSCHEIDUNG_LABEL, SIGNAL_EVENT,
 } from '../../lib/signale'
 import type { Signal, Beschluss, Entscheidung } from '../../lib/signale'
 import { TON, Wahl } from '../ui/Pruefung'
@@ -136,7 +136,9 @@ function Zeile({ nr, signal, beschluss, onBeschluss }: {
 export default function Signalliste() {
   const { useCases } = useUseCasesStore()
   const [beschluesse, setBeschluesse] = useState<Record<string, Beschluss>>(() => leseBeschluesse())
-  const [filter, setFilter] = useState<Entscheidung | 'alle'>('alle')
+  // Voreinstellung ist die Menge, die auch auf der Kachel steht — nicht
+  // „alle". Sonst nennt die Kachel eine Zahl und die Liste zeigt eine andere.
+  const [filter, setFilter] = useState<Entscheidung | 'alle' | 'zuTun'>('zuTun')
 
   const signale = useMemo(() => leiteSignaleAb(useCases), [useCases])
 
@@ -158,7 +160,9 @@ export default function Signalliste() {
   // Älteste zuerst — das ist die Reihenfolge, in der die Frage nach dem
   // Verbleib überhaupt gestellt werden kann.
   const sortiert = useMemo(() => {
-    const liste = filter === 'alle' ? signale : signale.filter((s) => stand(s).entscheidung === filter)
+    const liste = filter === 'alle' ? signale
+      : filter === 'zuTun' ? signale.filter((s) => istZuEntscheiden(s, beschluesse))
+      : signale.filter((s) => stand(s).entscheidung === filter)
     return [...liste].sort((a, b) => {
       const ua = istUeberfaellig(stand(a)) ? 0 : 1
       const ub = istUeberfaellig(stand(b)) ? 0 : 1
@@ -188,8 +192,12 @@ export default function Signalliste() {
 
       {/* Filter */}
       <div className="flex flex-wrap gap-2">
-        {([['alle', `Alle · ${signale.length}`], ...(['offen', 'beobachten', 'angenommen', 'verworfen'] as Entscheidung[])
-          .map((e) => [e, `${ENTSCHEIDUNG_LABEL[e]} · ${zaehler(e)}`] as [Entscheidung, string])] as [Entscheidung | 'alle', string][])
+        {([
+          ['zuTun', `Zu entscheiden · ${zaehleOffen(signale, beschluesse)}`],
+          ['alle', `Alle · ${signale.length}`],
+          ...(['offen', 'beobachten', 'angenommen', 'verworfen'] as Entscheidung[])
+            .map((e) => [e, `${ENTSCHEIDUNG_LABEL[e]} · ${zaehler(e)}`]),
+        ] as [Entscheidung | 'alle' | 'zuTun', string][])
           .map(([wert, label]) => (
             <button
               key={wert}

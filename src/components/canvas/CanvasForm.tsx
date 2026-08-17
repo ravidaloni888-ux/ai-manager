@@ -5,6 +5,7 @@ import { Sektion, StandZahl } from '../ui/Sektion'
 import { StakeholderFeld, AbhaengigkeitenFeld } from './CanvasZusatz'
 import type { CanvasZusatzDaten } from './CanvasZusatz'
 import { nachweiseAusPruefungen } from '../../lib/nachweise'
+import { riskFromResult } from '../assessments/RiskClassCheck'
 import { dokuVorschlag } from '../../lib/dokuText'
 import type { CaseChecks } from '../compliance/CaseComplianceChecks'
 import { machbarkeitAusDaten } from '../../lib/machbarkeit'
@@ -368,6 +369,21 @@ export default function CanvasForm({ existing }: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nachweisCount, fallChecks, zusatzStand, dokuCount])
+
+  // Dasselbe für die Risikoklasse. Der Prüfbaum ist die Quelle; das Feld
+  // am Fall war bisher nur beim Anlegen gefüllt und blieb danach stehen.
+  // Es speist aber das EU-AI-Act-Diagramm, die Abzeichen in der Liste und
+  // die Supabase-Spalte — ein nachträglich als Hochrisiko eingestufter
+  // Fall erschien dort weiter als „Minimal Risk".
+  const abgeleiteteKlasse = fallChecks?.riskClass?.done
+    ? riskFromResult(fallChecks.riskClass.resultId)
+    : undefined
+  useEffect(() => {
+    if (abgeleiteteKlasse && watched.euAiActRisk !== abgeleiteteKlasse) {
+      setValue('euAiActRisk', abgeleiteteKlasse, { shouldDirty: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [abgeleiteteKlasse])
 
   const vorschlag = machbarkeitAusDaten(fallChecks?.verfuegbarkeit, fallChecks?.dataQuality)
   const aktuellerScore = computePriorityScore(

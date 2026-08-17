@@ -100,7 +100,12 @@ export function nachweiseAusPruefungen(
         }
       }
       case 'complianceDocumentation': {
-        const ok = dokuCount >= 4
+        // Alle sieben, nicht vier. Die Schwelle lag auf der Zahl der
+        // ableitbaren Felder — ausgerechnet die drei handgeschriebenen
+        // (Erklärbarkeit, Betrieb, Änderungsmanagement) blieben damit
+        // aussen vor, und der Nachweis wurde grün, während der Abschnitt
+        // daneben „4 von 7" anzeigte.
+        const ok = dokuCount >= 7
         return { def, erfuellt: ok, offen: ok ? undefined : `Dokumentation erst ${dokuCount} von 7 Feldern` }
       }
       case 'complianceLiability': {

@@ -196,14 +196,23 @@ export function istUeberfaellig(b: Beschluss | undefined): boolean {
 }
 
 /**
- * Die Zahl für Dashboard und Reiter: was tatsächlich noch niemand
- * entschieden hat, plus was überfällig ist. „Beobachten" mit gültiger
- * Wiedervorlage zählt nicht — sonst wäre die Entscheidung folgenlos.
+ * Verlangt dieses Signal noch eine Entscheidung?
+ *
+ * Was tatsächlich niemand entschieden hat, plus was überfällig ist.
+ * „Beobachten" mit gültiger Wiedervorlage gehört nicht dazu — sonst
+ * wäre die Entscheidung folgenlos.
+ *
+ * Ein Prädikat, zwei Verwender: die Zahl auf Kachel und Reiter und die
+ * Voreinstellung der Liste. Getrennt gerechnet zeigten sie Verschiedenes,
+ * und wer auf die Kachel klickte, fand eine andere Zahl vor als darauf
+ * stand.
  */
+export function istZuEntscheiden(s: Signal, beschluesse: Record<string, Beschluss>): boolean {
+  const b = beschluesse[s.key]
+  if (!b || b.entscheidung === 'offen') return true
+  return istUeberfaellig(b)
+}
+
 export function zaehleOffen(signale: Signal[], beschluesse: Record<string, Beschluss>): number {
-  return signale.filter((s) => {
-    const b = beschluesse[s.key]
-    if (!b || b.entscheidung === 'offen') return true
-    return istUeberfaellig(b)
-  }).length
+  return signale.filter((s) => istZuEntscheiden(s, beschluesse)).length
 }
