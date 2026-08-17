@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useUseCasesStore } from '../../store/useCasesStore'
 import {
   leiteSignaleAb, leseBeschluesse, schreibeBeschluss, stempleNeue,
-  tageSeit, istUeberfaellig, istZuEntscheiden, zaehleOffen, ENTSCHEIDUNG_LABEL, SIGNAL_EVENT,
+  tageSeit, istUeberfaellig, istZuEntscheiden, zaehleOffen, ENTSCHEIDUNG_LABEL,
+  SIGNAL_EVENT, SIGNAL_ERKLAERUNG,
 } from '../../lib/signale'
 import type { Signal, Beschluss, Entscheidung } from '../../lib/signale'
 import { TON, Wahl } from '../ui/Pruefung'
@@ -176,18 +177,10 @@ export default function Signalliste() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-        <p className="text-sm text-slate-700 leading-relaxed">
-          Diese Liste wird nicht gepflegt, sondern <strong className="font-semibold">abgeleitet</strong>.
-          Jede Zeile stammt aus einer Prüfung, einem Nachweis oder einem Betriebs-KPI und führt per
-          Klick dorthin zurück. Beantwortet jemand die zugrunde liegende Frage, verschwindet die
-          Zeile von selbst.
-        </p>
-        <p className="text-sm text-slate-700 leading-relaxed mt-2">
-          Gespeichert wird allein die rechte Spalte — was jemand entschieden hat.
-          <strong className="font-semibold"> „Beobachten" ist eine gültige Entscheidung</strong>,
-          nicht das Fehlen einer. Ein Alarm ist eine Frage, kein Auftrag.
-        </p>
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 space-y-2">
+        {SIGNAL_ERKLAERUNG.map((satz, i) => (
+          <p key={i} className="text-sm text-slate-700 leading-relaxed">{satz}</p>
+        ))}
       </div>
 
       {/* Filter */}

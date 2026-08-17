@@ -9,7 +9,7 @@ import { GovernanceData, AimsClause, AIUseCase, EU_AI_ACT_BG, EuAiActRisk } from
 
 type Tab = 'richtlinie' | 'roles' | 'checklist' | 'aims' | 'compliance'
 
-const RICHTLINIE_FIELDS: { key: keyof GovernanceData['richtlinie']; title: string; desc: string }[] = [
+export const RICHTLINIE_FIELDS: { key: keyof GovernanceData['richtlinie']; title: string; desc: string }[] = [
   { key: 'zweck',                title: 'Zweck & Geltungsbereich',        desc: 'Wofür und in welchen Bereichen darf KI im Unternehmen eingesetzt werden?' },
   { key: 'daten',                title: 'Daten & Datenschutz',            desc: 'Welche Daten dürfen verwendet werden und wie wird ihr Schutz sichergestellt?' },
   { key: 'transparenz',          title: 'Transparenz & Nachvollziehbarkeit', desc: 'Wie werden Entscheidungen der KI erklärbar und prüfbar gemacht?' },
@@ -19,7 +19,7 @@ const RICHTLINIE_FIELDS: { key: keyof GovernanceData['richtlinie']; title: strin
   { key: 'schulung',             title: 'Schulung & Sensibilisierung',    desc: 'Wie werden Mitarbeitende befähigt, KI sicher und wirksam einzusetzen?' },
 ]
 
-const ROLES: { key: keyof GovernanceData['roles']; title: string; desc: string; icon: string }[] = [
+export const ROLES: { key: keyof GovernanceData['roles']; title: string; desc: string; icon: string }[] = [
   { key: 'aiOwner',  title: 'KI-Verantwortliche:r',           desc: 'Gesamtverantwortung für KI-Strategie und -Einsatz',          icon: '🎯' },
   { key: 'dpo',      title: 'Datenschutzbeauftragte:r (DSB)', desc: 'DSGVO-Konformität, DSFA, personenbezogene Daten',           icon: '🔒' },
   { key: 'security', title: 'IT-Sicherheit',                  desc: 'Cybersicherheit, Zugriffsrechte, Angriffsfestigkeit',        icon: '🛡️' },
@@ -31,7 +31,7 @@ const DPIA_URL = 'https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-reso
 
 type AimsKey = 'kl4' | 'kl5' | 'kl6' | 'kl7' | 'kl8' | 'kl9' | 'kl10'
 
-const AIMS_CLAUSES: {
+export const AIMS_CLAUSES: {
   key: AimsKey
   kl: string
   title: string
@@ -739,7 +739,7 @@ const STATUS_CFG: Record<VerstossStatus, { label: string; cls: string; dot: stri
   nicht_betroffen:  { label: 'Nicht betroffen',  cls: 'bg-green-100 text-green-700 border-green-200', dot: 'bg-green-500' },
 }
 
-const BAUSTEINE = [
+export const BAUSTEINE = [
   { key: 'aup',      label: 'KI-Nutzungsrichtlinie / IT-Nutzungsrichtlinie', desc: 'Regelt erlaubte Tools, verbotene Handlungen (AUP), Verantwortlichkeiten' },
   { key: 'toms',     label: 'DSGVO-TOMs',                                    desc: 'Technisch-organisatorische Maßnahmen: Verschlüsselung, Zugangskontrollen, Löschfristen' },
   { key: 'itpolicy', label: 'IT-Policy / Security Policy',                   desc: 'Passwortregeln, Geräteverwaltung, Vorfallmeldung, Authentifizierung und Autorisierung' },
@@ -747,7 +747,7 @@ const BAUSTEINE = [
   { key: 'itsm',     label: 'ITSM (Incident Management)',                    desc: 'Meldewege für Sicherheitsvorfälle' },
 ]
 
-const GAP_LUECKEN = [
+export const GAP_LUECKEN = [
   { title: 'Bias & Diskriminierung',    why: 'KI-Nutzungsrichtlinien regeln Nutzung, nicht Modelleigenschaften' },
   { title: 'Datenherkunft (Provenance)',why: 'DSGVO-TOMs sichern Verarbeitungsprozesse, nicht Trainingsdatenhistorie' },
   { title: 'Halluzination & Faktentreue',why: 'IT-Security-Regeln zielen auf Angriffe, nicht auf system-interne Fehler' },
@@ -755,7 +755,7 @@ const GAP_LUECKEN = [
   { title: 'Agenten-Autonomie',         why: 'KI-Nutzungsrichtlinien decken assistive Tools ab, nicht autonom handelnde Agenten' },
 ]
 
-const SCHATTEN_RISIKEN = [
+export const SCHATTEN_RISIKEN = [
   { title: 'Datenabfluss',    desc: 'Patientendaten in kostenlosen Tools, die zum Training genutzt werden', color: 'border-red-300 bg-red-50 text-red-700' },
   { title: 'DSGVO-Verstoß',   desc: 'Kein AVV mit dem KI-Anbieter, Datentransfer in Drittstaaten ohne Standardvertragsklauseln (SCC)', color: 'border-orange-300 bg-orange-50 text-orange-700' },
   { title: 'AI-Act-Verstoß',  desc: 'Art. 4 Kompetenzpflicht: die Organisation muss sicherstellen, dass Mitarbeitende kompetent mit KI umgehen — ist das bei Eigenbauten und Selbstversuchen der Fall?', color: 'border-amber-300 bg-amber-50 text-amber-700' },
@@ -1264,14 +1264,14 @@ const DEMO_RISIKEN: RisikoEntry[] = [
   { id: 'r5', beschreibung: 'Vendor Lock-in – Ausfall des KI-Anbieters legt Radiologie-Workflow für Wochen lahm', art: 'Sicherheitsrisiko', b: 9, a: 3, e: 4 },
 ]
 
-const RISIKOARTEN_INFO: { art: RisikoArt; kern: string; beispiel: string }[] = [
+export const RISIKOARTEN_INFO: { art: RisikoArt; kern: string; beispiel: string }[] = [
   { art: 'Bias',               kern: 'Systematische Verzerrungen in Daten oder Modell, die zu ungerechten Ergebnissen führen', beispiel: 'Doom-Loop-Bias, Unterrepräsentation bestimmter Gruppen, Anwendungs-Bias' },
   { art: 'Technischer Fehler', kern: 'Modell-Drift, Out-of-Distribution-Eingaben, Halluzinationen, Hardware-Probleme', beispiel: 'Drift bei neuen CT-Geräten, OOD bei seltenen Erkrankungsbildern, Halluzinationen' },
   { art: 'Ethisches Risiko',   kern: 'Automation Bias, Verlust von Berufsidentität, Erklärbarkeit, Autonomieverlust', beispiel: 'Radiologen prüfen KI-Befunde nicht mehr, Black-Box ohne Begründung' },
   { art: 'Sicherheitsrisiko',  kern: 'Adversarial Attacks, Supply Chain, Data Poisoning, Prompt Injection', beispiel: 'Manipulierte Bildeingaben, Vendor Lock-in, vergiftete Trainingsdaten' },
 ]
 
-const NIST_TRIAS = [
+export const NIST_TRIAS = [
   { label: 'Schaden für Menschen (Harm to People)',            desc: 'Individuum: Rechte, Gesundheit, wirtschaftliche Chancen. Gruppe: Diskriminierung. Gesellschaft: demokratische Teilhabe.' },
   { label: 'Schaden für die Organisation (Harm to Organization)', desc: 'Geschäftsbetrieb, Reputation, finanzielle Verluste, Sicherheitsverletzungen, Compliance-Strafen.' },
   { label: 'Schaden für das Umfeld (Harm to Ecosystem)',        desc: 'Globales Finanzsystem, Lieferketten, vernetzte Systeme, natürliche Ressourcen, Umwelt.' },

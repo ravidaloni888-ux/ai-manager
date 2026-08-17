@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 // ── Data ───────────────────────────────────────────────────────────────────
 
-const TIMELINE = [
+export const TIMELINE = [
   { date: '1 Aug 2024', label: 'AI Act tritt in Kraft', highlight: false },
   { date: '2 Feb 2025', label: 'Verbote (Art. 5) + Kompetenzpflicht (Art. 4) — gilt heute', highlight: true },
   { date: '2 Aug 2025', label: 'GPAI-Modelle (Kap. V)', highlight: false },
@@ -11,7 +11,7 @@ const TIMELINE = [
   { date: '2 Aug 2028', label: 'Vollständige Anwendung + produktintegrierte KI (Anhang I)', highlight: true },
 ]
 
-const RISK_CLASSES = [
+export const RISK_CLASSES = [
   {
     level: 1,
     name: 'Inakzeptables Risiko',
@@ -85,7 +85,7 @@ const RISK_CLASSES = [
   },
 ]
 
-const ACTOR_ROLES = [
+export const ACTOR_ROLES = [
   {
     role: 'Anbieter',
     art: 'Art. 3 Nr. 3',
@@ -134,7 +134,7 @@ const ART25_TRIGGERS = [
   },
 ]
 
-const COPYRIGHT_RULES = [
+export const COPYRIGHT_RULES = [
   {
     scenario: 'Rein KI-generiert',
     protection: 'Kein Schutz',
@@ -158,7 +158,7 @@ const COPYRIGHT_RULES = [
   },
 ]
 
-const AI_ACT_GOALS = [
+export const AI_ACT_GOALS = [
   { title: 'Schutz von Grundrechten, Demokratie, Rechtsstaatlichkeit', desc: 'Würde, Freiheit, Gleichheit, Privatsphäre, Nichtdiskriminierung — greift z.B. bei Bias-Risiken in HR-KI.', icon: '⚖️' },
   { title: 'Schutz von Gesundheit und Sicherheit', desc: 'Begründet die strenge Regulierung von Medizin-KI, Industrie-KI und autonomem Fahren.', icon: '🛡️' },
   { title: 'Förderung von Innovation und Wettbewerbsfähigkeit', desc: 'Regulatory Sandboxes (Art. 57), KMU-Erleichterungen, gestaffelte Anforderungen.', icon: '🚀' },
@@ -166,13 +166,13 @@ const AI_ACT_GOALS = [
   { title: 'Funktionierender Binnenmarkt für KI', desc: 'Einheitliche Regeln in allen 27 EU-Staaten — kein "Forum Shopping" zwischen Mitgliedstaaten. CE-Kennzeichnung gilt EU-weit.', icon: '🇪🇺' },
 ]
 
-const OMNIBUS_CHANGES = [
+export const OMNIBUS_CHANGES = [
   { label: 'Neue Fristen', detail: 'Hochrisiko-Pflichten (Anhang III) verschoben auf 2.12.2027 · Anhang I (Produkte) auf 2.8.2028' },
   { label: 'SMC-Kategorie', detail: 'KMU-Erleichterungen ausgeweitet auf "Small Mid-Cap"-Unternehmen (bis ~500 MA / 100 Mio. € Umsatz)' },
   { label: 'Neues Verbot (Art. 5)', detail: 'KI-generierte intime Bilder ohne Einwilligung (Deepfake-Nudifier) ausdrücklich verboten' },
 ]
 
-const KMU_BENEFITS = [
+export const KMU_BENEFITS = [
   {
     num: '1', title: 'Bevorzugter Zugang zu KI-Reallaboren (Sandbox)',
     points: ['Tests in kontrollierten Umgebungen — Rechtssicherheit beim Erproben', 'Austausch mit Behörden, Förderung von Innovation', 'Kostenloser Zugang für KMU und Start-ups (Art. 57)'],
@@ -194,7 +194,7 @@ const ART50_DUTIES = [
   { title: 'Wasserzeichen (Art. 50 Abs. 2)', desc: 'Ausgaben des KI-Systems müssen in einem maschinenlesbaren Format gekennzeichnet und als künstlich erzeugt oder manipuliert erkennbar sein.' },
 ]
 
-const BETREIBER_DUTIES = [
+export const BETREIBER_DUTIES = [
   { num: 1, art: 'Art. 26 Abs. 1', title: 'Zweckgemäßer Einsatz', desc: 'Das KI-System nur gemäß der Gebrauchsanweisung des Anbieters und für den vorgesehenen Zweck einsetzen. Eigenmächtige Zweckerweiterung löst Art. 25 (Rollenübergang) aus.' },
   { num: 2, art: 'Art. 26 Abs. 2', title: 'Zuständige Person benennen + schulen', desc: 'Eine zuständige natürliche Person benennen, die die menschliche Aufsicht über das KI-System ausübt. Diese Person muss ausreichend KI-Kompetenz (Art. 4) haben und entsprechend geschult sein.' },
   { num: 3, art: 'Art. 26 Abs. 3', title: 'Menschliche Aufsicht gewährleisten', desc: 'Sicherstellen, dass die im Betrieb eingesetzten natürlichen Personen die Kompetenz haben, das KI-System zu überwachen, Ergebnisse zu interpretieren und ggf. einzugreifen (Art. 14).' },
@@ -204,7 +204,7 @@ const BETREIBER_DUTIES = [
   { num: 7, art: 'Art. 27', title: 'FRIA — Grundrechte-Folgenabschätzung', desc: 'Betreiber von Hochrisiko-KI, die Behörden sind oder Dienstleistungen im öffentlichen Interesse erbringen, müssen vor Inbetriebnahme eine Grundrechte-Folgenabschätzung (Fundamental Rights Impact Assessment) durchführen und veröffentlichen.', highlight: true },
 ]
 
-const FALLSTUDIEN = [
+export const FALLSTUDIEN = [
   {
     id: 'clearview',
     company: 'Clearview AI',
@@ -240,7 +240,7 @@ const FALLSTUDIEN = [
   },
 ]
 
-const PARALLELES_RECHT = [
+export const PARALLELES_RECHT = [
   { law: 'EU AI Act', applies: 'Jedes KI-System in der EU (unabhängig von Daten)', focus: 'Risikoklassen, Pflichten für Anbieter/Betreiber, CE-Kennzeichnung', color: 'bg-blue-50 border-blue-200 text-blue-700' },
   { law: 'DSGVO', applies: 'Wenn personenbezogene Daten verarbeitet werden', focus: 'Rechtsgrundlage, Betroffenenrechte, Datenschutz by Design, DSFA', color: 'bg-violet-50 border-violet-200 text-violet-700' },
   { law: 'ProdHaftG / RL 2024', applies: 'KI als Produkt — bei Schäden durch fehlerhafte KI', focus: 'Schadensersatz ohne Verschuldensnachweis, gilt ab 9. Dez 2026', color: 'bg-orange-50 border-orange-200 text-orange-700' },
@@ -251,7 +251,7 @@ const PARALLELES_RECHT = [
 
 // ── Tag 6 · Konformität, Transparenz, Monitoring ───────────────────────────
 
-const KONFORMITAET_SCHRITTE = [
+export const KONFORMITAET_SCHRITTE = [
   { num: 1, title: 'Risikoklasse bestätigen', desc: 'Ist es wirklich Hochrisiko nach Art. 6 + Anhang III?', law: 'Art. 6 + Anhang III' },
   { num: 2, title: 'Konformitätsbewertungsverfahren wählen', desc: 'Anhang VI (intern, Regelfall) oder Anhang VII (extern, bei Biometrie oder sektoralen Vorschriften wie MDR)?', law: 'Art. 43 Abs. 1+2' },
   { num: 3, title: 'Prüfung gegen die 8 Anforderungen (Abschnitt 2)', desc: 'Art. 9 Risikomanagement · Art. 10 Daten-Governance · Art. 11 Technische Doku · Art. 12 Logging · Art. 13 Transparenz · Art. 14 Menschliche Aufsicht · Art. 15 Cybersicherheit · Art. 17 Qualitätsmanagement', law: 'Art. 9–17' },
@@ -261,7 +261,7 @@ const KONFORMITAET_SCHRITTE = [
   { num: 7, title: 'CE-Kennzeichnung anbringen + EU-Datenbank-Registrierung', desc: 'Vor Inverkehrbringen. Typische Dauer für ein Hochrisiko-System: 6–18 Monate von der Risikoklassifizierung bis zur Markteinführung.', law: 'Art. 48+49' },
 ]
 
-const TRANSPARENZ_PFADE = [
+export const TRANSPARENZ_PFADE = [
   { von: 'Anbieter', an: 'Betreiber', pflicht: 'Bedienungsanleitung — sachgerechten Einsatz ermöglichen', frage: 'Was muss darin stehen?', law: 'Art. 13' },
   { von: 'Betreiber', an: 'Beschäftigte', pflicht: 'Information vor KI-Einsatz — Ob und Wie, bevor die KI läuft', frage: 'Wann muss informiert werden?', law: 'Art. 26' },
   { von: 'Betreiber', an: 'Betroffene', pflicht: 'Information bei automatisierter Entscheidung', frage: 'Wer ist Adressat?', law: 'Art. 26' },
@@ -269,7 +269,7 @@ const TRANSPARENZ_PFADE = [
   { von: 'Anbieter', an: 'Welt', pflicht: 'Kennzeichnung KI-generierter Inhalte (maschinenlesbar)', frage: 'Was ist KI-generiert?', law: 'Art. 50' },
 ]
 
-const PMM_ELEMENTE = [
+export const PMM_ELEMENTE = [
   { num: 1, title: 'Sammeln', desc: 'Logs aus dem Betrieb, Performance-Metriken, Bewertungen, Vorfallsmeldungen' },
   { num: 2, title: 'Analysieren', desc: 'Modell-Drift, Bias-Indikatoren, Genauigkeitsmetriken' },
   { num: 3, title: 'Schwellwerte', desc: 'Ab welchem Wert wird eingegriffen? Klassifikationsgenauigkeit < 90 % → Untersuchung · < 85 % → automatische Deaktivierung · Drift-Indikator > 0,3 → Re-Training-Prüfung' },
@@ -277,19 +277,19 @@ const PMM_ELEMENTE = [
   { num: 5, title: 'Eingriff', desc: 'Modell-Update, Systemanpassung, im Extremfall Deaktivierung' },
 ]
 
-const MELDEPFLICHT_FRISTEN = [
+export const MELDEPFLICHT_FRISTEN = [
   { typ: 'Weitverbreitete Beeinträchtigung oder kritische Infrastruktur', frist: '2 Tage', color: 'bg-red-100 text-red-700 border-red-200' },
   { typ: 'Tod einer Person', frist: '10 Tage', color: 'bg-orange-100 text-orange-700 border-orange-200' },
   { typ: 'Sonstige schwerwiegende Vorfälle', frist: '15 Tage', color: 'bg-amber-100 text-amber-700 border-amber-200' },
 ]
 
-const DRIFT_TYPEN = [
+export const DRIFT_TYPEN = [
   { name: 'Datendrift', desc: 'Eingangsdaten ändern sich — neue Patientengruppen, andere Krankheitsbilder, neue Medikamente', icon: '📊' },
   { name: 'Konzeptdrift', desc: 'Was als "richtige Antwort" gilt, ändert sich — neue medizinische Leitlinien, aktualisierte Protokolle', icon: '💡' },
   { name: 'Lerndrift (Behavioral Drift)', desc: 'Das Modell lernt aus Bewertungen, die durch Verzerrungen geprägt sind — "freundlich = richtig". KI-Agenten verändern ihr Verhaltensprofil durch akkumulierte Erfahrung. Kandidat für Art. 3(23) "wesentliche Änderung".', icon: '🔄' },
 ]
 
-const LIABILITY_TABLE = [
+export const LIABILITY_TABLE = [
   { situation: 'KI-Fehler durch Designmangel', liable: 'Anbieter' },
   { situation: 'Fehleinsatz durch Betreiber', liable: 'Betreiber' },
   { situation: 'Projektleiter prüft KI-Output nicht', liable: 'Projektleiter + Büro' },

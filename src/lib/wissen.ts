@@ -8,6 +8,17 @@ import { TREE_NODES } from '../components/assessments/RiskClassCheck'
 import { DSFA_TRIGGERS, ART22_CHECKS } from '../components/compliance/CaseComplianceChecks'
 import { NACHWEISE } from './nachweise'
 import { RISIKOART_META } from './deriveRisks'
+import {
+  TIMELINE, RISK_CLASSES, ACTOR_ROLES, COPYRIGHT_RULES, AI_ACT_GOALS, OMNIBUS_CHANGES,
+  KMU_BENEFITS, BETREIBER_DUTIES, FALLSTUDIEN, PARALLELES_RECHT, KONFORMITAET_SCHRITTE,
+  TRANSPARENZ_PFADE, PMM_ELEMENTE, MELDEPFLICHT_FRISTEN, DRIFT_TYPEN, LIABILITY_TABLE,
+} from '../pages/EuAiActPage'
+import {
+  AIMS_CLAUSES, BAUSTEINE, GAP_LUECKEN, SCHATTEN_RISIKEN, RISIKOARTEN_INFO, NIST_TRIAS,
+  RICHTLINIE_FIELDS, ROLES,
+} from '../pages/GovernancePage'
+import { SCHWELLE_FRAGEN } from '../components/assessments/SchwellenwertCheck'
+import { SIGNAL_ERKLAERUNG, SIGNAL_QUELLEN, ENTSCHEIDUNG_LABEL } from './signale'
 
 // ─────────────────────────────────────────────────────────────────────────
 // Das Wissen der App als durchsuchbare Stücke.
@@ -175,6 +186,95 @@ function bauen(): WissenStueck[] {
     })
   }
 
+  // ── EU AI Act: die Seite selbst ────────────────────────────────────────
+  const eu = (titel: string, quelle: string, text: string) =>
+    stuecke.push({ titel, quelle: `EU AI Act · ${quelle}`, pfad: '/eu-ai-act', text })
+
+  for (const r of RISK_CLASSES) {
+    eu(`Risikoklasse: ${r.name}`, 'Risikoklassen',
+      `${r.summary} Pflichten: ${r.duties} Beispiele: ${r.examples.join(', ')}.`)
+  }
+  for (const a of ACTOR_ROLES) {
+    eu(`Rolle: ${a.role}`, `Akteure · ${a.art}`,
+      `${a.definition} Beispiel: ${a.example} Pflichten: ${a.duties}`)
+  }
+  for (const d of BETREIBER_DUTIES) {
+    eu(`Betreiberpflicht ${d.num}: ${d.title}`, d.art, d.desc)
+  }
+  for (const f of FALLSTUDIEN) {
+    eu(`Fallstudie: ${f.company} (${f.year})`, 'Fallstudien',
+      `${f.problem} Verstöße: ${f.violations.join(' · ')}. Ergebnis: ${f.verdict}`)
+  }
+  for (const t of TRANSPARENZ_PFADE) {
+    eu(`Transparenz: ${t.von} → ${t.an}`, `Transparenz · ${t.law}`, `${t.pflicht} ${t.frage}`)
+  }
+  for (const k of KONFORMITAET_SCHRITTE) {
+    eu(`Konformitätsbewertung Schritt ${k.num}: ${k.title}`, k.law, k.desc)
+  }
+  for (const p of PMM_ELEMENTE) {
+    eu(`Beobachtung nach Inverkehrbringen: ${p.title}`, 'Art. 72 · Post-Market Monitoring', p.desc)
+  }
+  for (const d of DRIFT_TYPEN) {
+    eu(`Drift-Typ: ${d.name}`, 'Betrieb · Drift', d.desc)
+  }
+  for (const p of PARALLELES_RECHT) {
+    eu(`Paralleles Recht: ${p.law}`, 'Rechtsrahmen', `Gilt für: ${p.applies} Schwerpunkt: ${p.focus}`)
+  }
+  for (const c of COPYRIGHT_RULES) {
+    eu(`Urheberrecht: ${c.scenario}`, 'Urheberrecht', `${c.protection} — ${c.detail}`)
+  }
+  for (const g of AI_ACT_GOALS) eu(`Ziel des AI Act: ${g.title}`, 'Ziele', g.desc)
+  for (const o of OMNIBUS_CHANGES) eu(`Digital Omnibus: ${o.label}`, 'Omnibus-Änderungen', o.detail)
+  for (const k of KMU_BENEFITS) eu(`KMU-Erleichterung ${k.num}: ${k.title}`, 'KMU', k.points.join(' · '))
+  for (const l of LIABILITY_TABLE) eu(`Haftung: ${l.situation}`, 'Haftung', `Haftbar ist: ${l.liable}`)
+  eu('Fristen des EU AI Act', 'Zeitplan',
+    TIMELINE.map((t) => `${t.date}: ${t.label}`).join(' · '))
+  eu('Meldepflicht bei schwerwiegenden Vorfällen', 'Art. 73 · Fristen',
+    MELDEPFLICHT_FRISTEN.map((m) => `${m.typ}: ${m.frist}`).join(' · '))
+
+  // ── Governance: ISO 42001 und der Betrieb ──────────────────────────────
+  const gov = (titel: string, quelle: string, text: string, tab = '') =>
+    stuecke.push({ titel, quelle: `Governance · ${quelle}`, pfad: `/governance${tab}`, text })
+
+  for (const k of AIMS_CLAUSES) {
+    gov(`ISO/IEC 42001 Klausel ${k.kl}: ${k.title}`, 'ISO 42001',
+      `${k.desc}${k.coveredBy ? ` In der App abgedeckt durch: ${k.coveredBy}.` : ''}`)
+  }
+  for (const b of BAUSTEINE) gov(`Governance-Baustein: ${b.label}`, 'Bausteine', b.desc)
+  for (const g of GAP_LUECKEN) gov(`Governance-Lücke: ${g.title}`, 'GAP-Analyse', g.why)
+  for (const s of SCHATTEN_RISIKEN) gov(`Schatten-KI-Risiko: ${s.title}`, 'Shadow AI', s.desc)
+  for (const r of RISIKOARTEN_INFO) {
+    gov(`Risikoart: ${r.art}`, 'Risikoarten', `${r.kern} Beispiel: ${r.beispiel}`)
+  }
+  for (const n of NIST_TRIAS) gov(`NIST-Schadensdimension: ${n.label}`, 'NIST AI RMF', n.desc)
+  for (const f of RICHTLINIE_FIELDS) gov(`KI-Richtlinie: ${f.title}`, 'KI-Richtlinie', f.desc)
+  for (const r of ROLES) gov(`Governance-Rolle: ${r.title}`, 'Verantwortlichkeiten', r.desc)
+
+  // ── Schwellenwert & Aufsicht ───────────────────────────────────────────
+  for (const f of SCHWELLE_FRAGEN) {
+    stuecke.push({
+      titel: `Schwellenwert — ${f.titel}`,
+      quelle: 'Fallprüfung · Schwellenwert & Aufsicht',
+      pfad: '/canvas',
+      text: `${f.frage} ${f.hinweis}`,
+    })
+  }
+
+  // ── Signalliste ────────────────────────────────────────────────────────
+  stuecke.push({
+    titel: 'Signalliste — was der Betrieb meldet',
+    quelle: 'Betrieb · Signale',
+    pfad: '/qa?tab=signale',
+    text: SIGNAL_ERKLAERUNG.join(' '),
+  })
+  stuecke.push({
+    titel: 'Woraus Signale entstehen',
+    quelle: 'Betrieb · Signale',
+    pfad: '/qa?tab=signale',
+    text: SIGNAL_QUELLEN.map((q) => `${q.quelle}: ${q.wann}`).join(' · ')
+      + `. Mögliche Entscheidungen: ${Object.values(ENTSCHEIDUNG_LABEL).join(', ')}.`,
+  })
+
   return stuecke
 }
 
@@ -215,20 +315,39 @@ const SYNONYME: Record<string, string[]> = {
  * für gut hundert Stücke genügt Wortüberdeckung. Titeltreffer zählen
  * dreifach, weil der Titel den Begriff benennt, um den es geht.
  */
+/**
+ * Deutsche Beugung grob abtragen: „Betreibers" soll „Betreiber" finden,
+ * „Pflichten" soll „Betreiberpflicht" finden. Kein Stemmer — nur die
+ * letzten ein bis zwei Buchstaben, und erst ab einer Länge, bei der das
+ * nicht in Unsinn umschlägt.
+ */
+function stamm(w: string): string {
+  if (w.length < 7) return w
+  return w.replace(/(en|er|es|em|n|s|e)$/, '')
+}
+
 export function findeWissen(frage: string, max = 14): WissenStueck[] {
   const gefragt = normalisieren(frage).split(' ')
-    .filter((w) => w.length > 2 && !STOPPWOERTER.has(w))
+    // Zahlen bleiben drin, auch kurze: „Art. 26", „Klausel 9", „Art. 35"
+    // sind genau die Form, in der Menschen nach Vorschriften fragen.
+    .filter((w) => (w.length > 2 || /^\d+$/.test(w)) && !STOPPWOERTER.has(w))
   const woerter = [...new Set(gefragt.flatMap((w) => [w, ...(SYNONYME[w] ?? [])]))]
   if (woerter.length === 0) return []
 
   const bewertet = WISSEN.map((s) => {
     const titel = normalisieren(s.titel)
     const text = normalisieren(s.text)
+    // Der Fundort trägt die Artikelnummern („Art. 26 Abs. 1"). Ohne ihn
+    // ist eine Vorschrift über ihre Nummer nicht auffindbar.
+    const quelle = normalisieren(s.quelle)
     let imTitel = 0
     let imText = 0
     for (const w of woerter) {
-      if (titel.includes(w)) imTitel++
+      const st = stamm(w)
+      if (titel.includes(w) || quelle.includes(w)) imTitel++
+      else if (st !== w && (titel.includes(st) || quelle.includes(st))) imTitel += 0.6
       if (text.includes(w)) imText++
+      else if (st !== w && text.includes(st)) imText += 0.6
     }
     // Lange Abschnitte treffen sonst allein durch ihre Länge — der lange
     // Ausnahmen-Knoten des Prüfbaums stand vorher bei fast jeder Frage

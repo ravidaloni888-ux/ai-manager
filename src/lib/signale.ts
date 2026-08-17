@@ -55,6 +55,26 @@ export interface Beschluss {
 
 const BUCKET = 'signale'
 
+// Was die Liste ist und wie sie zu lesen ist — an einer Stelle. Die
+// Liste zeigt es als Einleitung, der Nachschlage-Chat antwortet daraus.
+export const SIGNAL_ERKLAERUNG = [
+  'Die Signalliste wird nicht gepflegt, sondern abgeleitet. Jede Zeile stammt aus einer '
+  + 'Prüfung, einem Nachweis oder einem Betriebs-KPI und führt per Klick dorthin zurück. '
+  + 'Beantwortet jemand die zugrunde liegende Frage, verschwindet die Zeile von selbst.',
+  'Gespeichert wird allein die Entscheidung — was jemand daraufhin beschlossen hat. '
+  + '„Beobachten" ist dabei eine gültige Entscheidung, nicht das Fehlen einer. '
+  + 'Ein Alarm ist eine Frage, kein Auftrag.',
+  'Gezählt wird als offen, was niemand entschieden hat, plus was überfällig ist. '
+  + '„Beobachten" mit laufender Wiedervorlage zählt nicht mit — sonst wäre die Entscheidung folgenlos.',
+]
+
+/** Woraus Signale entstehen — beschreibt, was leiteSignaleAb() tatsächlich prüft. */
+export const SIGNAL_QUELLEN: { quelle: string; wann: string }[] = [
+  { quelle: 'Nachweise', wann: 'ein Nachweis ist aus den Prüfungen noch nicht belegt' },
+  { quelle: 'Fallprüfungen', wann: 'ein Prüfschritt steht auf „stopp" — geprüft und durchgefallen' },
+  { quelle: 'Betriebs-KPI', wann: 'ein KPI ist als relevant markiert, aber ohne Baseline oder Messmethode' },
+]
+
 export const ENTSCHEIDUNG_LABEL: Record<Entscheidung, string> = {
   offen: 'Offen',
   beobachten: 'Beobachten',

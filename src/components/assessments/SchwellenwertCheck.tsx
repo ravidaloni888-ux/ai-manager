@@ -57,6 +57,35 @@ const FOLGE: Record<FehlerKosten, string> = {
     + 'und die andere unsichtbar — welche das hier ist, gehört benannt.',
 }
 
+// Die vier Fragen als Konstante, nicht im JSX verstreut: Der Block
+// rendert daraus, und der Nachschlage-Chat zieht sein Wissen aus
+// derselben Stelle. Zwei Fassungen würden auseinanderlaufen.
+export const SCHWELLE_FRAGEN = [
+  {
+    key: 'teurer' as const, nr: 1, titel: 'Teurerer Fehler',
+    frage: 'Welcher Fehler kostet dieses Vorhaben mehr — ein Fehlalarm oder ein übersehener Fall?',
+    hinweis: 'Bei generativen Systemen gleichbedeutend: eine falsche Aussage durchlassen (Übersehen) gegen zu viel zurückhalten (Fehlalarm).',
+  },
+  {
+    key: 'begruendung' as const, nr: 2, titel: 'Heutige Einstellung',
+    frage: 'Wo steht der Schwellenwert heute — und womit ist das begründet?',
+    hinweis: 'Der Wert steckt nicht im Modell, sondern in einer Schicht darüber. Er ist verschiebbar, ohne neu zu trainieren — und muss deshalb begründet sein, nicht nur vorhanden.',
+  },
+  {
+    key: 'aendern' as const, nr: 3, titel: 'Wer verschiebt ihn',
+    frage: 'Wer darf den Schwellenwert ändern?',
+    hinweis: 'Eine Rolle oder ein Gremium, keine Abteilung. Wird das nicht benannt, verschiebt ihn im Zweifel derjenige, der das Dashboard bedient.',
+  },
+  {
+    key: 'verwerfen' as const, nr: 4, titel: 'Wer verwirft ein Ergebnis',
+    frage: 'Wer darf ein einzelnes Ergebnis des Systems verwerfen?',
+    hinweis: 'Mit Namen, nicht mit Abteilung. Bei Hochrisiko-Systemen verlangt Art. 14 EU AI Act ausdrücklich, dass Aufsichtspersonen dazu befähigt sind — und Art. 12 die Protokollierung.',
+  },
+]
+
+const F = Object.fromEntries(SCHWELLE_FRAGEN.map((f) => [f.key, f])) as
+  Record<(typeof SCHWELLE_FRAGEN)[number]['key'], (typeof SCHWELLE_FRAGEN)[number]>
+
 const feld = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-[13px] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
 
 export default function SchwellenwertCheck({ value, onChange, hochrisiko }: {
@@ -85,10 +114,10 @@ export default function SchwellenwertCheck({ value, onChange, hochrisiko }: {
       stand={<span className="text-[11px] text-slate-500">{beantwortet}/4</span>}
     >
       <Frage
-        id="schwelle-teurer" nr={1}
-        titel="Teurerer Fehler"
-        text="Welcher Fehler kostet dieses Vorhaben mehr — ein Fehlalarm oder ein übersehener Fall?"
-        hinweis="Bei generativen Systemen gleichbedeutend: eine falsche Aussage durchlassen (Übersehen) gegen zu viel zurückhalten (Fehlalarm)."
+        id="schwelle-teurer" nr={F.teurer.nr}
+        titel={F.teurer.titel}
+        text={F.teurer.frage}
+        hinweis={F.teurer.hinweis}
         ton={v.teurer ? 'teils' : null}
         folge={v.teurer ? <p className="text-[12px] text-slate-600 leading-relaxed">{FOLGE[v.teurer]}</p> : undefined}
       >
@@ -96,10 +125,10 @@ export default function SchwellenwertCheck({ value, onChange, hochrisiko }: {
       </Frage>
 
       <Frage
-        id="schwelle-begruendung" nr={2}
-        titel="Heutige Einstellung"
-        text="Wo steht der Schwellenwert heute — und womit ist das begründet?"
-        hinweis="Der Wert steckt nicht im Modell, sondern in einer Schicht darüber. Er ist verschiebbar, ohne neu zu trainieren — und muss deshalb begründet sein, nicht nur vorhanden."
+        id="schwelle-begruendung" nr={F.begruendung.nr}
+        titel={F.begruendung.titel}
+        text={F.begruendung.frage}
+        hinweis={F.begruendung.hinweis}
         ton={v.begruendung.trim() ? 'ok' : null}
       >
         <textarea
@@ -111,10 +140,10 @@ export default function SchwellenwertCheck({ value, onChange, hochrisiko }: {
       </Frage>
 
       <Frage
-        id="schwelle-aendern" nr={3}
-        titel="Wer verschiebt ihn"
-        text="Wer darf den Schwellenwert ändern?"
-        hinweis="Eine Rolle oder ein Gremium, keine Abteilung. Wird das nicht benannt, verschiebt ihn im Zweifel derjenige, der das Dashboard bedient."
+        id="schwelle-aendern" nr={F.aendern.nr}
+        titel={F.aendern.titel}
+        text={F.aendern.frage}
+        hinweis={F.aendern.hinweis}
         ton={v.aendern.trim() ? 'ok' : null}
       >
         <input
@@ -126,10 +155,10 @@ export default function SchwellenwertCheck({ value, onChange, hochrisiko }: {
       </Frage>
 
       <Frage
-        id="schwelle-verwerfen" nr={4}
-        titel="Wer verwirft ein Ergebnis"
-        text="Wer darf ein einzelnes Ergebnis des Systems verwerfen?"
-        hinweis="Mit Namen, nicht mit Abteilung. Bei Hochrisiko-Systemen verlangt Art. 14 EU AI Act ausdrücklich, dass Aufsichtspersonen dazu befähigt sind — und Art. 12 die Protokollierung."
+        id="schwelle-verwerfen" nr={F.verwerfen.nr}
+        titel={F.verwerfen.titel}
+        text={F.verwerfen.frage}
+        hinweis={F.verwerfen.hinweis}
         ton={v.verwerfen.trim() ? 'ok' : aufsichtFehlt ? 'stopp' : null}
       >
         <input
