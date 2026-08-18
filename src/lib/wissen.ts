@@ -17,6 +17,14 @@ import {
   AIMS_CLAUSES, BAUSTEINE, GAP_LUECKEN, SCHATTEN_RISIKEN, RISIKOARTEN_INFO, NIST_TRIAS,
   RICHTLINIE_FIELDS, ROLES,
 } from '../pages/GovernancePage'
+import { ARTICLES, DREISTUFENMODELL, DSGVO_GRUNDSAETZE, BIAS_TYPES } from '../pages/DsgvoPage'
+import { FAST, CASES, ZONES, FAIRNESS_DEFS } from '../pages/EthikPage'
+import { RESISTANCE_CAUSES, EMPATHY_PRINCIPLES, ADKAR_STEPS, KOTTER_STEPS } from '../pages/ChangeManagementPage'
+import { VENDORS, CRITERIA } from '../pages/VendorPage'
+import { ISO_TRAINING_REQUIREMENTS, ADOPTION_BLOCKS } from '../pages/EnablementPage'
+import { DIMS } from '../pages/MaturityPage'
+import { ROLES as COE_ROLLEN, ISO_REQUIREMENTS } from '../pages/RolesPage'
+import { INTEGRITY_MECHANISMS, VERSIONING_PRINCIPLES } from '../pages/DataGovernancePage'
 import { SCHWELLE_FRAGEN } from '../components/assessments/SchwellenwertCheck'
 import { SIGNAL_ERKLAERUNG, SIGNAL_QUELLEN, ENTSCHEIDUNG_LABEL } from './signale'
 
@@ -250,6 +258,136 @@ function bauen(): WissenStueck[] {
   for (const f of RICHTLINIE_FIELDS) gov(`KI-Richtlinie: ${f.title}`, 'KI-Richtlinie', f.desc)
   for (const r of ROLES) gov(`Governance-Rolle: ${r.title}`, 'Verantwortlichkeiten', r.desc)
 
+  // ── DSGVO ──────────────────────────────────────────────────────────────
+  const dsgvo = (titel: string, quelle: string, text: string) =>
+    stuecke.push({ titel, quelle: `DSGVO · ${quelle}`, pfad: '/dsgvo', text })
+
+  for (const a of ARTICLES) {
+    dsgvo(`${a.tag} — ${a.title}`, a.tag,
+      `${a.summary} ${a.details} Beispiel: ${a.example}`)
+  }
+  for (const g of DSGVO_GRUNDSAETZE) {
+    dsgvo(`Grundsatz: ${g.short} (${g.name})`, g.art, g.desc)
+  }
+  for (const s of DREISTUFENMODELL) {
+    dsgvo(`Dreistufenmodell — Stufe ${s.stufe}: ${s.title}`, 'Dreistufenmodell',
+      `${s.merkmal} Aufgaben: ${s.tasks.join(' · ')}`)
+  }
+  for (const b of BIAS_TYPES) {
+    dsgvo(`Bias-Art: ${b.type}`, 'Bias & Diskriminierung', b.desc)
+  }
+
+  // ── Ethik ──────────────────────────────────────────────────────────────
+  const ethik = (titel: string, quelle: string, text: string) =>
+    stuecke.push({ titel, quelle: `Ethik · ${quelle}`, pfad: '/ethik', text })
+
+  for (const f of FAST) ethik(`FAST — ${f.key}: ${f.label}`, 'FAST-Prinzipien', f.desc)
+  for (const z of ZONES) ethik(`Prüfzone: ${z.label}`, 'Drei Zonen', `${z.q} Maßstab: ${z.std}`)
+  for (const c of CASES) ethik(`Ethik-Fall: ${c.title}`, c.label, `${c.text} Signal: ${c.signal}`)
+  for (const d of FAIRNESS_DEFS) {
+    ethik(`Fairness-Definition: ${d.term}`, 'Fairness', `${d.body} Schwäche: ${d.weakness}`)
+  }
+
+  // ── Change Management ──────────────────────────────────────────────────
+  const change = (titel: string, quelle: string, text: string) =>
+    stuecke.push({ titel, quelle: `Change · ${quelle}`, pfad: '/change', text })
+
+  for (const c of RESISTANCE_CAUSES) {
+    change(`Widerstand: ${c.title}`, 'Widerstandsursachen',
+      `${c.motto} ${c.ursache} Typische Aussagen: ${c.aussagen.join(' · ')} Was hilft: ${c.hilft}`)
+  }
+  for (const p of EMPATHY_PRINCIPLES) change(`Empathie: ${p.title}`, 'Gesprächsführung', p.body)
+  for (const a of ADKAR_STEPS) {
+    change(`ADKAR ${a.letter}: ${a.title}`, 'ADKAR',
+      `${a.sub} Leitfrage: ${a.frage} Fehlt es: ${a.fehlt} — ${a.fehltDetail} Abhilfe: ${a.fix}`)
+  }
+  for (const k of KOTTER_STEPS) {
+    change(`Kotter: ${k.title}`, '8 Schritte', `${k.was} Beispiel: ${k.beispiel}`)
+  }
+
+  // ── Anbieter ───────────────────────────────────────────────────────────
+  for (const v of VENDORS) {
+    stuecke.push({
+      titel: `Anbieter: ${v.name}`,
+      quelle: `Anbietervergleich · ${v.category}`,
+      pfad: '/vendors',
+      text: `${v.description} Anbieter: ${v.vendor}. Preismodell: ${v.pricingModel}. `
+        + `EU-Datenhaltung: ${v.euDataResidency ? 'ja' : 'nein'}, DSGVO-bereit: ${v.gdprReady ? 'ja' : 'nein'}, `
+        + `On-Premise: ${v.onPremise ? 'ja' : 'nein'}, Feintuning: ${v.fineTuning ? 'ja' : 'nein'}.`,
+    })
+  }
+  stuecke.push({
+    titel: 'Bewertungskriterien für KI-Anbieter',
+    quelle: 'Anbietervergleich · Kriterien',
+    pfad: '/vendors',
+    text: CRITERIA.map((c) => c.label).join(' · '),
+  })
+
+  // ── Befähigung ─────────────────────────────────────────────────────────
+  for (const r of ISO_TRAINING_REQUIREMENTS) {
+    stuecke.push({
+      titel: `Schulungsanforderung ${r.clause}: ${r.title}`,
+      quelle: `Befähigung · ISO 42001 ${r.clause}`,
+      pfad: '/enablement',
+      text: `${r.description} Zu prüfen: ${r.check} ${r.detail}`,
+    })
+  }
+  for (const b of ADOPTION_BLOCKS) {
+    stuecke.push({
+      titel: `Akzeptanz-Hürde ${b.nr}: ${b.title}`,
+      quelle: 'Befähigung · Akzeptanz',
+      pfad: '/enablement',
+      text: `„${b.quote}" Verhalten: ${b.verhalten} Ziel: ${b.ziel} Was tun: ${b.wasTun} `
+        + `Was hilft: ${b.wasHilft} Verantwortlich: ${b.verantwortlich}`,
+    })
+  }
+
+  // ── Reifegrad ──────────────────────────────────────────────────────────
+  for (const d of DIMS) {
+    stuecke.push({
+      titel: `Reifegrad-Dimension: ${d.label}`,
+      quelle: 'Reifegrad · Dimensionen',
+      pfad: '/maturity',
+      text: d.questions.join(' · '),
+    })
+  }
+
+  // ── Rollen im KI-Kompetenzzentrum ──────────────────────────────────────
+  for (const r of COE_ROLLEN) {
+    stuecke.push({
+      titel: `Rolle: ${r.title}`,
+      quelle: 'Team & Rollen',
+      pfad: '/roles',
+      text: `${r.responsibility} Aufgaben: ${r.activities.join(' · ')}`,
+    })
+  }
+  for (const r of ISO_REQUIREMENTS) {
+    stuecke.push({
+      titel: `ISO 42001 ${r.clause}: ${r.requirement}`,
+      quelle: `Team & Rollen · ISO ${r.clause}`,
+      pfad: '/roles',
+      text: `${r.description} Abgedeckt durch: ${r.coveredLabel}`,
+    })
+  }
+
+  // ── Daten-Governance: Integrität und Versionierung ─────────────────────
+  for (const m of INTEGRITY_MECHANISMS) {
+    stuecke.push({
+      titel: `Datenintegrität: ${m.title}`,
+      quelle: 'Daten-Governance · Integrität',
+      pfad: '/data',
+      text: `${m.body} ${m.tag}`,
+    })
+  }
+  for (const p of VERSIONING_PRINCIPLES) {
+    stuecke.push({
+      titel: `Versionierung: ${p.title}`,
+      quelle: 'Daten-Governance · Versionierung',
+      pfad: '/data',
+      text: p.body,
+    })
+  }
+
   // ── Schwellenwert & Aufsicht ───────────────────────────────────────────
   for (const f of SCHWELLE_FRAGEN) {
     stuecke.push({
@@ -326,6 +464,22 @@ function stamm(w: string): string {
   return w.replace(/(en|er|es|em|n|s|e)$/, '')
 }
 
+/**
+ * Deutsche Komposita von hinten aufbrechen: „Datenversionierung" soll
+ * „Versionierung" finden, „Modellüberwachung" die „Überwachung".
+ *
+ * Kein Wörterbuch — nur die Endstücke ab sieben Zeichen, absteigend
+ * nach Länge, damit das längste und damit spezifischste zuerst greift.
+ * Treffer darüber zählen weniger als ein direkter, sonst verdrängen
+ * zufällige Wortenden die echten Treffer.
+ */
+function endstuecke(w: string): string[] {
+  if (w.length < 11) return []
+  const out: string[] = []
+  for (let i = 1; w.length - i >= 7; i++) out.push(w.slice(i))
+  return out
+}
+
 export function findeWissen(frage: string, max = 14): WissenStueck[] {
   const gefragt = normalisieren(frage).split(' ')
     // Zahlen bleiben drin, auch kurze: „Art. 26", „Klausel 9", „Art. 35"
@@ -344,10 +498,13 @@ export function findeWissen(frage: string, max = 14): WissenStueck[] {
     let imText = 0
     for (const w of woerter) {
       const st = stamm(w)
+      const enden = endstuecke(w)
       if (titel.includes(w) || quelle.includes(w)) imTitel++
       else if (st !== w && (titel.includes(st) || quelle.includes(st))) imTitel += 0.6
+      else if (enden.some((e) => titel.includes(e) || quelle.includes(e))) imTitel += 0.4
       if (text.includes(w)) imText++
       else if (st !== w && text.includes(st)) imText += 0.6
+      else if (enden.some((e) => text.includes(e))) imText += 0.4
     }
     // Lange Abschnitte treffen sonst allein durch ihre Länge — der lange
     // Ausnahmen-Knoten des Prüfbaums stand vorher bei fast jeder Frage

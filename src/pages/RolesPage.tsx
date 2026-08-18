@@ -25,7 +25,7 @@ interface RoleDef {
   color: { bg: string; text: string; badgeBg: string; border: string }
 }
 
-const ROLES: RoleDef[] = [
+export const ROLES: RoleDef[] = [
   {
     id: 'ai_architect',
     number: 1,
@@ -140,7 +140,7 @@ const ROLES: RoleDef[] = [
 
 // ── ISO 42001 §5.3 mapping ────────────────────────────────────────────────
 
-const ISO_REQUIREMENTS = [
+export const ISO_REQUIREMENTS = [
   {
     clause: '§5.3 a)',
     requirement: 'Ensure the AIMS conforms to the requirements of ISO 42001',

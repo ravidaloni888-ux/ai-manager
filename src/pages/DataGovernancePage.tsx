@@ -12,7 +12,7 @@ import TheoryBlock from '../components/ui/TheoryBlock'
 // ── Seite 5: Die sechs Dimensionen der Datenqualität ─────────────────────
 
 
-const INTEGRITY_MECHANISMS = [
+export const INTEGRITY_MECHANISMS = [
   {
     icon: '🔒',
     title: 'Prüfsummen & Hashes',
@@ -34,7 +34,7 @@ const INTEGRITY_MECHANISMS = [
   },
 ]
 
-const VERSIONING_PRINCIPLES = [
+export const VERSIONING_PRINCIPLES = [
   { title: 'Zustandshistorie', body: 'Jeder frühere Datenzustand bleibt abrufbar — kein Informationsverlust durch Überschreiben.' },
   { title: 'Änderungstransparenz', body: 'Was wurde geändert? Von wem? Zu welchem Zeitpunkt? Die Änderung ist sichtbar und begründet.' },
   { title: 'Parallelbetrieb', body: 'Alt und neu koexistieren — keine Zwangsentscheidung beim Anlegen einer neuen Version.' },

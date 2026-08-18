@@ -10,6 +10,7 @@ import {
 import { nanoid } from 'nanoid'
 import { getDemoMode } from '../store/demoStore'
 import { useIsDemo } from '../store/mandantStore'
+import { NIST_TRIAS } from './GovernancePage'
 import { deriveRisikoEntries, deriveAIRisks, RISIKOART_META, RisikoArt } from '../lib/deriveRisks'
 
 type Tab = 'register' | 'heatmap' | 'bae' | 'matrix'
@@ -29,11 +30,10 @@ const RISIKOART_CFG: Record<RisikoArt, { cls: string; dot: string }> = {
 
 const EMPTY_RISIKO: Omit<RisikoEntry, 'id' | 'auto'> = { beschreibung: '', art: 'Bias', b: 5, a: 5, e: 5 }
 
-const NIST_TRIAS = [
-  { label: 'Harm to People',       desc: 'Individuum: Rechte, Gesundheit, wirtschaftliche Chancen. Diskriminierung. Demokratische Teilhabe.' },
-  { label: 'Harm to Organization', desc: 'Geschäftsbetrieb, Reputation, finanzielle Verluste, Sicherheitsverletzungen, Compliance-Strafen.' },
-  { label: 'Harm to Ecosystem',    desc: 'Globales Finanzsystem, Lieferketten, vernetzte Systeme, natürliche Ressourcen, Umwelt.' },
-]
+// Die NIST-Trias stand hier ein zweites Mal — inhaltlich dieselbe,
+// aber mit englischen Beschriftungen. Zwei Fassungen desselben
+// Sachverhalts laufen irgendwann auseinander; jetzt gilt die aus der
+// Governance-Seite, deutsch beschriftet wie der Rest der Oberfläche.
 
 const deriveRisiken = (uc: AIUseCase) => deriveRisikoEntries(uc)
 

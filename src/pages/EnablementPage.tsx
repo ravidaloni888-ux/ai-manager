@@ -40,7 +40,7 @@ function computeStats(data: EnablementData) {
 
 // ── ISO 42001 §7.2 / §7.3 / A.2.2 Training panel ─────────────────────────
 
-const ISO_TRAINING_REQUIREMENTS = [
+export const ISO_TRAINING_REQUIREMENTS = [
   {
     clause: '§7.2',
     title: 'Competence',
@@ -205,7 +205,7 @@ function Iso42001TrainingPanel({
 
 // ── Tag 14 · Adoption Path & Schulungskonzept ─────────────────────────────
 
-const ADOPTION_BLOCKS = [
+export const ADOPTION_BLOCKS = [
   {
     nr: 1,
     title: 'Schock / Leugnung',

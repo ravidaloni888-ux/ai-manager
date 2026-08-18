@@ -30,7 +30,7 @@ interface Vendor {
 }
 
 // ── Vendor data ────────────────────────────────────────────────────────────
-const VENDORS: Vendor[] = [
+export const VENDORS: Vendor[] = [
   {
     id: 'openai',
     name: 'GPT-4o / o1',
@@ -250,7 +250,7 @@ const VENDORS: Vendor[] = [
 ]
 
 const CATEGORIES: Category[] = ['Foundation Model', 'ML Platform', 'AI Automation', 'Data & Analytics']
-const CRITERIA = [
+export const CRITERIA = [
   { key: 'capability',     label: 'AI Capability' },
   { key: 'integration',   label: 'Ease of Integration' },
   { key: 'dataPrivacy',   label: 'Data Privacy / EU' },

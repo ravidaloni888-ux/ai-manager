@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 // ── Static data ───────────────────────────────────────────────────────────────
-const FAST = [
+export const FAST = [
   {
     key: 'F' as const,
     label: 'Fairness',
@@ -40,7 +40,7 @@ const SUM = [
   { head: 'Protect', body: 'Soziale Werte, Gerechtigkeit und das Gemeinwohl schützen — über individuelle Interessen hinaus.', case: 'Verletzt: alle drei Fälle' },
 ]
 
-const CASES = [
+export const CASES = [
   {
     label: 'Niederlande · 2017–2021',
     title: 'Toeslagenaffaire — Der teuerste Algorithmus Europas',
@@ -67,13 +67,13 @@ const CASES = [
   },
 ]
 
-const ZONES = [
+export const ZONES = [
   { label: 'Legal', q: 'Ist es erlaubt?', std: 'DSGVO · KI-VO · Arbeitsrecht · Produkthaftung', color: 'bg-slate-50 border-slate-200' },
   { label: 'Ethical', q: 'Ist es vertretbar?', std: 'Würde ich es Betroffenen, Presse, Betriebsrat erklären wollen?', color: 'bg-amber-50 border-amber-200' },
   { label: 'Optimal', q: 'Ist es wirklich gut?', std: 'SUM Values · NIST AI RMF · Best Practice', color: 'bg-teal-50 border-teal-200' },
 ]
 
-const FAIRNESS_DEFS = [
+export const FAIRNESS_DEFS = [
   { term: 'Demographic Parity', body: 'Gleiche Ausgangsquoten je Gruppe.', weakness: 'Ignoriert unterschiedliche Basisraten.' },
   { term: 'Equalized Odds', body: 'Gleiche Fehlerraten je Gruppe (FP + FN).', weakness: 'Schwer zu kalibrieren; kann Quoten dennoch ungleich machen.' },
   { term: 'Calibration', body: 'Gleiche Treffsicherheit je Score-Wert.', weakness: 'Erzeugt bei unterschiedlichen Basisraten zwangsläufig ungleiche Quoten.' },

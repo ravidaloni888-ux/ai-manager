@@ -18,7 +18,7 @@ interface Article {
 
 // ── Data ───────────────────────────────────────────────────────────────────
 
-const ARTICLES: Article[] = [
+export const ARTICLES: Article[] = [
   {
     id: 'art3',
     tag: 'Art. 3',
@@ -71,7 +71,7 @@ const ARTICLES: Article[] = [
   },
 ]
 
-const DREISTUFENMODELL = [
+export const DREISTUFENMODELL = [
   {
     stufe: 1 as Stufe,
     color: 'bg-green-500',
@@ -119,7 +119,7 @@ const DREISTUFENMODELL = [
   },
 ]
 
-const DSGVO_GRUNDSAETZE = [
+export const DSGVO_GRUNDSAETZE = [
   { art: 'Art. 5 lit. a', name: 'Rechtmäßigkeit, Verarbeitung nach Treu und Glauben, Transparenz', short: 'Rechtmäßigkeit', desc: 'Es muss eine Rechtsgrundlage geben (Art. 6). Die Verarbeitung darf die betroffene Person nicht täuschen oder überraschen.' },
   { art: 'Art. 5 lit. b', name: 'Zweckbindung', short: 'Zweckbindung', desc: 'Daten dürfen nur für den festgelegten, eindeutigen und legitimen Zweck erhoben und verarbeitet werden. Keine "Vorratsdatenhaltung".' },
   { art: 'Art. 5 lit. c', name: 'Datenminimierung', short: 'Datenminimierung', desc: 'Nur die Daten verarbeiten, die für den Zweck tatsächlich erforderlich sind — nicht alle, die nützlich sein könnten.' },
@@ -129,7 +129,7 @@ const DSGVO_GRUNDSAETZE = [
   { art: 'Art. 5 Abs. 2', name: 'Rechenschaftspflicht', short: 'Rechenschaft', desc: 'Der Verantwortliche muss die Einhaltung aller Grundsätze nachweisen können — nicht nur einhalten, sondern dokumentieren.', highlight: true },
 ]
 
-const BIAS_TYPES = [
+export const BIAS_TYPES = [
   { type: 'Historical Bias', icon: '📜', desc: 'Die Trainingsdaten spiegeln vergangene Diskriminierung wider. Das Modell lernt und reproduziert diese Muster. Beispiel: Einstellungsdaten, bei denen Frauen historisch unterrepräsentiert waren, führen zu KI-Systemen, die Männer bevorzugen.', color: 'border-red-200 bg-red-50', badge: 'bg-red-100 text-red-700' },
   { type: 'Representation Bias', icon: '📊', desc: 'Bestimmte Gruppen sind in den Trainingsdaten unter- oder überrepräsentiert. Das Modell funktioniert für diese Gruppen schlechter. Beispiel: Gesichtserkennung, die bei dunklen Hauttönen mehr Fehler macht, weil Trainingsdaten überproportional helle Hauttöne enthalten.', color: 'border-amber-200 bg-amber-50', badge: 'bg-amber-100 text-amber-700' },
   { type: 'Measurement Bias', icon: '📏', desc: 'Die gewählten Messgrößen oder Labels selbst sind verzerrt. Beispiel: "Kreditwürdigkeit" gemessen an historischen Zahlungsverhalten, das selbst durch ungleichen Zugang zu Finanzprodukten geprägt ist.', color: 'border-violet-200 bg-violet-50', badge: 'bg-violet-100 text-violet-700' },

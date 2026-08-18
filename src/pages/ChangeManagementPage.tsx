@@ -8,7 +8,7 @@ import ChangeDiagnoseWizard from '../components/change/ChangeDiagnoseWizard'
 
 // ── Drei Ursachen von Widerstand ─────────────────────────────────────────
 
-const RESISTANCE_CAUSES = [
+export const RESISTANCE_CAUSES = [
   {
     key: 'rational',
     icon: '🧠',
@@ -50,7 +50,7 @@ const CAUSE_COLORS: Record<string, { border: string; bg: string; text: string; d
   purple: { border: 'border-purple-200', bg: 'bg-purple-50', text: 'text-purple-700', dot: 'bg-purple-500' },
 }
 
-const EMPATHY_PRINCIPLES = [
+export const EMPATHY_PRINCIPLES = [
   {
     icon: '👁️',
     title: 'Perspektive verstehen',
@@ -196,7 +196,7 @@ function WiderstaendeTab() {
 
 // ── ADKAR-Diagnose-Tool ──────────────────────────────────────────────────
 
-const ADKAR_STEPS = [
+export const ADKAR_STEPS = [
   {
     key: 'awareness',
     letter: 'A',
@@ -328,7 +328,7 @@ function AdkarTool() {
 
 // ── Change-Modelle ───────────────────────────────────────────────────────
 
-const KOTTER_STEPS = [
+export const KOTTER_STEPS = [
   { title: 'Dringlichkeit erzeugen', was: 'Warum müssen wir handeln — jetzt?', beispiel: 'Projektleitung erklärt, warum Expertenwissen digitalisiert werden muss, um wettbewerbsfähig zu bleiben.' },
   { title: 'Führungskoalition aufbauen', was: 'Wer trägt die Veränderung?', beispiel: 'Steuerungskreis + angesehene Fachkraft als Brücke zur Belegschaft + Standortleiter als Botschafter.' },
   { title: 'Vision entwickeln', was: 'Wohin wollen wir — in einem Satz?', beispiel: '„Das Wissen unserer besten Leute steht weltweit zur Verfügung — und bleibt dem Unternehmen erhalten."' },

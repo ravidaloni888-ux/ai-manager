@@ -27,7 +27,7 @@ interface DimDef {
   questions: string[]
 }
 
-const DIMS: DimDef[] = [
+export const DIMS: DimDef[] = [
   {
     id: 'strategy',
     label: 'Strategie & Vision',
