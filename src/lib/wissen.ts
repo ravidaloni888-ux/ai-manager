@@ -25,6 +25,7 @@ import { ISO_TRAINING_REQUIREMENTS, ADOPTION_BLOCKS } from '../pages/EnablementP
 import { DIMS } from '../pages/MaturityPage'
 import { ROLES as COE_ROLLEN, ISO_REQUIREMENTS } from '../pages/RolesPage'
 import { INTEGRITY_MECHANISMS, VERSIONING_PRINCIPLES } from '../pages/DataGovernancePage'
+import { VERGESSENE_POSTEN } from '../pages/ProjectPlanPage'
 import { SCHWELLE_FRAGEN } from '../components/assessments/SchwellenwertCheck'
 import { SIGNAL_ERKLAERUNG, SIGNAL_QUELLEN, ENTSCHEIDUNG_LABEL } from './signale'
 
@@ -385,6 +386,19 @@ function bauen(): WissenStueck[] {
       quelle: 'Daten-Governance · Versionierung',
       pfad: '/data',
       text: p.body,
+    })
+  }
+
+  // ── Projektplan: die vergessenen Budgetposten ──────────────────────────
+  for (const p of VERGESSENE_POSTEN) {
+    stuecke.push({
+      titel: `Vergessener Projektposten: ${p.titel}`,
+      quelle: 'Projektplan · Was in Standard-Plänen fehlt',
+      // Der Plan hat keine eigene Route — er steht im Prüfschritt
+      // „To-do-Plan" innerhalb eines Anwendungsfalls.
+      pfad: '/canvas',
+      text: `${p.kurz}. ${p.text} Diese Position ist typischerweise nicht eingeplant und `
+        + 'erscheint später als Budgetüberschreitung.',
     })
   }
 

@@ -313,6 +313,41 @@ function generatePlan(form: FormData, answers: Answers): Phase[] {
   ]
 }
 
+// ── Posten, die in Standard-Projektplänen fehlen ───────────────────────────
+//
+// Bewusst getrennt von den vier Phasen oben. Die dortigen Punkte sind
+// Aufgaben, die man abhakt. Diese vier sind Budgetpositionen: Sie fehlen
+// nicht, weil jemand sie vergisst zu tun, sondern weil sie in der
+// Kostenplanung nicht auftauchen — und später als Überschreitung
+// erscheinen.
+
+export const VERGESSENE_POSTEN = [
+  {
+    titel: 'Datenbeschaffung und -aufbereitung als eigene Phase',
+    kurz: 'nicht als Teilaufgabe der Entwicklung',
+    text: 'In der Praxis der aufwendigste Posten überhaupt. Wer ihn unter „Entwicklung" '
+      + 'verbucht, plant den grössten Anteil des Vorhabens als Nebensache.',
+  },
+  {
+    titel: 'Experimentierphase mit offenem Ausgang',
+    kurz: 'ein Ergebnis kann sein, dass es nicht geht',
+    text: 'Wer dafür kein Budget vorsieht, hat keinen Proof of Concept, sondern eine '
+      + 'Pflichtübung — das Ergebnis steht dann vorher fest.',
+  },
+  {
+    titel: 'Laufende Überwachung und Nachtraining',
+    kurz: 'Dauerposten im Betriebsbudget, nicht Gewährleistung',
+    text: 'Ein Modell altert, ohne dass jemand den Code anfasst. Als Gewährleistungsfall '
+      + 'gebucht, läuft der Posten irgendwann aus — das System läuft weiter.',
+  },
+  {
+    titel: 'Geordnete Außerbetriebnahme',
+    kurz: 'was mit Modell, Daten und Protokollen geschieht',
+    text: 'Diese Phase steht in jedem Lebenszyklusstandard und in fast keinem Projektplan. '
+      + 'Sie entscheidet, ob Nachweispflichten nach der Ablösung noch erfüllbar sind.',
+  },
+]
+
 // ── Law URL helper ─────────────────────────────────────────────────────────
 
 function getLawUrl(law: string): string | null {
@@ -1066,6 +1101,43 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
               </div>
             )
           })}
+
+          {/* Steht bewusst nach den Phasen und sieht anders aus: Das oben
+              sind Aufgaben, die man abhakt — das hier sind Budgetposten,
+              die man einplant. Als Häkchen getarnt wären sie erledigt,
+              sobald jemand sie gelesen hat. */}
+          <div className="bg-white rounded-xl border-2 border-slate-800 overflow-hidden">
+            <div className="px-5 py-3 bg-slate-800">
+              <p className="text-[11px] font-mono tracking-widest text-slate-400 uppercase">
+                Nicht vergessen
+              </p>
+              <h3 className="text-sm font-bold text-white">
+                Vier Posten, die in Standard-Projektplänen fehlen
+              </h3>
+            </div>
+            <div className="px-5 py-4">
+              <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                Übersetzt in die Sprache der Projektplanung: Diese Positionen sind typischerweise
+                nicht eingeplant — und erscheinen später als Budgetüberschreitung.
+              </p>
+              <div className="space-y-3">
+                {VERGESSENE_POSTEN.map((p, i) => (
+                  <div key={p.titel} className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-md bg-slate-100 text-slate-700 text-[11px] font-bold flex items-center justify-center mt-0.5">
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-slate-800 leading-snug">
+                        {p.titel}
+                        <span className="font-normal text-slate-500"> — {p.kurz}</span>
+                      </p>
+                      <p className="text-xs text-slate-600 leading-relaxed mt-0.5">{p.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
           <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
             <p className="text-xs text-slate-500 leading-relaxed">
