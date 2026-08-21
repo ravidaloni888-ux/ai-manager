@@ -84,10 +84,14 @@ export function nachweiseAusPruefungen(
         return { def, erfuellt: ok, offen: ok ? undefined : 'Risikoklasse noch nicht ermittelt' }
       }
       case 'compliancePersonalData': {
-        const avv = checks?.avv
+        // Vorher hing das an avv.personalData — die öffnet sich aber nur
+        // bei externem Anbieter und blieb bei Eigenentwicklung für immer
+        // null. Der Nachweis konnte dann nie erfüllt werden, egal was
+        // sonst beantwortet war. checks.personendaten ist die Grundfrage,
+        // unabhängig davon, wo das System läuft.
         const dsfaBeantwortet = Object.keys(checks?.dsfa ?? {}).length > 0
-        const ok = avv?.personalData !== null && avv?.personalData !== undefined && dsfaBeantwortet
-        return { def, erfuellt: !!ok, offen: ok ? undefined : 'DSFA-Trigger und AVV-Frage noch offen' }
+        const ok = checks?.personendaten !== null && checks?.personendaten !== undefined && dsfaBeantwortet
+        return { def, erfuellt: !!ok, offen: ok ? undefined : 'DSFA-Trigger und Personendaten-Frage noch offen' }
       }
       case 'complianceDataMin': {
         // Das Nutzungsrecht deckt die Zweckbindung ab — dieselbe Frage

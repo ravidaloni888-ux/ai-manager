@@ -16,6 +16,9 @@ type Step = 'form' | 'questions' | 'plan'
 interface CaseChecksShape {
   avv?: { external: boolean | null; personalData: boolean | null }
   dsfa?: Record<string, boolean>
+  personendaten?: boolean | null
+  commercialOutput?: boolean | null
+  notifiedBody?: boolean | null
 }
 
 function leseLokaleChecks(ucId: string): CaseChecksShape | null {
@@ -604,9 +607,17 @@ export function ProjectPlanContent({ ucid }: { ucid?: string | null }) {
         akteurRolle:      profil.rolle ?? null,
         worksCouncil:     profil.betriebsrat ?? null,
         riskLevel:        euAiActRiskToLevel(uc.euAiActRisk),
-        personalData:     avv?.personalData ?? uc.compliancePersonalData ?? null,
+        // checks.personendaten ist die Grundfrage aus dem Fall-Wizard —
+        // unabhängig davon, ob ein externer Anbieter beteiligt ist. Der
+        // frühere Fallback auf uc.compliancePersonalData war sachlich
+        // falsch: das Feld sagt "Nachweis erfüllt", nicht "Personendaten
+        // verarbeitet" — ein intern entwickeltes System mit Kundendaten
+        // wäre damit fälschlich als "nein" durchgegangen.
+        personalData:     checks?.personendaten ?? null,
         externalProvider: avv?.external ?? null,
         hrContext:        dsfa?.employees ?? null,
+        commercialOutput: checks?.commercialOutput ?? null,
+        notifiedBody:     checks?.notifiedBody ?? null,
       }
       setAnswers(merged)
       const i = naechsteOffeneFrage(merged)

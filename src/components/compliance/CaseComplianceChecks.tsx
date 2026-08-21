@@ -17,6 +17,7 @@ import type { EthicsState } from '../assessments/EthicsCheck'
 import SchwellenwertCheck, { EMPTY_SCHWELLE } from '../assessments/SchwellenwertCheck'
 import type { SchwelleState } from '../assessments/SchwellenwertCheck'
 import { fallStand, gateStand } from '../../lib/fallstand'
+import { getProfil } from '../../store/mandantProfil'
 import { ProjectPlanContent } from '../../pages/ProjectPlanPage'
 import { Sektion, StandZahl } from '../ui/Sektion'
 import { Pruefblock, Frage, Wahl, Fazit, JA_NEIN, TON, Sprungleiste } from '../ui/Pruefung'
@@ -46,6 +47,19 @@ export interface CaseChecks {
   ethics: EthicsState
   riskClass: RiskClassState
   schwelle: SchwelleState
+  /**
+   * Verarbeitet das System überhaupt personenbezogene Daten? — bewusst
+   * getrennt von avv.personalData: Die AVV-Frage öffnet sich nur, wenn
+   * zuvor „externer Anbieter: Ja" beantwortet wurde. Bei Eigenentwicklung
+   * blieb avv.personalData sonst für immer null, obwohl das System sehr
+   * wohl Personendaten verarbeiten kann — dieselbe Lücke betraf sowohl
+   * den Nachweis unten als auch den Projektplan.
+   */
+  personendaten: boolean | null
+  /** Art. 50 EU AI Act — nur relevant, wird aber unabhängig davon erfasst. */
+  commercialOutput: boolean | null
+  /** Anhang VI vs. VII — nur bei Anbieter + Hochrisiko überhaupt gefragt. */
+  notifiedBody: boolean | null
 }
 
 export const EMPTY_CHECKS: CaseChecks = {
@@ -58,6 +72,9 @@ export const EMPTY_CHECKS: CaseChecks = {
   ethics: EMPTY_ETHICS,
   riskClass: EMPTY_RISK_CLASS,
   schwelle: EMPTY_SCHWELLE,
+  personendaten: null,
+  commercialOutput: null,
+  notifiedBody: null,
 }
 
 // Antworten liegen je Mandant unter einem Schlüssel, darin je Anwendungsfall.
@@ -114,6 +131,28 @@ const ZUTREFFEND: WahlOption<boolean>[] = [
   { wert: true,  label: 'Trifft zu',       ton: 'warn' },
   { wert: false, label: 'Trifft nicht zu', ton: 'ok' },
 ]
+
+/**
+ * Die Grundfrage vor DSFA und AVV: Verarbeitet das System überhaupt
+ * personenbezogene Daten? Bewusst unabhängig von der AVV-Frage unten —
+ * die öffnet sich nur bei externem Anbieter und blieb bei Eigenentwicklung
+ * sonst für immer unbeantwortet, obwohl auch selbst betriebene Systeme
+ * Personendaten verarbeiten können.
+ */
+function PersonendatenFrage({ value, onChange }: { value: boolean | null; onChange: (v: boolean) => void }) {
+  return (
+    <Pruefblock titel="Personenbezogene Daten" hinweis="Grundfrage — davon hängt ab, ob DSFA und AVV überhaupt greifen">
+      <Frage
+        id="personendaten"
+        text="Verarbeitet das System personenbezogene Daten?"
+        hinweis="Namen, E-Mails, Mitarbeiterdaten, Kundenprofile, IP-Adressen — alles, was einer Person zugeordnet werden kann."
+        ton={value === null ? null : 'neutral'}
+      >
+        <Wahl optionen={JA_NEIN} wert={value} onWaehle={onChange} />
+      </Frage>
+    </Pruefblock>
+  )
+}
 
 function DsfaChecker({ checked, setChecked }: {
   checked: Record<string, boolean>
@@ -342,6 +381,9 @@ export default function CaseComplianceChecks(
   // Funktion nutzt die Signalableitung, damit beide dasselbe behaupten.
   const groups = fallStand(checks)
   const { offen: gateOffen, beantwortet: dgCount } = gateStand(checks)
+  // Rolle liegt im Firmenprofil, nicht im Fall — nur zum Ein-/Ausblenden
+  // der Notified-Body-Frage gebraucht, nicht für die Risikobewertung selbst.
+  const profilRolle = getProfil().rolle
   const gateAntworten = checks.verfuegbarkeit?.antworten ?? {}
 
   const doneCount = groups.filter((g) => g.done).length
@@ -359,6 +401,7 @@ export default function CaseComplianceChecks(
   ]
 
   const punkteDatenschutz: SprungPunkt[] = [
+    { id: 'personendaten', label: 'Personendaten?', erledigt: checks.personendaten !== null },
     ...DSFA_TRIGGERS.map((t) => ({ id: `dsfa-${t.id}`, label: t.kurz, erledigt: checks.dsfa[t.id] !== undefined })),
     { id: 'avv-external', label: 'AVV · Anbieter', erledigt: checks.avv.external !== null },
     ...(checks.avv.external === true
@@ -378,10 +421,22 @@ export default function CaseComplianceChecks(
     { id: 'schwelle-verwerfen',   label: 'Wer verwirft',      erledigt: !!s.verwerfen.trim() },
   ]
 
+  // Der Baum selbst hat keine feste Fragenliste — nur die beiden
+  // Plan-Zusatzfragen danach sind als fixe Punkte anspringbar.
+  const punkteRisiko: SprungPunkt[] = checks.riskClass.done
+    ? [
+        { id: 'commercial-output', label: 'Kommerzielle Nutzung?', erledigt: checks.commercialOutput !== null },
+        ...(riskFromResult(checks.riskClass.resultId) === 'High Risk' && profilRolle === 'anbieter'
+          ? [{ id: 'notified-body', label: 'Notified Body?', erledigt: checks.notifiedBody !== null }]
+          : []),
+      ]
+    : []
+
   const punkteFuer = (key: GroupKey): SprungPunkt[] =>
     key === 'datengrundlage' ? punkteDatengrundlage
       : key === 'datenschutz' ? punkteDatenschutz
       : key === 'schwelle' ? punkteSchwelle
+      : key === 'risiko' ? punkteRisiko
       : []
 
   const sprungSchritte: SprungSchritt[] = groups.map((g, i) => ({
@@ -478,13 +533,55 @@ export default function CaseComplianceChecks(
                 <div className="px-5 pb-5 bg-slate-50/50">
                   <div className="space-y-4">
                     {g.key === 'risiko' && (
-                      <RiskClassCheck
-                        value={checks.riskClass}
-                        onChange={(fn) => setChecks((prev) => ({ ...prev, riskClass: fn(prev.riskClass) }))}
-                      />
+                      <>
+                        <RiskClassCheck
+                          value={checks.riskClass}
+                          onChange={(fn) => setChecks((prev) => ({ ...prev, riskClass: fn(prev.riskClass) }))}
+                        />
+
+                        {/* Zwei Fragen, die sonst nur der To-do-Plan stellt — hier
+                            schon erfasst, damit der Plan sie nicht noch einmal
+                            fragen muss. Notified Body nur, wo er je greifen kann:
+                            Anbieter mit Hochrisiko-Einstufung. */}
+                        {checks.riskClass.done && (
+                          <Pruefblock titel="Für den Projektplan" hinweis="Zwei Fragen, die sonst erst beim To-do-Plan kämen">
+                            <Frage
+                              id="commercial-output"
+                              text="Werden KI-generierte Inhalte kommerziell genutzt oder veröffentlicht?"
+                              hinweis="Texte, Bilder, Code oder andere Outputs, die in Produkte oder Publikationen einfließen — Art. 50 EU AI Act."
+                              ton={checks.commercialOutput === null ? null : 'neutral'}
+                            >
+                              <Wahl
+                                optionen={JA_NEIN}
+                                wert={checks.commercialOutput}
+                                onWaehle={(v) => setChecks((prev) => ({ ...prev, commercialOutput: v }))}
+                              />
+                            </Frage>
+
+                            {riskFromResult(checks.riskClass.resultId) === 'High Risk' && profilRolle === 'anbieter' && (
+                              <Frage
+                                id="notified-body"
+                                text="Ist das System biometrisch oder unterliegt es sektoralen Harmonisierungsvorschriften?"
+                                hinweis="Biometrische Fernidentifizierung (Anhang III Nr. 1) oder KI als Sicherheitskomponente unter MDR, Maschinenverordnung o. ä. — dann ist ein externer Notified Body (Anhang VII) Pflicht."
+                                ton={checks.notifiedBody === null ? null : 'neutral'}
+                              >
+                                <Wahl
+                                  optionen={JA_NEIN}
+                                  wert={checks.notifiedBody}
+                                  onWaehle={(v) => setChecks((prev) => ({ ...prev, notifiedBody: v }))}
+                                />
+                              </Frage>
+                            )}
+                          </Pruefblock>
+                        )}
+                      </>
                     )}
                     {g.key === 'datenschutz' && (
                       <>
+                        <PersonendatenFrage
+                          value={checks.personendaten}
+                          onChange={(v) => setChecks((prev) => ({ ...prev, personendaten: v }))}
+                        />
                         <DsfaChecker
                           checked={checks.dsfa}
                           setChecked={(fn) => setChecks((prev) => ({ ...prev, dsfa: fn(prev.dsfa) }))}
