@@ -71,9 +71,248 @@ const DEPT_COLOURS: Record<string, string> = {
   Logistics: 'bg-teal-100 text-teal-700',
 }
 
+// ── Vom Einzelfall zum Portfolio ─────────────────────────────────────────
+//
+// Der Quartalsplan oben sortiert stur nach priorityScore — einer einzigen
+// Zahl. Genau davor warnt dieser Abschnitt: „Bewertungsmatrizen mit
+// gewichteten Punktwerten erzeugen eine Genauigkeit, die es nicht gibt."
+// Kein Widerspruch, den man auflösen müsste — die Automatik liefert einen
+// Vorschlag, diese vier Fragen sind die Gegenprobe davor, ihn zu übernehmen.
+
+export const ABHAENGIGKEITSARTEN = [
+  {
+    art: 'Datenabhängigkeit',
+    frage: 'Braucht Vorhaben B Daten, die erst Vorhaben A erschließt?',
+    konsequenz: 'Harte Reihenfolge — A vor B, ohne Verhandlungsspielraum',
+  },
+  {
+    art: 'Fähigkeitsabhängigkeit',
+    frage: 'Braucht B Kompetenzen, die erst in A aufgebaut werden?',
+    konsequenz: 'Weiche Reihenfolge — parallel möglich, aber riskanter und teurer',
+  },
+  {
+    art: 'Vertrauensabhängigkeit',
+    frage: 'Braucht B eine Akzeptanz, die erst ein sichtbarer Erfolg schafft?',
+    konsequenz: 'Organisatorische Reihenfolge — der erste Erfolg muss sichtbar sein, nicht groß',
+  },
+]
+
+export const PRIORISIERUNGS_FRAGEN = [
+  { frage: 'Wirkung mal Machbarkeit', zweck: 'Die Einordnung über alle Vorhaben hinweg angewendet' },
+  {
+    frage: 'Was blockiert es, wenn wir warten?',
+    zweck: 'Macht Datenabhängigkeiten sichtbar. Ein Vorhaben mit geringer Eigenwirkung kann als Wegbereiter dennoch vorn stehen.',
+  },
+  {
+    frage: 'Was lernen wir daraus?',
+    zweck: 'Frühe Vorhaben haben zwei Zwecke. Eines, das nichts lehrt, ist ein schlechter Start, selbst wenn es sich rechnet.',
+  },
+  {
+    frage: 'Wer trägt es im Fachbereich?',
+    zweck: 'Ohne benannte Person aus dem Fachbereich gehört ein Vorhaben nicht auf die Roadmap — der beste Frühindikator.',
+  },
+]
+
+// Bewusst nicht „HORIZONTE" genannt — der Name ist unten für das
+// BCG-Modell vergeben, das eine andere Achse misst (Zeithorizont statt
+// Verbindlichkeitsgrad). Zwei Konzepte, ein Wort im Kurs; hier getrennt
+// benannt, damit Ulli sie nicht verwechselt.
+export const VERBINDLICHKEITSSTUFEN = [
+  {
+    stufe: 'Beschlossen',
+    verbindlichkeit: 'Budget freigegeben, Verantwortliche benannt, Meilensteine gesetzt',
+    inhalt: 'Wenige Vorhaben, dafür vollständig durchgeplant',
+  },
+  {
+    stufe: 'Vorbereitet',
+    verbindlichkeit: 'Machbarkeit geprüft, Business Case gerechnet, Freigabe steht aus',
+    inhalt: 'Kandidaten für die nächste Entscheidungsrunde',
+  },
+  {
+    stufe: 'Beobachtet',
+    verbindlichkeit: 'Idee erfasst, bewusst noch nicht bewertet',
+    inhalt: 'Was aufgeschrieben, aber nicht begonnen wurde — inklusive Begründung, warum nicht',
+  },
+]
+
+export const REIFEGRAD_TEMPO = [
+  {
+    wennGilt: 'Kein Inventar, keine benannten Verantwortlichen',
+    gehoertDarauf: 'Zuerst Bestandsaufnahme und Zuständigkeiten — kein Modellvorhaben',
+  },
+  {
+    wennGilt: 'Einzelne Werkzeuge im Einsatz, keine Regeln',
+    gehoertDarauf: 'Ein sichtbarer, umkehrbarer Anwendungsfall plus verbindliche Nutzungsregeln',
+  },
+  {
+    wennGilt: 'Erste Anwendungsfälle laufen, Governance im Aufbau',
+    gehoertDarauf: 'Vorhaben mit echtem Wertbeitrag; parallel Überwachung und Freigabeprozesse aufbauen',
+  },
+  {
+    wennGilt: 'Governance steht, mehrere Systeme im Betrieb',
+    gehoertDarauf: 'Anspruchsvollere Vorhaben, auch mit höherer Risikoeinstufung',
+  },
+]
+
+export const ROADMAP_PRUEFFRAGEN = [
+  'Ist begründet, warum die Reihenfolge so ist? Eine Liste ohne Begründung ist eine Wunschliste.',
+  'Hat jedes Vorhaben eine benannte Person im Fachbereich? Nicht in der IT — im Fachbereich.',
+  'Steht drin, was wir bewusst nicht tun? Und warum?',
+  'Ist der Engpass benannt? Meist sind es zwei Personen, nicht das Budget.',
+  'Gibt es einen Punkt, an dem neu entschieden wird? Eine Roadmap ohne Entscheidungspunkte ist ein Versprechen, kein Plan.',
+]
+
+function PortfolioTab() {
+  return (
+    <div className="space-y-5">
+      <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-slate-800 rounded-r-xl px-5 py-4 text-sm text-slate-700 leading-relaxed">
+        <strong>Zehn gute Vorhaben ergeben keine Roadmap.</strong> Sie konkurrieren um dieselben Leute
+        — nicht um Budget, sondern um die zwei Personen, die die Daten kennen. Sie bauen aufeinander
+        auf. Und sie brauchen unterschiedliche organisatorische Reife. Das wird in der
+        Einzelbewertung eines Vorhabens nicht sichtbar.
+      </div>
+
+      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-800 leading-relaxed">
+        <strong>Zur Automatik oben im Quartalsplan:</strong> Sie sortiert nach Prioritätsscore — einer
+        einzigen Zahl. Das ist ein Vorschlag, keine Entscheidung. Die vier Fragen unten sind die
+        Gegenprobe, bevor der Vorschlag übernommen wird.
+      </div>
+
+      {/* Abhängigkeiten */}
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="px-5 py-3 bg-slate-800">
+          <p className="text-[11px] font-mono tracking-widest text-slate-400 uppercase">Schritt 1</p>
+          <h3 className="text-sm font-bold text-white">Abhängigkeiten sichtbar machen</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                <th className="text-left py-2.5 px-4 font-semibold text-slate-500">Art</th>
+                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">Leitfrage</th>
+                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">Konsequenz für die Reihenfolge</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {ABHAENGIGKEITSARTEN.map((a) => (
+                <tr key={a.art} className="hover:bg-slate-50 transition-colors">
+                  <td className="py-3 px-4 font-bold text-slate-700">{a.art}</td>
+                  <td className="py-3 px-3 text-slate-600">{a.frage}</td>
+                  <td className="py-3 px-3 text-slate-500">{a.konsequenz}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-5 py-3 border-t border-slate-100 text-xs text-slate-500 leading-relaxed">
+          Die Vertrauensabhängigkeit wird am häufigsten übersehen. Ein technisch machbares Projekt
+          scheitert daran, dass es das erste war und niemand ihm zugetraut hat, zu funktionieren.
+        </div>
+      </div>
+
+      {/* Vier Fragen */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+        <div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Schritt 2 · Priorisieren mit vier Fragen statt einer Punktzahl</p>
+          <p className="text-xs text-slate-400 mt-1">Vier Fragen je Vorhaben genügen und lassen sich vor einem Gremium vertreten.</p>
+        </div>
+        <div className="space-y-2">
+          {PRIORISIERUNGS_FRAGEN.map((f, i) => (
+            <div key={f.frage} className="flex gap-3 border border-slate-100 rounded-lg px-3 py-2.5 bg-slate-50">
+              <span className="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-800">{f.frage}</p>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{f.zweck}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Verbindlichkeitsstufen */}
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="px-5 py-3 bg-slate-800">
+          <p className="text-[11px] font-mono tracking-widest text-slate-400 uppercase">Schritt 3</p>
+          <h3 className="text-sm font-bold text-white">Die Roadmap in drei Verbindlichkeitsstufen</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                <th className="text-left py-2.5 px-4 font-semibold text-slate-500">Stufe</th>
+                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">Verbindlichkeit</th>
+                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">Was hier steht</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {VERBINDLICHKEITSSTUFEN.map((s) => (
+                <tr key={s.stufe} className="hover:bg-slate-50 transition-colors">
+                  <td className="py-3 px-4 font-bold text-slate-700">{s.stufe}</td>
+                  <td className="py-3 px-3 text-slate-600">{s.verbindlichkeit}</td>
+                  <td className="py-3 px-3 text-slate-500">{s.inhalt}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-5 py-3 border-t border-slate-100 text-xs text-slate-500 leading-relaxed">
+          <strong>Die dritte Spalte ist die wichtigste im Gespräch mit der Leitung.</strong> Eine
+          Roadmap, die nur zeigt, was gemacht wird, lädt zu Nachfragen ein. Eine, die auch zeigt, was
+          bewusst nicht gemacht wird und warum, beendet sie. Nicht zu verwechseln mit den
+          strategischen Horizonten (Deploy / Reshape / Invent) im nächsten Reiter — die messen den
+          Zeithorizont eines Vorhabens, nicht seine Verbindlichkeit.
+        </div>
+      </div>
+
+      {/* Reifegrad bestimmt Tempo */}
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="px-5 py-3 bg-slate-800">
+          <p className="text-[11px] font-mono tracking-widest text-slate-400 uppercase">Der Reifegrad bestimmt das Tempo</p>
+          <h3 className="text-sm font-bold text-white">Was auf jeder Stufe möglich ist — und was nicht</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                <th className="text-left py-2.5 px-4 font-semibold text-slate-500">Wenn im Haus gilt …</th>
+                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">… dann gehört auf die Roadmap</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {REIFEGRAD_TEMPO.map((r) => (
+                <tr key={r.wennGilt} className="hover:bg-slate-50 transition-colors">
+                  <td className="py-3 px-4 text-slate-600">{r.wennGilt}</td>
+                  <td className="py-3 px-3 text-slate-700 font-medium">{r.gehoertDarauf}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-5 py-3 border-t border-slate-100 text-xs text-red-700 bg-red-50 leading-relaxed">
+          <strong>Der häufigste Fehler ist der Sprung über eine Stufe:</strong> ein Hochrisiko-Anwendungsfall
+          als erstes Vorhaben. Er scheitert nicht an der Technik, sondern daran, dass es keine
+          Struktur gibt, die ihn tragen könnte.
+        </div>
+      </div>
+
+      {/* Prüffragen */}
+      <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-4">
+        <p className="text-sm font-bold text-red-800 mb-2">Fünf Prüffragen an eine fertige Roadmap</p>
+        <ul className="space-y-1.5">
+          {ROADMAP_PRUEFFRAGEN.map((f) => (
+            <li key={f} className="text-xs text-red-800 leading-relaxed flex gap-2">
+              <span className="flex-shrink-0">•</span><span>{f}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
 // ── BCG Three Horizons ───────────────────────────────────────────────────
 
-const HORIZONS = [
+export const HORIZONS = [
   {
     key: 'deploy',
     label: 'Deploy',
@@ -255,7 +494,7 @@ export default function RoadmapPage() {
   const { data: strategy } = useStrategyStore()
   const mandantId = useMandantId()
   const navigate = useNavigate()
-  const [tab, setTab] = useState<'plan' | 'horizonte'>('plan')
+  const [tab, setTab] = useState<'plan' | 'horizonte' | 'portfolio'>('plan')
 
   // derive default quarterly cap from strategy budget (÷ 5 quarters)
   const defaultCap = strategy ? Math.round(strategy.budgetTotalK / 5) : 500
@@ -323,7 +562,9 @@ export default function RoadmapPage() {
           <p className="text-sm text-slate-500 mt-0.5">
             {tab === 'plan'
               ? 'Auto-sequence use cases by priority score within quarterly budget caps. Drag cards to adjust.'
-              : 'BCG Drei-Horizonte-Modell — die strategische Ebene über dem Quartalsplan.'}
+              : tab === 'horizonte'
+              ? 'BCG Drei-Horizonte-Modell — die strategische Ebene über dem Quartalsplan.'
+              : 'Vom Einzelfall zum Portfolio — Abhängigkeiten, Priorisierung, Verbindlichkeit.'}
           </p>
         </div>
         {tab === 'plan' && (
@@ -341,6 +582,7 @@ export default function RoadmapPage() {
         {([
           { id: 'plan', label: '📅 Quartalsplan' },
           { id: 'horizonte', label: '🧭 Strategische Horizonte' },
+          { id: 'portfolio', label: '🧩 Portfolio & Priorisierung' },
         ] as const).map((t) => (
           <button
             key={t.id}
@@ -355,6 +597,7 @@ export default function RoadmapPage() {
       </div>
 
       {tab === 'horizonte' && <HorizonTool useCases={useCases} navigate={navigate} />}
+      {tab === 'portfolio' && <PortfolioTab />}
 
       {tab === 'plan' && (
       <>

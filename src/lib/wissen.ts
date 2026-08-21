@@ -26,6 +26,13 @@ import { DIMS } from '../pages/MaturityPage'
 import { ROLES as COE_ROLLEN, ISO_REQUIREMENTS } from '../pages/RolesPage'
 import { INTEGRITY_MECHANISMS, VERSIONING_PRINCIPLES } from '../pages/DataGovernancePage'
 import { VERGESSENE_POSTEN } from '../pages/ProjectPlanPage'
+import {
+  ABHAENGIGKEITSARTEN, PRIORISIERUNGS_FRAGEN, VERBINDLICHKEITSSTUFEN,
+  REIFEGRAD_TEMPO, ROADMAP_PRUEFFRAGEN, HORIZONS,
+} from '../pages/RoadmapPage'
+import {
+  ZUSAMMENSCHLUSS_WEGE, PROZESS_KANDIDATEN, ZUSAMMENSCHLUSS_REGELN,
+} from '../pages/ChangeManagementPage'
 import { SCHWELLE_FRAGEN } from '../components/assessments/SchwellenwertCheck'
 import { SIGNAL_ERKLAERUNG, SIGNAL_QUELLEN, ENTSCHEIDUNG_LABEL } from './signale'
 
@@ -401,6 +408,82 @@ function bauen(): WissenStueck[] {
         + 'erscheint später als Budgetüberschreitung.',
     })
   }
+
+  // ── Roadmap: vom Einzelfall zum Portfolio ──────────────────────────────
+  const portfolio = (titel: string, quelle: string, text: string) =>
+    stuecke.push({ titel, quelle: `Roadmap · ${quelle}`, pfad: '/roadmap?tab=portfolio', text })
+
+  for (const a of ABHAENGIGKEITSARTEN) {
+    portfolio(`Abhängigkeit: ${a.art}`, 'Abhängigkeiten', `${a.frage} Konsequenz: ${a.konsequenz}`)
+  }
+  for (const f of PRIORISIERUNGS_FRAGEN) {
+    portfolio(`Priorisierungsfrage: ${f.frage}`, 'Priorisierung', f.zweck)
+  }
+  for (const s of VERBINDLICHKEITSSTUFEN) {
+    portfolio(`Verbindlichkeitsstufe: ${s.stufe}`, 'Roadmap-Stufen',
+      // Bewusst nicht "Horizont" im Titel — das Wort ist für das
+      // BCG-Modell (Deploy/Reshape/Invent, Zeithorizont) belegt.
+      `${s.verbindlichkeit} Inhalt: ${s.inhalt}. Nicht zu verwechseln mit den strategischen `
+      + `Horizonten (Deploy/Reshape/Invent) — die messen den Zeithorizont eines Vorhabens, `
+      + 'diese Stufe misst seine Verbindlichkeit.')
+  }
+  for (const r of REIFEGRAD_TEMPO) {
+    portfolio(`Reifegrad-Gate: ${r.wennGilt}`, 'Reifegrad bestimmt Tempo', r.gehoertDarauf)
+  }
+  stuecke.push({
+    titel: 'Fünf Prüffragen an eine fertige Roadmap',
+    quelle: 'Roadmap · Prüffragen',
+    pfad: '/roadmap?tab=portfolio',
+    text: ROADMAP_PRUEFFRAGEN.join(' · '),
+  })
+  for (const h of HORIZONS) {
+    stuecke.push({
+      titel: `Strategischer Horizont: ${h.label}`,
+      quelle: 'Roadmap · Strategische Horizonte (BCG)',
+      pfad: '/roadmap?tab=horizonte',
+      // "Horizont" hier: Zeitraum bis zur Wirkung (Deploy/Reshape/Invent) —
+      // nicht zu verwechseln mit der Verbindlichkeitsstufe oben.
+      text: `${h.titel} (${h.zeitraum}). ${h.body} Nicht zu verwechseln mit den `
+        + 'Verbindlichkeitsstufen Beschlossen/Vorbereitet/Beobachtet — die messen, wie fest '
+        + 'ein Vorhaben zugesagt ist, nicht seinen Zeithorizont.',
+    })
+  }
+
+  // ── Change Management: Zusammenschluss ─────────────────────────────────
+  const zs = (titel: string, quelle: string, text: string) =>
+    stuecke.push({ titel, quelle: `Change · Zusammenschluss · ${quelle}`, pfad: '/change?tab=zusammenschluss', text })
+
+  for (const w of ZUSAMMENSCHLUSS_WEGE) {
+    zs(`Organisationsweg: ${w.weg}`, 'Organisationsstruktur', `${w.passiert} Preis: ${w.preis}`)
+  }
+  for (const p of PROZESS_KANDIDATEN) {
+    zs(`Prozesskandidat: ${p.stelle}`, 'Prozessanalyse', `${p.frage} ${p.hinweis}`)
+  }
+  for (const r of ZUSAMMENSCHLUSS_REGELN) {
+    zs(`Handlungsregel: ${r.regel}`, 'Handlungsregeln', r.text)
+  }
+  zs(
+    'Forschungsbefund zu Übernahmen',
+    'Evidenzlage',
+    'Eine Metaanalyse im Strategic Management Journal (King, Dalton, Daily & Covin, 2004) findet im '
+    + 'Mittel keine Leistungsverbesserung durch Übernahmen und keine verlässlichen Erfolgsfaktoren. '
+    + 'Angemessen ist deshalb eine Roadmap mit Entscheidungspunkten statt Endzuständen.',
+  )
+  zs(
+    'Kulturunterschiede bei Zusammenschlüssen',
+    'Kultur',
+    'Eine Metaanalyse in Organization Science (Stahl & Voigt, 2008; 46 Studien, über 10.000 '
+    + 'Zusammenschlüsse) zeigt: Kulturelle Unterschiede wirken sich nicht durchgängig negativ aus. '
+    + 'Entscheidend ist nicht der Abstand zwischen den Kulturen, sondern wie mit ihm umgegangen wird '
+    + '— nur dort harmonisieren, wo es tatsächlich kollidiert.',
+  )
+  zs(
+    'Schatten-KI-Nutzung im Zusammenschluss',
+    'Nutzungswirklichkeit',
+    'Eine Studie mit über 48.000 Befragten in 47 Ländern (Melbourne/KPMG, 2025): 57 % verbergen ihre '
+    + 'KI-Nutzung, fast die Hälfte nutzt KI entgegen Richtlinien, nur 40 % kennen eine Richtlinie dazu. '
+    + 'Veränderungsarbeit ist deshalb Regel- und Befähigungsarbeit, keine Überzeugungsarbeit.',
+  )
 
   // ── Schwellenwert & Aufsicht ───────────────────────────────────────────
   for (const f of SCHWELLE_FRAGEN) {

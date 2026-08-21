@@ -572,10 +572,220 @@ function StoryKpiTab() {
   )
 }
 
+// ── Zwei Häuser, ein System — Veränderung im Zusammenschluss ─────────────
+//
+// Eigener Reiter statt Erweiterung von „Story & KPIs": Die Fragestellung
+// ist eine andere — nicht „wie führe ich KI in einer Organisation ein",
+// sondern „welche Organisation entsteht, wenn zwei zusammengeführt
+// werden". Dieselbe Grunddisziplin (Widerstand, Vertrauen, Kommunikation),
+// aber mit einer zusätzlichen Achse: zwei bestehende Antworten, nicht nur
+// eine fehlende.
+
+export const ZUSAMMENSCHLUSS_WEGE = [
+  {
+    weg: 'Übernahme',
+    passiert: 'Die Struktur des größeren Hauses gilt fort, das kleinere passt sich an',
+    preis: 'Schnell und eindeutig. Das übernommene Haus verliert seine Fachleute, weil deren Wissen an die alte Struktur gebunden war',
+  },
+  {
+    weg: 'Nebeneinander',
+    passiert: 'Beide Strukturen bleiben zunächst bestehen, Zusammenführung später',
+    preis: 'Vermeidet Konflikt und erzeugt ihn nur zeitversetzt. Doppelte Kosten, doppelte Werkzeuge — und die Entscheidung wird schwerer, je länger beide laufen',
+  },
+  {
+    weg: 'Neubau',
+    passiert: 'Eine dritte Struktur, die aus beiden das Bessere übernimmt',
+    preis: 'Sachlich meist richtig, politisch am teuersten. Verlangt, dass beide Seiten etwas aufgeben — und braucht eine Leitung, die das durchhält',
+  },
+]
+
+export const PROZESS_KANDIDATEN = [
+  {
+    stelle: 'Medienbrüche',
+    frage: 'Wo wird etwas ausgedruckt, abfotografiert, abgetippt oder aus einem System in ein anderes übertragen?',
+    hinweis: 'Jeder Bruch kostet Zeit und erzeugt Fehler.',
+  },
+  {
+    stelle: 'Wartezeiten',
+    frage: 'Wo liegt ein Vorgang, ohne dass jemand daran arbeitet?',
+    hinweis: 'Meist wartet er auf eine Auskunft, eine Freigabe oder eine Person.',
+  },
+  {
+    stelle: 'Wiederholte Einzelfallentscheidungen',
+    frage: 'Wo entscheidet jemand hundertmal im Monat nach denselben Kriterien?',
+    hinweis: 'Der klassische Kandidat — und zugleich der, bei dem zuerst die Frage nach dem Freigabe-Gate steht.',
+  },
+  {
+    stelle: 'Rückfragen',
+    frage: 'Wo muss regelmäßig nachgefragt werden, weil eine Information fehlt oder unverständlich ist?',
+    hinweis: 'Deutet auf eine Lücke weiter vorn im Ablauf.',
+  },
+  {
+    stelle: 'Doppelt gelöst (im Zusammenschluss)',
+    frage: 'Wo ist derselbe Vorgang auf beiden Seiten verschieden gelöst?',
+    hinweis: 'Vor der Entscheidung, welche Lösung bleibt: warum sind sie unterschiedlich? Oft steckt eine Anforderung dahinter, die auf der anderen Seite nicht bekannt war.',
+  },
+]
+
+export const ZUSAMMENSCHLUSS_REGELN = [
+  {
+    regel: 'Nicht harmonisieren, was nicht kollidiert',
+    text: 'Führe die Stellen auf, an denen zwei Arbeitsweisen wirklich unvereinbar sind. Meist sind es weniger, als das Projektbüro annimmt.',
+  },
+  {
+    regel: 'Gleiche Regeln, ungleiche Begleitung',
+    text: 'Die Richtlinie gilt überall gleich. Wie sie eingeführt wird, richtet sich nach der Ausgangslage vor Ort — und die ist messbar verschieden.',
+  },
+  {
+    regel: 'Erst Richtlinie, dann Befähigung, dann Werkzeug',
+    text: 'Die übliche Reihenfolge ist umgekehrt und erzeugt genau die Zahlen, die verbergen und regelwidrig nutzen.',
+  },
+  {
+    regel: 'Übersetzen heißt nicht dolmetschen',
+    text: 'Eine wörtlich übertragene Richtlinie mit fremden Beispielen wirkt an einem anderen Standort wie eine Zusendung aus der Zentrale. Die Regel bleibt, die Beispiele kommen von dort.',
+  },
+  {
+    regel: 'Das erste sichtbare Vorhaben leitet jemand aus dem übernommenen Haus',
+    text: 'Keine Botschaft über Augenhöhe ersetzt diese eine Personalentscheidung.',
+  },
+]
+
+function ZusammenschlussTab() {
+  return (
+    <div className="space-y-5">
+      <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-red-700 rounded-r-xl px-5 py-4 text-sm text-slate-700 leading-relaxed">
+        <strong>Es gibt keinen belegten Bauplan für eine gelungene Zusammenführung.</strong> Eine
+        Metaanalyse im <em>Strategic Management Journal</em> findet im Mittel keine
+        Leistungsverbesserung durch Übernahmen — und keine verlässlichen Erfolgsfaktoren. Angemessen
+        ist deshalb eine Roadmap, die <strong>Entscheidungspunkte statt Endzustände</strong> festlegt
+        und nach jedem Punkt neu bewertet.
+        <span className="block text-xs text-slate-500 mt-1">
+          King, Dalton, Daily &amp; Covin — Meta-analyses of post-acquisition performance,
+          Strategic Management Journal 25(2), 2004. Die verbreitete Zahl „70–90 % scheitern" steht
+          hier bewusst nicht — ihre empirische Grundlage ist schwächer als ihre Verbreitung.
+        </span>
+      </div>
+
+      {/* Organisationsstruktur */}
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="px-5 py-3 bg-slate-800">
+          <p className="text-[11px] font-mono tracking-widest text-slate-400 uppercase">Organisationsstruktur</p>
+          <h3 className="text-sm font-bold text-white">Nicht das Organigramm entscheidet, sondern wer entscheiden darf</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                <th className="text-left py-2.5 px-4 font-semibold text-slate-500">Weg</th>
+                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">Was passiert</th>
+                <th className="text-left py-2.5 px-3 font-semibold text-slate-500">Preis</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {ZUSAMMENSCHLUSS_WEGE.map((w) => (
+                <tr key={w.weg} className="hover:bg-slate-50 transition-colors">
+                  <td className="py-3 px-4 font-bold text-slate-700">{w.weg}</td>
+                  <td className="py-3 px-3 text-slate-600">{w.passiert}</td>
+                  <td className="py-3 px-3 text-slate-500">{w.preis}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-5 py-3 border-t border-slate-100 text-xs text-slate-500 leading-relaxed">
+          <strong>Die Frage vor dem Organigramm:</strong> Bei welchen Entscheidungen soll künftig
+          einheitlich verfahren werden, und bei welchen darf es zwei Antworten geben? Prüfstein: drei
+          reale Streitfälle der letzten Monate — wer hätte sie in der neuen Struktur entschieden?
+          Bleibt die Antwort unklar, ist die Struktur noch nicht tragfähig.
+        </div>
+      </div>
+
+      {/* Prozessanalyse */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+        <div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Prozessanalyse</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Wo KI hingehört, zeigt der Prozess — nicht der Werkzeugkatalog. Die häufigste Reihenfolge
+            ist die falsche: erst ein Werkzeug auswählen, dann einen Anwendungsfall dafür suchen.
+          </p>
+        </div>
+        <div className="space-y-2">
+          {PROZESS_KANDIDATEN.map((p, i) => (
+            <div key={p.stelle} className="flex gap-3 border border-slate-100 rounded-lg px-3 py-2.5 bg-slate-50">
+              <span className="w-6 h-6 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-800">{p.stelle}</p>
+                <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{p.frage}</p>
+                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{p.hinweis}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Kulturunterschiede */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-2">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kulturunterschiede sind nicht das Problem — der Umgang mit ihnen ist es</p>
+        <p className="text-sm text-slate-700 leading-relaxed">
+          Eine Metaanalyse in <em>Organization Science</em> (46 Studien, über 10.000 Zusammenschlüsse)
+          widerspricht der verbreiteten Annahme: Kulturelle Unterschiede wirken sich nicht durchgängig
+          negativ aus — sie können ebenso eine Quelle von Wertschöpfung sein. Entscheidend ist nicht
+          der Abstand zwischen den Kulturen, sondern die Art, wie mit ihm umgegangen wird.
+        </p>
+        <p className="text-xs text-slate-500 leading-relaxed">
+          Praktische Folge: Das Ziel ist nicht, zwei Kulturen anzugleichen — sondern nur dort eine
+          gemeinsame Regel zu setzen, wo sie tatsächlich kollidieren. Wer flächendeckend
+          harmonisiert, erzeugt Widerstand an Stellen ohne echten Konflikt und verbraucht dafür das
+          Vertrauen, das er an den echten Konfliktstellen bräuchte.
+        </p>
+        <p className="text-[11px] text-slate-400">Stahl &amp; Voigt — Organization Science 19(1), 2008.</p>
+      </div>
+
+      {/* Der eigentliche Befund */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 space-y-2">
+        <p className="text-sm font-bold text-amber-900">Die Nutzung findet längst statt, die Regel fehlt</p>
+        <p className="text-xs text-amber-900 leading-relaxed">
+          Eine internationale Studie mit über 48.000 Befragten in 47 Ländern: 57 % verbergen ihre
+          KI-Nutzung und geben maschinell erzeugte Arbeit als eigene aus. Fast die Hälfte nutzt KI
+          entgegen den Richtlinien des Hauses. Zugleich haben nur 47 % eine Schulung erhalten, nur
+          40 % kennen eine Richtlinie dazu. Veränderungsarbeit ist hier keine Überzeugungsarbeit — die
+          Nutzung findet längst statt. Sie ist Regel- und Befähigungsarbeit.
+        </p>
+        <p className="text-[11px] text-amber-700">
+          Gillespie, Lockey, Ward, Macdade &amp; Hassed — University of Melbourne &amp; KPMG, 2025
+          (n = 48.340). Mitfinanziert von einem Beratungshaus — die Größenordnungen sind belastbar,
+          die Doppelrolle gehört bei jeder Zitierung dazu.
+        </p>
+      </div>
+
+      {/* Handlungsregeln */}
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="px-5 py-3 bg-slate-800 text-white">
+          <p className="text-sm font-bold">Fünf Sätze für die Veränderungsarbeit im Zusammenschluss</p>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {ZUSAMMENSCHLUSS_REGELN.map((r) => (
+            <div key={r.regel} className="px-5 py-3">
+              <p className="text-sm font-semibold text-slate-800">{r.regel}</p>
+              <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{r.text}</p>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 py-3 border-t border-slate-100 text-xs text-slate-500 leading-relaxed">
+          Was hier bewusst fehlt, sind die Stufenmodelle der Veränderungsführung (Kotter, ADKAR — siehe
+          vorherige Reiter). Sie beschreiben einen Wandel, den jemand auslöst und steuert. Ein
+          Zusammenschluss ist ein Wandel, der beiden Seiten gleichzeitig widerfährt — Dringlichkeit
+          muss dabei niemand erzeugen. Die knappe Größe ist nicht Aufmerksamkeit, sondern Vertrauen.
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────
 
 export default function ChangeManagementPage() {
-  const [tab, setTab] = useState<'diagnose' | 'modelle' | 'widerstand' | 'story'>('diagnose')
+  const [tab, setTab] = useState<'diagnose' | 'modelle' | 'widerstand' | 'story' | 'zusammenschluss'>('diagnose')
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -595,6 +805,7 @@ export default function ChangeManagementPage() {
           { id: 'modelle',    label: '🎯 ADKAR-Diagnose' },
           { id: 'widerstand', label: '🛡️ Widerstände' },
           { id: 'story',      label: '📖 Story & KPIs' },
+          { id: 'zusammenschluss', label: '🤝 Zusammenschluss' },
         ] as const).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
@@ -607,6 +818,7 @@ export default function ChangeManagementPage() {
       {tab === 'widerstand' && <WiderstaendeTab />}
       {tab === 'modelle' && <ModelleTab />}
       {tab === 'story' && <StoryKpiTab />}
+      {tab === 'zusammenschluss' && <ZusammenschlussTab />}
     </div>
   )
 }
